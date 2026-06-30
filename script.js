@@ -1,5 +1,5 @@
 const whatsappUrl =
-  "https://wa.me/622112345678?text=Halo%20MOTOVAX%2C%20saya%20ingin%20jadwalkan%20demo.";
+  "https://wa.me/6281999197186?text=Halo%20MOTOVAX%2C%20saya%20ingin%20jadwalkan%20demo.";
 
 for (const el of document.querySelectorAll("[data-year]")) {
   el.textContent = String(new Date().getFullYear());
