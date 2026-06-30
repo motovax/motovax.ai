@@ -1,0 +1,9 @@
+{
+  "name": "motovax-ai-landing",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "python -m http.server 5179",
+    "start": "python -m http.server 5179"
+  }
+}
