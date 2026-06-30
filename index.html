@@ -78,93 +78,125 @@
             </div>
           </div>
 
-          <div class="hero-visual" aria-label="Dashboard overview MOTOVAX">
-            <div class="dashboard hero-dashboard">
-              <aside class="dash-sidebar">
-                <div class="mini-brand"><span>MOTO</span><strong>VAX</strong></div>
-                <a class="active">Overview</a>
-                <a>Leads</a>
-                <a>Chat Center</a>
-                <a>Inventory</a>
-                <a>Deals</a>
-                <a>Customers</a>
-                <a>Campaigns</a>
-                <a>Reports</a>
-                <a>Settings</a>
-              </aside>
-              <div class="dash-main">
-                <div class="dash-top">
-                  <strong>Dashboard Overview</strong>
-                  <div class="dash-controls">
-                    <span>Periode: 30 Hari Terakhir</span>
-                    <i></i>
-                    <b></b>
-                  </div>
+          <div class="hero-visual" aria-label="Mockup dashboard Sales Trend MOTOVAX">
+            <div class="trend-mockup">
+              <div class="trend-topbar">
+                <div>
+                  <div class="trend-breadcrumb">Dashboard / Analytics / Sales Trend</div>
+                  <strong>Sales Trend</strong>
+                  <span>Ringkasan unit terjual, revenue, gross profit, dan funnel konversi.</span>
                 </div>
-                <div class="kpi-row">
-                  <div class="kpi">
-                    <small>Total Leads</small>
-                    <strong>1.248</strong>
-                    <span>+20%</span>
-                  </div>
-                  <div class="kpi">
-                    <small>Hot Prospects</small>
-                    <strong>312</strong>
-                    <span>+32%</span>
-                  </div>
-                  <div class="kpi">
-                    <small>Units Sold</small>
-                    <strong>86</strong>
-                    <span>+41%</span>
-                  </div>
-                  <div class="kpi">
-                    <small>Revenue (Est.)</small>
-                    <strong>Rp 2,48M</strong>
-                    <span>+35%</span>
-                  </div>
+                <div class="trend-actions">
+                  <button>MTD</button>
+                  <button>QTD</button>
+                  <button class="active">YTD</button>
+                  <button>Daily</button>
                 </div>
-                <div class="dash-grid">
-                  <div class="panel funnel-panel">
-                    <div class="panel-title">Lead Funnel</div>
-                    <div class="funnel" aria-hidden="true">
-                      <span></span><span></span><span></span><span></span>
+              </div>
+
+              <div class="trend-stat-grid">
+                <article class="trend-stat">
+                  <i class="trend-icon indigo">U</i>
+                  <div><small>Unit Terjual Bulan Ini</small><b>86</b></div>
+                  <em>+41%</em>
+                </article>
+                <article class="trend-stat">
+                  <i class="trend-icon blue">L</i>
+                  <div><small>Leads Bulan Ini</small><b>1.248</b></div>
+                  <em>+20%</em>
+                </article>
+                <article class="trend-stat">
+                  <i class="trend-icon slate">R</i>
+                  <div><small>Revenue Bulan Ini</small><b>Rp 2,48M</b></div>
+                  <em>+35%</em>
+                </article>
+                <article class="trend-stat">
+                  <i class="trend-icon green">GP</i>
+                  <div><small>Laba Kotor</small><b>Rp 412Jt</b></div>
+                  <em>+18%</em>
+                </article>
+                <article class="trend-stat">
+                  <i class="trend-icon red">H</i>
+                  <div><small>HPP Bulan Ini</small><b>Rp 2,06M</b></div>
+                  <em class="down">-6%</em>
+                </article>
+                <article class="trend-stat">
+                  <i class="trend-icon green">%</i>
+                  <div><small>Margin Kotor</small><b>16.6%</b></div>
+                  <em>+2.4pp</em>
+                </article>
+              </div>
+
+              <div class="trend-main-grid">
+                <section class="trend-panel trend-profit">
+                  <div class="trend-panel-head">
+                    <div>
+                      <b>Tren Laba Kotor</b>
+                      <span>Revenue dipecah menjadi HPP dan Laba Kotor - YTD.</span>
                     </div>
-                    <div class="funnel-meta">
-                      <p><b>Leads Baru</b><span>1.248</span></p>
-                      <p><b>Prospek</b><span>312</span></p>
-                      <p><b>Negosiasi</b><span>156</span></p>
-                      <p><b>Deal Won</b><span>86</span></p>
-                    </div>
+                    <div class="trend-legend"><i></i> HPP <i></i> Laba Kotor</div>
                   </div>
-                  <div class="panel donut-panel">
-                    <div class="panel-title">Omnichannel Breakdown</div>
-                    <div class="donut-wrap">
-                      <div class="donut"></div>
-                      <ul>
-                        <li><i class="wa"></i>WhatsApp <b>45%</b></li>
-                        <li><i class="web"></i>Website <b>25%</b></li>
-                        <li><i class="ig"></i>Instagram <b>15%</b></li>
-                        <li><i class="fb"></i>Facebook <b>10%</b></li>
-                        <li><i class="tel"></i>Telepon <b>5%</b></li>
-                      </ul>
-                    </div>
+                  <div class="stacked-bars" aria-hidden="true">
+                    <span style="--cogs:64%;--gp:22%"></span>
+                    <span style="--cogs:58%;--gp:28%"></span>
+                    <span style="--cogs:68%;--gp:25%"></span>
+                    <span style="--cogs:54%;--gp:34%"></span>
+                    <span style="--cogs:71%;--gp:24%"></span>
+                    <span style="--cogs:60%;--gp:38%"></span>
                   </div>
-                  <div class="panel chart-panel">
-                    <div class="panel-title">Trend Performa</div>
-                    <svg viewBox="0 0 420 120" role="img" aria-label="Trend leads dan deal">
-                      <path d="M8 82 45 70 82 88 119 58 156 74 193 40 230 54 267 28 304 44 341 70 378 62 412 42" fill="none" stroke="#1967f2" stroke-width="5" stroke-linecap="round" />
-                      <path d="M8 102 45 92 82 96 119 82 156 90 193 66 230 78 267 58 304 70 341 86 378 80 412 65" fill="none" stroke="#ff3f45" stroke-width="4" stroke-linecap="round" />
-                    </svg>
+                  <div class="trend-summary">
+                    <p><small>Total Revenue</small><b>Rp 14,8M</b></p>
+                    <p><small>Total HPP</small><b class="red">Rp 11,9M</b></p>
+                    <p><small>Total Laba Kotor</small><b class="green">Rp 2,9M</b></p>
                   </div>
-                  <div class="panel response-panel">
-                    <div class="panel-title">Response Time (Avg.)</div>
-                    <strong>00:01:28</strong>
-                    <span>+60% lebih cepat</span>
-                    <svg viewBox="0 0 160 42" aria-hidden="true">
-                      <path d="M2 28 16 20 29 30 44 12 59 23 75 18 90 32 105 10 121 24 139 18 158 22" fill="none" stroke="#1967f2" stroke-width="4" stroke-linecap="round" />
-                    </svg>
+                </section>
+
+                <section class="trend-panel branch-panel">
+                  <div class="trend-panel-head compact">
+                    <b>Revenue per Cabang</b>
+                    <span>Jun 2026</span>
                   </div>
-                </div>
+                  <div class="branch-bars">
+                    <p><span>CINERE</span><b>4.2M</b><i style="--w:92%"></i></p>
+                    <p><span>BINTARO</span><b>3.1M</b><i style="--w:74%"></i></p>
+                    <p><span>BEKASI</span><b>2.6M</b><i style="--w:62%"></i></p>
+                    <p><span>BSD</span><b>1.8M</b><i style="--w:46%"></i></p>
+                  </div>
+                </section>
+              </div>
+
+              <div class="trend-bottom-grid">
+                <section class="trend-panel inventory-panel">
+                  <div class="trend-panel-head compact">
+                    <b>Kesehatan Inventori</b>
+                    <span>Distribusi usia stok</span>
+                  </div>
+                  <div class="inventory-strip">
+                    <span style="--w:42%;--c:#10b981"></span>
+                    <span style="--w:28%;--c:#f59e0b"></span>
+                    <span style="--w:18%;--c:#f97316"></span>
+                    <span style="--w:12%;--c:#ef4444"></span>
+                  </div>
+                  <div class="inventory-meta">
+                    <p><small>Total Unit</small><b>1.247</b></p>
+                    <p><small>Nilai Stok</small><b>86.4M</b></p>
+                    <p><small>Avg Days</small><b>38 hr</b></p>
+                  </div>
+                </section>
+
+                <section class="trend-panel conversion-panel">
+                  <div class="trend-panel-head compact">
+                    <b>Funnel Konversi</b>
+                    <span>Apr 2026 - Sekarang</span>
+                  </div>
+                  <div class="conversion-flow">
+                    <div><b>8.420</b><span>Total Leads</span></div>
+                    <i>24%</i>
+                    <div><b>2.021</b><span>Total Booking</span></div>
+                    <i>42%</i>
+                    <div><b>848</b><span>Unit Terjual</span></div>
+                  </div>
+                </section>
               </div>
             </div>
           </div>
