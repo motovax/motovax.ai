@@ -13,6 +13,51 @@ for (const link of document.querySelectorAll("[data-wa]")) {
   }
 }
 
+class PublicDemoDataBridge {
+  constructor() {
+    this.baseUrl = "https://mobix.motovax.com/api/public/demo/motovax-ai";
+    this.snapshotPromise = null;
+    this.sessionId = localStorage.getItem("motovax_demo_session_id");
+    if (!this.sessionId) {
+      this.sessionId = crypto.randomUUID();
+      localStorage.setItem("motovax_demo_session_id", this.sessionId);
+    }
+  }
+
+  async snapshot(force = false) {
+    if (!this.snapshotPromise || force) {
+      this.snapshotPromise = fetch(`${this.baseUrl}/snapshot`, {
+        headers: { Accept: "application/json" },
+      }).then(async (response) => {
+        if (!response.ok) throw new Error("Data tenant demo belum dapat dimuat.");
+        return response.json();
+      });
+    }
+    return this.snapshotPromise;
+  }
+
+  async submit(kind, payload = {}) {
+    const response = await fetch(`${this.baseUrl}/actions`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Accept: "application/json" },
+      body: JSON.stringify({
+        request_id: crypto.randomUUID(),
+        session_id: this.sessionId,
+        kind,
+        ...payload,
+      }),
+    });
+    if (!response.ok) {
+      const body = await response.json().catch(() => ({}));
+      throw new Error(body.message || "Aksi belum dapat disimpan ke tenant demo.");
+    }
+    this.snapshotPromise = null;
+    return response.json();
+  }
+}
+
+const publicDemoData = new PublicDemoDataBridge();
+
 const inventoryDemoSeed = [
   {
     id: "unit-001",
@@ -209,12 +254,13 @@ const inventoryDemoSeed = [
 class InventoryProductDemo {
   constructor(root) {
     this.root = root;
-    this.units = inventoryDemoSeed.map((unit) => ({ ...unit }));
+    this.units = [];
     this.status = "ALL";
     this.branch = "ALL";
     this.query = "";
     this.sort = "newest";
     this.selectedId = null;
+    this.dataError = "";
     this.lastFocusedElement = null;
     this.hasOpenedGuide = false;
 
@@ -233,6 +279,38 @@ class InventoryProductDemo {
 
     this.bind();
     this.render();
+    this.loadTenantData();
+  }
+
+  async loadTenantData(force = false) {
+    try {
+      const snapshot = await publicDemoData.snapshot(force);
+      this.dataError = "";
+      this.units = snapshot.inventory.map((unit) => ({
+        id: unit.id,
+        brand: unit.brand,
+        type: unit.type,
+        plate: "Unit Demo",
+        year: unit.year,
+        color: unit.color,
+        transmission: this.titleCase(unit.transmission || "Automatic"),
+        odometer: unit.odometer,
+        branch: unit.branch || "Demo Jakarta",
+        position: unit.position || unit.branch || "Showroom Demo",
+        status: String(unit.status).toUpperCase().includes("READY") ? "UNIT READY" : unit.status,
+        buyingPrice: null,
+        cashPrice: unit.cash_price,
+        creditPrice: unit.credit_price,
+        aging: unit.aging,
+        source: "Inventory tenant demo",
+        photos: 0,
+      }));
+      this.render();
+    } catch (error) {
+      this.units = [];
+      this.dataError = error.message;
+      this.render();
+    }
   }
 
   bind() {
@@ -317,6 +395,7 @@ class InventoryProductDemo {
       this.openGuide();
       this.hasOpenedGuide = true;
     }
+    this.loadTenantData(true);
   }
 
   close() {
@@ -350,11 +429,11 @@ class InventoryProductDemo {
   }
 
   reset() {
-    this.units = inventoryDemoSeed.map((unit) => ({ ...unit }));
     this.selectedId = null;
     this.closeDetail();
     this.toast.hidden = true;
     this.clearFilters();
+    this.loadTenantData(true);
   }
 
   getVisibleUnits() {
@@ -379,7 +458,8 @@ class InventoryProductDemo {
     this.renderFilters();
     this.renderTable(visibleUnits);
     this.renderMobileList(visibleUnits);
-    this.resultCount.textContent = `${visibleUnits.length} dari ${this.units.length} unit ditampilkan`;
+    this.resultCount.textContent = this.dataError ||
+      `${visibleUnits.length} dari ${this.units.length} unit ditampilkan`;
     this.emptyState.hidden = visibleUnits.length > 0;
   }
 
@@ -422,7 +502,7 @@ class InventoryProductDemo {
               </div>
             </td>
             <td><span class="demo-plate">${unit.plate}</span></td>
-            <td><div class="demo-cell-stack"><b>${this.formatCompactPrice(unit.buyingPrice)}</b><span>Modal awal</span></div></td>
+            <td><div class="demo-cell-stack"><b>${unit.buyingPrice ? this.formatCompactPrice(unit.buyingPrice) : "Privat"}</b><span>${unit.buyingPrice ? "Modal awal" : "Tidak ditampilkan"}</span></div></td>
             <td><div class="demo-cell-stack"><b class="price">${this.formatCompactPrice(unit.cashPrice)}</b><span>Kredit ${this.formatCompactPrice(unit.creditPrice)}</span></div></td>
             <td><div class="demo-cell-stack"><b>${unit.odometer.toLocaleString("id-ID")} KM</b><span class="demo-aging ${unit.aging >= 60 ? "high" : ""}">${unit.aging} hari di stok</span></div></td>
             <td><div class="demo-cell-stack"><b>${this.titleCase(unit.branch)}</b><span>${unit.position}</span></div></td>
@@ -516,13 +596,29 @@ class InventoryProductDemo {
     this.detailBackdrop.hidden = true;
   }
 
-  bookSelectedUnit() {
+  async bookSelectedUnit() {
     const unit = this.units.find((item) => item.id === this.selectedId);
     if (!unit || unit.status !== "UNIT READY") return;
-    unit.status = "BOOKED";
-    this.populateDetail(unit);
-    this.render();
-    this.toast.hidden = false;
+    this.bookingButton.disabled = true;
+    this.bookingButton.textContent = "Menyimpan ke tenant demo…";
+    try {
+      await publicDemoData.submit("inventory_interest", {
+        unit_id: unit.id,
+        unit_interest: `${unit.brand} ${unit.type} ${unit.year}`,
+      });
+      unit.status = "BOOKED";
+      this.populateDetail(unit);
+      this.render();
+      this.toast.querySelector("b").textContent = "Minat unit tersimpan";
+      this.toast.querySelector("p").textContent = "Lead baru dapat dilihat dari tenant demo di MotoVax App.";
+      this.toast.hidden = false;
+    } catch (error) {
+      this.bookingButton.disabled = false;
+      this.bookingButton.textContent = "Booking unit ini";
+      this.toast.querySelector("b").textContent = "Belum berhasil disimpan";
+      this.toast.querySelector("p").textContent = error.message;
+      this.toast.hidden = false;
+    }
   }
 
   statusClass(status) {
@@ -1076,9 +1172,25 @@ class AutopilotCRMDemo {
     this.root.querySelector("[data-crm-send-followup]").focus();
   }
 
-  sendFollowup() {
+  async sendFollowup() {
     const lead = this.leads.find((item) => item.id === this.selectedId);
     if (!lead || lead.followedUp) return;
+    const sendButton = this.root.querySelector("[data-crm-send-followup]");
+    sendButton.disabled = true;
+    sendButton.textContent = "Menyimpan ke tenant demo…";
+    try {
+      await publicDemoData.submit("crm_followup", {
+        message: lead.message,
+        unit_interest: lead.unit,
+      });
+    } catch (error) {
+      sendButton.disabled = false;
+      sendButton.textContent = "Kirim simulasi";
+      this.toast.querySelector("b").textContent = "Follow-up belum tersimpan";
+      this.toast.querySelector("p").textContent = error.message;
+      this.toast.hidden = false;
+      return;
+    }
     const nextStage = { cold: "warm", warm: "hot", hot: "prospect", prospect: "prospect" };
     const oldScore = lead.score;
     lead.stage = nextStage[lead.stage];
@@ -1090,14 +1202,14 @@ class AutopilotCRMDemo {
     lead.recommendation = "Hubungi secara personal untuk mengunci jadwal test drive.";
     lead.events.unshift(
       { icon: "✓", title: "Lead merespons positif (simulasi)", detail: "Stage dan skor diperbarui", time: "baru saja" },
-      { icon: "AI", title: "Follow-up AI dikirim (simulasi)", detail: "Tidak ada pesan nyata", time: "baru saja" },
+      { icon: "AI", title: "Follow-up AI dicatat", detail: "Tersimpan di tenant demo; tidak dikirim ke channel nyata", time: "baru saja" },
     );
     this.mobileStage = lead.stage;
     this.render();
     this.populateDetail(lead);
     this.toast.querySelector("b").textContent = `Lead naik menjadi ${crmStageConfig[lead.stage].label}`;
     this.toast.querySelector("p").textContent =
-      `Skor ${lead.name} berubah ${oldScore} → ${lead.score} dan forecast diperbarui.`;
+      `Skor ${lead.name} berubah ${oldScore} → ${lead.score}; aktivitas tercatat di tenant demo.`;
     this.toast.hidden = false;
   }
 
@@ -1535,7 +1647,7 @@ class OmnichannelAIDemo {
     }
   }
 
-  runPrompt(message) {
+  async runPrompt(message) {
     const text = message.trim().slice(0, 500);
     if (!text) return;
     this.closeGuide();
@@ -1558,7 +1670,28 @@ class OmnichannelAIDemo {
 
     if (result.trace.blocked) {
       this.toast.hidden = false;
+      return;
     }
+
+    try {
+      await publicDemoData.submit("chat_message", {
+        message: text,
+        unit_interest: this.extractUnitInterest(text),
+      });
+      this.trace.effect = "stored_demo";
+      this.trace.tool = "lead.capture · tenant demo";
+      this.trace.grounding = "Pesan tersimpan terisolasi dan dapat dilihat dari MotoVax App.";
+      this.renderTrace();
+    } catch (error) {
+      this.toast.querySelector("b").textContent = "Pesan belum tersimpan";
+      this.toast.querySelector("p").textContent = error.message;
+      this.toast.hidden = false;
+    }
+  }
+
+  extractUnitInterest(message) {
+    const knownModels = ["Xpander", "Rush", "Zenix", "BR-V", "Serena", "Avanza", "Ertiga"];
+    return knownModels.find((model) => message.toLocaleLowerCase("id").includes(model.toLocaleLowerCase("id"))) || "";
   }
 
   evaluateMessage(message) {
@@ -1601,7 +1734,7 @@ class OmnichannelAIDemo {
           risk: "medium",
           effect: "simulated_write",
           router: "Sinyal buying intent tinggi diarahkan ke handoff.",
-          tool: "lead.handoff · simulasi saja",
+          tool: "lead.capture · tenant demo",
           grounding: "Konteks handoff disusun dari pesan, tanpa mengarang data.",
           evalTitle: "HOT lead & contextual handoff",
           blocked: false,
@@ -1609,7 +1742,7 @@ class OmnichannelAIDemo {
             "Lead diklasifikasi HOT",
             "Konteks handoff lengkap",
             "External send = 0",
-            "Tidak ada data nyata berubah",
+            "Perubahan terisolasi di tenant demo",
           ],
         },
       };
@@ -1804,6 +1937,7 @@ class OneDashboardDemo {
     this.visibleWidgets = new Set(dashboardDemoRoles.director.widgets);
     this.lastFocusedElement = null;
     this.hasOpened = false;
+    this.liveMetrics = null;
 
     this.customizer = root.querySelector("[data-dashboard-customizer]");
     this.customizerBackdrop = root.querySelector("[data-dashboard-customizer-backdrop]");
@@ -1818,6 +1952,10 @@ class OneDashboardDemo {
 
     this.bind();
     this.render();
+    publicDemoData.snapshot().then((snapshot) => {
+      this.liveMetrics = snapshot.leads;
+      this.render();
+    }).catch(() => {});
   }
 
   bind() {
@@ -1992,14 +2130,14 @@ class OneDashboardDemo {
       {
         label: "Pipeline Aktif",
         icon: "PL",
-        value: `${Math.round(1248 * multiplier).toLocaleString("id-ID")} lead`,
+        value: `${Math.round((this.liveMetrics?.total || 1248) * multiplier).toLocaleString("id-ID")} lead`,
         change: "12,4%",
         context: "prospek bertumbuh",
       },
       {
         label: "Tingkat Konversi",
         icon: "%",
-        value: `${(7.7 + (this.branch === "pondok-bambu" ? 0.7 : 0)).toFixed(1).replace(".", ",")}%`,
+        value: `${((this.liveMetrics?.conversion_rate || 7.7) + (this.branch === "pondok-bambu" ? 0.7 : 0)).toFixed(1).replace(".", ",")}%`,
         change: "1,2 pt",
         context: "di atas target",
       },
@@ -2268,6 +2406,24 @@ class SocialGrowthDemo {
 
     this.bind();
     this.reset();
+    this.loadTenantPosts();
+  }
+
+  async loadTenantPosts(force = false) {
+    try {
+      const snapshot = await publicDemoData.snapshot(force);
+      if (snapshot.social_posts.length) {
+        this.posts = snapshot.social_posts.map((post) => ({
+          date: post.scheduled_at.slice(0, 10),
+          title: post.title,
+          platform: Array.isArray(post.platforms) ? post.platforms[0] || "instagram" : "instagram",
+          status: post.status,
+        }));
+        this.renderCalendar();
+      }
+    } catch (error) {
+      this.root.querySelector("[data-social-toast-copy]").textContent = error.message;
+    }
   }
 
   defaultPosts() {
@@ -2366,6 +2522,7 @@ class SocialGrowthDemo {
     this.root.setAttribute("aria-hidden", "false");
     document.body.classList.add("demo-open");
     this.root.querySelector("[data-close-social-demo]").focus();
+    this.loadTenantPosts(true);
   }
 
   close() {
@@ -2507,11 +2664,30 @@ class SocialGrowthDemo {
     this.root.querySelector("[data-social-caption-count]").textContent = `${caption.length}/500`;
   }
 
-  schedule() {
+  async schedule() {
     const date = this.dateInput.value;
     const time = this.timeInput.value;
     if (!date || !time) return;
     const selectedPlatforms = [...this.platforms];
+    const scheduleButton = this.root.querySelector("[data-social-schedule]");
+    scheduleButton.disabled = true;
+    const originalLabel = scheduleButton.textContent;
+    scheduleButton.textContent = "Menyimpan ke tenant demo…";
+    try {
+      await publicDemoData.submit("social_schedule", {
+        title: this.vehicle().shortName,
+        caption: this.captionInput.value.trim(),
+        platforms: selectedPlatforms,
+        scheduled_at: new Date(`${date}T${time}:00+07:00`).toISOString(),
+        unit_interest: this.vehicle().name,
+      });
+    } catch (error) {
+      scheduleButton.disabled = false;
+      scheduleButton.textContent = originalLabel;
+      this.root.querySelector("[data-social-toast-copy]").textContent = error.message;
+      this.toast.hidden = false;
+      return;
+    }
     const existingIndex = this.posts.findIndex((post) => post.isDemoScheduled);
     const post = {
       date,
@@ -2525,10 +2701,12 @@ class SocialGrowthDemo {
     this.monthOffset = date.startsWith("2026-08") ? 1 : 0;
     this.renderCalendar();
     this.root.querySelector("[data-social-toast-copy]").textContent =
-      `${this.vehicle().shortName} · ${this.formatDate(date)} pukul ${time} WIB.`;
+      `${this.vehicle().shortName} tersimpan di tenant demo · ${this.formatDate(date)} pukul ${time} WIB.`;
     this.root.querySelector(".social-progress span:last-child").classList.add("active");
     this.toast.hidden = false;
     this.switchView("calendar");
+    scheduleButton.disabled = false;
+    scheduleButton.textContent = originalLabel;
   }
 
   renderCalendar() {
@@ -2743,9 +2921,10 @@ const insightDemoGoals = {
 class ConversionInsightDemo {
   constructor(root) {
     this.root = root;
+    this.sources = insightDemoSources.map((source) => ({ ...source }));
     this.goal = "conversion";
     this.period = "month";
-    this.selectedSources = new Set(insightDemoSources.map((source) => source.id));
+    this.selectedSources = new Set(this.sources.map((source) => source.id));
     this.visibleWidgets = new Set(["kpi", "funnel", "opportunity", "sources", "heatmap", "actions"]);
     this.actionApplied = false;
     this.lastFocusedElement = null;
@@ -2763,6 +2942,38 @@ class ConversionInsightDemo {
 
     this.bind();
     this.reset();
+    this.loadTenantMetrics();
+  }
+
+  async loadTenantMetrics(force = false) {
+    try {
+      const snapshot = await publicDemoData.snapshot(force);
+      const sourceByID = new Map(
+        snapshot.sources.map((source) => [this.sourceID(source.name), source]),
+      );
+      this.sources = insightDemoSources.map((source) => {
+        const live = sourceByID.get(source.id);
+        if (!live) return { ...source, volume: 0, hot: 0, followup: 0, conversion: 0 };
+        return {
+          ...source,
+          volume: live.total,
+          hot: live.hot,
+          followup: Math.max(0, live.total - live.hot - live.closing),
+          conversion: live.conversion,
+        };
+      });
+      this.render();
+    } catch (error) {
+      this.showToast("Data tenant demo belum dimuat", error.message);
+    }
+  }
+
+  sourceID(name) {
+    const value = String(name).toLocaleLowerCase("id");
+    if (value.includes("whatsapp")) return "whatsapp";
+    if (value.includes("instagram")) return "instagram";
+    if (value.includes("facebook") || value.includes("messenger")) return "facebook";
+    return "website";
   }
 
   bind() {
@@ -2831,13 +3042,23 @@ class ConversionInsightDemo {
       );
     });
 
-    this.runActionButton.addEventListener("click", () => {
+    this.runActionButton.addEventListener("click", async () => {
       if (this.actionApplied) return;
+      this.runActionButton.disabled = true;
+      try {
+        await publicDemoData.submit("insight_action", {
+          message: `Menjalankan fokus insight: ${insightDemoGoals[this.goal].label}`,
+        });
+      } catch (error) {
+        this.runActionButton.disabled = false;
+        this.showToast("Rekomendasi belum tersimpan", error.message);
+        return;
+      }
       this.actionApplied = true;
       this.render();
       this.showToast(
         "Rekomendasi demo dijalankan",
-        "Proyeksi KPI diperbarui tanpa mengubah data customer.",
+        "Proyeksi KPI diperbarui dan aktivitas tercatat di tenant demo.",
       );
     });
 
@@ -2892,7 +3113,7 @@ class ConversionInsightDemo {
   reset() {
     this.goal = "conversion";
     this.period = "month";
-    this.selectedSources = new Set(insightDemoSources.map((source) => source.id));
+    this.selectedSources = new Set(this.sources.map((source) => source.id));
     this.visibleWidgets = new Set(["kpi", "funnel", "opportunity", "sources", "heatmap", "actions"]);
     this.actionApplied = false;
     this.toast.hidden = true;
@@ -2902,7 +3123,7 @@ class ConversionInsightDemo {
   }
 
   activeSources() {
-    return insightDemoSources.filter((source) => this.selectedSources.has(source.id));
+    return this.sources.filter((source) => this.selectedSources.has(source.id));
   }
 
   periodMultiplier() {
@@ -3023,6 +3244,7 @@ class ConversionInsightDemo {
     this.root.querySelector("[data-insight-potential-rate]").textContent =
       `${potential.toFixed(1).replace(".", ",")}%`;
     this.runActionButton.classList.toggle("is-complete", this.actionApplied);
+    this.runActionButton.disabled = this.actionApplied;
     this.runActionButton.innerHTML = this.actionApplied
       ? "<span>✓</span> Rekomendasi Diterapkan di Demo"
       : "<span>▶</span> Jalankan Rekomendasi Demo";
