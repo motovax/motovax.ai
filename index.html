@@ -228,8 +228,11 @@
           </div>
 
           <div class="feature-grid">
-            <article class="feature-card">
-              <div class="feature-icon">IM</div>
+            <article class="feature-card feature-card-demo">
+              <div class="feature-card-topline">
+                <div class="feature-icon">IM</div>
+                <span class="demo-available-badge"><i></i> Demo tersedia</span>
+              </div>
               <h3>Inventory Management System</h3>
               <p>
                 Kelola stok secara real-time dengan sinkronisasi multi-branch dan integrasi leasing.
@@ -247,6 +250,10 @@
                 <div><small>Cabang</small><b>5</b></div>
                 <div><span>+ Live Sync</span></div>
               </div>
+              <button class="feature-demo-button" type="button" data-open-inventory-demo>
+                Coba demo gratis <span aria-hidden="true">→</span>
+              </button>
+              <small class="feature-demo-note">Tanpa daftar · Data dummy · Langsung coba</small>
             </article>
 
             <article class="feature-card">
@@ -461,6 +468,213 @@
       </div>
       <div class="copyright">&copy; <span data-year></span> MOTOVAX. All rights reserved.</div>
     </footer>
+
+    <div
+      class="inventory-demo"
+      id="inventoryDemo"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="inventoryDemoTitle"
+      aria-hidden="true"
+    >
+      <div class="demo-app">
+        <header class="demo-topbar">
+          <div class="demo-brand-wrap">
+            <span class="demo-brand"><span>MOTO</span><strong>VAX</strong></span>
+            <span class="demo-divider" aria-hidden="true"></span>
+            <div>
+              <b id="inventoryDemoTitle">Inventory Management</b>
+              <span>Interactive product demo</span>
+            </div>
+          </div>
+          <div class="demo-topbar-actions">
+            <span class="demo-mode"><i></i> Mode Demo · Data Dummy</span>
+            <button class="demo-reset-button" type="button" data-demo-reset>Reset demo</button>
+            <button class="demo-close-button" type="button" data-close-inventory-demo aria-label="Tutup demo">
+              <span aria-hidden="true">×</span>
+            </button>
+          </div>
+        </header>
+
+        <div class="demo-layout">
+          <aside class="demo-sidebar" aria-label="Navigasi demo">
+            <nav>
+              <button type="button"><span>⌂</span> Dashboard</button>
+              <button class="active" type="button"><span>▣</span> Inventory</button>
+              <button type="button"><span>◎</span> Prospek</button>
+              <button type="button"><span>◇</span> Penjualan</button>
+              <button type="button"><span>↗</span> Analytics</button>
+            </nav>
+            <div class="demo-sidebar-tip">
+              <span>DEMO GUIDE</span>
+              <b>Coba cari dan filter unit</b>
+              <p>Klik salah satu unit untuk melihat detail lalu coba ubah statusnya menjadi booked.</p>
+            </div>
+          </aside>
+
+          <main class="demo-workspace">
+            <div class="demo-page-heading">
+              <div>
+                <span class="demo-breadcrumb">Home / Inventory / Semua Unit</span>
+                <h2>Inventory Unit</h2>
+                <p>Pantau stok, harga, aging, dan posisi unit di seluruh cabang.</p>
+              </div>
+              <button class="demo-primary-action" type="button" data-demo-guide>
+                <span aria-hidden="true">▶</span> Panduan demo
+              </button>
+            </div>
+
+            <section class="demo-stat-grid" aria-label="Ringkasan inventory">
+              <button class="demo-stat active" type="button" data-status-filter="ALL">
+                <span class="demo-stat-icon indigo">▦</span>
+                <span><small>Semua Unit</small><b data-stat-all>0</b></span>
+                <em>100%</em>
+              </button>
+              <button class="demo-stat" type="button" data-status-filter="UNIT READY">
+                <span class="demo-stat-icon green">✓</span>
+                <span><small>Unit Ready</small><b data-stat-ready>0</b></span>
+                <em class="positive">Siap jual</em>
+              </button>
+              <button class="demo-stat" type="button" data-status-filter="BOOKED">
+                <span class="demo-stat-icon amber">◷</span>
+                <span><small>Booked</small><b data-stat-booked>0</b></span>
+                <em>Follow-up</em>
+              </button>
+              <button class="demo-stat" type="button" data-status-filter="SOLD">
+                <span class="demo-stat-icon blue">◆</span>
+                <span><small>Sold</small><b data-stat-sold>0</b></span>
+                <em class="positive">Terjual</em>
+              </button>
+            </section>
+
+            <section class="demo-inventory-panel">
+              <div class="demo-toolbar">
+                <label class="demo-search">
+                  <span aria-hidden="true">⌕</span>
+                  <input
+                    type="search"
+                    placeholder="Cari merek, tipe, atau plat nomor..."
+                    aria-label="Cari unit"
+                    data-demo-search
+                  />
+                </label>
+                <label class="demo-select-wrap">
+                  <span>Cabang</span>
+                  <select aria-label="Filter cabang" data-demo-branch>
+                    <option value="ALL">Semua cabang</option>
+                    <option value="CINERE">Cinere</option>
+                    <option value="PONDOK BAMBU">Pondok Bambu</option>
+                    <option value="BINTARO">Bintaro</option>
+                    <option value="BEKASI">Bekasi</option>
+                  </select>
+                </label>
+                <label class="demo-select-wrap">
+                  <span>Urutkan</span>
+                  <select aria-label="Urutkan unit" data-demo-sort>
+                    <option value="newest">Aging terendah</option>
+                    <option value="oldest">Aging tertinggi</option>
+                    <option value="price-high">Harga tertinggi</option>
+                    <option value="price-low">Harga terendah</option>
+                  </select>
+                </label>
+              </div>
+
+              <div class="demo-filter-row">
+                <div class="demo-filter-pills" role="group" aria-label="Filter status unit">
+                  <button class="active" type="button" data-status-filter="ALL">Semua</button>
+                  <button type="button" data-status-filter="UNIT READY">Unit Ready</button>
+                  <button type="button" data-status-filter="BOOKED">Booked</button>
+                  <button type="button" data-status-filter="SOLD">Sold</button>
+                </div>
+                <span class="demo-result-count" data-demo-result-count></span>
+              </div>
+
+              <div class="demo-table-wrap">
+                <table class="demo-table">
+                  <thead>
+                    <tr>
+                      <th>Unit</th>
+                      <th>Plat</th>
+                      <th>Harga Beli</th>
+                      <th>Harga Jual (OTR)</th>
+                      <th>Odo &amp; Aging</th>
+                      <th>Cabang &amp; Lokasi</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody data-demo-table-body></tbody>
+                </table>
+                <div class="demo-mobile-list" data-demo-mobile-list></div>
+                <div class="demo-empty-state" data-demo-empty hidden>
+                  <span>⌕</span>
+                  <b>Unit tidak ditemukan</b>
+                  <p>Coba kata kunci atau filter lainnya.</p>
+                  <button type="button" data-demo-clear-filter>Reset filter</button>
+                </div>
+              </div>
+            </section>
+          </main>
+        </div>
+      </div>
+
+      <div class="demo-detail-backdrop" data-demo-detail-backdrop hidden></div>
+      <aside class="demo-detail-panel" aria-labelledby="demoDetailTitle" aria-hidden="true">
+        <div class="demo-detail-header">
+          <div>
+            <span>DETAIL UNIT</span>
+            <h3 id="demoDetailTitle" data-detail-name>Detail unit</h3>
+          </div>
+          <button type="button" data-close-demo-detail aria-label="Tutup detail unit">×</button>
+        </div>
+        <div class="demo-detail-content">
+          <div class="demo-detail-car" aria-hidden="true">
+            <span data-detail-brand>MVX</span>
+          </div>
+          <div class="demo-detail-status-row">
+            <span data-detail-status></span>
+            <span data-detail-plate></span>
+          </div>
+          <div class="demo-detail-price">
+            <small>Harga Jual (OTR)</small>
+            <b data-detail-price></b>
+            <span data-detail-credit></span>
+          </div>
+          <dl class="demo-detail-specs">
+            <div><dt>Tahun</dt><dd data-detail-year></dd></div>
+            <div><dt>Transmisi</dt><dd data-detail-transmission></dd></div>
+            <div><dt>Warna</dt><dd data-detail-color></dd></div>
+            <div><dt>Odometer</dt><dd data-detail-odometer></dd></div>
+            <div><dt>Cabang</dt><dd data-detail-branch></dd></div>
+            <div><dt>Posisi Unit</dt><dd data-detail-position></dd></div>
+            <div><dt>Aging Stok</dt><dd data-detail-aging></dd></div>
+            <div><dt>Sumber Unit</dt><dd data-detail-source></dd></div>
+          </dl>
+          <div class="demo-detail-insight">
+            <span>INSIGHT INVENTORY</span>
+            <p data-detail-insight></p>
+          </div>
+        </div>
+        <div class="demo-detail-footer">
+          <button class="demo-secondary-action" type="button" data-close-demo-detail>Kembali</button>
+          <button class="demo-primary-action" type="button" data-demo-book-unit>Booking unit ini</button>
+          <p>Perubahan hanya berlaku pada demo ini.</p>
+        </div>
+      </aside>
+
+      <div class="demo-guide-popover" data-demo-guide-popover hidden>
+        <button type="button" data-close-demo-guide aria-label="Tutup panduan">×</button>
+        <span>LANGKAH 1 DARI 3</span>
+        <h3>Mulai dari pencarian cepat</h3>
+        <p>Cari “Toyota”, pilih cabang, atau klik kartu status untuk melihat stok yang relevan.</p>
+        <button type="button" data-demo-guide-start>Mulai coba</button>
+      </div>
+
+      <div class="demo-toast" role="status" aria-live="polite" data-demo-toast hidden>
+        <span>✓</span>
+        <div><b>Status berhasil diperbarui</b><p>Unit kini masuk ke daftar Booked.</p></div>
+        <button type="button" data-close-demo-toast aria-label="Tutup notifikasi">×</button>
+      </div>
+    </div>
 
     <script src="./script.js"></script>
   </body>
