@@ -2654,6 +2654,467 @@ if (socialDemoMount) {
   new SocialGrowthDemo(socialDemoMount);
 }
 
+const insightDemoSources = [
+  {
+    id: "whatsapp",
+    name: "WhatsApp",
+    icon: "WA",
+    volume: 562,
+    hot: 78,
+    response: 1.4,
+    conversion: 8.7,
+    followup: 34,
+    status: "Peluang tinggi",
+  },
+  {
+    id: "instagram",
+    name: "Instagram",
+    icon: "IG",
+    volume: 318,
+    hot: 52,
+    response: 2.1,
+    conversion: 9.4,
+    followup: 17,
+    status: "Terbaik",
+  },
+  {
+    id: "facebook",
+    name: "Facebook",
+    icon: "FB",
+    volume: 246,
+    hot: 31,
+    response: 3.8,
+    conversion: 6.1,
+    followup: 22,
+    status: "Perlu optimasi",
+  },
+  {
+    id: "website",
+    name: "Website",
+    icon: "WEB",
+    volume: 122,
+    hot: 19,
+    response: 2.6,
+    conversion: 7.2,
+    followup: 9,
+    status: "Stabil",
+  },
+];
+
+const insightDemoGoals = {
+  conversion: {
+    label: "Tingkatkan Konversi",
+    title: "Conversion Intelligence",
+    description: "Temukan kebocoran funnel dan peluang terbesar untuk meningkatkan closing.",
+    focus: "Fokus aktif: tingkatkan konversi dari lead masuk hingga closing.",
+    opportunityTitle: "Pulihkan 18 deal potensial",
+    opportunityCopy:
+      "23 lead Warm belum mendapat follow-up dalam 2 jam. Prioritaskan sekarang untuk menaikkan peluang closing.",
+    potentialUplift: 1.4,
+    bottleneck: "Warm → Hot kehilangan 42% peluang",
+    bestTime: "Selasa–Kamis · 10:00–14:00",
+  },
+  response: {
+    label: "Percepat Respons",
+    title: "Response Intelligence",
+    description: "Lihat kapan dan di mana lead menunggu terlalu lama sebelum ditangani.",
+    focus: "Fokus aktif: pangkas waktu respons dan cegah lead kehilangan momentum.",
+    opportunityTitle: "Pangkas respons hingga 1,8 menit",
+    opportunityCopy:
+      "Volume tertinggi terjadi pukul 10:00–14:00, sementara kapasitas tim turun 21%. Atur ulang prioritas antrian untuk merespons lebih cepat.",
+    potentialUplift: 0.9,
+    bottleneck: "Connected → Warm melambat saat jam sibuk",
+    bestTime: "Senin–Kamis · 09:00–13:00",
+  },
+  hot: {
+    label: "Prioritaskan Lead HOT",
+    title: "HOT Lead Intelligence",
+    description: "Pisahkan peluang siap closing dan arahkan tindakan tim ke lead bernilai tinggi.",
+    focus: "Fokus aktif: amankan lead HOT sebelum melewati SLA follow-up.",
+    opportunityTitle: "Amankan 11 lead HOT hari ini",
+    opportunityCopy:
+      "11 lead HOT belum mendapat tindakan lanjutan. Handoff ke agent dengan kapasitas terbaik dapat mempertahankan peluang closing.",
+    potentialUplift: 1.1,
+    bottleneck: "11 lead HOT berisiko melewati SLA",
+    bestTime: "Hari kerja · 09:00–16:00",
+  },
+};
+
+class ConversionInsightDemo {
+  constructor(root) {
+    this.root = root;
+    this.goal = "conversion";
+    this.period = "month";
+    this.selectedSources = new Set(insightDemoSources.map((source) => source.id));
+    this.visibleWidgets = new Set(["kpi", "funnel", "opportunity", "sources", "heatmap", "actions"]);
+    this.actionApplied = false;
+    this.lastFocusedElement = null;
+    this.hasOpened = false;
+
+    this.customizer = root.querySelector("[data-insight-customizer]");
+    this.customizerBackdrop = root.querySelector("[data-insight-customizer-backdrop]");
+    this.toast = root.querySelector("[data-insight-toast]");
+    this.kpiGrid = root.querySelector("[data-insight-widget='kpi']");
+    this.funnel = root.querySelector("[data-insight-funnel]");
+    this.sourceList = root.querySelector("[data-insight-source-list]");
+    this.heatmap = root.querySelector("[data-insight-heatmap]");
+    this.actionList = root.querySelector("[data-insight-action-list]");
+    this.runActionButton = root.querySelector("[data-insight-run-action]");
+
+    this.bind();
+    this.reset();
+  }
+
+  bind() {
+    for (const button of document.querySelectorAll("[data-open-insight-demo]")) {
+      button.addEventListener("click", () => this.open(button));
+    }
+    for (const button of this.root.querySelectorAll("[data-close-insight-demo]")) {
+      button.addEventListener("click", () => this.close());
+    }
+
+    this.root.querySelector("[data-insight-reset]").addEventListener("click", () => this.reset());
+    this.root.querySelector("[data-insight-customize]").addEventListener("click", () => this.openCustomizer());
+    this.root.querySelector("[data-insight-customize-banner]").addEventListener("click", () => this.openCustomizer());
+    this.root.querySelector("[data-insight-customize-sidebar]").addEventListener("click", () => this.openCustomizer());
+    this.root.querySelector("[data-insight-customizer-close]").addEventListener("click", () => this.closeCustomizer());
+    this.customizerBackdrop.addEventListener("click", () => this.closeCustomizer());
+    this.root.querySelector("[data-insight-toast-close]").addEventListener("click", () => {
+      this.toast.hidden = true;
+    });
+
+    for (const button of this.root.querySelectorAll("[data-insight-period]")) {
+      button.addEventListener("click", () => {
+        this.period = button.dataset.insightPeriod || "month";
+        this.actionApplied = false;
+        this.render();
+      });
+    }
+
+    for (const button of this.root.querySelectorAll("[data-insight-goal]")) {
+      button.addEventListener("click", () => {
+        this.goal = button.dataset.insightGoal || "conversion";
+        this.actionApplied = false;
+        this.render();
+      });
+    }
+
+    for (const input of this.root.querySelectorAll("[data-insight-source]")) {
+      input.addEventListener("change", () => {
+        const source = input.value;
+        if (!input.checked && this.selectedSources.size === 1) {
+          input.checked = true;
+          return;
+        }
+        if (input.checked) this.selectedSources.add(source);
+        else this.selectedSources.delete(source);
+        this.actionApplied = false;
+        this.render();
+      });
+    }
+
+    for (const input of this.root.querySelectorAll("[data-insight-toggle]")) {
+      input.addEventListener("change", () => {
+        const widget = input.dataset.insightToggle;
+        if (!widget) return;
+        if (input.checked) this.visibleWidgets.add(widget);
+        else this.visibleWidgets.delete(widget);
+        this.renderWidgets();
+      });
+    }
+
+    this.root.querySelector("[data-insight-save]").addEventListener("click", () => {
+      this.closeCustomizer();
+      this.showToast(
+        "Tampilan insight disimpan",
+        `Fokus ${insightDemoGoals[this.goal].label} siap digunakan.`,
+      );
+    });
+
+    this.runActionButton.addEventListener("click", () => {
+      if (this.actionApplied) return;
+      this.actionApplied = true;
+      this.render();
+      this.showToast(
+        "Rekomendasi demo dijalankan",
+        "Proyeksi KPI diperbarui tanpa mengubah data customer.",
+      );
+    });
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key !== "Escape" || !this.root.classList.contains("is-open")) return;
+      if (!this.toast.hidden) this.toast.hidden = true;
+      else if (this.customizer.classList.contains("is-open")) this.closeCustomizer();
+      else this.close();
+    });
+  }
+
+  open(trigger) {
+    this.lastFocusedElement = trigger;
+    this.root.classList.add("is-open");
+    this.root.setAttribute("aria-hidden", "false");
+    document.body.classList.add("demo-open");
+    this.root.querySelector("[data-close-insight-demo]").focus();
+    if (!this.hasOpened) {
+      this.openCustomizer();
+      this.hasOpened = true;
+    }
+  }
+
+  close() {
+    this.closeCustomizer();
+    this.toast.hidden = true;
+    this.root.classList.remove("is-open");
+    this.root.setAttribute("aria-hidden", "true");
+    document.body.classList.remove("demo-open");
+    if (this.lastFocusedElement) this.lastFocusedElement.focus();
+  }
+
+  openCustomizer() {
+    this.customizer.classList.add("is-open");
+    this.customizer.setAttribute("aria-hidden", "false");
+    this.customizerBackdrop.hidden = false;
+    this.customizer.querySelector("[data-insight-customizer-close]").focus();
+  }
+
+  closeCustomizer() {
+    this.customizer.classList.remove("is-open");
+    this.customizer.setAttribute("aria-hidden", "true");
+    this.customizerBackdrop.hidden = true;
+  }
+
+  showToast(title, copy) {
+    this.root.querySelector("[data-insight-toast-title]").textContent = title;
+    this.root.querySelector("[data-insight-toast-copy]").textContent = copy;
+    this.toast.hidden = false;
+  }
+
+  reset() {
+    this.goal = "conversion";
+    this.period = "month";
+    this.selectedSources = new Set(insightDemoSources.map((source) => source.id));
+    this.visibleWidgets = new Set(["kpi", "funnel", "opportunity", "sources", "heatmap", "actions"]);
+    this.actionApplied = false;
+    this.toast.hidden = true;
+    for (const input of this.root.querySelectorAll("[data-insight-source]")) input.checked = true;
+    for (const input of this.root.querySelectorAll("[data-insight-toggle]")) input.checked = true;
+    this.render();
+  }
+
+  activeSources() {
+    return insightDemoSources.filter((source) => this.selectedSources.has(source.id));
+  }
+
+  periodMultiplier() {
+    if (this.period === "today") return 0.045;
+    if (this.period === "week") return 0.24;
+    return 1;
+  }
+
+  analytics() {
+    const sources = this.activeSources();
+    const multiplier = this.periodMultiplier();
+    const rawLeads = sources.reduce((sum, source) => sum + source.volume, 0);
+    const leads = Math.max(1, Math.round(rawLeads * multiplier));
+    const rawHot = sources.reduce((sum, source) => sum + source.hot, 0);
+    const hot = Math.max(1, Math.round(rawHot * multiplier));
+    const response = sources.reduce((sum, source) => sum + source.response * source.volume, 0) / Math.max(1, rawLeads);
+    const conversion = sources.reduce((sum, source) => sum + source.conversion * source.volume, 0) / Math.max(1, rawLeads);
+    const followup = Math.max(1, Math.round(sources.reduce((sum, source) => sum + source.followup, 0) * multiplier));
+    const actionCount = Math.max(1, Math.round((followup * 0.42) + (hot * 0.08)));
+
+    return {
+      sources,
+      leads,
+      hot,
+      response: Math.max(0.6, response - (this.actionApplied && this.goal === "response" ? 0.8 : 0)),
+      conversion: conversion + (this.actionApplied ? insightDemoGoals[this.goal].potentialUplift : 0),
+      baseConversion: conversion,
+      followup: this.actionApplied ? Math.max(0, followup - Math.ceil(followup * 0.28)) : followup,
+      actionCount: this.actionApplied ? Math.max(0, actionCount - Math.ceil(actionCount * 0.6)) : actionCount,
+    };
+  }
+
+  render() {
+    const goal = insightDemoGoals[this.goal];
+    const data = this.analytics();
+    const periodLabel = this.period === "today" ? "Hari Ini" : this.period === "week" ? "Minggu Ini" : "Bulan Ini";
+
+    this.root.querySelector("[data-insight-title]").textContent = goal.title;
+    this.root.querySelector("[data-insight-description]").textContent = goal.description;
+    this.root.querySelector("[data-insight-focus-copy]").textContent = goal.focus;
+
+    for (const button of this.root.querySelectorAll("[data-insight-period]")) {
+      const active = button.dataset.insightPeriod === this.period;
+      button.classList.toggle("active", active);
+      button.setAttribute("aria-pressed", String(active));
+    }
+    for (const button of this.root.querySelectorAll("[data-insight-goal]")) {
+      const active = button.dataset.insightGoal === this.goal;
+      button.classList.toggle("active", active);
+      button.setAttribute("aria-pressed", String(active));
+    }
+
+    const kpis = [
+      ["LD", `Leads Masuk · ${periodLabel}`, data.leads.toLocaleString("id-ID"), "↑ 14,8%", "vs periode lalu", "leads"],
+      ["HOT", "Lead HOT", data.hot.toLocaleString("id-ID"), "↑ 18,2%", "siap ditindaklanjuti", "hot"],
+      ["RT", "Rata-rata Respons", `${data.response.toFixed(1).replace(".", ",")} mnt`, "↓ 22,4%", "lebih cepat", "response"],
+      ["%", "Tingkat Konversi", `${data.conversion.toFixed(1).replace(".", ",")}%`, `↑ ${(data.conversion - 6.4).toFixed(1).replace(".", ",")} pt`, "dari lead masuk", "conversion"],
+      ["FU", "Pending Follow-up", data.followup.toLocaleString("id-ID"), this.actionApplied ? "↓ 28,0%" : "↓ 8,1%", "perlu diselesaikan", "followup"],
+      ["!", "Butuh Aksi · SLA", data.actionCount.toLocaleString("id-ID"), this.actionApplied ? "↓ 60,0%" : "↓ 12,3%", "prioritas tim", "action"],
+    ];
+    const priorityKey = this.goal === "response" ? "response" : this.goal === "hot" ? "hot" : "conversion";
+    this.kpiGrid.innerHTML = kpis
+      .map(
+        ([icon, label, value, delta, copy, key]) => `
+          <article class="dashboard-kpi-card ${key === priorityKey ? "is-priority" : ""}">
+            <span>${label}<i>${icon}</i></span><b>${value}</b><small><em>${delta}</em>${copy}</small>
+          </article>
+        `,
+      )
+      .join("");
+
+    this.renderFunnel(data);
+    this.renderOpportunity(data, goal);
+    this.renderSources(data);
+    this.renderHeatmap(goal);
+    this.renderActions(data);
+    this.renderWidgets();
+  }
+
+  renderFunnel(data) {
+    const closing = Math.max(1, Math.round(data.leads * data.conversion / 100));
+    const stages = [
+      ["Lead Masuk", data.leads, 100],
+      ["Terhubung", Math.round(data.leads * 0.72), 72],
+      ["Warm", Math.round(data.leads * 0.44), 44],
+      ["Hot", data.hot, Math.max(12, (data.hot / data.leads) * 100)],
+      ["Closing", closing, Math.max(7, (closing / data.leads) * 100)],
+    ];
+    this.funnel.innerHTML = stages
+      .map(
+        ([label, value, width], index) => `
+          <div class="insight-funnel-row">
+            <span>${label}</span>
+            <div class="insight-funnel-track"><i style="width:${Math.min(100, width)}%"></i></div>
+            <b>${Number(value).toLocaleString("id-ID")}</b>
+            <em>${index === 0 ? "100%" : `${((Number(value) / data.leads) * 100).toFixed(0)}%`}</em>
+          </div>
+        `,
+      )
+      .join("");
+    this.root.querySelector("[data-insight-funnel-rate]").textContent =
+      `${data.conversion.toFixed(1).replace(".", ",")}% end-to-end`;
+    this.root.querySelector("[data-insight-bottleneck]").textContent =
+      insightDemoGoals[this.goal].bottleneck;
+  }
+
+  renderOpportunity(data, goal) {
+    const current = data.baseConversion;
+    const potential = current + goal.potentialUplift;
+    this.root.querySelector("[data-insight-opportunity-title]").textContent =
+      this.actionApplied ? "Rekomendasi berhasil disimulasikan" : goal.opportunityTitle;
+    this.root.querySelector("[data-insight-opportunity-copy]").textContent =
+      this.actionApplied
+        ? "Prioritas tim telah diperbarui dalam simulasi. KPI proyeksi menunjukkan dampak jika tindakan yang sama diterapkan."
+        : goal.opportunityCopy;
+    this.root.querySelector("[data-insight-current-rate]").textContent =
+      `${current.toFixed(1).replace(".", ",")}%`;
+    this.root.querySelector("[data-insight-potential-rate]").textContent =
+      `${potential.toFixed(1).replace(".", ",")}%`;
+    this.runActionButton.classList.toggle("is-complete", this.actionApplied);
+    this.runActionButton.innerHTML = this.actionApplied
+      ? "<span>✓</span> Rekomendasi Diterapkan di Demo"
+      : "<span>▶</span> Jalankan Rekomendasi Demo";
+  }
+
+  renderSources(data) {
+    const maxVolume = Math.max(...data.sources.map((source) => source.volume), 1);
+    const multiplier = this.periodMultiplier();
+    const rows = data.sources
+      .map((source) => {
+        const warning = source.status === "Perlu optimasi";
+        return `
+          <div class="insight-source-row">
+            <div class="insight-source-name"><span class="insight-source-icon ${source.id}">${source.icon}</span>${source.name}</div>
+            <div class="insight-source-volume"><i style="--source-width:${(source.volume / maxVolume) * 100}%"></i>${Math.max(1, Math.round(source.volume * multiplier)).toLocaleString("id-ID")}</div>
+            <span>${Math.max(1, Math.round(source.hot * multiplier))} HOT</span>
+            <span>${source.response.toFixed(1).replace(".", ",")} mnt</span>
+            <b class="insight-source-rate">${source.conversion.toFixed(1).replace(".", ",")}%</b>
+            <span class="insight-source-status ${warning ? "warning" : ""}">${source.status}</span>
+          </div>
+        `;
+      })
+      .join("");
+    this.sourceList.innerHTML = `
+      <div class="insight-source-head"><span>Sumber</span><span>Volume Lead</span><span>Potensi</span><span>Respons</span><span>Konversi</span><span>Status</span></div>
+      ${rows}
+    `;
+    this.root.querySelector("[data-insight-source-count]").textContent =
+      `${data.sources.length} sumber aktif`;
+  }
+
+  renderHeatmap(goal) {
+    const days = ["Sen", "Sel", "Rab", "Kam", "Jum"];
+    const times = ["09:00", "10:00", "12:00", "14:00", "16:00"];
+    const values = [
+      [42, 56, 49, 38, 31],
+      [58, 91, 86, 79, 45],
+      [61, 94, 88, 83, 48],
+      [55, 89, 92, 77, 51],
+      [39, 62, 58, 47, 34],
+    ];
+    const cells = ['<span class="axis"></span>', ...days.map((day) => `<span class="axis">${day}</span>`)];
+    times.forEach((time, row) => {
+      cells.push(`<span class="axis">${time}</span>`);
+      values[row].forEach((value) => cells.push(`<span class="cell" style="--heat:${value}%">${value}</span>`));
+    });
+    this.heatmap.innerHTML = cells.join("");
+    this.root.querySelector("[data-insight-best-time]").textContent = goal.bestTime;
+  }
+
+  renderActions(data) {
+    const actionSets = {
+      conversion: [
+        ["!", "critical", `Follow-up ${Math.max(8, data.followup)} lead Warm`, "Lewat 2 jam · potensi closing tinggi", "Sekarang"],
+        ["↗", "positive", "Gunakan script Instagram terbaik", "Konversi 9,4% · unggul 1,7 poin", "+6 deal"],
+        ["RT", "", "Percepat antrian Facebook", "Respons 3,8 menit · paling lambat", "Hari ini"],
+      ],
+      response: [
+        ["RT", "critical", "Tambah kapasitas pukul 10–14", "Menangani 46% volume harian", "-1,8 mnt"],
+        ["!", "", `${data.followup} follow-up menunggu`, "Urutkan berdasarkan SLA terdekat", "Sekarang"],
+        ["↗", "positive", "Salin pola respons WhatsApp", "Respons tercepat 1,4 menit", "+12%"],
+      ],
+      hot: [
+        ["!", "critical", `${Math.max(3, data.actionCount)} lead HOT melewati SLA`, "Handoff ke agent yang tersedia", "Mendesak"],
+        ["HOT", "", "Prioritaskan intent test drive", "Peluang closing 2,3× lebih tinggi", "+7 deal"],
+        ["✓", "positive", "Pertahankan routing Instagram", "Konversi HOT terbaik bulan ini", "9,4%"],
+      ],
+    };
+    const actions = actionSets[this.goal];
+    this.actionList.innerHTML = actions
+      .map(
+        ([icon, tone, title, copy, impact]) => `
+          <div class="insight-action-item ${tone}"><span>${icon}</span><div><b>${title}</b><p>${copy}</p></div><em>${impact}</em></div>
+        `,
+      )
+      .join("");
+    this.root.querySelector("[data-insight-action-count]").textContent =
+      `${actions.length} prioritas`;
+  }
+
+  renderWidgets() {
+    for (const widget of this.root.querySelectorAll("[data-insight-widget]")) {
+      widget.hidden = !this.visibleWidgets.has(widget.dataset.insightWidget);
+    }
+  }
+}
+
+const insightDemoMount = document.getElementById("insightDemo");
+if (insightDemoMount) {
+  new ConversionInsightDemo(insightDemoMount);
+}
+
 class AsciiIndonesiaBackground {
   constructor(container) {
     this.el = container;
