@@ -279,12 +279,15 @@
               <small class="feature-demo-note">Tanpa daftar · Data dummy · Langsung coba</small>
             </article>
 
-            <article class="feature-card">
-              <div class="feature-icon">AD</div>
+            <article class="feature-card feature-card-demo social-feature-card">
+              <div class="feature-card-topline">
+                <div class="feature-icon">AD</div>
+                <span class="demo-available-badge"><i></i> Demo tersedia</span>
+              </div>
               <h3>Social Media & Ads Automation</h3>
               <p>
-                Buat konten otomatis, jadwal posting, dan optimasi iklan berbasis AI untuk
-                menjangkau lebih banyak prospek berkualitas.
+                Buat konten dari inventory, jadwalkan posting, dan lacak campaign hingga
+                menjadi lead—semuanya dalam satu alur.
               </p>
               <div class="calendar-mock">
                 <div class="calendar-grid">
@@ -293,12 +296,16 @@
                   <span>7</span><span>8</span><span class="active">9</span><span>10</span><span>11</span><span>12</span><span>13</span>
                 </div>
                 <div class="ad-score">
-                  <small>Performa Iklan</small>
-                  <strong>CTR 2.45%</strong>
-                  <strong>ROAS 4.21x</strong>
-                  <span>Dioptimasi AI</span>
+                  <small>Campaign Insight</small>
+                  <strong>1.284 klik</strong>
+                  <strong>96 leads</strong>
+                  <span>7,5% konversi</span>
                 </div>
               </div>
+              <button class="feature-demo-button" type="button" data-open-social-demo>
+                Coba Demo Gratis <span aria-hidden="true">→</span>
+              </button>
+              <small class="feature-demo-note">Tanpa daftar · Data dummy · Langsung coba</small>
             </article>
 
             <article class="feature-card feature-card-demo">
@@ -1295,6 +1302,212 @@
         <span>✓</span>
         <div><b>Layout berhasil disimpan</b><p data-dashboard-toast-copy>Dashboard Direktur siap digunakan.</p></div>
         <button type="button" data-dashboard-toast-close aria-label="Tutup notifikasi">×</button>
+      </div>
+    </div>
+
+    <div
+      class="inventory-demo social-product-demo"
+      id="socialDemo"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="socialDemoTitle"
+      aria-hidden="true"
+    >
+      <div class="demo-app">
+        <header class="demo-topbar">
+          <div class="demo-brand-wrap">
+            <span class="demo-brand"><span>MOTO</span><strong>VAX</strong></span>
+            <span class="demo-divider" aria-hidden="true"></span>
+            <div>
+              <b id="socialDemoTitle">Social Media &amp; Ads Automation</b>
+              <span>Social Growth Studio · Tampilan produk</span>
+            </div>
+          </div>
+          <div class="demo-topbar-actions">
+            <span class="demo-mode social-safe-mode"><i></i> Sandbox · Tidak memposting</span>
+            <button class="demo-reset-button" type="button" data-social-reset>Reset demo</button>
+            <button class="demo-close-button" type="button" data-close-social-demo aria-label="Tutup demo">
+              <span aria-hidden="true">×</span>
+            </button>
+          </div>
+        </header>
+
+        <div class="demo-layout">
+          <aside class="demo-sidebar social-sidebar" aria-label="Navigasi Social Growth Studio">
+            <nav>
+              <span class="demo-nav-section">Social Growth</span>
+              <button class="active" type="button" data-social-nav="studio">
+                <svg class="demo-nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 1.4 4.1L18 8.5l-4.6 1.4L12 14l-1.4-4.1L6 8.5l4.6-1.4L12 3Zm7 10 .8 2.2L22 16l-2.2.8L19 19l-.8-2.2L16 16l2.2-.8L19 13ZM5 14l1 2.8L9 18l-3 1.2L5 22l-1-2.8L1 18l3-1.2L5 14Z"/></svg>
+                <span>Content Studio</span>
+              </button>
+              <button type="button" data-social-nav="calendar">
+                <svg class="demo-nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 3v3m14-3v3M3 9h18M5 5h14a2 2 0 0 1 2 2v13H3V7a2 2 0 0 1 2-2Z"/></svg>
+                <span>Kalender Posting</span>
+                <em data-social-calendar-count>4</em>
+              </button>
+              <button type="button" data-social-nav="insight">
+                <svg class="demo-nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19V9m8 10V5m8 14v-7M2 19h20"/></svg>
+                <span>Campaign Insight</span>
+              </button>
+            </nav>
+            <div class="demo-sidebar-tip social-sidebar-tip">
+              <span>ALUR TERHUBUNG</span>
+              <b>Konten → Klik → Lead</b>
+              <p>Desain memakai data inventory, jadwal masuk kalender, lalu UTM menghubungkan performa campaign ke CRM.</p>
+              <div><i></i><span>Data demo lokal</span></div>
+            </div>
+          </aside>
+
+          <main class="demo-workspace social-workspace">
+            <div class="demo-page-heading social-page-heading">
+              <div>
+                <span class="demo-breadcrumb" data-social-breadcrumb>Social Media / Content Studio</span>
+                <h2 data-social-page-title>Buat Konten Siap Tayang</h2>
+                <p data-social-page-description>Pilih unit, sesuaikan desain, lalu jadwalkan ke channel pilihan dalam satu alur.</p>
+              </div>
+              <div class="social-heading-status">
+                <span><i></i> Meta Business siap</span>
+                <b>Demo aman</b>
+              </div>
+            </div>
+
+            <section class="social-view is-active" data-social-view-panel="studio">
+              <div class="social-progress" aria-label="Tahapan pembuatan konten">
+                <span class="active"><i>1</i>Pilih Unit</span>
+                <span class="active"><i>2</i>Edit Desain</span>
+                <span class="active"><i>3</i>Platform &amp; Caption</span>
+                <span><i>4</i>Jadwalkan</span>
+              </div>
+
+              <div class="social-studio-grid">
+                <div class="social-editor-panel">
+                  <section class="social-editor-section">
+                    <header><div><span>01</span><h3>Pilih kendaraan dari inventory</h3></div><em>3 unit ready</em></header>
+                    <div class="social-vehicle-options" data-social-vehicle-options></div>
+                  </section>
+
+                  <section class="social-editor-section social-design-controls">
+                    <header><div><span>02</span><h3>Desain &amp; format</h3></div><em>Live preview</em></header>
+                    <div class="social-control-row">
+                      <div>
+                        <label>Template</label>
+                        <button class="social-template-choice active" type="button"><i>MV</i><span><b>Mobix Catalog</b><small>Harga, TDP &amp; spesifikasi</small></span><em>✓</em></button>
+                      </div>
+                      <div>
+                        <label>Format</label>
+                        <div class="social-format-options" role="group" aria-label="Format konten">
+                          <button class="active" type="button" data-social-format="square"><i class="square"></i><span>Post<small>1:1</small></span></button>
+                          <button type="button" data-social-format="portrait"><i class="portrait"></i><span>Feed<small>4:5</small></span></button>
+                          <button type="button" data-social-format="story"><i class="story"></i><span>Story<small>9:16</small></span></button>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="social-copy-controls">
+                      <label>Headline<input type="text" maxlength="42" data-social-headline value="Drive Your Dream Today" /></label>
+                      <label>Penawaran<input type="text" maxlength="36" data-social-offer value="TDP mulai Rp48 juta" /></label>
+                    </div>
+                  </section>
+
+                  <section class="social-editor-section">
+                    <header><div><span>03</span><h3>Platform &amp; caption</h3></div><button type="button" data-social-generate>✦ Generate Ulang</button></header>
+                    <div class="social-platform-row" role="group" aria-label="Platform tujuan">
+                      <button class="active instagram" type="button" data-social-platform="instagram"><i>IG</i><span><b>Instagram</b><small>@mobix.autos</small></span><em>✓</em></button>
+                      <button class="active facebook" type="button" data-social-platform="facebook"><i>f</i><span><b>Facebook</b><small>Mobix Indonesia</small></span><em>✓</em></button>
+                    </div>
+                    <label class="social-caption-field">
+                      <span>Caption Postingan <small data-social-caption-count>0/500</small></span>
+                      <textarea rows="4" maxlength="500" data-social-caption></textarea>
+                    </label>
+                  </section>
+                </div>
+
+                <aside class="social-preview-column">
+                  <div class="social-preview-head"><span>LIVE PREVIEW</span><b data-social-preview-format>Instagram Post · 1:1</b></div>
+                  <div class="social-post-preview">
+                    <header><span class="social-account-avatar">M</span><div><b>mobix.autos</b><small>Sponsored · Jakarta</small></div><em>•••</em></header>
+                    <div class="social-creative-frame square" data-social-creative>
+                      <span class="social-creative-brand">MOBIX</span>
+                      <div class="social-creative-copy">
+                        <small>PILIHAN MOBIL TERBAIK</small>
+                        <strong data-social-creative-title>Toyota Innova Zenix</strong>
+                        <span data-social-creative-year>2023 · Hybrid · Automatic</span>
+                      </div>
+                      <div class="social-car-art" data-social-car-art><i></i><i></i></div>
+                      <div class="social-creative-offer"><small data-social-creative-headline>DRIVE YOUR DREAM TODAY</small><b data-social-creative-offer>TDP mulai Rp48 juta</b></div>
+                    </div>
+                    <div class="social-post-actions"><span>♡</span><span>○</span><span>⌁</span><em>▱</em></div>
+                    <p data-social-preview-caption></p>
+                  </div>
+
+                  <div class="social-schedule-box">
+                    <div><span>04</span><div><b>Jadwalkan Postingan</b><small>Waktu Indonesia Barat</small></div></div>
+                    <div class="social-schedule-fields">
+                      <label>Tanggal<input type="date" value="2026-07-31" data-social-date /></label>
+                      <label>Waktu<input type="time" value="09:00" data-social-time /></label>
+                    </div>
+                    <button type="button" data-social-schedule><span>▣</span> Jadwalkan ke <b data-social-platform-count>2 platform</b></button>
+                    <small>Simulasi lokal—tidak mengirim konten ke akun Meta.</small>
+                  </div>
+                </aside>
+              </div>
+            </section>
+
+            <section class="social-view" data-social-view-panel="calendar" hidden>
+              <div class="social-stat-grid">
+                <article><span class="all">▦</span><div><small>Total Konten</small><b data-social-total-posts>4</b></div></article>
+                <article><span class="draft">✎</span><div><small>Draft</small><b>1</b></div></article>
+                <article><span class="planned">◷</span><div><small>Terjadwal</small><b data-social-planned-posts>2</b></div></article>
+                <article><span class="published">✓</span><div><small>Terbit</small><b>2</b></div></article>
+              </div>
+              <div class="social-calendar-panel">
+                <header>
+                  <div><button type="button" data-social-month-prev aria-label="Bulan sebelumnya">‹</button><button type="button" data-social-month-next aria-label="Bulan berikutnya">›</button><b data-social-month-title>Juli 2026</b></div>
+                  <div><button class="active" type="button">Bulan</button><button type="button">Jadwal</button></div>
+                </header>
+                <div class="social-calendar-weekdays"><span>Sen</span><span>Sel</span><span>Rab</span><span>Kam</span><span>Jum</span><span>Sab</span><span>Min</span></div>
+                <div class="social-calendar-days" data-social-calendar-days></div>
+              </div>
+            </section>
+
+            <section class="social-view" data-social-view-panel="insight" hidden>
+              <div class="social-campaign-toolbar">
+                <div>
+                  <span>CAMPAIGN AKTIF</span>
+                  <h3 data-social-campaign-name>Meta · Zenix Hybrid Juli</h3>
+                  <p><code data-social-utm>utm_campaign=zenix_hybrid_jul26</code><em data-social-hashtag>#ZENIXHYBRID</em></p>
+                </div>
+                <label>Campaign<select data-social-campaign><option value="zenix">Zenix Hybrid Juli</option><option value="brv">BR-V Family Deal</option><option value="xpander">Xpander Weekend</option></select></label>
+              </div>
+
+              <div class="social-insight-kpis" data-social-insight-kpis></div>
+
+              <div class="social-insight-grid">
+                <article class="social-insight-panel social-trend-panel">
+                  <header><div><span>CAMPAIGN TREND</span><h3>Klik &amp; Lead Masuk</h3></div><div><i></i>Klik <i></i>Lead</div></header>
+                  <div class="social-trend-chart" data-social-trend-chart></div>
+                </article>
+                <article class="social-insight-panel social-funnel-card">
+                  <header><div><span>ATTRIBUTION</span><h3>Dari Klik ke CRM</h3></div><em>Live trace</em></header>
+                  <div class="social-attribution-flow" data-social-attribution></div>
+                </article>
+                <article class="social-insight-panel social-product-performance">
+                  <header><div><span>TOP PRODUCTS</span><h3>Produk dengan Konversi Terbaik</h3></div><em>Campaign terpilih</em></header>
+                  <div data-social-product-ranking></div>
+                </article>
+                <article class="social-insight-panel social-lead-table">
+                  <header><div><span>LEAD TERBARU</span><h3>Atribusi Campaign ke CRM</h3></div><button type="button">Buka CRM →</button></header>
+                  <table><thead><tr><th>Customer</th><th>Produk Iklan</th><th>Sumber</th><th>Status CRM</th></tr></thead><tbody data-social-leads></tbody></table>
+                </article>
+              </div>
+            </section>
+          </main>
+        </div>
+      </div>
+
+      <div class="demo-toast social-toast" role="status" aria-live="polite" data-social-toast hidden>
+        <span>✓</span>
+        <div><b>Konten berhasil dijadwalkan</b><p data-social-toast-copy>Posting dummy muncul di Kalender Posting.</p></div>
+        <button type="button" data-social-toast-close aria-label="Tutup notifikasi">×</button>
       </div>
     </div>
 

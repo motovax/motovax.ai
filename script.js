@@ -2164,6 +2164,496 @@ if (dashboardDemoMount) {
   new OneDashboardDemo(dashboardDemoMount);
 }
 
+const socialDemoVehicles = [
+  {
+    id: "zenix",
+    name: "Toyota Innova Zenix",
+    shortName: "Innova Zenix",
+    year: "2023",
+    specs: "Hybrid · Automatic",
+    price: "Rp468 juta",
+    offer: "TDP mulai Rp48 juta",
+    color: "#f8fafc",
+    caption:
+      "Naik kelas bersama Toyota Innova Zenix Hybrid 2023. Kabin premium, hemat bahan bakar, dan siap menemani setiap perjalanan keluarga. TDP mulai Rp48 juta. #ZENIXHYBRID #MobixAutos",
+  },
+  {
+    id: "brv",
+    name: "Honda BR-V Prestige",
+    shortName: "BR-V Prestige",
+    year: "2021",
+    specs: "CVT · 7 Seater",
+    price: "Rp255 juta",
+    offer: "Cicilan mulai Rp5,8 juta",
+    color: "#94a3b8",
+    caption:
+      "Waktunya membawa keluarga menjelajah lebih jauh bersama Honda BR-V Prestige CVT. Nyaman, lega, dan siap pakai. Cicilan mulai Rp5,8 juta. #BRVFAMILY #MobixAutos",
+  },
+  {
+    id: "xpander",
+    name: "Mitsubishi Xpander",
+    shortName: "Xpander Ultimate",
+    year: "2021",
+    specs: "Ultimate · Automatic",
+    price: "Rp239 juta",
+    offer: "Bonus servis berkala",
+    color: "#f1f5f9",
+    caption:
+      "Mitsubishi Xpander Ultimate—partner andal untuk aktivitas dan liburan keluarga. Unit ready dengan bonus servis berkala. Jadwalkan test drive hari ini. #XPANDERWEEKEND #MobixAutos",
+  },
+];
+
+const socialDemoCampaigns = {
+  zenix: {
+    name: "Meta · Zenix Hybrid Juli",
+    utm: "utm_campaign=zenix_hybrid_jul26",
+    hashtag: "#ZENIXHYBRID",
+    clicks: 1284,
+    possible: 214,
+    leads: 96,
+    conversion: 7.5,
+    change: ["18,4%", "22,1%", "16,9%", "1,3 pt"],
+    trend: [
+      [38, 13], [52, 19], [47, 17], [68, 26], [61, 23], [78, 34], [91, 39],
+    ],
+  },
+  brv: {
+    name: "Instagram · BR-V Family Deal",
+    utm: "utm_campaign=brv_family_jul26",
+    hashtag: "#BRVFAMILY",
+    clicks: 864,
+    possible: 148,
+    leads: 71,
+    conversion: 8.2,
+    change: ["12,7%", "15,4%", "20,3%", "1,8 pt"],
+    trend: [
+      [29, 11], [35, 14], [42, 18], [40, 17], [57, 25], [64, 31], [71, 36],
+    ],
+  },
+  xpander: {
+    name: "Meta · Xpander Weekend",
+    utm: "utm_campaign=xpander_weekend",
+    hashtag: "#XPANDERWEEKEND",
+    clicks: 642,
+    possible: 103,
+    leads: 43,
+    conversion: 6.7,
+    change: ["9,8%", "11,2%", "8,6%", "0,7 pt"],
+    trend: [
+      [24, 8], [31, 10], [28, 9], [39, 14], [44, 17], [51, 20], [58, 24],
+    ],
+  },
+};
+
+class SocialGrowthDemo {
+  constructor(root) {
+    this.root = root;
+    this.view = "studio";
+    this.vehicleId = "zenix";
+    this.format = "square";
+    this.platforms = new Set(["instagram", "facebook"]);
+    this.captionVariant = 0;
+    this.monthOffset = 0;
+    this.lastFocusedElement = null;
+    this.posts = this.defaultPosts();
+
+    this.vehicleOptions = root.querySelector("[data-social-vehicle-options]");
+    this.captionInput = root.querySelector("[data-social-caption]");
+    this.headlineInput = root.querySelector("[data-social-headline]");
+    this.offerInput = root.querySelector("[data-social-offer]");
+    this.dateInput = root.querySelector("[data-social-date]");
+    this.timeInput = root.querySelector("[data-social-time]");
+    this.toast = root.querySelector("[data-social-toast]");
+    this.campaignSelect = root.querySelector("[data-social-campaign]");
+
+    this.bind();
+    this.reset();
+  }
+
+  defaultPosts() {
+    return [
+      { date: "2026-07-08", title: "BR-V Family Deal", platform: "instagram", status: "published" },
+      { date: "2026-07-16", title: "Xpander Weekend", platform: "facebook", status: "published" },
+      { date: "2026-07-24", title: "Tips Trade In", platform: "instagram", status: "draft" },
+      { date: "2026-07-29", title: "Zenix Hybrid", platform: "instagram", status: "planned" },
+    ];
+  }
+
+  bind() {
+    for (const button of document.querySelectorAll("[data-open-social-demo]")) {
+      button.addEventListener("click", () => this.open(button));
+    }
+    for (const button of this.root.querySelectorAll("[data-close-social-demo]")) {
+      button.addEventListener("click", () => this.close());
+    }
+
+    this.root.querySelector("[data-social-reset]").addEventListener("click", () => this.reset());
+    this.root.querySelector("[data-social-toast-close]").addEventListener("click", () => {
+      this.toast.hidden = true;
+    });
+
+    for (const button of this.root.querySelectorAll("[data-social-nav]")) {
+      button.addEventListener("click", () => this.switchView(button.dataset.socialNav || "studio"));
+    }
+
+    this.vehicleOptions.addEventListener("click", (event) => {
+      const button = event.target.closest("[data-social-vehicle]");
+      if (!button) return;
+      this.vehicleId = button.dataset.socialVehicle;
+      this.offerInput.value = this.vehicle().offer;
+      this.captionInput.value = this.vehicle().caption;
+      this.renderStudio();
+    });
+
+    for (const button of this.root.querySelectorAll("[data-social-format]")) {
+      button.addEventListener("click", () => {
+        this.format = button.dataset.socialFormat || "square";
+        this.renderStudio();
+      });
+    }
+
+    for (const button of this.root.querySelectorAll("[data-social-platform]")) {
+      button.addEventListener("click", () => {
+        const platform = button.dataset.socialPlatform;
+        if (!platform) return;
+        if (this.platforms.has(platform)) {
+          if (this.platforms.size === 1) return;
+          this.platforms.delete(platform);
+        } else {
+          this.platforms.add(platform);
+        }
+        this.renderStudio();
+      });
+    }
+
+    this.headlineInput.addEventListener("input", () => this.renderPreviewCopy());
+    this.offerInput.addEventListener("input", () => this.renderPreviewCopy());
+    this.captionInput.addEventListener("input", () => this.renderPreviewCopy());
+
+    this.root.querySelector("[data-social-generate]").addEventListener("click", () => {
+      this.captionVariant += 1;
+      const vehicle = this.vehicle();
+      const variants = [
+        vehicle.caption,
+        `${vehicle.name} ${vehicle.year} siap menemani cerita baru Anda. ${this.offerInput.value}. Unit terpilih, inspeksi transparan, dan bisa test drive. ${this.hashtagForVehicle()} #MobixAutos`,
+        `Cari ${vehicle.shortName} dengan kondisi siap pakai? Temukan penawaran spesial ${this.offerInput.value.toLowerCase()} dan konsultasikan kebutuhan Anda hari ini. ${this.hashtagForVehicle()} #MobilBekasBerkualitas`,
+      ];
+      this.captionInput.value = variants[this.captionVariant % variants.length];
+      this.renderPreviewCopy();
+    });
+
+    this.root.querySelector("[data-social-schedule]").addEventListener("click", () => this.schedule());
+    this.root.querySelector("[data-social-month-prev]").addEventListener("click", () => {
+      this.monthOffset = Math.max(0, this.monthOffset - 1);
+      this.renderCalendar();
+    });
+    this.root.querySelector("[data-social-month-next]").addEventListener("click", () => {
+      this.monthOffset = Math.min(1, this.monthOffset + 1);
+      this.renderCalendar();
+    });
+    this.campaignSelect.addEventListener("change", () => this.renderInsight());
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key !== "Escape" || !this.root.classList.contains("is-open")) return;
+      if (!this.toast.hidden) this.toast.hidden = true;
+      else this.close();
+    });
+  }
+
+  open(trigger) {
+    this.lastFocusedElement = trigger;
+    this.root.classList.add("is-open");
+    this.root.setAttribute("aria-hidden", "false");
+    document.body.classList.add("demo-open");
+    this.root.querySelector("[data-close-social-demo]").focus();
+  }
+
+  close() {
+    this.toast.hidden = true;
+    this.root.classList.remove("is-open");
+    this.root.setAttribute("aria-hidden", "true");
+    document.body.classList.remove("demo-open");
+    if (this.lastFocusedElement) this.lastFocusedElement.focus();
+  }
+
+  reset() {
+    this.view = "studio";
+    this.vehicleId = "zenix";
+    this.format = "square";
+    this.platforms = new Set(["instagram", "facebook"]);
+    this.captionVariant = 0;
+    this.monthOffset = 0;
+    this.posts = this.defaultPosts();
+    this.headlineInput.value = "Drive Your Dream Today";
+    this.offerInput.value = this.vehicle().offer;
+    this.captionInput.value = this.vehicle().caption;
+    this.dateInput.value = "2026-07-31";
+    this.timeInput.value = "09:00";
+    this.campaignSelect.value = "zenix";
+    this.toast.hidden = true;
+    this.root.querySelector(".social-progress span:last-child").classList.remove("active");
+    this.renderAll();
+    this.switchView("studio");
+  }
+
+  vehicle() {
+    return socialDemoVehicles.find((vehicle) => vehicle.id === this.vehicleId) || socialDemoVehicles[0];
+  }
+
+  hashtagForVehicle() {
+    if (this.vehicleId === "brv") return "#BRVFAMILY";
+    if (this.vehicleId === "xpander") return "#XPANDERWEEKEND";
+    return "#ZENIXHYBRID";
+  }
+
+  switchView(view) {
+    this.view = view;
+    const headings = {
+      studio: {
+        breadcrumb: "Social Media / Content Studio",
+        title: "Buat Konten Siap Tayang",
+        description: "Pilih unit, sesuaikan desain, lalu jadwalkan ke channel pilihan dalam satu alur.",
+      },
+      calendar: {
+        breadcrumb: "Social Media / Kalender Posting",
+        title: "Kalender Konten",
+        description: "Lihat seluruh draft, jadwal, dan konten yang sudah terbit dalam satu kalender.",
+      },
+      insight: {
+        breadcrumb: "Social Media / Campaign Insight",
+        title: "Campaign Insight",
+        description: "Hubungkan setiap klik campaign dengan lead dan status CRM yang dihasilkan.",
+      },
+    };
+    const heading = headings[view] || headings.studio;
+
+    for (const button of this.root.querySelectorAll("[data-social-nav]")) {
+      const active = button.dataset.socialNav === view;
+      button.classList.toggle("active", active);
+      button.setAttribute("aria-current", active ? "page" : "false");
+    }
+    for (const panel of this.root.querySelectorAll("[data-social-view-panel]")) {
+      const active = panel.dataset.socialViewPanel === view;
+      panel.hidden = !active;
+      panel.classList.toggle("is-active", active);
+    }
+    this.root.querySelector("[data-social-breadcrumb]").textContent = heading.breadcrumb;
+    this.root.querySelector("[data-social-page-title]").textContent = heading.title;
+    this.root.querySelector("[data-social-page-description]").textContent = heading.description;
+    if (view === "calendar") this.renderCalendar();
+    if (view === "insight") this.renderInsight();
+    this.root.querySelector(".social-workspace").scrollTop = 0;
+  }
+
+  renderAll() {
+    this.renderVehicles();
+    this.renderStudio();
+    this.renderCalendar();
+    this.renderInsight();
+  }
+
+  renderVehicles() {
+    this.vehicleOptions.innerHTML = socialDemoVehicles
+      .map(
+        (vehicle) => `
+          <button class="social-vehicle-card ${vehicle.id === this.vehicleId ? "active" : ""}" type="button" data-social-vehicle="${vehicle.id}">
+            <span class="social-vehicle-thumb" style="--car-color:${vehicle.color}"></span>
+            <span><b>${vehicle.shortName}</b><small>${vehicle.year} · ${vehicle.price}</small></span>
+            <em>✓</em>
+          </button>
+        `,
+      )
+      .join("");
+  }
+
+  renderStudio() {
+    const vehicle = this.vehicle();
+    this.renderVehicles();
+    for (const button of this.root.querySelectorAll("[data-social-format]")) {
+      const active = button.dataset.socialFormat === this.format;
+      button.classList.toggle("active", active);
+      button.setAttribute("aria-pressed", String(active));
+    }
+    for (const button of this.root.querySelectorAll("[data-social-platform]")) {
+      const active = this.platforms.has(button.dataset.socialPlatform);
+      button.classList.toggle("active", active);
+      button.setAttribute("aria-pressed", String(active));
+    }
+
+    const formatLabels = {
+      square: "Instagram Post · 1:1",
+      portrait: "Facebook / IG Feed · 4:5",
+      story: "Instagram Story · 9:16",
+    };
+    const creative = this.root.querySelector("[data-social-creative]");
+    creative.className = `social-creative-frame ${this.format}`;
+    this.root.querySelector("[data-social-preview-format]").textContent = formatLabels[this.format];
+    this.root.querySelector("[data-social-creative-title]").textContent = vehicle.name;
+    this.root.querySelector("[data-social-creative-year]").textContent = `${vehicle.year} · ${vehicle.specs}`;
+    this.root.querySelector("[data-social-car-art]").style.setProperty("--preview-car", vehicle.color);
+    const platformCount = this.platforms.size;
+    this.root.querySelector("[data-social-platform-count]").textContent =
+      `${platformCount} platform`;
+    this.renderPreviewCopy();
+  }
+
+  renderPreviewCopy() {
+    const headline = this.headlineInput.value.trim() || "Drive Your Dream Today";
+    const offer = this.offerInput.value.trim() || this.vehicle().offer;
+    const caption = this.captionInput.value.trim();
+    this.root.querySelector("[data-social-creative-headline]").textContent = headline.toLocaleUpperCase("id");
+    this.root.querySelector("[data-social-creative-offer]").textContent = offer;
+    this.root.querySelector("[data-social-preview-caption]").textContent = caption;
+    this.root.querySelector("[data-social-caption-count]").textContent = `${caption.length}/500`;
+  }
+
+  schedule() {
+    const date = this.dateInput.value;
+    const time = this.timeInput.value;
+    if (!date || !time) return;
+    const selectedPlatforms = [...this.platforms];
+    const existingIndex = this.posts.findIndex((post) => post.isDemoScheduled);
+    const post = {
+      date,
+      title: this.vehicle().shortName,
+      platform: selectedPlatforms[0],
+      status: "planned",
+      isDemoScheduled: true,
+    };
+    if (existingIndex >= 0) this.posts[existingIndex] = post;
+    else this.posts.push(post);
+    this.monthOffset = date.startsWith("2026-08") ? 1 : 0;
+    this.renderCalendar();
+    this.root.querySelector("[data-social-toast-copy]").textContent =
+      `${this.vehicle().shortName} · ${this.formatDate(date)} pukul ${time} WIB.`;
+    this.root.querySelector(".social-progress span:last-child").classList.add("active");
+    this.toast.hidden = false;
+    this.switchView("calendar");
+  }
+
+  renderCalendar() {
+    const year = 2026;
+    const month = 6 + this.monthOffset;
+    const monthNames = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus"];
+    this.root.querySelector("[data-social-month-title]").textContent = `${monthNames[month]} ${year}`;
+
+    const firstDay = new Date(Date.UTC(year, month, 1));
+    const mondayOffset = (firstDay.getUTCDay() + 6) % 7;
+    const daysInMonth = new Date(Date.UTC(year, month + 1, 0)).getUTCDate();
+    const daysInPrevious = new Date(Date.UTC(year, month, 0)).getUTCDate();
+    const cellCount = mondayOffset + daysInMonth > 35 ? 42 : 35;
+    const cells = [];
+
+    for (let index = 0; index < cellCount; index += 1) {
+      const day = index - mondayOffset + 1;
+      const inMonth = day >= 1 && day <= daysInMonth;
+      const displayDay = day < 1 ? daysInPrevious + day : day > daysInMonth ? day - daysInMonth : day;
+      const date = inMonth
+        ? `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`
+        : "";
+      const dayPosts = date ? this.posts.filter((post) => post.date === date) : [];
+      const postMarkup = dayPosts
+        .map(
+          (post) => `
+            <button class="social-calendar-post ${post.status} ${post.platform}" type="button" title="${post.title}">
+              <i>${post.platform === "facebook" ? "FB" : "IG"}</i>${post.title}
+            </button>
+          `,
+        )
+        .join("");
+      cells.push(`<div class="social-calendar-day ${inMonth ? "" : "is-muted"}"><span>${displayDay}</span>${postMarkup}</div>`);
+    }
+    this.root.querySelector("[data-social-calendar-days]").innerHTML = cells.join("");
+    const planned = this.posts.filter((post) => post.status === "planned").length;
+    this.root.querySelector("[data-social-total-posts]").textContent = String(this.posts.length);
+    this.root.querySelector("[data-social-planned-posts]").textContent = String(planned);
+    this.root.querySelector("[data-social-calendar-count]").textContent = String(this.posts.length);
+  }
+
+  renderInsight() {
+    const campaign = socialDemoCampaigns[this.campaignSelect.value] || socialDemoCampaigns.zenix;
+    this.root.querySelector("[data-social-campaign-name]").textContent = campaign.name;
+    this.root.querySelector("[data-social-utm]").textContent = campaign.utm;
+    this.root.querySelector("[data-social-hashtag]").textContent = campaign.hashtag;
+
+    const metrics = [
+      ["↗", "Tracked Clicks", campaign.clicks.toLocaleString("id-ID")],
+      ["◷", "Possible Leads", campaign.possible.toLocaleString("id-ID")],
+      ["✓", "Confirmed Leads", campaign.leads.toLocaleString("id-ID")],
+      ["%", "Conversion Rate", `${campaign.conversion.toFixed(1).replace(".", ",")}%`],
+    ];
+    this.root.querySelector("[data-social-insight-kpis]").innerHTML = metrics
+      .map(
+        ([icon, label, value], index) => `
+          <article class="social-insight-kpi"><span>${icon}</span><div><small>${label}</small><b>${value}</b><em>↑ ${campaign.change[index]} vs lalu</em></div></article>
+        `,
+      )
+      .join("");
+
+    const maxClicks = Math.max(...campaign.trend.map((point) => point[0]));
+    this.root.querySelector("[data-social-trend-chart]").innerHTML = campaign.trend
+      .map(
+        ([clicks, leads], index) => `
+          <div class="social-trend-day">
+            <i style="height:${Math.max(8, (clicks / maxClicks) * 100)}%"></i>
+            <i style="height:${Math.max(8, (leads / maxClicks) * 100)}%"></i>
+            <span>${22 + index} Jul</span>
+          </div>
+        `,
+      )
+      .join("");
+
+    const steps = [
+      ["UTM", "Tracked Click", campaign.utm, campaign.clicks],
+      ["?", "Possible Lead", "Nomor mulai teridentifikasi", campaign.possible],
+      ["CRM", "Confirmed Lead", "Customer masuk pipeline", campaign.leads],
+    ];
+    this.root.querySelector("[data-social-attribution]").innerHTML = steps
+      .map(
+        ([icon, label, copy, value]) => `
+          <div class="social-attribution-step"><span>${icon}</span><div><b>${label}</b><small>${copy}</small></div><strong>${Number(value).toLocaleString("id-ID")}</strong></div>
+        `,
+      )
+      .join("");
+
+    const ranking = [
+      ["Toyota Innova Zenix", "498 klik · 42 lead", "8,4%"],
+      ["Honda BR-V Prestige", "382 klik · 29 lead", "7,6%"],
+      ["Mitsubishi Xpander", "274 klik · 18 lead", "6,6%"],
+    ];
+    this.root.querySelector("[data-social-product-ranking]").innerHTML = ranking
+      .map(
+        ([name, copy, conversion], index) => `
+          <div class="social-product-row"><span>${index + 1}</span><span class="social-product-thumb"></span><div><b>${name}</b><small>${copy}</small></div><strong>${conversion}</strong></div>
+        `,
+      )
+      .join("");
+
+    const leads = [
+      ["Nadia Putri", "Innova Zenix", "Instagram", "Prospek"],
+      ["Raka Aditya", "Honda BR-V", "Facebook", "Follow-up"],
+      ["Dewi Maharani", "Innova Zenix", "Instagram", "Test Drive"],
+    ];
+    this.root.querySelector("[data-social-leads]").innerHTML = leads
+      .map(
+        ([customer, product, source, status]) => `
+          <tr><td>${customer}</td><td>${product}</td><td>${source}</td><td><span class="social-lead-status">${status}</span></td></tr>
+        `,
+      )
+      .join("");
+  }
+
+  formatDate(value) {
+    const date = new Date(`${value}T00:00:00Z`);
+    return new Intl.DateTimeFormat("id-ID", { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" }).format(date);
+  }
+}
+
+const socialDemoMount = document.getElementById("socialDemo");
+if (socialDemoMount) {
+  new SocialGrowthDemo(socialDemoMount);
+}
+
 class AsciiIndonesiaBackground {
   constructor(container) {
     this.el = container;
