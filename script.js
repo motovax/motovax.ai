@@ -563,6 +563,563 @@ if (inventoryDemoMount) {
   new InventoryProductDemo(inventoryDemoMount);
 }
 
+const crmDemoSeed = [
+  {
+    id: "lead-nadia",
+    name: "Nadia Demo",
+    unit: "Mitsubishi Xpander Ultimate 2023",
+    stage: "warm",
+    score: 62,
+    value: 320000000,
+    days: 8,
+    source: "whatsapp",
+    handler: "AI Bot · Dimas",
+    ai: true,
+    summary:
+      "Nadia menanyakan cicilan Xpander dan sudah menyebut kisaran uang muka. Respons terakhir positif, tetapi belum ada tindak lanjut selama 8 hari.",
+    recommendation: "Kirim simulasi cicilan dan tawarkan jadwal test drive.",
+    message:
+      "Halo Kak Nadia, saya Dimas dari Motovax. Simulasi cicilan Xpander Ultimate yang Kakak tanyakan sudah siap. Apakah saya boleh kirimkan rinciannya sekaligus bantu jadwalkan test drive minggu ini?",
+    events: [
+      { icon: "WA", title: "Menanyakan simulasi cicilan", detail: "WhatsApp masuk", time: "8 hari lalu" },
+      { icon: "AI", title: "AI mengidentifikasi minat tinggi", detail: "Intent: financing", time: "8 hari lalu" },
+      { icon: "D", title: "Dialihkan ke Dimas", detail: "Sales consultant", time: "8 hari lalu" },
+    ],
+  },
+  {
+    id: "lead-bayu",
+    name: "Bayu Prakoso",
+    unit: "Toyota Raize GR Sport 2022",
+    stage: "cold",
+    score: 28,
+    value: 236000000,
+    days: 2,
+    source: "instagram",
+    handler: "AI Bot · Rani",
+    ai: true,
+    summary: "Bayu menyimpan konten unit dari Instagram dan baru menanyakan ketersediaan warna.",
+    recommendation: "Kirim pilihan warna dan foto unit yang tersedia.",
+    message:
+      "Halo Kak Bayu, warna Toyota Raize yang Kakak tanyakan masih tersedia. Saya bisa kirim foto unit dan detail harganya di sini.",
+    events: [
+      { icon: "IG", title: "Membalas Instagram Story", detail: "Instagram DM", time: "2 hari lalu" },
+      { icon: "AI", title: "AI menjawab ketersediaan", detail: "Respons otomatis", time: "2 hari lalu" },
+    ],
+  },
+  {
+    id: "lead-sinta",
+    name: "Sinta Maharani",
+    unit: "Honda BR-V Prestige 2021",
+    stage: "cold",
+    score: 34,
+    value: 255000000,
+    days: 5,
+    source: "facebook",
+    handler: "AI Bot",
+    ai: true,
+    summary: "Sinta mengisi formulir iklan dan tertarik menukar unit lama, tetapi belum memberi detail kendaraan.",
+    recommendation: "Minta data singkat unit trade-in untuk estimasi awal.",
+    message:
+      "Halo Kak Sinta, terima kasih sudah tertarik dengan Honda BR-V. Boleh kirim tipe, tahun, dan foto unit lama Kakak agar tim kami bantu estimasi trade-in?",
+    events: [
+      { icon: "FB", title: "Lead dari Facebook Ads", detail: "Form iklan", time: "5 hari lalu" },
+      { icon: "AI", title: "Lead berhasil dikualifikasi", detail: "Minat: trade-in", time: "5 hari lalu" },
+    ],
+  },
+  {
+    id: "lead-andi",
+    name: "Andi Saputra",
+    unit: "Toyota Rush G AT 2022",
+    stage: "warm",
+    score: 55,
+    value: 190000000,
+    days: 4,
+    source: "excel_import",
+    handler: "Ayu",
+    ai: false,
+    summary: "Andi berasal dari daftar pameran dan sudah menerima katalog harga.",
+    recommendation: "Konfirmasi kebutuhan tenor dan target pembelian.",
+    message:
+      "Halo Pak Andi, saya Ayu dari Motovax. Apakah katalog Toyota Rush sudah sempat dilihat? Saya bisa bantu hitungkan cicilan sesuai tenor yang Bapak inginkan.",
+    events: [
+      { icon: "XL", title: "Diimpor dari daftar pameran", detail: "Excel Import", time: "6 hari lalu" },
+      { icon: "A", title: "Katalog dikirim oleh Ayu", detail: "Aktivitas sales", time: "4 hari lalu" },
+    ],
+  },
+  {
+    id: "lead-farhan",
+    name: "Farhan Rizki",
+    unit: "Honda HR-V S CVT 2020",
+    stage: "warm",
+    score: 58,
+    value: 248000000,
+    days: 7,
+    source: "whatsapp",
+    handler: "AI Bot · Dimas",
+    ai: true,
+    summary: "Farhan meminta video kondisi interior dan membandingkan dua pilihan unit.",
+    recommendation: "Kirim video walkaround dan tekankan hasil inspeksi.",
+    message:
+      "Halo Kak Farhan, video interior HR-V dan ringkasan inspeksinya sudah siap. Saya kirimkan sekarang agar Kakak bisa membandingkan kedua unitnya.",
+    events: [
+      { icon: "WA", title: "Meminta video unit", detail: "WhatsApp masuk", time: "7 hari lalu" },
+      { icon: "AI", title: "Kebutuhan dicatat AI", detail: "Intent: unit comparison", time: "7 hari lalu" },
+    ],
+  },
+  {
+    id: "lead-rizky",
+    name: "Rizky Ramadhan",
+    unit: "Suzuki Ertiga GX Hybrid 2023",
+    stage: "hot",
+    score: 88,
+    value: 243000000,
+    days: 1,
+    source: "whatsapp",
+    handler: "Rani",
+    ai: false,
+    summary: "Rizky sudah menyetujui kisaran cicilan dan ingin melihat unit akhir pekan ini.",
+    recommendation: "Kunci jadwal test drive dan siapkan unit.",
+    message:
+      "Halo Pak Rizky, kami siap jadwalkan test drive Ertiga Hybrid akhir pekan ini. Bapak lebih nyaman datang Sabtu atau Minggu?",
+    events: [
+      { icon: "WA", title: "Menyetujui kisaran cicilan", detail: "WhatsApp", time: "1 hari lalu" },
+      { icon: "R", title: "Rani menawarkan test drive", detail: "Aktivitas sales", time: "1 hari lalu" },
+    ],
+  },
+  {
+    id: "lead-laras",
+    name: "Laras Wulandari",
+    unit: "Daihatsu Rocky 1.2 X CVT 2022",
+    stage: "hot",
+    score: 79,
+    value: 189000000,
+    days: 3,
+    source: "instagram",
+    handler: "AI Bot · Ayu",
+    ai: true,
+    summary: "Laras sudah mengirim KTP untuk pengecekan awal dan menunggu pilihan paket pembiayaan.",
+    recommendation: "Kirim dua opsi paket pembiayaan terbaik.",
+    message:
+      "Halo Kak Laras, pengecekan awal sudah selesai. Saya punya dua pilihan paket pembiayaan Rocky yang paling sesuai. Boleh saya kirimkan perbandingannya?",
+    events: [
+      { icon: "IG", title: "Melanjutkan chat dari Instagram", detail: "Instagram DM", time: "3 hari lalu" },
+      { icon: "AI", title: "Dokumen awal diterima", detail: "Dibantu AI", time: "3 hari lalu" },
+    ],
+  },
+  {
+    id: "lead-yoga",
+    name: "Yoga Permana",
+    unit: "Toyota Avanza G CVT 2022",
+    stage: "prospect",
+    score: 91,
+    value: 229000000,
+    days: 1,
+    source: "walk_in",
+    handler: "Dimas",
+    ai: false,
+    summary: "Yoga sudah test drive, memilih unit, dan sedang melengkapi dokumen pemesanan.",
+    recommendation: "Pastikan kelengkapan dokumen dan konfirmasi metode pembayaran.",
+    message:
+      "Halo Pak Yoga, terima kasih sudah test drive Avanza. Saya bantu cek kembali kelengkapan dokumen agar proses pemesanannya bisa segera dilanjutkan.",
+    events: [
+      { icon: "TD", title: "Test drive selesai", detail: "Kunjungan showroom", time: "1 hari lalu" },
+      { icon: "D", title: "Dokumen pemesanan diminta", detail: "Dimas", time: "1 hari lalu" },
+    ],
+  },
+  {
+    id: "lead-maya",
+    name: "Maya Lestari",
+    unit: "Nissan Serena HWS AT 2023",
+    stage: "prospect",
+    score: 86,
+    value: 350000000,
+    days: 2,
+    source: "excel_import",
+    handler: "Ayu",
+    ai: false,
+    summary: "Maya telah menerima penawaran final dan meminta waktu untuk persetujuan keluarga.",
+    recommendation: "Follow-up singkat dengan masa berlaku penawaran.",
+    message:
+      "Halo Ibu Maya, saya ingin mengingatkan bahwa penawaran Serena berlaku sampai Jumat. Jika ada bagian yang ingin didiskusikan bersama keluarga, saya siap membantu.",
+    events: [
+      { icon: "XL", title: "Lead pelanggan lama", detail: "Excel Import", time: "9 hari lalu" },
+      { icon: "A", title: "Penawaran final dikirim", detail: "Ayu", time: "2 hari lalu" },
+    ],
+  },
+];
+
+const crmStageConfig = {
+  cold: { label: "Cold", probability: 0.1 },
+  warm: { label: "Warm", probability: 0.3 },
+  hot: { label: "Hot", probability: 0.7 },
+  prospect: { label: "Prospect", probability: 0.8 },
+};
+
+class AutopilotCRMDemo {
+  constructor(root) {
+    this.root = root;
+    this.leads = this.cloneSeed();
+    this.source = "all";
+    this.query = "";
+    this.mobileStage = "cold";
+    this.selectedId = null;
+    this.lastFocusedElement = null;
+    this.hasOpenedGuide = false;
+
+    this.board = root.querySelector("[data-crm-board]");
+    this.stageTabs = root.querySelector("[data-crm-stage-tabs]");
+    this.searchInput = root.querySelector("[data-crm-search]");
+    this.detailPanel = root.querySelector(".crm-detail-panel");
+    this.detailBackdrop = root.querySelector("[data-crm-detail-backdrop]");
+    this.guide = root.querySelector("[data-crm-guide-popover]");
+    this.toast = root.querySelector("[data-crm-toast]");
+    this.messagePreview = root.querySelector("[data-crm-message-preview]");
+    this.prepareButton = root.querySelector("[data-crm-prepare-followup]");
+    this.closedList = root.querySelector("[data-crm-closed-list]");
+
+    this.bind();
+    this.render();
+  }
+
+  cloneSeed() {
+    return crmDemoSeed.map((lead) => ({
+      ...lead,
+      events: lead.events.map((event) => ({ ...event })),
+    }));
+  }
+
+  bind() {
+    for (const button of document.querySelectorAll("[data-open-crm-demo]")) {
+      button.addEventListener("click", () => this.open(button));
+    }
+
+    for (const button of this.root.querySelectorAll("[data-close-crm-demo]")) {
+      button.addEventListener("click", () => this.close());
+    }
+
+    for (const button of this.root.querySelectorAll("[data-crm-source]")) {
+      button.addEventListener("click", () => {
+        this.source = button.dataset.crmSource || "all";
+        this.render();
+      });
+    }
+
+    this.searchInput.addEventListener("input", () => {
+      this.query = this.searchInput.value.trim().toLocaleLowerCase("id");
+      this.render();
+    });
+
+    this.board.addEventListener("click", (event) => this.handleLeadActivation(event));
+    this.board.addEventListener("keydown", (event) => this.handleLeadActivation(event));
+    this.stageTabs.addEventListener("click", (event) => {
+      const button = event.target.closest("[data-crm-stage]");
+      if (!button) return;
+      this.mobileStage = button.dataset.crmStage;
+      this.render();
+    });
+
+    for (const button of this.root.querySelectorAll("[data-close-crm-detail]")) {
+      button.addEventListener("click", () => this.closeDetail());
+    }
+    this.detailBackdrop.addEventListener("click", () => this.closeDetail());
+
+    this.prepareButton.addEventListener("click", () => this.prepareFollowup());
+    this.root.querySelector("[data-crm-send-followup]").addEventListener("click", () => this.sendFollowup());
+    this.root.querySelector("[data-crm-reset]").addEventListener("click", () => this.reset());
+
+    this.root.querySelector("[data-crm-guide]").addEventListener("click", () => this.openGuide());
+    this.root.querySelector("[data-close-crm-guide]").addEventListener("click", () => this.closeGuide());
+    this.root.querySelector("[data-crm-guide-start]").addEventListener("click", () => {
+      this.closeGuide();
+      this.source = "all";
+      this.query = "";
+      this.searchInput.value = "";
+      this.mobileStage = "warm";
+      this.render();
+      const featuredLead = this.root.querySelector('[data-lead-id="lead-nadia"]');
+      if (featuredLead) featuredLead.focus();
+    });
+    this.root.querySelector("[data-close-crm-toast]").addEventListener("click", () => {
+      this.toast.hidden = true;
+    });
+
+    this.root.querySelector("[data-crm-toggle-closed]").addEventListener("click", (event) => {
+      const button = event.currentTarget;
+      const isExpanded = button.getAttribute("aria-expanded") === "true";
+      button.setAttribute("aria-expanded", String(!isExpanded));
+      this.closedList.hidden = isExpanded;
+      this.root.querySelector("[data-crm-closed-chevron]").textContent = isExpanded ? "⌄" : "⌃";
+    });
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key !== "Escape" || !this.root.classList.contains("is-open")) return;
+      if (!this.toast.hidden) {
+        this.toast.hidden = true;
+      } else if (!this.guide.hidden) {
+        this.closeGuide();
+      } else if (this.detailPanel.classList.contains("is-open")) {
+        this.closeDetail();
+      } else {
+        this.close();
+      }
+    });
+  }
+
+  open(trigger) {
+    this.lastFocusedElement = trigger;
+    this.root.classList.add("is-open");
+    this.root.setAttribute("aria-hidden", "false");
+    document.body.classList.add("demo-open");
+    this.root.querySelector("[data-close-crm-demo]").focus();
+    if (!this.hasOpenedGuide) {
+      this.openGuide();
+      this.hasOpenedGuide = true;
+    }
+  }
+
+  close() {
+    this.closeDetail();
+    this.closeGuide();
+    this.toast.hidden = true;
+    this.root.classList.remove("is-open");
+    this.root.setAttribute("aria-hidden", "true");
+    document.body.classList.remove("demo-open");
+    if (this.lastFocusedElement) this.lastFocusedElement.focus();
+  }
+
+  openGuide() {
+    this.guide.hidden = false;
+    this.guide.querySelector("[data-crm-guide-start]").focus();
+  }
+
+  closeGuide() {
+    this.guide.hidden = true;
+  }
+
+  reset() {
+    this.leads = this.cloneSeed();
+    this.source = "all";
+    this.query = "";
+    this.mobileStage = "cold";
+    this.selectedId = null;
+    this.searchInput.value = "";
+    this.closedList.hidden = true;
+    const closedToggle = this.root.querySelector("[data-crm-toggle-closed]");
+    closedToggle.setAttribute("aria-expanded", "false");
+    this.root.querySelector("[data-crm-closed-chevron]").textContent = "⌄";
+    this.closeDetail();
+    this.toast.hidden = true;
+    this.render();
+  }
+
+  getVisibleLeads() {
+    return this.leads.filter((lead) => {
+      const isOmnichannel = ["whatsapp", "instagram", "facebook"].includes(lead.source);
+      const matchesSource =
+        this.source === "all" ||
+        (this.source === "omnichannel" && isOmnichannel) ||
+        (this.source === "excel" && lead.source === "excel_import");
+      const haystack = `${lead.name} ${lead.unit} ${lead.handler}`.toLocaleLowerCase("id");
+      return matchesSource && haystack.includes(this.query);
+    });
+  }
+
+  render() {
+    const visibleLeads = this.getVisibleLeads();
+    this.renderSummary();
+    this.renderFilters();
+    this.renderStageTabs(visibleLeads);
+    this.renderBoard(visibleLeads);
+  }
+
+  renderSummary() {
+    const pipeline = this.leads.reduce((total, lead) => total + lead.value, 0);
+    const forecast = this.leads.reduce(
+      (total, lead) => total + lead.value * crmStageConfig[lead.stage].probability,
+      0,
+    );
+    this.root.querySelector("[data-crm-pipeline-value]").textContent = this.formatCompactPrice(pipeline);
+    this.root.querySelector("[data-crm-forecast]").textContent = this.formatCompactPrice(forecast);
+    this.root.querySelector("[data-crm-active-count]").textContent = String(this.leads.length);
+    this.root.querySelector("[data-crm-followup-count]").textContent = String(
+      this.leads.filter((lead) => lead.days >= 7).length,
+    );
+    this.root.querySelector("[data-crm-hot-count]").textContent = String(
+      this.leads.filter((lead) => lead.stage === "hot").length,
+    );
+    this.root.querySelector("[data-crm-ai-count]").textContent = String(
+      this.leads.filter((lead) => lead.ai).length,
+    );
+  }
+
+  renderFilters() {
+    for (const button of this.root.querySelectorAll("[data-crm-source]")) {
+      button.classList.toggle("active", button.dataset.crmSource === this.source);
+    }
+  }
+
+  renderStageTabs(leads) {
+    this.stageTabs.innerHTML = Object.entries(crmStageConfig)
+      .map(([stage, config]) => {
+        const count = leads.filter((lead) => lead.stage === stage).length;
+        return `<button class="${stage === this.mobileStage ? "active" : ""}" type="button" role="tab" aria-selected="${stage === this.mobileStage}" data-crm-stage="${stage}">${config.label} (${count})</button>`;
+      })
+      .join("");
+  }
+
+  renderBoard(leads) {
+    this.board.innerHTML = Object.entries(crmStageConfig)
+      .map(([stage, config]) => {
+        const stageLeads = leads.filter((lead) => lead.stage === stage);
+        const stageValue = stageLeads.reduce((total, lead) => total + lead.value, 0);
+        const cards = stageLeads.length
+          ? stageLeads.map((lead) => this.renderLeadCard(lead)).join("")
+          : '<div class="crm-empty">Belum ada lead pada filter ini.</div>';
+        return `
+          <section class="crm-column ${stage === this.mobileStage ? "is-mobile-active" : ""}" data-crm-column="${stage}">
+            <div class="crm-column-head ${stage}">
+              <span><i></i><b>${config.label}</b><em>${stageLeads.length}</em></span>
+              <small>${this.formatCompactPrice(stageValue)}</small>
+            </div>
+            <div class="crm-column-list">${cards}</div>
+          </section>
+        `;
+      })
+      .join("");
+  }
+
+  renderLeadCard(lead) {
+    const isFeatured = lead.id === "lead-nadia" && !lead.followedUp;
+    return `
+      <article class="crm-lead-card ${isFeatured ? "featured" : ""}" data-lead-id="${lead.id}" tabindex="0" aria-label="Buka detail ${lead.name}">
+        ${isFeatured ? '<span class="crm-try-badge">Coba ini</span>' : ""}
+        <div class="crm-lead-card-head">
+          <h3>${lead.name}</h3>
+          <span class="crm-score">${lead.score}/100</span>
+        </div>
+        <p class="crm-lead-unit">${lead.unit}</p>
+        <div class="crm-lead-meta">
+          <span class="crm-source-badge ${lead.source}">${this.sourceLabel(lead.source)}</span>
+          <b>${this.formatCompactPrice(lead.value)}</b>
+        </div>
+        <div class="crm-lead-card-footer">
+          <span class="crm-handler">${lead.handler}</span>
+          <span class="crm-stale ${lead.days >= 7 ? "high" : ""}">${lead.days} hari di stage</span>
+        </div>
+      </article>
+    `;
+  }
+
+  handleLeadActivation(event) {
+    if (event.type === "keydown" && event.key !== "Enter" && event.key !== " ") return;
+    const card = event.target.closest("[data-lead-id]");
+    if (!card) return;
+    if (event.type === "keydown") event.preventDefault();
+    this.openDetail(card.dataset.leadId);
+  }
+
+  openDetail(leadId) {
+    const lead = this.leads.find((item) => item.id === leadId);
+    if (!lead) return;
+    this.selectedId = lead.id;
+    this.closeGuide();
+    this.populateDetail(lead);
+    this.detailBackdrop.hidden = false;
+    this.detailPanel.classList.add("is-open");
+    this.detailPanel.setAttribute("aria-hidden", "false");
+    this.detailPanel.querySelector("[data-close-crm-detail]").focus();
+  }
+
+  populateDetail(lead) {
+    this.root.querySelector("[data-crm-detail-name]").textContent = lead.name;
+    this.root.querySelector("[data-crm-detail-unit]").textContent = lead.unit;
+    const stageBadge = this.root.querySelector("[data-crm-detail-stage]");
+    stageBadge.className = `crm-stage-badge ${lead.stage}`;
+    stageBadge.textContent = crmStageConfig[lead.stage].label;
+    const sourceBadge = this.root.querySelector("[data-crm-detail-source]");
+    sourceBadge.className = `crm-source-badge ${lead.source}`;
+    sourceBadge.textContent = this.sourceLabel(lead.source);
+    this.root.querySelector("[data-crm-detail-score]").textContent = `Skor ${lead.score}/100`;
+    this.root.querySelector("[data-crm-detail-value]").textContent = this.formatCompactPrice(lead.value);
+    this.root.querySelector("[data-crm-detail-days]").textContent = `${lead.days} hari`;
+    this.root.querySelector("[data-crm-detail-handler]").textContent = lead.handler;
+    this.root.querySelector("[data-crm-detail-summary]").textContent = lead.summary;
+    this.root.querySelector("[data-crm-detail-recommendation]").textContent = lead.recommendation;
+    this.root.querySelector("[data-crm-message]").textContent = lead.message;
+    this.root.querySelector("[data-crm-timeline]").innerHTML = lead.events
+      .map(
+        (event) => `
+          <div class="crm-timeline-item">
+            <span>${event.icon}</span>
+            <div><b>${event.title}</b><small>${event.detail}</small></div>
+            <time>${event.time}</time>
+          </div>
+        `,
+      )
+      .join("");
+    this.messagePreview.hidden = true;
+    this.prepareButton.disabled = Boolean(lead.followedUp);
+    this.prepareButton.textContent = lead.followedUp ? "Follow-up sudah disimulasikan" : "Siapkan follow-up AI";
+  }
+
+  closeDetail() {
+    this.detailPanel.classList.remove("is-open");
+    this.detailPanel.setAttribute("aria-hidden", "true");
+    this.detailBackdrop.hidden = true;
+    this.messagePreview.hidden = true;
+  }
+
+  prepareFollowup() {
+    const lead = this.leads.find((item) => item.id === this.selectedId);
+    if (!lead || lead.followedUp) return;
+    this.messagePreview.hidden = false;
+    this.root.querySelector("[data-crm-send-followup]").focus();
+  }
+
+  sendFollowup() {
+    const lead = this.leads.find((item) => item.id === this.selectedId);
+    if (!lead || lead.followedUp) return;
+    const nextStage = { cold: "warm", warm: "hot", hot: "prospect", prospect: "prospect" };
+    const oldScore = lead.score;
+    lead.stage = nextStage[lead.stage];
+    lead.score = Math.min(95, lead.score + 22);
+    lead.days = 0;
+    lead.followedUp = true;
+    lead.summary =
+      "Follow-up simulasi mendapat respons positif. Lead meminta rincian berikutnya dan kini masuk prioritas tinggi.";
+    lead.recommendation = "Hubungi secara personal untuk mengunci jadwal test drive.";
+    lead.events.unshift(
+      { icon: "✓", title: "Lead merespons positif (simulasi)", detail: "Stage dan skor diperbarui", time: "baru saja" },
+      { icon: "AI", title: "Follow-up AI dikirim (simulasi)", detail: "Tidak ada pesan nyata", time: "baru saja" },
+    );
+    this.mobileStage = lead.stage;
+    this.render();
+    this.populateDetail(lead);
+    this.toast.querySelector("b").textContent = `Lead naik menjadi ${crmStageConfig[lead.stage].label}`;
+    this.toast.querySelector("p").textContent =
+      `Skor ${lead.name} berubah ${oldScore} → ${lead.score} dan forecast diperbarui.`;
+    this.toast.hidden = false;
+  }
+
+  sourceLabel(source) {
+    if (source === "excel_import") return "Excel";
+    if (source === "walk_in") return "Walk-in";
+    return source;
+  }
+
+  formatCompactPrice(value) {
+    if (value >= 1000000000) {
+      return `Rp ${(value / 1000000000).toLocaleString("id-ID", { maximumFractionDigits: 2 })} M`;
+    }
+    return `Rp ${(value / 1000000).toLocaleString("id-ID", { maximumFractionDigits: 0 })} jt`;
+  }
+}
+
+const crmDemoMount = document.getElementById("crmDemo");
+if (crmDemoMount) {
+  new AutopilotCRMDemo(crmDemoMount);
+}
+
 class AsciiIndonesiaBackground {
   constructor(container) {
     this.el = container;
