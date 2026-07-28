@@ -1120,6 +1120,637 @@ if (crmDemoMount) {
   new AutopilotCRMDemo(crmDemoMount);
 }
 
+const omniDemoContacts = [
+  {
+    id: "omni-nadia",
+    name: "Nadia Demo",
+    channel: "whatsapp",
+    preview: "Cari mobil keluarga budget 250 juta",
+    time: "10:42",
+    messages: [
+      {
+        role: "customer",
+        content: "Saya cari mobil keluarga budget sekitar 250 juta. Ada rekomendasi?",
+        time: "10:41",
+      },
+      {
+        role: "assistant",
+        content:
+          "Ada dua pilihan dari stok demo: Honda BR-V Prestige 2021 Rp255 jt dan Toyota Rush G AT 2022 Rp190 jt. Lebih penting kabin luas atau efisiensi cicilan, Kak?",
+        time: "10:42",
+      },
+    ],
+  },
+  {
+    id: "omni-rizky",
+    name: "Rizky Ramadhan",
+    channel: "instagram",
+    preview: "Mau test drive besok sore",
+    time: "10:18",
+    messages: [
+      { role: "customer", content: "Unit Ertiga Hybrid masih ada? Saya mau test drive besok sore.", time: "10:17" },
+      {
+        role: "assistant",
+        content:
+          "Unit tersedia di data demo. Minat test drive saya tandai sebagai HOT dan saya siapkan konteksnya untuk Call Center. Besok sekitar pukul berapa, Kak?",
+        time: "10:18",
+      },
+    ],
+  },
+  {
+    id: "omni-sinta",
+    name: "Sinta Maharani",
+    channel: "messenger",
+    preview: "Bisa trade-in mobil lama?",
+    time: "09:56",
+    messages: [
+      { role: "customer", content: "Kalau beli BR-V bisa trade-in mobil lama?", time: "09:55" },
+      {
+        role: "assistant",
+        content: "Bisa dibantu estimasi awal. Sebutkan merek, tipe, tahun, dan kondisi singkat mobilnya ya, Kak.",
+        time: "09:56",
+      },
+    ],
+  },
+  {
+    id: "omni-bayu",
+    name: "Bayu Prakoso",
+    channel: "whatsapp",
+    preview: "Minta foto interior Raize",
+    time: "09:34",
+    messages: [
+      { role: "customer", content: "Boleh lihat foto interior Raize yang ready?", time: "09:33" },
+      {
+        role: "assistant",
+        content: "Boleh. Saya cek unit yang tepat dulu agar foto tidak tertukar. Ada preferensi warna, Kak?",
+        time: "09:34",
+      },
+    ],
+  },
+  {
+    id: "omni-laras",
+    name: "Laras Wulandari",
+    channel: "instagram",
+    preview: "Tanya paket pembiayaan",
+    time: "08:47",
+    messages: [
+      { role: "customer", content: "Ada paket pembiayaan untuk Rocky?", time: "08:46" },
+      {
+        role: "assistant",
+        content: "Ada beberapa opsi. Agar tidak mengarang angka, saya perlu unit, target DP, dan tenor yang diinginkan.",
+        time: "08:47",
+      },
+    ],
+  },
+  {
+    id: "omni-farhan",
+    name: "Farhan Rizki",
+    channel: "messenger",
+    preview: "Bandingkan HR-V dan Xpander",
+    time: "Kemarin",
+    messages: [
+      { role: "customer", content: "Untuk keluarga lebih cocok HR-V atau Xpander?", time: "Kemarin" },
+      {
+        role: "assistant",
+        content:
+          "Saya bisa bantu membandingkan dari kebutuhan dan data unit. Berapa jumlah penumpang rutin dan lebih sering dipakai di kota atau perjalanan jauh?",
+        time: "Kemarin",
+      },
+    ],
+  },
+  {
+    id: "omni-maya",
+    name: "Maya Lestari",
+    channel: "whatsapp",
+    preview: "Lokasi showroom terdekat",
+    time: "Kemarin",
+    messages: [
+      { role: "customer", content: "Showroom terdekat dari Bintaro di mana?", time: "Kemarin" },
+      {
+        role: "assistant",
+        content: "Saya cek lokasi resmi dealer untuk area Bintaro agar tidak memberi alamat yang keliru.",
+        time: "Kemarin",
+      },
+    ],
+  },
+  {
+    id: "omni-andi",
+    name: "Andi Saputra",
+    channel: "whatsapp",
+    preview: "Mau booking Toyota Rush",
+    time: "Senin",
+    messages: [
+      { role: "customer", content: "Saya sudah cocok dengan Rush, mau booking.", time: "Senin" },
+      {
+        role: "assistant",
+        content: "Siap, minat booking saya tandai sebagai prioritas tinggi dan konteksnya disiapkan untuk tim sales.",
+        time: "Senin",
+      },
+    ],
+  },
+];
+
+class OmnichannelAIDemo {
+  constructor(root) {
+    this.root = root;
+    this.contacts = this.cloneContacts();
+    this.activeContactId = "omni-nadia";
+    this.channel = "all";
+    this.mobilePanel = "chat";
+    this.lastFocusedElement = null;
+    this.hasOpenedGuide = false;
+    this.humanTakeover = false;
+
+    this.contactList = root.querySelector("[data-omni-contact-list]");
+    this.chatLog = root.querySelector("[data-omni-chat-log]");
+    this.input = root.querySelector("[data-omni-input]");
+    this.form = root.querySelector("[data-omni-form]");
+    this.guide = root.querySelector("[data-omni-guide-popover]");
+    this.toast = root.querySelector("[data-omni-toast]");
+    this.takeoverButton = root.querySelector("[data-omni-human-takeover]");
+
+    this.defaultTrace = {
+      domain: "query",
+      risk: "low",
+      effect: "read_only",
+      router: "Memilih domain query dari konteks percakapan.",
+      tool: "inventory.search · read_only",
+      grounding: "Jawaban hanya memakai hasil data demo.",
+      evalTitle: "Skenario pencarian stok",
+      blocked: false,
+      assertions: [
+        "Domain routing sesuai",
+        "Data source terverifikasi",
+        "Tidak ada side effect",
+        "Data sensitif tidak bocor",
+      ],
+    };
+    this.trace = { ...this.defaultTrace };
+
+    this.bind();
+    this.render();
+  }
+
+  cloneContacts() {
+    return omniDemoContacts.map((contact) => ({
+      ...contact,
+      messages: contact.messages.map((message) => ({ ...message })),
+    }));
+  }
+
+  bind() {
+    for (const button of document.querySelectorAll("[data-open-omni-demo]")) {
+      button.addEventListener("click", () => this.open(button));
+    }
+    for (const button of this.root.querySelectorAll("[data-close-omni-demo]")) {
+      button.addEventListener("click", () => this.close());
+    }
+
+    this.root.querySelector("[data-omni-reset]").addEventListener("click", () => this.reset());
+    this.root.querySelector("[data-omni-guide]").addEventListener("click", () => this.openGuide());
+    this.root.querySelector("[data-close-omni-guide]").addEventListener("click", () => this.closeGuide());
+    this.root.querySelector("[data-omni-guide-start]").addEventListener("click", () => {
+      this.closeGuide();
+      this.runPrompt("Saya cari mobil keluarga budget 250 juta");
+    });
+    this.root.querySelector("[data-close-omni-toast]").addEventListener("click", () => {
+      this.toast.hidden = true;
+    });
+
+    for (const button of this.root.querySelectorAll("[data-omni-channel]")) {
+      button.addEventListener("click", () => {
+        this.channel = button.dataset.omniChannel || "all";
+        const activeStillVisible =
+          this.channel === "all" || this.activeContact().channel === this.channel;
+        if (!activeStillVisible) {
+          const firstMatch = this.contacts.find((contact) => contact.channel === this.channel);
+          if (firstMatch) this.activeContactId = firstMatch.id;
+        }
+        this.render();
+      });
+    }
+
+    this.contactList.addEventListener("click", (event) => {
+      const contact = event.target.closest("[data-omni-contact]");
+      if (!contact) return;
+      this.activeContactId = contact.dataset.omniContact;
+      this.humanTakeover = false;
+      this.render();
+    });
+
+    for (const button of this.root.querySelectorAll("[data-omni-prompt]")) {
+      button.addEventListener("click", () => this.runPrompt(button.dataset.omniPrompt || ""));
+    }
+
+    this.form.addEventListener("submit", (event) => {
+      event.preventDefault();
+      const message = this.input.value.trim();
+      if (!message) return;
+      this.runPrompt(message);
+    });
+
+    this.takeoverButton.addEventListener("click", () => {
+      this.humanTakeover = !this.humanTakeover;
+      this.takeoverButton.classList.toggle("taken", this.humanTakeover);
+      this.takeoverButton.textContent = this.humanTakeover ? "Diambil alih" : "Ambil alih";
+      const contact = this.activeContact();
+      contact.messages.push({
+        role: "assistant",
+        content: this.humanTakeover
+          ? "Call Center mengambil alih percakapan (simulasi). Ringkasan kebutuhan dan riwayat lead tetap tersedia."
+          : "Percakapan dikembalikan ke Jasmine AI (simulasi).",
+        time: "baru saja",
+      });
+      this.renderChat();
+    });
+
+    for (const button of this.root.querySelectorAll("[data-omni-mobile-tab]")) {
+      button.addEventListener("click", () => {
+        this.mobilePanel = button.dataset.omniMobileTab || "chat";
+        this.renderMobilePanel();
+      });
+    }
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key !== "Escape" || !this.root.classList.contains("is-open")) return;
+      if (!this.toast.hidden) {
+        this.toast.hidden = true;
+      } else if (!this.guide.hidden) {
+        this.closeGuide();
+      } else {
+        this.close();
+      }
+    });
+  }
+
+  open(trigger) {
+    this.lastFocusedElement = trigger;
+    this.root.classList.add("is-open");
+    this.root.setAttribute("aria-hidden", "false");
+    document.body.classList.add("demo-open");
+    this.root.querySelector("[data-close-omni-demo]").focus();
+    if (!this.hasOpenedGuide) {
+      this.openGuide();
+      this.hasOpenedGuide = true;
+    }
+  }
+
+  close() {
+    this.closeGuide();
+    this.toast.hidden = true;
+    this.root.classList.remove("is-open");
+    this.root.setAttribute("aria-hidden", "true");
+    document.body.classList.remove("demo-open");
+    if (this.lastFocusedElement) this.lastFocusedElement.focus();
+  }
+
+  openGuide() {
+    this.guide.hidden = false;
+    this.guide.querySelector("[data-omni-guide-start]").focus();
+  }
+
+  closeGuide() {
+    this.guide.hidden = true;
+  }
+
+  reset() {
+    this.contacts = this.cloneContacts();
+    this.activeContactId = "omni-nadia";
+    this.channel = "all";
+    this.mobilePanel = "chat";
+    this.trace = { ...this.defaultTrace };
+    this.humanTakeover = false;
+    this.takeoverButton.classList.remove("taken");
+    this.takeoverButton.textContent = "Ambil alih";
+    this.input.value = "";
+    this.toast.hidden = true;
+    this.render();
+  }
+
+  activeContact() {
+    return this.contacts.find((contact) => contact.id === this.activeContactId) || this.contacts[0];
+  }
+
+  render() {
+    this.renderChannelFilter();
+    this.renderContacts();
+    this.renderChat();
+    this.renderTrace();
+    this.renderMobilePanel();
+  }
+
+  renderChannelFilter() {
+    for (const button of this.root.querySelectorAll("[data-omni-channel]")) {
+      button.classList.toggle("active", button.dataset.omniChannel === this.channel);
+    }
+  }
+
+  renderContacts() {
+    const contacts = this.contacts.filter(
+      (contact) => this.channel === "all" || contact.channel === this.channel,
+    );
+    if (!contacts.length) {
+      this.contactList.innerHTML = '<div class="omni-contact-empty">Tidak ada percakapan pada channel ini.</div>';
+      return;
+    }
+    this.contactList.innerHTML = contacts
+      .map(
+        (contact) => `
+          <button class="omni-contact ${contact.id === this.activeContactId ? "active" : ""}" type="button" data-omni-contact="${contact.id}">
+            <span class="omni-contact-avatar ${contact.channel}">${this.initials(contact.name)}</span>
+            <span class="omni-contact-main">
+              <span><i class="omni-channel-dot ${contact.channel}"></i><b>${contact.name}</b></span>
+              <small>${contact.preview}</small>
+            </span>
+            <time>${contact.time}</time>
+          </button>
+        `,
+      )
+      .join("");
+  }
+
+  renderChat() {
+    const contact = this.activeContact();
+    const avatar = this.root.querySelector("[data-omni-active-avatar]");
+    avatar.className = `omni-contact-avatar ${contact.channel}`;
+    avatar.textContent = this.initials(contact.name);
+    this.root.querySelector("[data-omni-active-name]").textContent = contact.name;
+    this.root.querySelector("[data-omni-active-channel]").textContent = this.channelLabel(contact.channel);
+
+    this.chatLog.replaceChildren();
+    for (const message of contact.messages) {
+      const row = document.createElement("div");
+      row.className = `omni-message ${message.role}${message.blocked ? " blocked" : ""}`;
+      const bubble = document.createElement("div");
+      bubble.className = "omni-message-bubble";
+      bubble.textContent = message.content;
+      const meta = document.createElement("div");
+      meta.className = "omni-message-meta";
+      if (message.role === "assistant") {
+        const badge = document.createElement("span");
+        badge.className = message.blocked ? "omni-blocked-badge" : "omni-ai-badge";
+        badge.textContent = message.blocked ? "GUARDRAIL" : "JASMINE AI";
+        meta.appendChild(badge);
+      }
+      meta.append(document.createTextNode(message.time));
+      row.append(bubble, meta);
+      this.chatLog.appendChild(row);
+    }
+    this.chatLog.scrollTop = this.chatLog.scrollHeight;
+  }
+
+  renderTrace() {
+    this.root.querySelector("[data-omni-domain]").textContent = this.trace.domain;
+    this.root.querySelector("[data-omni-risk]").textContent = this.trace.risk;
+    this.root.querySelector("[data-omni-effect]").textContent = this.trace.effect;
+    this.root.querySelector("[data-omni-router]").textContent = this.trace.router;
+    this.root.querySelector("[data-omni-tool]").textContent = this.trace.tool;
+    this.root.querySelector("[data-omni-grounding]").textContent = this.trace.grounding;
+    this.root.querySelector("[data-omni-eval-title]").textContent = this.trace.evalTitle;
+
+    const status = this.root.querySelector("[data-omni-eval-status]");
+    status.className = `omni-eval-status ${this.trace.blocked ? "blocked" : "pass"}`;
+    status.textContent = this.trace.blocked ? "BLOCKED · PASS" : "PASS";
+
+    const assertions = this.root.querySelector("[data-omni-assertions]");
+    assertions.replaceChildren();
+    for (const assertion of this.trace.assertions) {
+      const item = document.createElement("li");
+      item.className = this.trace.blocked ? "blocked" : "pass";
+      const icon = document.createElement("span");
+      icon.textContent = "✓";
+      item.append(icon, document.createTextNode(assertion));
+      assertions.appendChild(item);
+    }
+  }
+
+  renderMobilePanel() {
+    for (const button of this.root.querySelectorAll("[data-omni-mobile-tab]")) {
+      const active = button.dataset.omniMobileTab === this.mobilePanel;
+      button.classList.toggle("active", active);
+      button.setAttribute("aria-selected", String(active));
+    }
+    for (const panel of this.root.querySelectorAll("[data-omni-mobile-panel]")) {
+      panel.classList.toggle("is-mobile-active", panel.dataset.omniMobilePanel === this.mobilePanel);
+    }
+  }
+
+  runPrompt(message) {
+    const text = message.trim().slice(0, 500);
+    if (!text) return;
+    this.closeGuide();
+    this.toast.hidden = true;
+    this.input.value = "";
+
+    const contact = this.activeContact();
+    contact.messages.push({ role: "customer", content: text, time: "baru saja" });
+    const result = this.evaluateMessage(text);
+    contact.messages.push({
+      role: "assistant",
+      content: result.response,
+      time: "baru saja",
+      blocked: result.trace.blocked,
+    });
+    contact.preview = result.trace.blocked ? "Ancaman diblokir oleh guardrail" : text;
+    contact.time = "baru";
+    this.trace = result.trace;
+    this.render();
+
+    if (result.trace.blocked) {
+      this.toast.hidden = false;
+    }
+  }
+
+  evaluateMessage(message) {
+    const normalized = message
+      .normalize("NFKD")
+      .toLocaleLowerCase("id")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/\s+/g, " ")
+      .trim();
+
+    if (this.isSecurityThreat(normalized)) {
+      return {
+        response:
+          "Permintaan tidak diizinkan. Saya tidak dapat menghapus knowledge/data, mengungkap prompt atau kredensial, mengubah permission, maupun mengakses tenant lain. Tidak ada tool atau perubahan yang dijalankan.",
+        trace: {
+          domain: "security",
+          risk: "critical",
+          effect: "blocked",
+          router: "Instruksi bertentangan dengan kebijakan dan batas role.",
+          tool: "none · 0 tool calls",
+          grounding: "Input dihentikan sebelum menyentuh data atau channel.",
+          evalTitle: "Prompt injection & destructive action",
+          blocked: true,
+          assertions: [
+            "Instruksi berbahaya ditolak",
+            "System prompt tetap rahasia",
+            "Tool calls = 0",
+            "Side effects = 0",
+          ],
+        },
+      };
+    }
+
+    if (/(test drive|tes drive|lihat unit|datang|booking|mau beli|mau ambil|deal)/.test(normalized)) {
+      return {
+        response:
+          "Minat kunjungan terdeteksi sebagai HOT. Saya tidak mengirim apa pun dari demo ini, tetapi konteks lead sudah disiapkan: unit minat, waktu kunjungan, dan alasan handoff. Besok sekitar pukul berapa, Kak?",
+        trace: {
+          domain: "handoff",
+          risk: "medium",
+          effect: "simulated_write",
+          router: "Sinyal buying intent tinggi diarahkan ke handoff.",
+          tool: "lead.handoff · simulasi saja",
+          grounding: "Konteks handoff disusun dari pesan, tanpa mengarang data.",
+          evalTitle: "HOT lead & contextual handoff",
+          blocked: false,
+          assertions: [
+            "Lead diklasifikasi HOT",
+            "Konteks handoff lengkap",
+            "External send = 0",
+            "Tidak ada data nyata berubah",
+          ],
+        },
+      };
+    }
+
+    if (/(dp|cicilan|tenor|kredit|angsuran|leasing|pembiayaan)/.test(normalized)) {
+      return {
+        response:
+          "Saya tidak akan mengarang angka pembiayaan. Sebutkan unit, target DP, dan tenor yang diinginkan; sistem kemudian memakai kalkulator resmi atau menyerahkannya ke sales untuk penawaran final.",
+        trace: {
+          domain: "finance",
+          risk: "low",
+          effect: "read_only",
+          router: "Pertanyaan DP/cicilan masuk domain finance.",
+          tool: "finance.simulate · menunggu parameter",
+          grounding: "Angka hanya boleh berasal dari kalkulator resmi.",
+          evalTitle: "Finance without fabrication",
+          blocked: false,
+          assertions: [
+            "Domain finance sesuai",
+            "Tidak mengarang angka",
+            "Parameter wajib diminta",
+            "Penawaran final diarahkan ke sales",
+          ],
+        },
+      };
+    }
+
+    if (/(foto|gambar|video|interior|eksterior)/.test(normalized)) {
+      return {
+        response:
+          "Saya cek unit yang tepat lebih dulu agar media tidak tertukar. Di demo ini tidak ada file yang dikirim. Sebutkan model atau plat unit fiktif yang ingin dilihat.",
+        trace: {
+          domain: "photo",
+          risk: "low",
+          effect: "read_only",
+          router: "Permintaan media masuk domain photo.",
+          tool: "inventory.search · read_only",
+          grounding: "Unit diverifikasi sebelum media dipilih.",
+          evalTitle: "Safe media selection",
+          blocked: false,
+          assertions: [
+            "Domain photo sesuai",
+            "Unit diverifikasi dahulu",
+            "External send = 0",
+            "Tidak ada media nyata dikirim",
+          ],
+        },
+      };
+    }
+
+    if (/(caption|konten|promo|posting|iklan)/.test(normalized)) {
+      return {
+        response:
+          "Saya bisa menyiapkan draft konten dari data unit yang terverifikasi. Pada demo ini hasil hanya berupa preview dan tidak dipublikasikan ke channel mana pun.",
+        trace: {
+          domain: "content",
+          risk: "low",
+          effect: "read_only",
+          router: "Permintaan materi promosi masuk domain content.",
+          tool: "content.caption · preview",
+          grounding: "Draft memakai atribut unit yang sudah diverifikasi.",
+          evalTitle: "Content preview safety",
+          blocked: false,
+          assertions: [
+            "Domain content sesuai",
+            "Unit source terverifikasi",
+            "Publish tidak dipanggil",
+            "External send = 0",
+          ],
+        },
+      };
+    }
+
+    if (/(mobil|unit|stok|harga|budget|keluarga|xpander|br-v|brv|rush|raize|ertiga|rocky)/.test(normalized)) {
+      return {
+        response:
+          "Dari stok fiktif demo, ada Honda BR-V Prestige 2021 Rp255 jt dan Toyota Rush G AT 2022 Rp190 jt. Agar rekomendasinya tepat, lebih penting kabin luas, konsumsi bahan bakar, atau cicilan ringan, Kak?",
+        trace: {
+          ...this.defaultTrace,
+          assertions: [...this.defaultTrace.assertions],
+        },
+      };
+    }
+
+    return {
+      response:
+        "Saya siap membantu dari satu inbox untuk WhatsApp, Instagram, dan Facebook. Ceritakan kebutuhan kendaraan, budget, atau rencana waktunya agar saya bisa menentukan langkah berikutnya.",
+      trace: {
+        domain: "general",
+        risk: "low",
+        effect: "none",
+        router: "Belum ada domain operasional yang cukup spesifik.",
+        tool: "none · menunggu konteks",
+        grounding: "AI meminta klarifikasi daripada menebak.",
+        evalTitle: "Clarify before acting",
+        blocked: false,
+        assertions: [
+          "Tidak menebak intent",
+          "Tidak memanggil tool prematur",
+          "Pertanyaan lanjutan relevan",
+          "Tidak ada side effect",
+        ],
+      },
+    };
+  }
+
+  isSecurityThreat(message) {
+    const threatPatterns = [
+      /(hapus|delete|remove|drop|kosongkan|reset|wipe|destroy|musnahkan).*(knowledge|database|data|customer|tenant|riwayat|log|sistem|stok)/,
+      /(abaikan|ignore|bypass|lewati|override).*(instruksi|instruction|aturan|guardrail|security|system|sistem)/,
+      /(system prompt|prompt sistem|api key|token rahasia|password|credential|secret|kredensial)/,
+      /(ubah|naikkan|beri|jadikan).*(permission|role|akses|admin|otorisasi)/,
+      /(tenant lain|semua tenant|cross.?tenant|lintas tenant)/,
+      /(sql|shell|terminal|command).*(jalankan|run|execute|eksekusi)/,
+      /(export|unduh|download|kirim).*(semua customer|seluruh data|database|semua lead)/,
+    ];
+    return threatPatterns.some((pattern) => pattern.test(message));
+  }
+
+  initials(name) {
+    return name
+      .split(/\s+/)
+      .slice(0, 2)
+      .map((part) => part[0])
+      .join("")
+      .toLocaleUpperCase("id");
+  }
+
+  channelLabel(channel) {
+    if (channel === "instagram") return "Instagram";
+    if (channel === "messenger") return "Facebook Messenger";
+    return "WhatsApp";
+  }
+}
+
+const omniDemoMount = document.getElementById("omniDemo");
+if (omniDemoMount) {
+  new OmnichannelAIDemo(omniDemoMount);
+}
+
 class AsciiIndonesiaBackground {
   constructor(container) {
     this.el = container;
