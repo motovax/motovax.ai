@@ -1033,6 +1033,8 @@ i.tel,
 }
 
 .feature-card-demo {
+  display: flex;
+  flex-direction: column;
   border-color: #cbdcf7;
   box-shadow: 0 16px 42px rgba(18, 103, 245, 0.12);
 }
@@ -1087,7 +1089,7 @@ i.tel,
   align-items: center;
   justify-content: center;
   gap: 10px;
-  margin-top: 18px;
+  margin-top: 0;
   border: 0;
   border-radius: 9px;
   color: #fff;
@@ -1107,6 +1109,12 @@ i.tel,
 
 .feature-demo-button span {
   font-size: 18px;
+}
+
+.feature-demo-footer {
+  width: 100%;
+  margin-top: auto;
+  padding-top: 18px;
 }
 
 .feature-demo-note {
@@ -1363,19 +1371,27 @@ i.tel,
   font-weight: 800;
 }
 
-.source-list {
-  width: 52%;
+.insight-card-visual {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 104px;
+  align-items: center;
+  gap: 18px;
   margin-top: 20px;
+}
+
+.insight-card-visual .source-list {
+  width: 100%;
+  margin-top: 0;
 }
 
 .source-list p {
   align-items: center;
 }
 
-.feature-card .donut.small {
-  position: absolute;
-  right: 24px;
-  bottom: 32px;
+.insight-card-visual .donut.small {
+  position: relative;
+  right: auto;
+  bottom: auto;
 }
 
 .ai-section {
@@ -4617,11 +4633,13 @@ body.demo-open {
     width: 100%;
   }
 
-  .feature-card .donut.small {
-    position: relative;
-    right: auto;
-    bottom: auto;
-    margin-top: 14px;
+  .insight-card-visual {
+    grid-template-columns: minmax(0, 1fr) 88px;
+    gap: 12px;
+  }
+
+  .insight-card-visual .donut.small {
+    width: 88px;
   }
 
   .ai-banner {
