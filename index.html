@@ -328,12 +328,15 @@
               <small class="feature-demo-note">Tanpa daftar · Simulasi aman · Data fiktif</small>
             </article>
 
-            <article class="feature-card">
-              <div class="feature-icon">DB</div>
+            <article class="feature-card feature-card-demo dashboard-feature-card">
+              <div class="feature-card-topline">
+                <div class="feature-icon">DB</div>
+                <span class="demo-available-badge"><i></i> Demo tersedia</span>
+              </div>
               <h3>One Dashboard</h3>
               <p>
-                Satu dashboard untuk semua channel, semua KPI, semua cabang. Ambil keputusan
-                lebih cepat dengan data real-time.
+                Satu dashboard untuk semua channel, KPI, dan cabang—dengan tampilan yang
+                dapat disesuaikan untuk setiap peran dan kebutuhan.
               </p>
               <div class="micro-dashboard">
                 <div><small>Leads</small><b>1.248</b><span>+20%</span></div>
@@ -343,6 +346,10 @@
               <svg class="micro-chart" viewBox="0 0 320 72" aria-hidden="true">
                 <path d="M5 50 44 32 83 46 122 20 161 38 200 18 239 34 278 24 315 36" fill="none" stroke="#1967f2" stroke-width="5" stroke-linecap="round" />
               </svg>
+              <button class="feature-demo-button" type="button" data-open-dashboard-demo>
+                Kustom dashboard Anda <span aria-hidden="true">→</span>
+              </button>
+              <small class="feature-demo-note">Tanpa daftar · Widget fleksibel · Data dummy</small>
             </article>
 
             <article class="feature-card">
@@ -1111,6 +1118,183 @@
         <span>🛡</span>
         <div><b>Ancaman berhasil diblokir</b><p>Tidak ada tool, data, atau perubahan yang dijalankan.</p></div>
         <button type="button" data-close-omni-toast aria-label="Tutup notifikasi">×</button>
+      </div>
+    </div>
+
+    <div
+      class="inventory-demo dashboard-product-demo"
+      id="dashboardDemo"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="dashboardDemoTitle"
+      aria-hidden="true"
+    >
+      <div class="demo-app">
+        <header class="demo-topbar">
+          <div class="demo-brand-wrap">
+            <span class="demo-brand"><span>MOTO</span><strong>VAX</strong></span>
+            <span class="demo-divider" aria-hidden="true"></span>
+            <div>
+              <b id="dashboardDemoTitle">One Dashboard</b>
+              <span>Executive Command Center · Tampilan produk</span>
+            </div>
+          </div>
+          <div class="demo-topbar-actions">
+            <span class="demo-mode dashboard-flex-mode"><i></i> Layout Fleksibel</span>
+            <button class="demo-reset-button" type="button" data-dashboard-reset>Reset demo</button>
+            <button class="demo-close-button" type="button" data-close-dashboard-demo aria-label="Tutup demo">
+              <span aria-hidden="true">×</span>
+            </button>
+          </div>
+        </header>
+
+        <div class="demo-layout">
+          <aside class="demo-sidebar dashboard-sidebar" aria-label="Navigasi One Dashboard">
+            <nav>
+              <span class="demo-nav-section">Analytics</span>
+              <button class="active" type="button">
+                <svg class="demo-nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3h7v8H3V3Zm11 0h7v5h-7V3ZM3 15h7v6H3v-6Zm11-3h7v9h-7v-9Z"/></svg>
+                <span>Executive Overview</span>
+              </button>
+              <button type="button">
+                <svg class="demo-nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19V9m8 10V5m8 14v-7M2 19h20"/></svg>
+                <span>Sales Performance</span>
+              </button>
+              <button type="button">
+                <svg class="demo-nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 21V7l8-4 8 4v14M8 10h2m4 0h2M8 14h2m4 0h2M8 18h8"/></svg>
+                <span>Branch Performance</span>
+              </button>
+              <button type="button">
+                <svg class="demo-nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4v8Z"/></svg>
+                <span>Omnichannel</span>
+              </button>
+            </nav>
+            <div class="demo-sidebar-tip dashboard-sidebar-tip">
+              <span>DASHBOARD ANDA</span>
+              <b>Satu data, beda kebutuhan</b>
+              <p>Direktur, Sales Manager, dan Kepala Cabang dapat memiliki susunan KPI serta widget masing-masing.</p>
+              <button type="button" data-dashboard-customize-sidebar>Atur tampilan →</button>
+            </div>
+          </aside>
+
+          <main class="demo-workspace dashboard-workspace">
+            <div class="demo-page-heading dashboard-page-heading">
+              <div>
+                <span class="demo-breadcrumb">Analytics / One Dashboard</span>
+                <h2 data-dashboard-title>Executive Overview</h2>
+                <p data-dashboard-description>Ringkasan lintas cabang untuk keputusan strategis dan pertumbuhan bisnis.</p>
+              </div>
+              <div class="dashboard-heading-actions">
+                <label class="dashboard-branch-select">
+                  <span>Cabang</span>
+                  <select data-dashboard-branch aria-label="Pilih cabang">
+                    <option value="all">Semua Cabang</option>
+                    <option value="pondok-bambu">Pondok Bambu</option>
+                    <option value="cinere">Cinere</option>
+                    <option value="cibubur">Cibubur</option>
+                  </select>
+                </label>
+                <div class="dashboard-period-switch" role="group" aria-label="Periode dashboard">
+                  <button class="active" type="button" data-dashboard-period="mtd">MTD</button>
+                  <button type="button" data-dashboard-period="qtd">QTD</button>
+                  <button type="button" data-dashboard-period="ytd">YTD</button>
+                </div>
+                <button class="demo-primary-action dashboard-customize-button" type="button" data-dashboard-customize aria-label="Buka kustomisasi dashboard">
+                  <span aria-hidden="true">✦</span> Kustom Dashboard
+                </button>
+              </div>
+            </div>
+
+            <div class="dashboard-personalization-banner">
+              <span class="dashboard-banner-icon">✦</span>
+              <div>
+                <b>Tampilan ini bisa mengikuti cara kerja tim Anda</b>
+                <p>Pilih peran, cabang, periode, lalu tentukan widget yang paling penting.</p>
+              </div>
+              <button type="button" data-dashboard-customize-banner>Coba kustomisasi</button>
+            </div>
+
+            <section class="dashboard-kpi-grid" data-dashboard-widget="kpi" aria-label="KPI utama"></section>
+
+            <section class="dashboard-content-grid">
+              <article class="dashboard-panel dashboard-revenue-panel" data-dashboard-widget="revenue">
+                <header>
+                  <div><span>PENDAPATAN</span><h3>Tren Pendapatan + Forecast</h3></div>
+                  <div class="dashboard-legend"><span><i class="actual"></i> Aktual</span><span><i class="forecast"></i> Forecast</span></div>
+                </header>
+                <div class="dashboard-revenue-total"><b data-dashboard-revenue-total>Rp1,84 M</b><span data-dashboard-revenue-delta>↑ 18,6% vs periode lalu</span></div>
+                <div class="dashboard-bar-chart" data-dashboard-chart aria-label="Grafik tren pendapatan"></div>
+              </article>
+
+              <article class="dashboard-panel dashboard-funnel-panel" data-dashboard-widget="pipeline">
+                <header><div><span>PIPELINE SALES</span><h3>Corong Konversi</h3></div><em data-dashboard-pipeline-total>1.248 lead</em></header>
+                <div class="dashboard-funnel" data-dashboard-funnel></div>
+              </article>
+
+              <article class="dashboard-panel dashboard-branch-panel" data-dashboard-widget="branches">
+                <header><div><span>MULTI-BRANCH</span><h3>Performa Cabang</h3></div><button type="button">Lihat detail →</button></header>
+                <div class="dashboard-table-wrap">
+                  <table>
+                    <thead><tr><th>Cabang</th><th>Revenue</th><th>Closing</th><th>Konversi</th><th>Target</th></tr></thead>
+                    <tbody data-dashboard-branch-table></tbody>
+                  </table>
+                </div>
+              </article>
+
+              <article class="dashboard-panel dashboard-agents-panel" data-dashboard-widget="agents">
+                <header><div><span>SALES TEAM</span><h3>Top Agent</h3></div><em>Bulan ini</em></header>
+                <div class="dashboard-agent-list" data-dashboard-agent-list></div>
+              </article>
+
+              <article class="dashboard-panel dashboard-alert-panel" data-dashboard-widget="alerts">
+                <header><div><span>PRIORITAS HARI INI</span><h3>Insight &amp; Peringatan</h3></div><em data-dashboard-alert-count>3 perlu perhatian</em></header>
+                <div class="dashboard-alert-list" data-dashboard-alert-list></div>
+              </article>
+            </section>
+
+            <aside class="dashboard-customizer" data-dashboard-customizer aria-hidden="true">
+              <header>
+                <div><span>PERSONALISASI</span><h3>Kustom Dashboard</h3><p>Susun tampilan yang relevan untuk setiap pengambil keputusan.</p></div>
+                <button type="button" data-dashboard-customizer-close aria-label="Tutup panel kustomisasi">×</button>
+              </header>
+
+              <div class="dashboard-customizer-scroll">
+                <fieldset>
+                  <legend>Dashboard untuk</legend>
+                  <div class="dashboard-role-options">
+                    <button class="active" type="button" data-dashboard-role="director"><span>DI</span><div><b>Direktur</b><small>Ringkasan lintas cabang</small></div><i>✓</i></button>
+                    <button type="button" data-dashboard-role="sales"><span>SM</span><div><b>Sales Manager</b><small>Pipeline dan produktivitas</small></div><i>✓</i></button>
+                    <button type="button" data-dashboard-role="branch"><span>BM</span><div><b>Kepala Cabang</b><small>Operasional harian cabang</small></div><i>✓</i></button>
+                  </div>
+                </fieldset>
+
+                <fieldset>
+                  <legend>Widget yang ditampilkan</legend>
+                  <div class="dashboard-widget-options">
+                    <label><input type="checkbox" data-dashboard-toggle="kpi" checked /><span><i></i></span><div><b>KPI Utama</b><small>Revenue, pipeline, conversion</small></div></label>
+                    <label><input type="checkbox" data-dashboard-toggle="revenue" checked /><span><i></i></span><div><b>Tren + Forecast</b><small>Pendapatan aktual dan proyeksi</small></div></label>
+                    <label><input type="checkbox" data-dashboard-toggle="pipeline" checked /><span><i></i></span><div><b>Pipeline Sales</b><small>Corong konversi lead</small></div></label>
+                    <label><input type="checkbox" data-dashboard-toggle="branches" checked /><span><i></i></span><div><b>Performa Cabang</b><small>Komparasi seluruh cabang</small></div></label>
+                    <label><input type="checkbox" data-dashboard-toggle="agents" checked /><span><i></i></span><div><b>Top Agent</b><small>Leaderboard sales</small></div></label>
+                    <label><input type="checkbox" data-dashboard-toggle="alerts" checked /><span><i></i></span><div><b>Insight &amp; Peringatan</b><small>Prioritas yang perlu tindakan</small></div></label>
+                  </div>
+                </fieldset>
+              </div>
+
+              <footer>
+                <small><span>●</span> Preview berubah langsung</small>
+                <button type="button" data-dashboard-save>Simpan layout</button>
+              </footer>
+            </aside>
+            <button class="dashboard-customizer-backdrop" type="button" data-dashboard-customizer-backdrop aria-label="Tutup panel kustomisasi" hidden></button>
+          </main>
+        </div>
+      </div>
+
+      <div class="demo-toast dashboard-toast" role="status" aria-live="polite" data-dashboard-toast hidden>
+        <span>✓</span>
+        <div><b>Layout berhasil disimpan</b><p data-dashboard-toast-copy>Dashboard Direktur siap digunakan.</p></div>
+        <button type="button" data-dashboard-toast-close aria-label="Tutup notifikasi">×</button>
       </div>
     </div>
 

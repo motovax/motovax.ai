@@ -1751,6 +1751,419 @@ if (omniDemoMount) {
   new OmnichannelAIDemo(omniDemoMount);
 }
 
+const dashboardDemoRoles = {
+  director: {
+    label: "Direktur",
+    title: "Executive Overview",
+    description: "Ringkasan lintas cabang untuk keputusan strategis dan pertumbuhan bisnis.",
+    widgets: ["kpi", "revenue", "pipeline", "branches", "agents", "alerts"],
+  },
+  sales: {
+    label: "Sales Manager",
+    title: "Sales Performance",
+    description: "Pantau kualitas pipeline, produktivitas tim, dan peluang closing dari satu layar.",
+    widgets: ["kpi", "revenue", "pipeline", "agents", "alerts"],
+  },
+  branch: {
+    label: "Kepala Cabang",
+    title: "Branch Command Center",
+    description: "Fokus pada target, aktivitas sales, dan prioritas operasional cabang hari ini.",
+    widgets: ["kpi", "pipeline", "branches", "agents", "alerts"],
+  },
+};
+
+const dashboardDemoData = {
+  branches: [
+    { id: "pondok-bambu", name: "Pondok Bambu", revenue: 742, closing: 31, conversion: 8.4, target: 92 },
+    { id: "cinere", name: "Cinere", revenue: 618, closing: 26, conversion: 7.8, target: 84 },
+    { id: "cibubur", name: "Cibubur", revenue: 480, closing: 21, conversion: 6.9, target: 76 },
+  ],
+  agents: [
+    { name: "Rizky Pratama", branch: "Pondok Bambu", closing: 14, revenue: 328 },
+    { name: "Nadia Putri", branch: "Cinere", closing: 12, revenue: 286 },
+    { name: "Fajar Maulana", branch: "Cibubur", closing: 10, revenue: 241 },
+    { name: "Ayu Lestari", branch: "Pondok Bambu", closing: 9, revenue: 218 },
+  ],
+  chart: [
+    { label: "Feb", actual: 54 },
+    { label: "Mar", actual: 68 },
+    { label: "Apr", actual: 61 },
+    { label: "Mei", actual: 78 },
+    { label: "Jun", actual: 72 },
+    { label: "Jul", actual: 88, forecast: 96 },
+    { label: "Agu", forecast: 100 },
+  ],
+};
+
+class OneDashboardDemo {
+  constructor(root) {
+    this.root = root;
+    this.role = "director";
+    this.period = "mtd";
+    this.branch = "all";
+    this.visibleWidgets = new Set(dashboardDemoRoles.director.widgets);
+    this.lastFocusedElement = null;
+    this.hasOpened = false;
+
+    this.customizer = root.querySelector("[data-dashboard-customizer]");
+    this.customizerBackdrop = root.querySelector("[data-dashboard-customizer-backdrop]");
+    this.toast = root.querySelector("[data-dashboard-toast]");
+    this.kpiGrid = root.querySelector("[data-dashboard-widget='kpi']");
+    this.chart = root.querySelector("[data-dashboard-chart]");
+    this.funnel = root.querySelector("[data-dashboard-funnel]");
+    this.branchTable = root.querySelector("[data-dashboard-branch-table]");
+    this.agentList = root.querySelector("[data-dashboard-agent-list]");
+    this.alertList = root.querySelector("[data-dashboard-alert-list]");
+    this.branchSelect = root.querySelector("[data-dashboard-branch]");
+
+    this.bind();
+    this.render();
+  }
+
+  bind() {
+    for (const button of document.querySelectorAll("[data-open-dashboard-demo]")) {
+      button.addEventListener("click", () => this.open(button));
+    }
+
+    for (const button of this.root.querySelectorAll("[data-close-dashboard-demo]")) {
+      button.addEventListener("click", () => this.close());
+    }
+
+    this.root.querySelector("[data-dashboard-reset]").addEventListener("click", () => this.reset());
+    this.root.querySelector("[data-dashboard-customize]").addEventListener("click", () => this.openCustomizer());
+    this.root.querySelector("[data-dashboard-customize-banner]").addEventListener("click", () => this.openCustomizer());
+    this.root.querySelector("[data-dashboard-customize-sidebar]").addEventListener("click", () => this.openCustomizer());
+    this.root.querySelector("[data-dashboard-customizer-close]").addEventListener("click", () => this.closeCustomizer());
+    this.customizerBackdrop.addEventListener("click", () => this.closeCustomizer());
+
+    for (const button of this.root.querySelectorAll("[data-dashboard-period]")) {
+      button.addEventListener("click", () => {
+        this.period = button.dataset.dashboardPeriod || "mtd";
+        this.render();
+      });
+    }
+
+    this.branchSelect.addEventListener("change", () => {
+      this.branch = this.branchSelect.value;
+      this.render();
+    });
+
+    for (const button of this.root.querySelectorAll("[data-dashboard-role]")) {
+      button.addEventListener("click", () => {
+        this.role = button.dataset.dashboardRole || "director";
+        this.visibleWidgets = new Set(dashboardDemoRoles[this.role].widgets);
+        this.syncWidgetInputs();
+        this.render();
+      });
+    }
+
+    for (const input of this.root.querySelectorAll("[data-dashboard-toggle]")) {
+      input.addEventListener("change", () => {
+        const widget = input.dataset.dashboardToggle;
+        if (!widget) return;
+        if (input.checked) this.visibleWidgets.add(widget);
+        else this.visibleWidgets.delete(widget);
+        this.renderWidgets();
+      });
+    }
+
+    this.root.querySelector("[data-dashboard-save]").addEventListener("click", () => {
+      this.closeCustomizer();
+      this.root.querySelector("[data-dashboard-toast-copy]").textContent =
+        `Dashboard ${dashboardDemoRoles[this.role].label} siap digunakan.`;
+      this.toast.hidden = false;
+      this.toast.querySelector("[data-dashboard-toast-close]").focus();
+    });
+
+    this.root.querySelector("[data-dashboard-toast-close]").addEventListener("click", () => {
+      this.toast.hidden = true;
+    });
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key !== "Escape" || !this.root.classList.contains("is-open")) return;
+      if (!this.toast.hidden) {
+        this.toast.hidden = true;
+      } else if (this.customizer.classList.contains("is-open")) {
+        this.closeCustomizer();
+      } else {
+        this.close();
+      }
+    });
+  }
+
+  open(trigger) {
+    this.lastFocusedElement = trigger;
+    this.root.classList.add("is-open");
+    this.root.setAttribute("aria-hidden", "false");
+    document.body.classList.add("demo-open");
+    this.root.querySelector("[data-close-dashboard-demo]").focus();
+
+    if (!this.hasOpened) {
+      this.openCustomizer();
+      this.hasOpened = true;
+    }
+  }
+
+  close() {
+    this.closeCustomizer();
+    this.toast.hidden = true;
+    this.root.classList.remove("is-open");
+    this.root.setAttribute("aria-hidden", "true");
+    document.body.classList.remove("demo-open");
+    if (this.lastFocusedElement) this.lastFocusedElement.focus();
+  }
+
+  openCustomizer() {
+    this.customizer.classList.add("is-open");
+    this.customizer.setAttribute("aria-hidden", "false");
+    this.customizerBackdrop.hidden = false;
+    this.customizer.querySelector("[data-dashboard-customizer-close]").focus();
+  }
+
+  closeCustomizer() {
+    this.customizer.classList.remove("is-open");
+    this.customizer.setAttribute("aria-hidden", "true");
+    this.customizerBackdrop.hidden = true;
+  }
+
+  reset() {
+    this.role = "director";
+    this.period = "mtd";
+    this.branch = "all";
+    this.branchSelect.value = "all";
+    this.visibleWidgets = new Set(dashboardDemoRoles.director.widgets);
+    this.toast.hidden = true;
+    this.syncWidgetInputs();
+    this.render();
+  }
+
+  syncWidgetInputs() {
+    for (const input of this.root.querySelectorAll("[data-dashboard-toggle]")) {
+      input.checked = this.visibleWidgets.has(input.dataset.dashboardToggle);
+    }
+  }
+
+  periodMultiplier() {
+    if (this.period === "qtd") return 2.56;
+    if (this.period === "ytd") return 6.84;
+    return 1;
+  }
+
+  branchMultiplier() {
+    if (this.branch === "pondok-bambu") return 0.4;
+    if (this.branch === "cinere") return 0.335;
+    if (this.branch === "cibubur") return 0.265;
+    return 1;
+  }
+
+  scopedBranches() {
+    if (this.branch === "all") return dashboardDemoData.branches;
+    return dashboardDemoData.branches.filter((branch) => branch.id === this.branch);
+  }
+
+  render() {
+    const role = dashboardDemoRoles[this.role];
+    const multiplier = this.periodMultiplier() * this.branchMultiplier();
+    const periodLabel = this.period.toLocaleUpperCase("id");
+
+    this.root.querySelector("[data-dashboard-title]").textContent = role.title;
+    this.root.querySelector("[data-dashboard-description]").textContent = role.description;
+
+    for (const button of this.root.querySelectorAll("[data-dashboard-period]")) {
+      const active = button.dataset.dashboardPeriod === this.period;
+      button.classList.toggle("active", active);
+      button.setAttribute("aria-pressed", String(active));
+    }
+
+    for (const button of this.root.querySelectorAll("[data-dashboard-role]")) {
+      const active = button.dataset.dashboardRole === this.role;
+      button.classList.toggle("active", active);
+      button.setAttribute("aria-pressed", String(active));
+    }
+
+    const kpis = [
+      {
+        label: `Pendapatan ${periodLabel}`,
+        icon: "Rp",
+        value: this.formatRupiahCompact(1840 * multiplier),
+        change: "18,6%",
+        context: "vs periode lalu",
+      },
+      {
+        label: "Pipeline Aktif",
+        icon: "PL",
+        value: `${Math.round(1248 * multiplier).toLocaleString("id-ID")} lead`,
+        change: "12,4%",
+        context: "prospek bertumbuh",
+      },
+      {
+        label: "Tingkat Konversi",
+        icon: "%",
+        value: `${(7.7 + (this.branch === "pondok-bambu" ? 0.7 : 0)).toFixed(1).replace(".", ",")}%`,
+        change: "1,2 pt",
+        context: "di atas target",
+      },
+      {
+        label: "Rata-rata Deal",
+        icon: "AV",
+        value: "Rp23,6 jt",
+        change: "8,3%",
+        context: "nilai per closing",
+      },
+      {
+        label: "Kecepatan Closing",
+        icon: "⏱",
+        value: this.branch === "cinere" ? "4,2 hari" : "4,8 hari",
+        change: "0,9 hari",
+        context: "lebih cepat",
+      },
+    ];
+
+    this.kpiGrid.innerHTML = kpis
+      .map(
+        (kpi) => `
+          <article class="dashboard-kpi-card">
+            <span>${kpi.label}<i>${kpi.icon}</i></span>
+            <b>${kpi.value}</b>
+            <small><em>↑ ${kpi.change}</em>${kpi.context}</small>
+          </article>
+        `,
+      )
+      .join("");
+
+    const chartScale = Math.min(1.08, 0.76 + this.periodMultiplier() * 0.12);
+    this.chart.innerHTML = dashboardDemoData.chart
+      .map((point) => {
+        const actual = point.actual
+          ? `<i style="height:${Math.min(100, point.actual * chartScale)}%" title="Aktual ${point.label}"></i>`
+          : "";
+        const forecast = point.forecast
+          ? `<i class="forecast" style="height:${Math.min(100, point.forecast * chartScale)}%" title="Forecast ${point.label}"></i>`
+          : "";
+        return `<div class="dashboard-bar-item">${actual}${forecast}<small>${point.label}</small></div>`;
+      })
+      .join("");
+
+    this.root.querySelector("[data-dashboard-revenue-total]").textContent =
+      this.formatRupiahCompact(1840 * multiplier);
+    this.root.querySelector("[data-dashboard-revenue-delta]").textContent =
+      `↑ ${this.period === "ytd" ? "24,1" : "18,6"}% vs periode lalu`;
+
+    const pipeline = [
+      ["Lead Baru", 1248, 100],
+      ["Terhubung", 864, 69],
+      ["Prospek", 512, 41],
+      ["Hot", 226, 18],
+      ["Deal", 96, 8],
+    ];
+    this.root.querySelector("[data-dashboard-pipeline-total]").textContent =
+      `${Math.round(1248 * multiplier).toLocaleString("id-ID")} lead`;
+    this.funnel.innerHTML = pipeline
+      .map(
+        ([label, count, width]) => `
+          <div class="dashboard-funnel-row">
+            <span>${label}</span>
+            <div class="dashboard-funnel-track"><i style="width:${width}%"></i></div>
+            <b>${Math.max(1, Math.round(count * multiplier)).toLocaleString("id-ID")}</b>
+          </div>
+        `,
+      )
+      .join("");
+
+    this.branchTable.innerHTML = this.scopedBranches()
+      .map(
+        (branch) => `
+          <tr>
+            <td>${branch.name}</td>
+            <td>${this.formatRupiahCompact(branch.revenue * this.periodMultiplier())}</td>
+            <td>${Math.round(branch.closing * this.periodMultiplier())} unit</td>
+            <td>${branch.conversion.toFixed(1).replace(".", ",")}%</td>
+            <td><span class="dashboard-target-cell"><i style="--progress:${branch.target}%"></i>${branch.target}%</span></td>
+          </tr>
+        `,
+      )
+      .join("");
+
+    const agents = this.branch === "all"
+      ? dashboardDemoData.agents
+      : dashboardDemoData.agents.filter((agent) => agent.branch.toLocaleLowerCase("id").replaceAll(" ", "-") === this.branch);
+    this.agentList.innerHTML = agents
+      .slice(0, 4)
+      .map(
+        (agent, index) => `
+          <div class="dashboard-agent">
+            <span>${index + 1}</span>
+            <span class="dashboard-agent-avatar">${this.initials(agent.name)}</span>
+            <div><b>${agent.name}</b><small>${agent.branch} · ${Math.round(agent.closing * this.periodMultiplier())} closing</small></div>
+            <strong>${this.formatRupiahCompact(agent.revenue * this.periodMultiplier())}</strong>
+          </div>
+        `,
+      )
+      .join("");
+
+    const branchName = this.branchSelect.options[this.branchSelect.selectedIndex].text;
+    const alerts = [
+      {
+        type: "warning",
+        icon: "!",
+        title: "7 lead HOT belum ditindaklanjuti",
+        copy: `${branchName} · potensi Rp186 jt menunggu respons sales.`,
+      },
+      {
+        type: "positive",
+        icon: "↑",
+        title: "Konversi naik 18,6%",
+        copy: "WhatsApp menjadi sumber dengan pertumbuhan closing tertinggi.",
+      },
+      {
+        type: "info",
+        icon: "i",
+        title: "Forecast mencapai 108% target",
+        copy: "Pertahankan kecepatan follow-up untuk mengamankan proyeksi.",
+      },
+    ];
+    this.alertList.innerHTML = alerts
+      .map(
+        (alert) => `
+          <div class="dashboard-alert-item ${alert.type}">
+            <span>${alert.icon}</span>
+            <div><b>${alert.title}</b><p>${alert.copy}</p></div>
+          </div>
+        `,
+      )
+      .join("");
+
+    this.renderWidgets();
+  }
+
+  renderWidgets() {
+    for (const widget of this.root.querySelectorAll("[data-dashboard-widget]")) {
+      widget.hidden = !this.visibleWidgets.has(widget.dataset.dashboardWidget);
+    }
+  }
+
+  formatRupiahCompact(valueInMillions) {
+    if (valueInMillions >= 1000) {
+      return `Rp${(valueInMillions / 1000).toFixed(2).replace(".", ",")} M`;
+    }
+    return `Rp${Math.round(valueInMillions).toLocaleString("id-ID")} jt`;
+  }
+
+  initials(name) {
+    return name
+      .split(/\s+/)
+      .slice(0, 2)
+      .map((part) => part[0])
+      .join("")
+      .toLocaleUpperCase("id");
+  }
+}
+
+const dashboardDemoMount = document.getElementById("dashboardDemo");
+if (dashboardDemoMount) {
+  new OneDashboardDemo(dashboardDemoMount);
+}
+
 class AsciiIndonesiaBackground {
   constructor(container) {
     this.el = container;
