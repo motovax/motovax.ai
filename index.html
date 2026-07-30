@@ -254,7 +254,7 @@
                 <button class="feature-demo-button" type="button" data-open-inventory-demo>
                   Coba Demo Gratis <span aria-hidden="true">→</span>
                 </button>
-                <small class="feature-demo-note">Tanpa daftar · Data dummy · Langsung coba</small>
+                <small class="feature-demo-note">Tanpa daftar · Tersimpan di tenant demo</small>
               </div>
             </article>
 
@@ -279,7 +279,7 @@
                 <button class="feature-demo-button" type="button" data-open-omni-demo>
                   Coba Demo Gratis <span aria-hidden="true">→</span>
                 </button>
-                <small class="feature-demo-note">Tanpa daftar · Data dummy · Langsung coba</small>
+                <small class="feature-demo-note">Tanpa daftar · Tersimpan di tenant demo</small>
               </div>
             </article>
 
@@ -310,7 +310,7 @@
                 <button class="feature-demo-button" type="button" data-open-social-demo>
                   Coba Demo Gratis <span aria-hidden="true">→</span>
                 </button>
-                <small class="feature-demo-note">Tanpa daftar · Data dummy · Langsung coba</small>
+                <small class="feature-demo-note">Tanpa daftar · Tersimpan di tenant demo</small>
               </div>
             </article>
 
@@ -339,7 +339,7 @@
                 <button class="feature-demo-button" type="button" data-open-crm-demo>
                   Coba Demo Gratis <span aria-hidden="true">→</span>
                 </button>
-                <small class="feature-demo-note">Tanpa daftar · Data dummy · Langsung coba</small>
+                <small class="feature-demo-note">Tanpa daftar · Tersimpan di tenant demo</small>
               </div>
             </article>
 
@@ -365,7 +365,7 @@
                 <button class="feature-demo-button" type="button" data-open-dashboard-demo>
                   Coba Demo Gratis <span aria-hidden="true">→</span>
                 </button>
-                <small class="feature-demo-note">Tanpa daftar · Data dummy · Langsung coba</small>
+                <small class="feature-demo-note">Tanpa daftar · Data tenant demo</small>
               </div>
             </article>
 
@@ -393,7 +393,7 @@
                 <button class="feature-demo-button" type="button" data-open-insight-demo>
                   Coba Demo Gratis <span aria-hidden="true">→</span>
                 </button>
-                <small class="feature-demo-note">Tanpa daftar · Data dummy · Langsung coba</small>
+                <small class="feature-demo-note">Tanpa daftar · Tersimpan di tenant demo</small>
               </div>
             </article>
           </div>
@@ -537,7 +537,9 @@
             </div>
           </div>
           <div class="demo-topbar-actions">
-            <span class="demo-mode"><i></i> Mode Demo · Data Dummy</span>
+            <span class="demo-mode" data-demo-tenant-status>
+              <i></i><span data-demo-tenant-label>Menghubungkan tenant demo…</span>
+            </span>
             <button class="demo-reset-button" type="button" data-demo-reset>Reset demo</button>
             <button class="demo-close-button" type="button" data-close-inventory-demo aria-label="Tutup demo">
               <span aria-hidden="true">×</span>
@@ -722,7 +724,7 @@
         <div class="demo-detail-footer">
           <button class="demo-secondary-action" type="button" data-close-demo-detail>Kembali</button>
           <button class="demo-primary-action" type="button" data-demo-book-unit>Booking unit ini</button>
-          <p>Perubahan hanya berlaku pada demo ini.</p>
+          <p>Minat booking tersimpan di tenant demo; status unit asli tidak diubah.</p>
         </div>
       </aside>
 
@@ -736,7 +738,7 @@
 
       <div class="demo-toast" role="status" aria-live="polite" data-demo-toast hidden>
         <span>✓</span>
-        <div><b>Status berhasil diperbarui</b><p>Unit kini masuk ke daftar Booked.</p></div>
+        <div><b>Minat booking tersimpan</b><p>Lead demo dapat dilihat dari MotoVax App.</p></div>
         <button type="button" data-close-demo-toast aria-label="Tutup notifikasi">×</button>
       </div>
     </div>
@@ -760,7 +762,9 @@
             </div>
           </div>
           <div class="demo-topbar-actions">
-            <span class="demo-mode"><i></i> Mode Demo · Data Fiktif</span>
+            <span class="demo-mode" data-demo-tenant-status>
+              <i></i><span data-demo-tenant-label>Menghubungkan tenant demo…</span>
+            </span>
             <button class="demo-reset-button" type="button" data-crm-reset>Reset demo</button>
             <button class="demo-close-button" type="button" data-close-crm-demo aria-label="Tutup demo">
               <span aria-hidden="true">×</span>
@@ -856,7 +860,7 @@
                   <span aria-hidden="true">⌕</span>
                   <input type="search" placeholder="Cari lead atau unit..." aria-label="Cari lead" data-crm-search />
                 </label>
-                <span class="crm-demo-safety">Simulasi lokal · Tidak mengirim pesan</span>
+                <span class="crm-demo-safety">Aktivitas tersimpan · Tidak mengirim pesan</span>
               </div>
 
               <div class="crm-stage-tabs" role="tablist" aria-label="Pilih stage pipeline" data-crm-stage-tabs></div>
@@ -931,7 +935,7 @@
           <button class="demo-primary-action" type="button" data-crm-prepare-followup>
             Siapkan follow-up AI
           </button>
-          <p>Semua aksi hanya berlaku pada data fiktif di browser ini.</p>
+          <p>Aktivitas tersimpan di tenant demo; pesan tidak dikirim ke channel customer.</p>
         </div>
       </aside>
 
@@ -969,7 +973,9 @@
             </div>
           </div>
           <div class="demo-topbar-actions">
-            <span class="demo-mode omni-safe-mode"><i></i> Eval Sandbox · Aman</span>
+            <span class="demo-mode omni-safe-mode" data-demo-tenant-status>
+              <i></i><span data-demo-tenant-label>Menghubungkan tenant demo…</span>
+            </span>
             <button class="demo-reset-button" type="button" data-omni-reset>Reset demo</button>
             <button class="demo-close-button" type="button" data-close-omni-demo aria-label="Tutup demo">
               <span aria-hidden="true">×</span>
@@ -1126,7 +1132,7 @@
 
                 <div class="omni-sandbox-note">
                   <span>🛡</span>
-                  <div><b>Eval Sandbox</b><p>Dalam demo, seluruh input lokal. Pada Eval produk, tool write dan external_send diblokir.</p></div>
+                  <div><b>Tenant Demo Terisolasi</b><p>Input percobaan dicatat di tenant demo. Respons AI disimulasikan dan tidak dikirim ke channel customer.</p></div>
                 </div>
               </aside>
             </section>
@@ -1168,7 +1174,9 @@
             </div>
           </div>
           <div class="demo-topbar-actions">
-            <span class="demo-mode dashboard-flex-mode"><i></i> Layout Fleksibel</span>
+            <span class="demo-mode dashboard-flex-mode" data-demo-tenant-status data-demo-data-only>
+              <i></i><span data-demo-tenant-label>Menghubungkan tenant demo…</span>
+            </span>
             <button class="demo-reset-button" type="button" data-dashboard-reset>Reset demo</button>
             <button class="demo-close-button" type="button" data-close-dashboard-demo aria-label="Tutup demo">
               <span aria-hidden="true">×</span>
@@ -1345,7 +1353,9 @@
             </div>
           </div>
           <div class="demo-topbar-actions">
-            <span class="demo-mode social-safe-mode"><i></i> Sandbox · Tidak memposting</span>
+            <span class="demo-mode social-safe-mode" data-demo-tenant-status>
+              <i></i><span data-demo-tenant-label>Menghubungkan tenant demo…</span>
+            </span>
             <button class="demo-reset-button" type="button" data-social-reset>Reset demo</button>
             <button class="demo-close-button" type="button" data-close-social-demo aria-label="Tutup demo">
               <span aria-hidden="true">×</span>
@@ -1375,7 +1385,7 @@
               <span>ALUR TERHUBUNG</span>
               <b>Konten → Klik → Lead</b>
               <p>Desain memakai data inventory, jadwal masuk kalender, lalu UTM menghubungkan performa campaign ke CRM.</p>
-              <div><i></i><span>Data demo lokal</span></div>
+              <div><i></i><span>Data tersimpan di tenant demo</span></div>
             </div>
           </aside>
 
@@ -1467,7 +1477,7 @@
                       <label>Waktu<input type="time" value="09:00" data-social-time /></label>
                     </div>
                     <button type="button" data-social-schedule><span>▣</span> Jadwalkan ke <b data-social-platform-count>2 platform</b></button>
-                    <small>Simulasi lokal—tidak mengirim konten ke akun Meta.</small>
+                    <small>Jadwal tersimpan di tenant demo—konten tidak dikirim ke akun Meta.</small>
                   </div>
                 </aside>
               </div>
@@ -1551,7 +1561,9 @@
             </div>
           </div>
           <div class="demo-topbar-actions">
-            <span class="demo-mode insight-safe-mode"><i></i> Data Sandbox · Aman</span>
+            <span class="demo-mode insight-safe-mode" data-demo-tenant-status>
+              <i></i><span data-demo-tenant-label>Menghubungkan tenant demo…</span>
+            </span>
             <button class="demo-reset-button" type="button" data-insight-reset>Reset demo</button>
             <button class="demo-close-button" type="button" data-close-insight-demo aria-label="Tutup demo">
               <span aria-hidden="true">×</span>
@@ -1638,7 +1650,7 @@
                   <div><small>Potensi setelah aksi</small><b data-insight-potential-rate>9,1%</b></div>
                 </div>
                 <button type="button" data-insight-run-action><span>▶</span> Jalankan Rekomendasi Demo</button>
-                <small>Simulasi lokal—tidak mengubah customer atau CRM.</small>
+                <small>Aktivitas dicatat di tenant demo—data customer lain tidak diubah.</small>
               </article>
 
               <article class="dashboard-panel insight-source-panel" data-insight-widget="sources">

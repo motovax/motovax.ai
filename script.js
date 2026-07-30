@@ -31,9 +31,38 @@ class PublicDemoDataBridge {
       }).then(async (response) => {
         if (!response.ok) throw new Error("Data tenant demo belum dapat dimuat.");
         return response.json();
+      }).then((snapshot) => {
+        this.updateConnectionStatus(snapshot.tenant);
+        return snapshot;
+      }).catch((error) => {
+        this.updateConnectionStatus(null, error);
+        throw error;
       });
     }
     return this.snapshotPromise;
+  }
+
+  updateConnectionStatus(tenant, error = null) {
+    const tenantName = String(tenant?.name || "Tenant demo").trim();
+    const writesActive = Boolean(tenant?.writes_active);
+
+    for (const status of document.querySelectorAll("[data-demo-tenant-status]")) {
+      const dataOnly = status.hasAttribute("data-demo-data-only");
+      const label = error
+        ? "Tenant demo tidak terhubung"
+        : dataOnly
+          ? "Tenant Demo · Data live"
+          : writesActive
+            ? "Tenant Demo · Input tersimpan"
+            : "Tenant Demo · Mode baca";
+      status.classList.toggle("is-error", Boolean(error));
+      status.classList.toggle("is-readonly", !error && !writesActive);
+      const text = status.querySelector("[data-demo-tenant-label]");
+      if (text) text.textContent = label;
+      status.title = error
+        ? error.message
+        : `Terhubung ke ${tenantName}; terisolasi dari tenant customer lain.`;
+    }
   }
 
   async submit(kind, payload = {}) {

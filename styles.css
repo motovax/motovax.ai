@@ -1844,6 +1844,28 @@ body.demo-open {
   font-weight: 800;
 }
 
+.demo-mode.is-readonly {
+  border-color: #fde68a;
+  color: #a16207;
+  background: #fffbeb;
+}
+
+.demo-mode.is-readonly i {
+  background: #f59e0b;
+  box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.12);
+}
+
+.demo-mode.is-error {
+  border-color: #fecaca;
+  color: #b91c1c;
+  background: #fef2f2;
+}
+
+.demo-mode.is-error i {
+  background: #ef4444;
+  box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.12);
+}
+
 .demo-reset-button,
 .demo-close-button,
 .demo-detail-header button,
@@ -5965,8 +5987,7 @@ body.demo-open {
 
 @media (max-width: 640px) {
   .dashboard-product-demo .demo-brand-wrap > div,
-  .dashboard-product-demo .demo-divider,
-  .dashboard-flex-mode {
+  .dashboard-product-demo .demo-divider {
     display: none;
   }
 
@@ -7674,8 +7695,7 @@ body.demo-open {
 
 @media (max-width: 640px) {
   .social-product-demo .demo-brand-wrap > div,
-  .social-product-demo .demo-divider,
-  .social-safe-mode {
+  .social-product-demo .demo-divider {
     display: none;
   }
 
@@ -8478,8 +8498,7 @@ body.demo-open {
 
 @media (max-width: 640px) {
   .insight-product-demo .demo-brand-wrap > div,
-  .insight-product-demo .demo-divider,
-  .insight-safe-mode {
+  .insight-product-demo .demo-divider {
     display: none;
   }
 
