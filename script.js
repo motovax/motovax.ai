@@ -305,6 +305,7 @@ class InventoryProductDemo {
     this.guide = root.querySelector("[data-demo-guide-popover]");
     this.toast = root.querySelector("[data-demo-toast]");
     this.bookingButton = root.querySelector("[data-demo-book-unit]");
+    this.bookingCopy = root.querySelector("[data-demo-booking-copy]");
 
     this.bind();
     this.render();
@@ -617,6 +618,11 @@ class InventoryProductDemo {
         : unit.status === "BOOKED"
           ? "Unit sudah di-booking"
           : "Booking unit ini";
+    this.bookingCopy.textContent = unit.bookedBy
+      ? `${unit.bookedBy} tercatat booking ${unit.brand} ${unit.type} ${unit.year} di tenant demo.`
+      : unit.status === "BOOKED"
+        ? "Unit ini sudah berstatus Booked di tenant demo."
+        : "Minat booking tersimpan di tenant demo; status unit asli tidak diubah.";
   }
 
   closeDetail() {
@@ -631,15 +637,19 @@ class InventoryProductDemo {
     this.bookingButton.disabled = true;
     this.bookingButton.textContent = "Menyimpan ke tenant demo…";
     try {
-      await publicDemoData.submit("inventory_interest", {
+      const booking = await publicDemoData.submit("inventory_interest", {
         unit_id: unit.id,
         unit_interest: `${unit.brand} ${unit.type} ${unit.year}`,
       });
+      const customerName = String(booking.customer_name || "").trim();
+      if (!customerName) throw new Error("Identitas pengunjung demo belum tersedia.");
       unit.status = "BOOKED";
+      unit.bookedBy = customerName;
       this.populateDetail(unit);
       this.render();
-      this.toast.querySelector("b").textContent = "Minat unit tersimpan";
-      this.toast.querySelector("p").textContent = "Lead baru dapat dilihat dari tenant demo di MotoVax App.";
+      this.toast.querySelector("b").textContent = `${customerName} sudah booking`;
+      this.toast.querySelector("p").textContent =
+        `${unit.brand} ${unit.type} ${unit.year} tercatat di tenant demo MotoVax App.`;
       this.toast.hidden = false;
     } catch (error) {
       this.bookingButton.disabled = false;
