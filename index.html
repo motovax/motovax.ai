@@ -1664,11 +1664,15 @@
               <b id="dashboardDemoTitle">One Dashboard</b>
               <span>Executive Command Center · Tampilan produk</span>
             </div>
+            <span class="dashboard-industry-badge" data-dashboard-industry-badge hidden>Otomotif</span>
           </div>
           <div class="demo-topbar-actions">
             <span class="demo-mode dashboard-flex-mode" data-demo-tenant-status data-demo-data-only>
               <i></i><span data-demo-tenant-label>Menghubungkan tenant demo…</span>
             </span>
+            <button class="demo-reset-button dashboard-change-business" type="button" data-dashboard-change-business hidden>
+              Ganti bisnis
+            </button>
             <button class="demo-reset-button" type="button" data-dashboard-reset>Reset demo</button>
             <button class="demo-close-button" type="button" data-close-dashboard-demo aria-label="Tutup demo">
               <span aria-hidden="true">×</span>
@@ -1676,7 +1680,77 @@
           </div>
         </header>
 
-        <div class="demo-layout">
+        <div class="dashboard-onboarding" data-dashboard-onboarding hidden>
+          <div class="dashboard-onboarding-card">
+            <header>
+              <span>LANGKAH 1 · BISNIS ANDA</span>
+              <h2>Sesuaikan demo dengan bisnis Anda</h2>
+              <p>
+                Pilih industri calon customer — KPI, funnel, lokasi, dan highlight prioritas
+                akan digenerate otomatis. Untuk otomotif, tampilan sama persis Command Center Motovax.
+              </p>
+            </header>
+
+            <div class="dashboard-vertical-grid" role="listbox" aria-label="Pilih industri" data-dashboard-vertical-grid>
+              <button type="button" role="option" class="dashboard-vertical-card" data-dashboard-vertical="automotive" aria-selected="true">
+                <span class="dashboard-vertical-icon">OT</span>
+                <b>Otomotif / Dealer</b>
+                <small>Command Center Motovax · unit, cabang, lead</small>
+              </button>
+              <button type="button" role="option" class="dashboard-vertical-card" data-dashboard-vertical="property" aria-selected="false">
+                <span class="dashboard-vertical-icon">PR</span>
+                <b>Properti / Real Estate</b>
+                <small>Inquiry → site visit → booking → akad</small>
+              </button>
+              <button type="button" role="option" class="dashboard-vertical-card" data-dashboard-vertical="fnb" aria-selected="false">
+                <span class="dashboard-vertical-icon">FB</span>
+                <b>F&amp;B / Restoran</b>
+                <small>Outlet, ticket size, peak hour</small>
+              </button>
+              <button type="button" role="option" class="dashboard-vertical-card" data-dashboard-vertical="retail" aria-selected="false">
+                <span class="dashboard-vertical-icon">RT</span>
+                <b>Retail / Toko</b>
+                <small>Sell-through, basket size, toko</small>
+              </button>
+              <button type="button" role="option" class="dashboard-vertical-card" data-dashboard-vertical="healthcare" aria-selected="false">
+                <span class="dashboard-vertical-icon">KL</span>
+                <b>Klinik / Healthcare</b>
+                <small>Booking pasien, no-show, cabang</small>
+              </button>
+              <button type="button" role="option" class="dashboard-vertical-card" data-dashboard-vertical="education" aria-selected="false">
+                <span class="dashboard-vertical-icon">ED</span>
+                <b>Edukasi / Kursus</b>
+                <small>Lead → trial → enrollment</small>
+              </button>
+              <button type="button" role="option" class="dashboard-vertical-card" data-dashboard-vertical="custom" aria-selected="false">
+                <span class="dashboard-vertical-icon">+</span>
+                <b>Lainnya</b>
+                <small>Template generik + deskripsi Anda</small>
+              </button>
+            </div>
+
+            <label class="dashboard-business-desc">
+              <span>Deskripsi bisnis <em>(opsional)</em></span>
+              <textarea
+                data-dashboard-business-desc
+                maxlength="280"
+                rows="2"
+                placeholder="Contoh: Dealer mobil bekas 3 cabang di Jabodetabek, fokus MPV &amp; SUV family…"
+              ></textarea>
+            </label>
+
+            <footer class="dashboard-onboarding-actions">
+              <button type="button" class="dashboard-onboarding-skip" data-dashboard-skip-onboarding>
+                Lewati — contoh Otomotif
+              </button>
+              <button type="button" class="dashboard-onboarding-generate" data-dashboard-generate>
+                Generate Dashboard <span aria-hidden="true">→</span>
+              </button>
+            </footer>
+          </div>
+        </div>
+
+        <div class="demo-layout" data-dashboard-workspace hidden>
           <aside class="demo-sidebar dashboard-sidebar" aria-label="Navigasi One Dashboard">
             <nav>
               <span class="demo-nav-section">Analytics</span>
@@ -1714,13 +1788,8 @@
               </div>
               <div class="dashboard-heading-actions">
                 <label class="dashboard-branch-select">
-                  <span>Cabang</span>
-                  <select data-dashboard-branch aria-label="Pilih cabang">
-                    <option value="all">Semua Cabang</option>
-                    <option value="pondok-bambu">Pondok Bambu</option>
-                    <option value="cinere">Cinere</option>
-                    <option value="cibubur">Cibubur</option>
-                  </select>
+                  <span data-dashboard-location-label>Cabang</span>
+                  <select data-dashboard-branch aria-label="Pilih lokasi"></select>
                 </label>
                 <div class="dashboard-period-switch" role="group" aria-label="Periode dashboard">
                   <button class="active" type="button" data-dashboard-period="mtd">MTD</button>
@@ -1736,8 +1805,8 @@
             <div class="dashboard-personalization-banner">
               <span class="dashboard-banner-icon">✦</span>
               <div>
-                <b>Tampilan ini bisa mengikuti cara kerja tim Anda</b>
-                <p>Pilih peran, cabang, periode, lalu tentukan widget yang paling penting.</p>
+                <b data-dashboard-banner-title>Tampilan ini bisa mengikuti cara kerja tim Anda</b>
+                <p data-dashboard-banner-copy>Pilih peran, cabang, periode, lalu tentukan widget yang paling penting.</p>
               </div>
               <button type="button" data-dashboard-customize-banner>Coba sesuaikan</button>
             </div>
@@ -1760,10 +1829,24 @@
               </article>
 
               <article class="dashboard-panel dashboard-branch-panel" data-dashboard-widget="branches">
-                <header><div><span>MULTI-BRANCH</span><h3>Performa Cabang</h3></div><button type="button">Lihat detail →</button></header>
+                <header>
+                  <div>
+                    <span data-dashboard-branch-panel-kicker>MULTI-BRANCH</span>
+                    <h3 data-dashboard-branch-panel-title>Performa Cabang</h3>
+                  </div>
+                  <button type="button">Lihat detail →</button>
+                </header>
                 <div class="dashboard-table-wrap">
                   <table>
-                    <thead><tr><th>Cabang</th><th>Revenue</th><th>Closing</th><th>Konversi</th><th>Target</th></tr></thead>
+                    <thead>
+                      <tr data-dashboard-table-head>
+                        <th>Cabang</th>
+                        <th>Revenue</th>
+                        <th>Closing</th>
+                        <th>Konversi</th>
+                        <th>Target</th>
+                      </tr>
+                    </thead>
                     <tbody data-dashboard-branch-table></tbody>
                   </table>
                 </div>
@@ -1806,6 +1889,15 @@
                     <label><input type="checkbox" data-dashboard-toggle="agents" checked /><span><i></i></span><div><b>Top Agent</b><small>Leaderboard sales</small></div></label>
                     <label><input type="checkbox" data-dashboard-toggle="alerts" checked /><span><i></i></span><div><b>Insight &amp; Peringatan</b><small>Prioritas yang perlu tindakan</small></div></label>
                   </div>
+                </fieldset>
+
+                <fieldset class="dashboard-highlight-fieldset">
+                  <legend>Highlight prioritas</legend>
+                  <p class="dashboard-highlight-hint">Edit judul &amp; copy — max 3. Reset mengembalikan default industri.</p>
+                  <div class="dashboard-highlight-editors" data-dashboard-highlight-editors></div>
+                  <button type="button" class="dashboard-highlight-reset" data-dashboard-highlight-reset>
+                    Kembalikan default industri
+                  </button>
                 </fieldset>
               </div>
 

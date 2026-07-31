@@ -1186,7 +1186,7 @@ class InventoryProductDemo {
     if (options.greet) {
       if (next === "sales") {
         this.pushFalconBot(
-          "Halo! Saya Falcon untuk Sales Agent.\n\nSaya bisa bantu: cek stok/unit, foto, simulasi kredit, lokasi showroom, catat lead, handoff admin, generate konten, dan performa sales Anda.\n\nTidak bisa: laporan aging/GP, import Excel, edit unit massal, atau data harga internal.\n\nCoba chip di kiri, atau ketik “tampilkan semua fitur sales” untuk ringkasan + cara coba tiap fitur.",
+          "Halo! Saya Falcon untuk Sales Agent.\n\nSaya bisa bantu: cek stok/unit, foto, simulasi kredit, lokasi showroom, catat lead, handoff admin, generate konten, dan performa sales Anda.\n\nCoba chip di kiri, atau ketik “tampilkan semua fitur sales” untuk ringkasan + cara coba tiap fitur.",
         );
       } else {
         this.pushFalconSystem("Mode berganti ke Management Agent.");
@@ -1213,7 +1213,7 @@ class InventoryProductDemo {
     }
     if (this.falconRoleHint) {
       this.falconRoleHint.textContent = isSales
-        ? "Falcon menjawab dengan capability Sales — tidak bisa laporan management / data internal."
+        ? "Falcon menjawab dengan capability Sales Agent."
         : "Falcon menjawab dengan capability Management — laporan, aging, analytics, dan operasional inventory.";
     }
     const badge = this.root.querySelector("[data-falcon-role-badge]");
@@ -1746,12 +1746,6 @@ class InventoryProductDemo {
       "   Coba: “Buat caption promo unit”\n" +
       "9. Performa sales sendiri — analytics:sales_performance\n" +
       "   Coba: “Performa sales saya”\n\n" +
-      "❌ Tidak bisa (role Sales):\n" +
-      "• Laporan aging / GP / margin / tren cabang (butuh Management)\n" +
-      "• Import Excel inventory massal\n" +
-      "• Edit unit penuh (status/harga master)\n" +
-      "• Upload/review dokumen legal unit\n" +
-      "• Data internal: HPP, harga beli, bottom price, profit\n\n" +
       "Centang checklist di kiri sambil mencoba tiap fitur. Data demo, bukan production."
     );
   }
