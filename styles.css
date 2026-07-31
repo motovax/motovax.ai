@@ -2054,12 +2054,15 @@ body.demo-open {
 }
 
 .demo-guide-actions [data-demo-guide-next],
-.demo-guide-actions [data-demo-guide-finish] {
+.demo-guide-actions [data-demo-guide-finish],
+.demo-guide-actions [data-social-guide-next],
+.demo-guide-actions [data-social-guide-finish] {
   background: #4338ca;
   color: #fff;
 }
 
-.demo-guide-actions [data-demo-guide-prev] {
+.demo-guide-actions [data-demo-guide-prev],
+.demo-guide-actions [data-social-guide-prev] {
   background: #e2e8f0;
   color: #334155;
 }
@@ -3305,6 +3308,41 @@ body.demo-open {
 .demo-detail-price span {
   color: #64748b;
   font-size: 9px;
+}
+
+.demo-detail-features-block {
+  margin: 0 0 16px;
+  padding: 12px 14px;
+  border: 1px solid #e2e8f0;
+  border-radius: 11px;
+  background: #f8fafc;
+}
+
+.demo-detail-features-block > span {
+  display: block;
+  margin-bottom: 8px;
+  color: #64748b;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+}
+
+.demo-detail-features-block ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.demo-detail-features-block li {
+  padding: 5px 9px;
+  border-radius: 999px;
+  background: #eff6ff;
+  color: #1d4ed8;
+  font-size: 10px;
+  font-weight: 700;
 }
 
 .demo-detail-specs {
@@ -6881,10 +6919,30 @@ body.demo-open {
   align-items: center;
 }
 
+.social-heading-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
 .social-heading-status {
   display: flex;
   align-items: center;
   gap: 8px;
+}
+
+.social-guide-highlight {
+  outline: 2px solid #2563eb;
+  outline-offset: 4px;
+  border-radius: 12px;
+  box-shadow: 0 0 0 6px rgba(37, 99, 235, 0.12);
+  transition: outline 0.15s ease, box-shadow 0.15s ease;
+}
+
+.social-guide-popover {
+  z-index: 12;
 }
 
 .social-heading-status span,
@@ -7148,6 +7206,13 @@ body.demo-open {
   margin-top: 3px;
   color: #94a3b8;
   font-size: 6px;
+}
+
+.social-vehicle-card small.social-vehicle-meta {
+  white-space: normal;
+  line-height: 1.35;
+  font-size: 6px;
+  color: #a1a1aa;
 }
 
 .social-vehicle-card > em {
@@ -8432,6 +8497,11 @@ body.demo-open {
 
   .social-page-heading {
     align-items: flex-start;
+  }
+
+  .social-heading-actions {
+    width: 100%;
+    justify-content: flex-start;
   }
 
   .social-heading-status {

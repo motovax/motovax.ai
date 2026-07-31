@@ -850,11 +850,19 @@
             <div><dt>Transmisi</dt><dd data-detail-transmission></dd></div>
             <div><dt>Warna</dt><dd data-detail-color></dd></div>
             <div><dt>Odometer</dt><dd data-detail-odometer></dd></div>
+            <div><dt>Tipe Bodi</dt><dd data-detail-body></dd></div>
+            <div><dt>Bahan Bakar</dt><dd data-detail-fuel></dd></div>
+            <div><dt>Mesin</dt><dd data-detail-engine></dd></div>
+            <div><dt>Kapasitas</dt><dd data-detail-seats></dd></div>
             <div><dt>Cabang</dt><dd data-detail-branch></dd></div>
             <div><dt>Posisi Unit</dt><dd data-detail-position></dd></div>
             <div><dt>Aging Stok</dt><dd data-detail-aging></dd></div>
             <div><dt>Sumber Unit</dt><dd data-detail-source></dd></div>
           </dl>
+          <div class="demo-detail-features-block">
+            <span>FITUR UNIT</span>
+            <ul data-detail-features></ul>
+          </div>
           <div class="demo-detail-insight">
             <span>INSIGHT INVENTORY</span>
             <p data-detail-insight></p>
@@ -1729,28 +1737,33 @@
                 <h2 data-social-page-title>Buat Konten Siap Tayang</h2>
                 <p data-social-page-description>Pilih unit, sesuaikan desain, lalu jadwalkan ke channel pilihan dalam satu alur.</p>
               </div>
-              <div class="social-heading-status">
-                <span><i></i> Meta Business siap</span>
-                <b>Demo aman</b>
+              <div class="social-heading-actions">
+                <div class="social-heading-status">
+                  <span><i></i> Meta Business siap</span>
+                  <b>Demo aman</b>
+                </div>
+                <button class="demo-primary-action" type="button" data-social-guide>
+                  <span aria-hidden="true">▶</span> Panduan demo
+                </button>
               </div>
             </div>
 
             <section class="social-view is-active" data-social-view-panel="studio">
               <div class="social-progress" aria-label="Tahapan pembuatan konten">
-                <span class="active"><i>1</i>Pilih Unit</span>
-                <span class="active"><i>2</i>Edit Desain</span>
-                <span class="active"><i>3</i>Platform &amp; Caption</span>
-                <span><i>4</i>Jadwalkan</span>
+                <span class="active" data-social-step="1"><i>1</i>Pilih Unit</span>
+                <span class="active" data-social-step="2"><i>2</i>Edit Desain</span>
+                <span class="active" data-social-step="3"><i>3</i>Platform &amp; Caption</span>
+                <span data-social-step="4"><i>4</i>Jadwalkan</span>
               </div>
 
               <div class="social-studio-grid">
                 <div class="social-editor-panel">
-                  <section class="social-editor-section">
-                    <header><div><span>01</span><h3>Pilih kendaraan dari inventory</h3></div><em>3 unit ready</em></header>
+                  <section class="social-editor-section" data-social-anchor="vehicles">
+                    <header><div><span>01</span><h3>Pilih kendaraan dari inventory</h3></div><em data-social-vehicle-count>8 unit ready</em></header>
                     <div class="social-vehicle-options" data-social-vehicle-options></div>
                   </section>
 
-                  <section class="social-editor-section social-design-controls">
+                  <section class="social-editor-section social-design-controls" data-social-anchor="design">
                     <header><div><span>02</span><h3>Desain &amp; format</h3></div><em>Live preview</em></header>
                     <div class="social-control-row">
                       <div>
@@ -1772,7 +1785,7 @@
                     </div>
                   </section>
 
-                  <section class="social-editor-section">
+                  <section class="social-editor-section" data-social-anchor="caption">
                     <header><div><span>03</span><h3>Platform &amp; caption</h3></div><button type="button" data-social-generate>✦ Generate Ulang</button></header>
                     <div class="social-platform-row" role="group" aria-label="Platform tujuan">
                       <button class="active instagram" type="button" data-social-platform="instagram"><i>IG</i><span><b>Instagram</b><small>@mobix.autos</small></span><em>✓</em></button>
@@ -1803,7 +1816,7 @@
                     <p data-social-preview-caption></p>
                   </div>
 
-                  <div class="social-schedule-box">
+                  <div class="social-schedule-box" data-social-anchor="schedule">
                     <div><span>04</span><div><b>Jadwalkan Postingan</b><small>Waktu Indonesia Barat</small></div></div>
                     <div class="social-schedule-fields">
                       <label>Tanggal<input type="date" value="2026-07-31" data-social-date /></label>
@@ -1816,7 +1829,7 @@
               </div>
             </section>
 
-            <section class="social-view" data-social-view-panel="calendar" hidden>
+            <section class="social-view" data-social-view-panel="calendar" hidden data-social-anchor="calendar">
               <div class="social-stat-grid">
                 <article><span class="all">▦</span><div><small>Total Konten</small><b data-social-total-posts>4</b></div></article>
                 <article><span class="draft">✎</span><div><small>Draft</small><b>1</b></div></article>
@@ -1833,14 +1846,21 @@
               </div>
             </section>
 
-            <section class="social-view" data-social-view-panel="insight" hidden>
+            <section class="social-view" data-social-view-panel="insight" hidden data-social-anchor="insight">
               <div class="social-campaign-toolbar">
                 <div>
                   <span>CAMPAIGN AKTIF</span>
                   <h3 data-social-campaign-name>Meta · Zenix Hybrid Juli</h3>
                   <p><code data-social-utm>utm_campaign=zenix_hybrid_jul26</code><em data-social-hashtag>#ZENIXHYBRID</em></p>
                 </div>
-                <label>Campaign<select data-social-campaign><option value="zenix">Zenix Hybrid Juli</option><option value="brv">BR-V Family Deal</option><option value="xpander">Xpander Weekend</option></select></label>
+                <label>Campaign<select data-social-campaign>
+                  <option value="zenix">Zenix Hybrid Juli</option>
+                  <option value="brv">BR-V Family Deal</option>
+                  <option value="xpander">Xpander Weekend</option>
+                  <option value="raize">Raize GR Sport</option>
+                  <option value="pajero">Pajero Sport Dakar</option>
+                  <option value="ertiga">Ertiga Hybrid</option>
+                </select></label>
               </div>
 
               <div class="social-insight-kpis" data-social-insight-kpis></div>
@@ -1865,6 +1885,18 @@
               </div>
             </section>
           </main>
+        </div>
+      </div>
+
+      <div class="demo-guide-popover social-guide-popover" data-social-guide-popover hidden>
+        <button type="button" data-close-social-guide aria-label="Tutup panduan">×</button>
+        <span data-social-guide-step-label>LANGKAH 1 DARI 8</span>
+        <h3 data-social-guide-title>Social Growth Studio</h3>
+        <p data-social-guide-body>Demo Social Media &amp; Ads Automation: pilih unit inventory, buat konten, jadwalkan, lalu lacak lead ke CRM.</p>
+        <div class="demo-guide-actions">
+          <button type="button" class="demo-secondary-action" data-social-guide-prev hidden>Kembali</button>
+          <button type="button" data-social-guide-next>Lanjut</button>
+          <button type="button" data-social-guide-finish hidden>Selesai</button>
         </div>
       </div>
 

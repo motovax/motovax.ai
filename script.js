@@ -106,6 +106,11 @@ const inventoryDemoSeed = [
     aging: 110,
     source: "Rental Up · PT BAS",
     photos: 18,
+    bodyType: "MPV",
+    fuel: "Bensin",
+    engine: "2.0 L",
+    seats: 7,
+    features: ["Power Sliding Door", "Around View Monitor", "Captain Seat", "Keyless Entry"],
   },
   {
     id: "unit-002",
@@ -125,6 +130,11 @@ const inventoryDemoSeed = [
     aging: 60,
     source: "Referensi · Rental",
     photos: 14,
+    bodyType: "SUV",
+    fuel: "Bensin",
+    engine: "1.5 L",
+    seats: 7,
+    features: ["ABS + EBD", "Dual Airbag", "Rear Camera", "Roof Rail"],
   },
   {
     id: "unit-003",
@@ -144,6 +154,11 @@ const inventoryDemoSeed = [
     aging: 48,
     source: "Trade In · Mitsubishi",
     photos: 22,
+    bodyType: "SUV",
+    fuel: "Bensin",
+    engine: "1.5 L",
+    seats: 7,
+    features: ["TRD Bodykit", "Touchscreen Audio", "Rear Parking Sensor", "Daytime Running Light"],
   },
   {
     id: "unit-004",
@@ -163,6 +178,11 @@ const inventoryDemoSeed = [
     aging: 40,
     source: "Referensi · Sales",
     photos: 12,
+    bodyType: "SUV",
+    fuel: "Bensin",
+    engine: "1.5 L",
+    seats: 5,
+    features: ["Magic Seat", "ECON Mode", "Cruise Control", "Side Camera"],
   },
   {
     id: "unit-005",
@@ -182,6 +202,11 @@ const inventoryDemoSeed = [
     aging: 34,
     source: "Referensi · Sales",
     photos: 16,
+    bodyType: "MPV",
+    fuel: "Bensin",
+    engine: "1.5 L",
+    seats: 7,
+    features: ["Ultra Seat", "Double Blower", "ABS", "ISOFIX"],
   },
   {
     id: "unit-006",
@@ -201,6 +226,11 @@ const inventoryDemoSeed = [
     aging: 21,
     source: "Trade In",
     photos: 20,
+    bodyType: "MPV",
+    fuel: "Bensin",
+    engine: "1.5 L",
+    seats: 7,
+    features: ["Head Unit 9\"", "Keyless Push Start", "Cruise Control", "Rear Camera"],
   },
   {
     id: "unit-007",
@@ -220,6 +250,11 @@ const inventoryDemoSeed = [
     aging: 12,
     source: "Lelang Partner",
     photos: 24,
+    bodyType: "MPV",
+    fuel: "Hybrid",
+    engine: "1.5 L Hybrid",
+    seats: 7,
+    features: ["SHVS Hybrid", "ESP", "Hill Hold", "Smart Key"],
   },
   {
     id: "unit-008",
@@ -239,6 +274,11 @@ const inventoryDemoSeed = [
     aging: 27,
     source: "Trade In",
     photos: 19,
+    bodyType: "MPV",
+    fuel: "Bensin",
+    engine: "1.5 L",
+    seats: 7,
+    features: ["DNGA Platform", "VSC", "Rear Camera", "Digital AC"],
   },
   {
     id: "unit-009",
@@ -258,6 +298,11 @@ const inventoryDemoSeed = [
     aging: 31,
     source: "Fleet Partner",
     photos: 15,
+    bodyType: "SUV",
+    fuel: "Bensin",
+    engine: "1.2 L",
+    seats: 5,
+    features: ["DNGA", "LED Headlamp", "Keyless", "Rear Camera"],
   },
   {
     id: "unit-010",
@@ -277,6 +322,155 @@ const inventoryDemoSeed = [
     aging: 16,
     source: "Customer Direct",
     photos: 21,
+    bodyType: "SUV",
+    fuel: "Bensin",
+    engine: "1.5 L",
+    seats: 7,
+    features: ["Honda Sensing", "LaneWatch", "7 Seater", "Smart Key"],
+  },
+  {
+    id: "unit-011",
+    brand: "Toyota",
+    type: "Innova Zenix Hybrid Q",
+    plate: "B 1211 MVX",
+    year: 2023,
+    color: "Platinum White Pearl",
+    transmission: "Automatic",
+    odometer: 12450,
+    branch: "BINTARO",
+    position: "Showroom Bintaro",
+    status: "UNIT READY",
+    buyingPrice: 410000000,
+    cashPrice: 468000000,
+    creditPrice: 482000000,
+    aging: 9,
+    source: "Customer Direct",
+    photos: 28,
+    bodyType: "MPV",
+    fuel: "Hybrid",
+    engine: "2.0 L Hybrid",
+    seats: 7,
+    features: ["TNGA Hybrid", "Panoramic Roof", "Captain Seat", "TSS Safety"],
+  },
+  {
+    id: "unit-012",
+    brand: "Toyota",
+    type: "Raize GR Sport 1.0T",
+    plate: "B 1212 MVX",
+    year: 2022,
+    color: "Turquoise Mica Metallic",
+    transmission: "Automatic",
+    odometer: 22100,
+    branch: "CINERE",
+    position: "Showroom Cinere",
+    status: "UNIT READY",
+    buyingPrice: 198000000,
+    cashPrice: 228000000,
+    creditPrice: 235000000,
+    aging: 18,
+    source: "Trade In",
+    photos: 17,
+    bodyType: "SUV",
+    fuel: "Bensin",
+    engine: "1.0 L Turbo",
+    seats: 5,
+    features: ["GR Sport Kit", "Turbo Engine", "LED Projector", "Digital Meter"],
+  },
+  {
+    id: "unit-013",
+    brand: "Mitsubishi",
+    type: "Pajero Sport Dakar 4x2",
+    plate: "B 1213 MVX",
+    year: 2020,
+    color: "Graphite Grey",
+    transmission: "Automatic",
+    odometer: 58200,
+    branch: "PONDOK BAMBU",
+    position: "Pondok Bambu",
+    status: "UNIT READY",
+    buyingPrice: 385000000,
+    cashPrice: 435000000,
+    creditPrice: 448000000,
+    aging: 42,
+    source: "Fleet Partner",
+    photos: 26,
+    bodyType: "SUV",
+    fuel: "Diesel",
+    engine: "2.4 L Diesel",
+    seats: 7,
+    features: ["4WD Select", "Cruise Control", "Rockford Audio", "360 Camera"],
+  },
+  {
+    id: "unit-014",
+    brand: "Honda",
+    type: "CR-V Turbo Prestige",
+    plate: "B 1214 MVX",
+    year: 2021,
+    color: "Crystal Black Pearl",
+    transmission: "Automatic",
+    odometer: 29800,
+    branch: "BEKASI",
+    position: "Showroom Bekasi",
+    status: "BOOKED",
+    buyingPrice: 420000000,
+    cashPrice: 475000000,
+    creditPrice: 489000000,
+    aging: 25,
+    source: "Referensi · Sales",
+    photos: 23,
+    bodyType: "SUV",
+    fuel: "Bensin",
+    engine: "1.5 L Turbo",
+    seats: 7,
+    features: ["Honda Sensing", "Panoramic Roof", "Power Tailgate", "Leather Seat"],
+  },
+  {
+    id: "unit-015",
+    brand: "Daihatsu",
+    type: "Xenia R ADS 1.5",
+    plate: "B 1215 MVX",
+    year: 2023,
+    color: "Icy White",
+    transmission: "Automatic",
+    odometer: 9800,
+    branch: "CINERE",
+    position: "Showroom Cinere",
+    status: "UNIT READY",
+    buyingPrice: 185000000,
+    cashPrice: 212000000,
+    creditPrice: 219000000,
+    aging: 11,
+    source: "Lelang Partner",
+    photos: 16,
+    bodyType: "MPV",
+    fuel: "Bensin",
+    engine: "1.5 L",
+    seats: 7,
+    features: ["ADS Package", "Digital AC", "Rear Camera", "VSC + HAC"],
+  },
+  {
+    id: "unit-016",
+    brand: "Wuling",
+    type: "Almaz RS Pro",
+    plate: "B 1216 MVX",
+    year: 2022,
+    color: "Carnelian Red",
+    transmission: "Automatic",
+    odometer: 24500,
+    branch: "BINTARO",
+    position: "Showroom Bintaro",
+    status: "UNIT READY",
+    buyingPrice: 265000000,
+    cashPrice: 305000000,
+    creditPrice: 315000000,
+    aging: 28,
+    source: "Customer Direct",
+    photos: 20,
+    bodyType: "SUV",
+    fuel: "Bensin",
+    engine: "1.5 L Turbo",
+    seats: 7,
+    features: ["Internet of Vehicle", "360 Camera", "ADAS Level 2", "Panoramic Sunroof"],
   },
 ];
 
@@ -433,25 +627,39 @@ class InventoryProductDemo {
     try {
       const snapshot = await publicDemoData.snapshot(force);
       this.dataError = "";
-      this.units = snapshot.inventory.map((unit) => ({
-        id: unit.id,
-        brand: unit.brand,
-        type: unit.type,
-        plate: "Unit Demo",
-        year: unit.year,
-        color: unit.color,
-        transmission: this.titleCase(unit.transmission || "Automatic"),
-        odometer: unit.odometer,
-        branch: unit.branch || "Demo Jakarta",
-        position: unit.position || unit.branch || "Showroom Demo",
-        status: String(unit.status).toUpperCase().includes("READY") ? "UNIT READY" : unit.status,
-        buyingPrice: null,
-        cashPrice: unit.cash_price,
-        creditPrice: unit.credit_price,
-        aging: unit.aging,
-        source: "Inventory tenant demo",
-        photos: 0,
-      }));
+      this.units = snapshot.inventory.map((unit) => {
+        const seed =
+          inventoryDemoSeed.find(
+            (item) =>
+              item.id === unit.id ||
+              (`${item.brand} ${item.type}`.toLowerCase() ===
+                `${unit.brand || ""} ${unit.type || ""}`.toLowerCase()),
+          ) || {};
+        return {
+          id: unit.id,
+          brand: unit.brand,
+          type: unit.type,
+          plate: unit.plate || seed.plate || "Unit Demo",
+          year: unit.year,
+          color: unit.color || seed.color,
+          transmission: this.titleCase(unit.transmission || seed.transmission || "Automatic"),
+          odometer: unit.odometer ?? seed.odometer ?? 0,
+          branch: unit.branch || seed.branch || "Demo Jakarta",
+          position: unit.position || unit.branch || seed.position || "Showroom Demo",
+          status: String(unit.status).toUpperCase().includes("READY") ? "UNIT READY" : unit.status,
+          buyingPrice: null,
+          cashPrice: unit.cash_price ?? seed.cashPrice,
+          creditPrice: unit.credit_price ?? seed.creditPrice,
+          aging: unit.aging ?? seed.aging ?? 0,
+          source: unit.source || seed.source || "Inventory tenant demo",
+          photos: unit.photos ?? seed.photos ?? 0,
+          bodyType: unit.body_type || unit.bodyType || seed.bodyType,
+          fuel: unit.fuel || seed.fuel,
+          engine: unit.engine || seed.engine,
+          seats: unit.seats || seed.seats,
+          features: unit.features || seed.features || [],
+        };
+      });
       this.render();
     } catch (error) {
       this.units = inventoryDemoSeed.map((unit) => ({ ...unit }));
@@ -1507,6 +1715,24 @@ class InventoryProductDemo {
     this.root.querySelector("[data-detail-position]").textContent = unit.position;
     this.root.querySelector("[data-detail-aging]").textContent = `${unit.aging} hari`;
     this.root.querySelector("[data-detail-source]").textContent = unit.source;
+
+    const bodyEl = this.root.querySelector("[data-detail-body]");
+    const fuelEl = this.root.querySelector("[data-detail-fuel]");
+    const engineEl = this.root.querySelector("[data-detail-engine]");
+    const seatsEl = this.root.querySelector("[data-detail-seats]");
+    if (bodyEl) bodyEl.textContent = unit.bodyType || "—";
+    if (fuelEl) fuelEl.textContent = unit.fuel || "—";
+    if (engineEl) engineEl.textContent = unit.engine || "—";
+    if (seatsEl) seatsEl.textContent = unit.seats ? `${unit.seats} penumpang` : "—";
+
+    const featuresEl = this.root.querySelector("[data-detail-features]");
+    if (featuresEl) {
+      const list = Array.isArray(unit.features) && unit.features.length ? unit.features : [];
+      featuresEl.innerHTML = list.length
+        ? list.map((f) => `<li>${f}</li>`).join("")
+        : "<li>Fitur unit akan dilengkapi dari master data tenant.</li>";
+    }
+
     this.root.querySelector("[data-detail-insight]").textContent =
       unit.aging >= 60
         ? "Aging unit melewati 60 hari. Pertimbangkan penyesuaian harga atau promosi untuk mempercepat perputaran stok."
@@ -4071,10 +4297,15 @@ const socialDemoVehicles = [
     name: "Toyota Innova Zenix",
     shortName: "Innova Zenix",
     year: "2023",
-    specs: "Hybrid · Automatic",
+    specs: "Hybrid · Automatic · 7 Seater",
     price: "Rp468 juta",
     offer: "TDP mulai Rp48 juta",
     color: "#f8fafc",
+    bodyType: "MPV",
+    fuel: "Hybrid",
+    engine: "2.0 L Hybrid",
+    seats: 7,
+    features: ["TNGA Hybrid", "Panoramic Roof", "Captain Seat", "TSS Safety"],
     caption:
       "Naik kelas bersama Toyota Innova Zenix Hybrid 2023. Kabin premium, hemat bahan bakar, dan siap menemani setiap perjalanan keluarga. TDP mulai Rp48 juta. #ZENIXHYBRID #MobixAutos",
   },
@@ -4083,10 +4314,15 @@ const socialDemoVehicles = [
     name: "Honda BR-V Prestige",
     shortName: "BR-V Prestige",
     year: "2021",
-    specs: "CVT · 7 Seater",
+    specs: "CVT · 7 Seater · Sensing",
     price: "Rp255 juta",
     offer: "Cicilan mulai Rp5,8 juta",
     color: "#94a3b8",
+    bodyType: "SUV",
+    fuel: "Bensin",
+    engine: "1.5 L",
+    seats: 7,
+    features: ["Honda Sensing", "LaneWatch", "7 Seater", "Smart Key"],
     caption:
       "Waktunya membawa keluarga menjelajah lebih jauh bersama Honda BR-V Prestige CVT. Nyaman, lega, dan siap pakai. Cicilan mulai Rp5,8 juta. #BRVFAMILY #MobixAutos",
   },
@@ -4095,12 +4331,102 @@ const socialDemoVehicles = [
     name: "Mitsubishi Xpander",
     shortName: "Xpander Ultimate",
     year: "2021",
-    specs: "Ultimate · Automatic",
+    specs: "Ultimate · Automatic · 7 Seater",
     price: "Rp239 juta",
     offer: "Bonus servis berkala",
     color: "#f1f5f9",
+    bodyType: "MPV",
+    fuel: "Bensin",
+    engine: "1.5 L",
+    seats: 7,
+    features: ["Head Unit 9\"", "Keyless Push Start", "Cruise Control", "Rear Camera"],
     caption:
       "Mitsubishi Xpander Ultimate—partner andal untuk aktivitas dan liburan keluarga. Unit ready dengan bonus servis berkala. Jadwalkan test drive hari ini. #XPANDERWEEKEND #MobixAutos",
+  },
+  {
+    id: "raize",
+    name: "Toyota Raize GR Sport",
+    shortName: "Raize GR Sport",
+    year: "2022",
+    specs: "1.0T · Automatic · 5 Seater",
+    price: "Rp228 juta",
+    offer: "TDP mulai Rp28 juta",
+    color: "#14b8a6",
+    bodyType: "SUV",
+    fuel: "Bensin",
+    engine: "1.0 L Turbo",
+    seats: 5,
+    features: ["GR Sport Kit", "Turbo Engine", "LED Projector", "Digital Meter"],
+    caption:
+      "Toyota Raize GR Sport 1.0 Turbo—gaya sporty, lincah di kota, irit di jalanan. TDP mulai Rp28 juta. Unit ready inspeksi lengkap. #RAIZEGR #MobixAutos",
+  },
+  {
+    id: "pajero",
+    name: "Mitsubishi Pajero Sport",
+    shortName: "Pajero Sport Dakar",
+    year: "2020",
+    specs: "2.4 Diesel · 7 Seater",
+    price: "Rp435 juta",
+    offer: "Cashback suku cadang",
+    color: "#475569",
+    bodyType: "SUV",
+    fuel: "Diesel",
+    engine: "2.4 L Diesel",
+    seats: 7,
+    features: ["4WD Select", "Cruise Control", "Rockford Audio", "360 Camera"],
+    caption:
+      "Mitsubishi Pajero Sport Dakar 4x2—tangguh, lega, siap petualangan. Cashback suku cadang + servis. Jadwalkan test drive. #PAJEROSPORT #MobixAutos",
+  },
+  {
+    id: "ertiga",
+    name: "Suzuki Ertiga Hybrid",
+    shortName: "Ertiga GX Hybrid",
+    year: "2023",
+    specs: "Hybrid · Automatic · 7 Seater",
+    price: "Rp243 juta",
+    offer: "Cicilan mulai Rp4,9 juta",
+    color: "#0f172a",
+    bodyType: "MPV",
+    fuel: "Hybrid",
+    engine: "1.5 L Hybrid",
+    seats: 7,
+    features: ["SHVS Hybrid", "ESP", "Hill Hold", "Smart Key"],
+    caption:
+      "Suzuki Ertiga GX Hybrid 2023—MPV hemat BBM untuk keluarga modern. Cicilan mulai Rp4,9 juta. Unit ready cabang Bekasi. #ERTIGAHYBRID #MobixAutos",
+  },
+  {
+    id: "crv",
+    name: "Honda CR-V Turbo",
+    shortName: "CR-V Turbo Prestige",
+    year: "2021",
+    specs: "1.5T · Prestige · 7 Seater",
+    price: "Rp475 juta",
+    offer: "Trade-in prioritas",
+    color: "#1e293b",
+    bodyType: "SUV",
+    fuel: "Bensin",
+    engine: "1.5 L Turbo",
+    seats: 7,
+    features: ["Honda Sensing", "Panoramic Roof", "Power Tailgate", "Leather Seat"],
+    caption:
+      "Honda CR-V Turbo Prestige—SUV premium dengan Honda Sensing dan panoramic roof. Trade-in prioritas minggu ini. #CRVTURBO #MobixAutos",
+  },
+  {
+    id: "almaz",
+    name: "Wuling Almaz RS",
+    shortName: "Almaz RS Pro",
+    year: "2022",
+    specs: "1.5T · ADAS · 7 Seater",
+    price: "Rp305 juta",
+    offer: "Gratis IoV 1 tahun",
+    color: "#b91c1c",
+    bodyType: "SUV",
+    fuel: "Bensin",
+    engine: "1.5 L Turbo",
+    seats: 7,
+    features: ["Internet of Vehicle", "360 Camera", "ADAS Level 2", "Panoramic Sunroof"],
+    caption:
+      "Wuling Almaz RS Pro—SUV cerdas dengan ADAS & IoV. Gratis konektivitas 1 tahun. Siap test drive hari ini. #ALMAZRS #MobixAutos",
   },
 ];
 
@@ -4144,6 +4470,45 @@ const socialDemoCampaigns = {
       [24, 8], [31, 10], [28, 9], [39, 14], [44, 17], [51, 20], [58, 24],
     ],
   },
+  raize: {
+    name: "Meta · Raize GR Sport",
+    utm: "utm_campaign=raize_gr_jul26",
+    hashtag: "#RAIZEGR",
+    clicks: 712,
+    possible: 118,
+    leads: 52,
+    conversion: 7.3,
+    change: ["14,2%", "16,8%", "11,5%", "0,9 pt"],
+    trend: [
+      [26, 9], [33, 12], [41, 15], [48, 19], [55, 22], [62, 28], [70, 31],
+    ],
+  },
+  pajero: {
+    name: "Facebook · Pajero Sport Dakar",
+    utm: "utm_campaign=pajero_dakar",
+    hashtag: "#PAJEROSPORT",
+    clicks: 498,
+    possible: 82,
+    leads: 31,
+    conversion: 6.2,
+    change: ["7,4%", "9,1%", "5,8%", "0,5 pt"],
+    trend: [
+      [18, 6], [22, 7], [27, 9], [31, 11], [36, 13], [42, 16], [48, 18],
+    ],
+  },
+  ertiga: {
+    name: "Instagram · Ertiga Hybrid Deal",
+    utm: "utm_campaign=ertiga_hybrid",
+    hashtag: "#ERTIGAHYBRID",
+    clicks: 580,
+    possible: 96,
+    leads: 44,
+    conversion: 7.6,
+    change: ["10,3%", "12,6%", "14,1%", "1,1 pt"],
+    trend: [
+      [21, 8], [28, 11], [34, 13], [39, 16], [46, 19], [53, 23], [61, 27],
+    ],
+  },
 };
 
 class SocialGrowthDemo {
@@ -4157,6 +4522,8 @@ class SocialGrowthDemo {
     this.monthOffset = 0;
     this.lastFocusedElement = null;
     this.posts = this.defaultPosts();
+    this.guideStepIndex = 0;
+    this.hasOpenedGuide = false;
 
     this.vehicleOptions = root.querySelector("[data-social-vehicle-options]");
     this.captionInput = root.querySelector("[data-social-caption]");
@@ -4166,6 +4533,7 @@ class SocialGrowthDemo {
     this.timeInput = root.querySelector("[data-social-time]");
     this.toast = root.querySelector("[data-social-toast]");
     this.campaignSelect = root.querySelector("[data-social-campaign]");
+    this.guide = root.querySelector("[data-social-guide-popover]");
 
     this.bind();
     this.reset();
@@ -4198,6 +4566,84 @@ class SocialGrowthDemo {
     ];
   }
 
+  guideSteps() {
+    return [
+      {
+        view: "studio",
+        title: "Social Growth Studio",
+        body: "Demo Social Media & Ads Automation: alur Konten → Jadwal → Insight lead. Data mock aman, tidak terkirim ke Meta asli.",
+      },
+      {
+        view: "studio",
+        title: "Pilih unit dari inventory",
+        body: "Delapan unit ready siap jadi materi iklan. Klik kartu unit untuk mengganti preview, harga, dan caption otomatis.",
+        enter: () => {
+          this.vehicleId = "zenix";
+          this.offerInput.value = this.vehicle().offer;
+          this.captionInput.value = this.vehicle().caption;
+          this.renderStudio();
+          this.highlightAnchor("vehicles");
+        },
+      },
+      {
+        view: "studio",
+        title: "Cek fitur mobil di creative",
+        body: "Setiap unit membawa spesifikasi Motovax: bodi, BBM, mesin, kapasitas, dan fitur unggulan yang ikut ke caption & preview.",
+        enter: () => {
+          this.vehicleId = "brv";
+          this.offerInput.value = this.vehicle().offer;
+          this.captionInput.value = this.vehicle().caption;
+          this.renderStudio();
+          this.highlightAnchor("vehicles");
+        },
+      },
+      {
+        view: "studio",
+        title: "Desain & format konten",
+        body: "Pilih format Post 1:1, Feed 4:5, atau Story 9:16. Edit headline dan penawaran—preview langsung berubah.",
+        enter: () => {
+          this.format = "portrait";
+          this.renderStudio();
+          this.highlightAnchor("design");
+        },
+      },
+      {
+        view: "studio",
+        title: "Platform & generate caption",
+        body: "Aktifkan Instagram/Facebook, lalu Generate Ulang untuk 3 varian caption berbasis unit + penawaran.",
+        enter: () => {
+          this.highlightAnchor("caption");
+          this.root.querySelector("[data-social-generate]")?.focus();
+        },
+      },
+      {
+        view: "studio",
+        title: "Jadwalkan ke tenant demo",
+        body: "Atur tanggal/waktu lalu Jadwalkan. Posting tersimpan di tenant demo (tidak publish ke akun Meta).",
+        enter: () => {
+          this.root.querySelector(".social-progress span:last-child")?.classList.add("active");
+          this.highlightAnchor("schedule");
+        },
+      },
+      {
+        view: "calendar",
+        title: "Kalender konten",
+        body: "Lihat draft, terjadwal, dan terbit. Setelah schedule, unit masuk sebagai posting planned di kalender.",
+        enter: () => this.highlightAnchor("calendar"),
+      },
+      {
+        view: "insight",
+        title: "Campaign Insight → CRM",
+        body: "Ganti campaign untuk melihat klik, lead, UTM, ranking produk, dan lead terbaru yang masuk pipeline CRM.",
+        enter: () => {
+          this.campaignSelect.value = "zenix";
+          this.renderInsight();
+          this.highlightAnchor("insight");
+        },
+      },
+    ];
+  }
+
   bind() {
     for (const button of document.querySelectorAll("[data-open-social-demo]")) {
       button.addEventListener("click", () => this.open(button));
@@ -4210,6 +4656,14 @@ class SocialGrowthDemo {
     this.root.querySelector("[data-social-toast-close]").addEventListener("click", () => {
       this.toast.hidden = true;
     });
+
+    for (const button of this.root.querySelectorAll("[data-social-guide]")) {
+      button.addEventListener("click", () => this.openGuide(0));
+    }
+    this.root.querySelector("[data-close-social-guide]")?.addEventListener("click", () => this.closeGuide());
+    this.root.querySelector("[data-social-guide-next]")?.addEventListener("click", () => this.nextGuideStep());
+    this.root.querySelector("[data-social-guide-prev]")?.addEventListener("click", () => this.prevGuideStep());
+    this.root.querySelector("[data-social-guide-finish]")?.addEventListener("click", () => this.closeGuide());
 
     for (const button of this.root.querySelectorAll("[data-social-nav]")) {
       button.addEventListener("click", () => this.switchView(button.dataset.socialNav || "studio"));
@@ -4252,10 +4706,11 @@ class SocialGrowthDemo {
     this.root.querySelector("[data-social-generate]").addEventListener("click", () => {
       this.captionVariant += 1;
       const vehicle = this.vehicle();
+      const featureLine = (vehicle.features || []).slice(0, 2).join(" · ");
       const variants = [
         vehicle.caption,
-        `${vehicle.name} ${vehicle.year} siap menemani cerita baru Anda. ${this.offerInput.value}. Unit terpilih, inspeksi transparan, dan bisa test drive. ${this.hashtagForVehicle()} #MobixAutos`,
-        `Cari ${vehicle.shortName} dengan kondisi siap pakai? Temukan penawaran spesial ${this.offerInput.value.toLowerCase()} dan konsultasikan kebutuhan Anda hari ini. ${this.hashtagForVehicle()} #MobilBekasBerkualitas`,
+        `${vehicle.name} ${vehicle.year} siap menemani cerita baru Anda. ${this.offerInput.value}. ${featureLine ? `Highlight: ${featureLine}. ` : ""}Unit terpilih, inspeksi transparan, dan bisa test drive. ${this.hashtagForVehicle()} #MobixAutos`,
+        `Cari ${vehicle.shortName} (${vehicle.fuel || "siap pakai"} · ${vehicle.seats || 7} penumpang)? Penawaran ${this.offerInput.value.toLowerCase()}. ${this.hashtagForVehicle()} #MobilBekasBerkualitas`,
       ];
       this.captionInput.value = variants[this.captionVariant % variants.length];
       this.renderPreviewCopy();
@@ -4275,6 +4730,7 @@ class SocialGrowthDemo {
     document.addEventListener("keydown", (event) => {
       if (event.key !== "Escape" || !this.root.classList.contains("is-open")) return;
       if (!this.toast.hidden) this.toast.hidden = true;
+      else if (this.guide && !this.guide.hidden) this.closeGuide();
       else this.close();
     });
   }
@@ -4286,14 +4742,90 @@ class SocialGrowthDemo {
     document.body.classList.add("demo-open");
     this.root.querySelector("[data-close-social-demo]").focus();
     this.loadTenantPosts(true);
+    if (!this.hasOpenedGuide) {
+      this.openGuide(0);
+      this.hasOpenedGuide = true;
+    }
   }
 
   close() {
+    this.closeGuide();
     this.toast.hidden = true;
     this.root.classList.remove("is-open");
     this.root.setAttribute("aria-hidden", "true");
     document.body.classList.remove("demo-open");
     if (this.lastFocusedElement) this.lastFocusedElement.focus();
+  }
+
+  openGuide(startIndex = 0) {
+    if (!this.guide) return;
+    this.guideStepIndex = Math.max(0, startIndex);
+    this.guide.hidden = false;
+    this.renderGuideStep();
+    const focusBtn =
+      this.guide.querySelector("[data-social-guide-next]:not([hidden])") ||
+      this.guide.querySelector("[data-social-guide-finish]:not([hidden])");
+    focusBtn?.focus();
+  }
+
+  closeGuide() {
+    if (!this.guide) return;
+    this.guide.hidden = true;
+    this.clearHighlight();
+  }
+
+  highlightAnchor(name) {
+    this.clearHighlight();
+    const el = this.root.querySelector(`[data-social-anchor="${name}"]`);
+    if (el) el.classList.add("social-guide-highlight");
+  }
+
+  clearHighlight() {
+    for (const el of this.root.querySelectorAll(".social-guide-highlight")) {
+      el.classList.remove("social-guide-highlight");
+    }
+  }
+
+  renderGuideStep() {
+    if (!this.guide) return;
+    const steps = this.guideSteps();
+    const step = steps[this.guideStepIndex] || steps[0];
+    const total = steps.length;
+    const index = this.guideStepIndex + 1;
+
+    this.guide.querySelector("[data-social-guide-step-label]").textContent =
+      `LANGKAH ${index} DARI ${total}`;
+    this.guide.querySelector("[data-social-guide-title]").textContent = step.title;
+    this.guide.querySelector("[data-social-guide-body]").textContent = step.body;
+
+    const prev = this.guide.querySelector("[data-social-guide-prev]");
+    const next = this.guide.querySelector("[data-social-guide-next]");
+    const finish = this.guide.querySelector("[data-social-guide-finish]");
+    const isLast = this.guideStepIndex >= total - 1;
+    const isFirst = this.guideStepIndex <= 0;
+
+    if (prev) prev.hidden = isFirst;
+    if (next) next.hidden = isLast;
+    if (finish) finish.hidden = !isLast;
+
+    if (step.view) this.switchView(step.view);
+    if (typeof step.enter === "function") step.enter();
+  }
+
+  nextGuideStep() {
+    const steps = this.guideSteps();
+    if (this.guideStepIndex >= steps.length - 1) {
+      this.closeGuide();
+      return;
+    }
+    this.guideStepIndex += 1;
+    this.renderGuideStep();
+  }
+
+  prevGuideStep() {
+    if (this.guideStepIndex <= 0) return;
+    this.guideStepIndex -= 1;
+    this.renderGuideStep();
   }
 
   reset() {
@@ -4311,6 +4843,7 @@ class SocialGrowthDemo {
     this.timeInput.value = "09:00";
     this.campaignSelect.value = "zenix";
     this.toast.hidden = true;
+    this.closeGuide();
     this.root.querySelector(".social-progress span:last-child").classList.remove("active");
     this.renderAll();
     this.switchView("studio");
@@ -4321,9 +4854,17 @@ class SocialGrowthDemo {
   }
 
   hashtagForVehicle() {
-    if (this.vehicleId === "brv") return "#BRVFAMILY";
-    if (this.vehicleId === "xpander") return "#XPANDERWEEKEND";
-    return "#ZENIXHYBRID";
+    const map = {
+      brv: "#BRVFAMILY",
+      xpander: "#XPANDERWEEKEND",
+      raize: "#RAIZEGR",
+      pajero: "#PAJEROSPORT",
+      ertiga: "#ERTIGAHYBRID",
+      crv: "#CRVTURBO",
+      almaz: "#ALMAZRS",
+      zenix: "#ZENIXHYBRID",
+    };
+    return map[this.vehicleId] || "#MOTOVAX";
   }
 
   switchView(view) {
@@ -4373,16 +4914,24 @@ class SocialGrowthDemo {
   }
 
   renderVehicles() {
+    const countEl = this.root.querySelector("[data-social-vehicle-count]");
+    if (countEl) countEl.textContent = `${socialDemoVehicles.length} unit ready`;
+
     this.vehicleOptions.innerHTML = socialDemoVehicles
-      .map(
-        (vehicle) => `
+      .map((vehicle) => {
+        const featureHint = (vehicle.features || []).slice(0, 2).join(" · ");
+        return `
           <button class="social-vehicle-card ${vehicle.id === this.vehicleId ? "active" : ""}" type="button" data-social-vehicle="${vehicle.id}">
             <span class="social-vehicle-thumb" style="--car-color:${vehicle.color}"></span>
-            <span><b>${vehicle.shortName}</b><small>${vehicle.year} · ${vehicle.price}</small></span>
+            <span>
+              <b>${vehicle.shortName}</b>
+              <small>${vehicle.year} · ${vehicle.price}</small>
+              <small class="social-vehicle-meta">${vehicle.fuel || "—"} · ${vehicle.seats || "—"} penumpang${featureHint ? ` · ${featureHint}` : ""}</small>
+            </span>
             <em>✓</em>
           </button>
-        `,
-      )
+        `;
+      })
       .join("");
   }
 
@@ -4409,7 +4958,10 @@ class SocialGrowthDemo {
     creative.className = `social-creative-frame ${this.format}`;
     this.root.querySelector("[data-social-preview-format]").textContent = formatLabels[this.format];
     this.root.querySelector("[data-social-creative-title]").textContent = vehicle.name;
-    this.root.querySelector("[data-social-creative-year]").textContent = `${vehicle.year} · ${vehicle.specs}`;
+    const featureTag = (vehicle.features || [])[0];
+    this.root.querySelector("[data-social-creative-year]").textContent = featureTag
+      ? `${vehicle.year} · ${vehicle.specs} · ${featureTag}`
+      : `${vehicle.year} · ${vehicle.specs}`;
     this.root.querySelector("[data-social-car-art]").style.setProperty("--preview-car", vehicle.color);
     const platformCount = this.platforms.size;
     this.root.querySelector("[data-social-platform-count]").textContent =
@@ -4557,11 +5109,46 @@ class SocialGrowthDemo {
       )
       .join("");
 
-    const ranking = [
-      ["Toyota Innova Zenix", "498 klik · 42 lead", "8,4%"],
-      ["Honda BR-V Prestige", "382 klik · 29 lead", "7,6%"],
-      ["Mitsubishi Xpander", "274 klik · 18 lead", "6,6%"],
-    ];
+    const rankingByCampaign = {
+      zenix: [
+        ["Toyota Innova Zenix", "498 klik · 42 lead", "8,4%"],
+        ["Honda BR-V Prestige", "382 klik · 29 lead", "7,6%"],
+        ["Suzuki Ertiga Hybrid", "301 klik · 22 lead", "7,3%"],
+        ["Mitsubishi Xpander", "274 klik · 18 lead", "6,6%"],
+      ],
+      brv: [
+        ["Honda BR-V Prestige", "412 klik · 34 lead", "8,3%"],
+        ["Toyota Raize GR Sport", "298 klik · 21 lead", "7,0%"],
+        ["Honda CR-V Turbo", "256 klik · 17 lead", "6,6%"],
+        ["Wuling Almaz RS", "188 klik · 12 lead", "6,4%"],
+      ],
+      xpander: [
+        ["Mitsubishi Xpander", "320 klik · 24 lead", "7,5%"],
+        ["Suzuki Ertiga Hybrid", "245 klik · 18 lead", "7,3%"],
+        ["Toyota Innova Zenix", "198 klik · 14 lead", "7,1%"],
+        ["Daihatsu Xenia ADS", "142 klik · 9 lead", "6,3%"],
+      ],
+      raize: [
+        ["Toyota Raize GR Sport", "356 klik · 28 lead", "7,9%"],
+        ["Honda BR-V Prestige", "274 klik · 19 lead", "6,9%"],
+        ["Wuling Almaz RS", "210 klik · 14 lead", "6,7%"],
+        ["Daihatsu Rocky", "156 klik · 9 lead", "5,8%"],
+      ],
+      pajero: [
+        ["Mitsubishi Pajero Sport", "288 klik · 18 lead", "6,3%"],
+        ["Honda CR-V Turbo", "241 klik · 15 lead", "6,2%"],
+        ["Toyota Innova Zenix", "198 klik · 12 lead", "6,1%"],
+        ["Mitsubishi Xpander", "164 klik · 9 lead", "5,5%"],
+      ],
+      ertiga: [
+        ["Suzuki Ertiga Hybrid", "310 klik · 26 lead", "8,4%"],
+        ["Mitsubishi Xpander", "252 klik · 18 lead", "7,1%"],
+        ["Toyota Avanza G", "198 klik · 13 lead", "6,6%"],
+        ["Honda Mobilio", "141 klik · 8 lead", "5,7%"],
+      ],
+    };
+    const campaignKey = this.campaignSelect.value;
+    const ranking = rankingByCampaign[campaignKey] || rankingByCampaign.zenix;
     this.root.querySelector("[data-social-product-ranking]").innerHTML = ranking
       .map(
         ([name, copy, conversion], index) => `
@@ -4574,6 +5161,9 @@ class SocialGrowthDemo {
       ["Nadia Putri", "Innova Zenix", "Instagram", "Prospek"],
       ["Raka Aditya", "Honda BR-V", "Facebook", "Follow-up"],
       ["Dewi Maharani", "Innova Zenix", "Instagram", "Test Drive"],
+      ["Bima Pratama", "Raize GR Sport", "Instagram", "Prospek"],
+      ["Siti Aulia", "Ertiga Hybrid", "Facebook", "Follow-up"],
+      ["Andi Wijaya", "Pajero Sport", "Facebook", "Test Drive"],
     ];
     this.root.querySelector("[data-social-leads]").innerHTML = leads
       .map(
