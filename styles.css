@@ -6817,18 +6817,16 @@ body.demo-open {
   z-index: 2;
   top: 8%;
   left: 8%;
-  font-size: 9px;
+  color: #fff;
+  font-size: 10px;
   font-style: italic;
   font-weight: 950;
   letter-spacing: -0.04em;
 }
 
+/* Brand mark on generated template: Motovax only (no MOBIX). */
 .social-creative-brand::after {
-  color: #f43f5e;
-  content: " BY MOTO VAX";
-  font-size: 5px;
-  font-style: normal;
-  letter-spacing: 0;
+  content: none;
 }
 
 .social-creative-copy {
