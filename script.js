@@ -294,6 +294,11 @@ class InventoryProductDemo {
     this.hasOpenedGuide = false;
     this.activeView = "units";
     this.activeUploadTab = "inventory";
+    this.guideStepIndex = 0;
+    this.falconRole = "sales"; // sales | management
+    this.falconMessages = [];
+    this.falconSalesDone = false;
+    this.falconTutorialDone = { sales: {}, management: {} };
 
     this.tableBody = root.querySelector("[data-demo-table-body]");
     this.mobileList = root.querySelector("[data-demo-mobile-list]");
@@ -312,11 +317,116 @@ class InventoryProductDemo {
     this.branchGrid = root.querySelector("[data-ims-branch-grid]");
     this.tipTitle = root.querySelector("[data-ims-tip-title]");
     this.tipBody = root.querySelector("[data-ims-tip-body]");
+    this.falconMessagesEl = root.querySelector("[data-falcon-messages]");
+    this.falconInput = root.querySelector("[data-falcon-input]");
+    this.falconContact = root.querySelector("[data-falcon-contact]");
+    this.falconAvatar = root.querySelector("[data-falcon-avatar]");
+    this.falconRoleLabel = root.querySelector("[data-falcon-role-label]");
+    this.falconRoleHint = root.querySelector("[data-falcon-role-hint]");
+    this.falconTutorialList = root.querySelector("[data-falcon-tutorial-list]");
+    this.falconQuickPrompts = root.querySelector("[data-falcon-quick-prompts]");
 
     this.bind();
     this.setView("units");
+    this.initFalconChat();
     this.render();
     this.loadTenantData();
+  }
+
+  guideSteps() {
+    const samples = this.sampleUnitNames();
+    return [
+      {
+        view: "units",
+        title: "Tiga modul SMI seperti Mobix",
+        body: "Sidebar Sistem Manajemen Inventaris berisi Manajemen Unit, Unit per Cabang, dan Upload Data — sama dengan Mobix. Klik Lanjut untuk mencoba satu per satu.",
+      },
+      {
+        view: "units",
+        title: "Manajemen Unit",
+        body: "Cari merek/tipe, filter status Ready/Booked/Sold, lalu buka detail unit. Coba booking unit Ready (tersimpan di tenant demo).",
+      },
+      {
+        view: "per-cabang",
+        title: "Unit per Cabang",
+        body: "Lihat ringkasan stok Ready, Booked, dan foto per cabang. Klik kartu cabang untuk kembali ke Manajemen Unit dengan filter cabang itu.",
+      },
+      {
+        view: "uploads",
+        title: "Upload Data",
+        body: "Tab Import Inventory, Foto, Handover, dan MRP — alur yang sama dengan Mobix. Di demo, unggah bersifat simulasi.",
+      },
+      {
+        view: "falcon",
+        title: "Masuk AI Falcon",
+        body: "Mock iPhone WhatsApp. Kontak: Sales Agent — Falcon menjawab dengan role sales (tidak bisa laporan management).",
+        enter: () => this.setFalconRole("sales", { greet: true }),
+      },
+      {
+        view: "falcon",
+        title: "Sales: tanya unit",
+        body: `Kirim contoh: “Halo mau tanya ${samples.join(", ")}”. Falcon membalas detail unit real-like (data demo, bukan DB production).`,
+        enter: () => {
+          this.setFalconRole("sales");
+          this.sendFalconUserMessage(
+            `Halo mau tanya ${samples.join(", ")}`,
+            { fromGuide: true },
+          );
+        },
+      },
+      {
+        view: "falcon",
+        title: "Sales: minta foto",
+        body: "Lanjut: “Minta foto” unit yang ditanyakan. Falcon mengirim mock foto unit.",
+        enter: () => this.sendFalconUserMessage("Minta foto", { fromGuide: true }),
+      },
+      {
+        view: "falcon",
+        title: "Sales: update foto stok",
+        body: "Tekan ikon lampiran 📎 di composer untuk mengirim foto (simulasi update stok). Tidak mengubah database production.",
+        enter: () => this.simulateFalconPhotoUpload({ fromGuide: true }),
+      },
+      {
+        view: "falcon",
+        title: "Sales: daftar fitur",
+        body: "Tanya “Fitur sales agent apa saja?” — Falcon merangkum capability Sales dari Motovax (unit query, simulasi kredit, foto, handoff, dll.).",
+        enter: () =>
+          this.sendFalconUserMessage("Fitur sales agent apa saja?", { fromGuide: true }),
+      },
+      {
+        view: "falcon",
+        title: "Berganti ke Management Agent",
+        body: "Tutorial Sales selesai. Kontak WhatsApp berganti ke Management Agent — Falcon bisa laporan & insight bisnis.",
+        enter: () => this.setFalconRole("management", { greet: true, fromGuide: true }),
+      },
+      {
+        view: "falcon",
+        title: "Management: minta laporan",
+        body: "Coba “Laporan stok per cabang” atau “Laporan aging”. Falcon membalas ringkasan agregat (mock data demo).",
+        enter: () =>
+          this.sendFalconUserMessage("Laporan stok per cabang", { fromGuide: true }),
+      },
+      {
+        view: "falcon",
+        title: "Management: daftar fitur",
+        body: "Tanya “Fitur management apa saja?” untuk melihat capability penuh (analytics, import, unit edit, inventory analysis).",
+        enter: () =>
+          this.sendFalconUserMessage("Fitur management apa saja?", { fromGuide: true }),
+      },
+      {
+        view: "falcon",
+        title: "Panduan selesai",
+        body: "Anda sudah menelusuri 3 modul SMI dan AI Falcon (Sales → Management Agent). Silakan eksplor bebas atau Reset demo.",
+      },
+    ];
+  }
+
+  sampleUnitNames() {
+    const ready = (this.units.length ? this.units : inventoryDemoSeed)
+      .filter((u) => String(u.status).toUpperCase().includes("READY") || u.status === "UNIT READY")
+      .slice(0, 3);
+    const pool = ready.length ? ready : (this.units.length ? this.units : inventoryDemoSeed).slice(0, 3);
+    return pool.map((u) => `${u.brand} ${u.type}`);
   }
 
   async loadTenantData(force = false) {
@@ -344,8 +454,8 @@ class InventoryProductDemo {
       }));
       this.render();
     } catch (error) {
-      this.units = [];
-      this.dataError = error.message;
+      this.units = inventoryDemoSeed.map((unit) => ({ ...unit }));
+      this.dataError = "";
       this.render();
     }
   }
@@ -444,15 +554,31 @@ class InventoryProductDemo {
       this.searchInput.focus();
     });
 
-    this.root.querySelector("[data-demo-guide]").addEventListener("click", () => this.openGuide());
+    for (const button of this.root.querySelectorAll("[data-demo-guide]")) {
+      button.addEventListener("click", () => this.openGuide(0));
+    }
     this.root.querySelector("[data-close-demo-guide]").addEventListener("click", () => this.closeGuide());
-    this.root.querySelector("[data-demo-guide-start]").addEventListener("click", () => {
-      this.closeGuide();
-      this.setView("units");
-      this.searchInput.focus();
-    });
+    this.root.querySelector("[data-demo-guide-next]")?.addEventListener("click", () => this.nextGuideStep());
+    this.root.querySelector("[data-demo-guide-prev]")?.addEventListener("click", () => this.prevGuideStep());
+    this.root.querySelector("[data-demo-guide-finish]")?.addEventListener("click", () => this.closeGuide());
     this.root.querySelector("[data-close-demo-toast]").addEventListener("click", () => {
       this.toast.hidden = true;
+    });
+
+    this.root.querySelector("[data-falcon-send]")?.addEventListener("click", () => this.handleFalconSend());
+    this.root.querySelector("[data-falcon-attach]")?.addEventListener("click", () =>
+      this.simulateFalconPhotoUpload(),
+    );
+    this.falconInput?.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        this.handleFalconSend();
+      }
+    });
+    this.falconQuickPrompts?.addEventListener("click", (event) => {
+      const chip = event.target.closest("[data-falcon-prompt]");
+      if (!chip) return;
+      this.sendFalconUserMessage(chip.dataset.falconPrompt || chip.textContent);
     });
 
     document.addEventListener("keydown", (event) => {
@@ -470,7 +596,7 @@ class InventoryProductDemo {
   }
 
   setView(view) {
-    const next = ["units", "per-cabang", "uploads"].includes(view) ? view : "units";
+    const next = ["units", "per-cabang", "uploads", "falcon"].includes(view) ? view : "units";
     this.activeView = next;
 
     for (const button of this.root.querySelectorAll("[data-ims-nav]")) {
@@ -499,6 +625,10 @@ class InventoryProductDemo {
         title: "Alur upload data",
         body: "Pilih tab Import Inventory, Foto, Handover, atau MRP — tiga menu IMS ini sama dengan Mobix.",
       },
+      falcon: {
+        title: "Chat AI Falcon",
+        body: "Mulai sebagai Sales Agent, selesaikan tutorial sales, lalu berganti ke Management Agent untuk laporan.",
+      },
     };
     const tip = tips[next] || tips.units;
     if (this.tipTitle) this.tipTitle.textContent = tip.title;
@@ -507,6 +637,11 @@ class InventoryProductDemo {
     if (next !== "units") this.closeDetail();
     this.renderBranchSummary();
     this.renderUploadMeta();
+    if (next === "falcon") {
+      this.renderFalconChrome();
+      this.renderFalconTutorial();
+      this.renderFalconQuickPrompts();
+    }
   }
 
   setUploadTab(tab) {
@@ -547,13 +682,59 @@ class InventoryProductDemo {
     if (this.lastFocusedElement) this.lastFocusedElement.focus();
   }
 
-  openGuide() {
+  openGuide(startIndex = 0) {
+    this.guideStepIndex = Math.max(0, startIndex);
     this.guide.hidden = false;
-    this.guide.querySelector("[data-demo-guide-start]").focus();
+    this.renderGuideStep();
+    const focusBtn =
+      this.guide.querySelector("[data-demo-guide-next]:not([hidden])") ||
+      this.guide.querySelector("[data-demo-guide-finish]:not([hidden])");
+    focusBtn?.focus();
   }
 
   closeGuide() {
     this.guide.hidden = true;
+  }
+
+  renderGuideStep() {
+    const steps = this.guideSteps();
+    const step = steps[this.guideStepIndex] || steps[0];
+    const total = steps.length;
+    const index = this.guideStepIndex + 1;
+
+    this.guide.querySelector("[data-demo-guide-step-label]").textContent =
+      `LANGKAH ${index} DARI ${total}`;
+    this.guide.querySelector("[data-demo-guide-title]").textContent = step.title;
+    this.guide.querySelector("[data-demo-guide-body]").textContent = step.body;
+
+    const prev = this.guide.querySelector("[data-demo-guide-prev]");
+    const next = this.guide.querySelector("[data-demo-guide-next]");
+    const finish = this.guide.querySelector("[data-demo-guide-finish]");
+    const isLast = this.guideStepIndex >= total - 1;
+    const isFirst = this.guideStepIndex <= 0;
+
+    if (prev) prev.hidden = isFirst;
+    if (next) next.hidden = isLast;
+    if (finish) finish.hidden = !isLast;
+
+    if (step.view) this.setView(step.view);
+    if (typeof step.enter === "function") step.enter();
+  }
+
+  nextGuideStep() {
+    const steps = this.guideSteps();
+    if (this.guideStepIndex >= steps.length - 1) {
+      this.closeGuide();
+      return;
+    }
+    this.guideStepIndex += 1;
+    this.renderGuideStep();
+  }
+
+  prevGuideStep() {
+    if (this.guideStepIndex <= 0) return;
+    this.guideStepIndex -= 1;
+    this.renderGuideStep();
   }
 
   clearFilters() {
@@ -572,9 +753,405 @@ class InventoryProductDemo {
     this.closeDetail();
     this.toast.hidden = true;
     this.clearFilters();
+    this.guideStepIndex = 0;
+    this.falconSalesDone = false;
+    this.falconTutorialDone = { sales: {}, management: {} };
+    this.setFalconRole("sales", { greet: true, reset: true });
     this.setView("units");
     this.setUploadTab("inventory");
     this.loadTenantData(true);
+  }
+
+  initFalconChat() {
+    this.setFalconRole("sales", { greet: true, reset: true });
+  }
+
+  setFalconRole(role, options = {}) {
+    const next = role === "management" ? "management" : "sales";
+    this.falconRole = next;
+    if (next === "management") this.falconSalesDone = true;
+
+    if (options.reset) {
+      this.falconMessages = [];
+    }
+
+    this.renderFalconChrome();
+    this.renderFalconTutorial();
+    this.renderFalconQuickPrompts();
+
+    if (options.greet) {
+      if (next === "sales") {
+        this.pushFalconBot(
+          "Halo! Saya Falcon untuk Sales Agent. Saya bantu cek stok, detail unit, foto, simulasi kredit, dan handoff lead. Tanya saja unit atau ketik “fitur sales agent”.",
+        );
+      } else {
+        this.pushFalconSystem("Mode berganti ke Management Agent.");
+        this.pushFalconBot(
+          "Halo! Saya Falcon untuk Management Agent. Saya bisa laporan stok/cabang/aging, insight bisnis, import, dan analisis inventory. Coba “laporan stok per cabang” atau “fitur management”.",
+        );
+      }
+    }
+
+    this.renderFalconMessages();
+  }
+
+  renderFalconChrome() {
+    const isSales = this.falconRole === "sales";
+    if (this.falconContact) {
+      this.falconContact.textContent = isSales ? "Sales Agent" : "Management Agent";
+    }
+    if (this.falconAvatar) {
+      this.falconAvatar.textContent = isSales ? "SA" : "MA";
+      this.falconAvatar.classList.toggle("is-management", !isSales);
+    }
+    if (this.falconRoleLabel) {
+      this.falconRoleLabel.textContent = isSales ? "Sales Agent" : "Management Agent";
+    }
+    if (this.falconRoleHint) {
+      this.falconRoleHint.textContent = isSales
+        ? "Falcon menjawab dengan capability Sales — tidak bisa laporan management / data internal."
+        : "Falcon menjawab dengan capability Management — laporan, aging, analytics, dan operasional inventory.";
+    }
+    const badge = this.root.querySelector("[data-falcon-role-badge]");
+    badge?.classList.toggle("is-management", !isSales);
+  }
+
+  salesTutorialItems() {
+    return [
+      { id: "unit", label: "Tanya detail unit (A/B/C real-like)" },
+      { id: "photo", label: "Minta foto unit" },
+      { id: "upload", label: "Kirim foto update stok (simulasi)" },
+      { id: "features", label: "Tanya semua fitur Sales Agent" },
+      { id: "finance", label: "Simulasi kredit (opsional)" },
+    ];
+  }
+
+  managementTutorialItems() {
+    return [
+      { id: "report_branch", label: "Laporan stok per cabang" },
+      { id: "report_aging", label: "Laporan aging / insight" },
+      { id: "features", label: "Tanya semua fitur Management" },
+      { id: "import", label: "Import / upload data (simulasi)" },
+    ];
+  }
+
+  renderFalconTutorial() {
+    if (!this.falconTutorialList) return;
+    const items =
+      this.falconRole === "sales" ? this.salesTutorialItems() : this.managementTutorialItems();
+    const doneMap = this.falconTutorialDone[this.falconRole] || {};
+    this.falconTutorialList.innerHTML = items
+      .map(
+        (item) => `
+        <li class="${doneMap[item.id] ? "is-done" : ""}">
+          <span>${doneMap[item.id] ? "✓" : "○"}</span>
+          <span>${item.label}</span>
+        </li>
+      `,
+      )
+      .join("");
+
+    if (this.falconRole === "sales") {
+      const required = ["unit", "photo", "upload", "features"];
+      const allDone = required.every((id) => doneMap[id]);
+      if (allDone && !this.falconSalesDone) {
+        this.falconSalesDone = true;
+      }
+    }
+  }
+
+  markFalconTutorial(id) {
+    if (!this.falconTutorialDone[this.falconRole]) {
+      this.falconTutorialDone[this.falconRole] = {};
+    }
+    this.falconTutorialDone[this.falconRole][id] = true;
+    this.renderFalconTutorial();
+  }
+
+  renderFalconQuickPrompts() {
+    if (!this.falconQuickPrompts) return;
+    const samples = this.sampleUnitNames();
+    const sales = [
+      `Halo mau tanya ${samples.slice(0, 2).join(" dan ")}`,
+      "Minta foto",
+      "Fitur sales agent apa saja?",
+      "Simulasi kredit 20% DP 48 bulan",
+      "Laporan aging stok",
+      "Ganti ke Management Agent",
+    ];
+    const management = [
+      "Laporan stok per cabang",
+      "Laporan aging unit",
+      "Fitur management apa saja?",
+      "Import inventory lewat WA",
+      "Gross profit / margin unit",
+      "Kembali ke Sales Agent",
+    ];
+    const list = this.falconRole === "sales" ? sales : management;
+    this.falconQuickPrompts.innerHTML = list
+      .map(
+        (text) =>
+          `<button type="button" data-falcon-prompt="${text.replace(/"/g, "&quot;")}">${text}</button>`,
+      )
+      .join("");
+  }
+
+  pushFalconBot(text, extra = {}) {
+    this.falconMessages.push({ role: "bot", text, ...extra });
+  }
+
+  pushFalconUser(text, extra = {}) {
+    this.falconMessages.push({ role: "user", text, ...extra });
+  }
+
+  pushFalconSystem(text) {
+    this.falconMessages.push({ role: "system", text });
+  }
+
+  renderFalconMessages() {
+    if (!this.falconMessagesEl) return;
+    this.falconMessagesEl.innerHTML = this.falconMessages
+      .map((msg) => {
+        if (msg.role === "system") {
+          return `<div class="wa-system"><span>${this.escapeHtml(msg.text)}</span></div>`;
+        }
+        if (msg.role === "user") {
+          const media = msg.photo
+            ? `<div class="wa-media-thumb" aria-hidden="true">📷 Foto stok</div>`
+            : "";
+          return `<div class="wa-bubble wa-out">${media}<p>${this.escapeHtml(msg.text)}</p></div>`;
+        }
+        const media =
+          msg.photos
+            ? `<div class="wa-photo-grid">${msg.photos
+                .map(
+                  (p) =>
+                    `<div class="wa-photo-card"><b>${this.escapeHtml(p.label)}</b><span>${this.escapeHtml(p.meta)}</span></div>`,
+                )
+                .join("")}</div>`
+            : "";
+        const report = msg.reportHtml || "";
+        return `<div class="wa-bubble wa-in">${media}${report}<p>${this.escapeHtml(msg.text)}</p></div>`;
+      })
+      .join("");
+    this.falconMessagesEl.scrollTop = this.falconMessagesEl.scrollHeight;
+  }
+
+  escapeHtml(value) {
+    return String(value || "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;");
+  }
+
+  handleFalconSend() {
+    const text = (this.falconInput?.value || "").trim();
+    if (!text) return;
+    if (this.falconInput) this.falconInput.value = "";
+    this.sendFalconUserMessage(text);
+  }
+
+  sendFalconUserMessage(text, options = {}) {
+    const content = String(text || "").trim();
+    if (!content) return;
+    this.pushFalconUser(content);
+    this.renderFalconMessages();
+    const reply = this.buildFalconReply(content);
+    window.setTimeout(() => {
+      if (reply.roleSwitch) {
+        this.setFalconRole(reply.roleSwitch, { greet: true });
+        return;
+      }
+      this.pushFalconBot(reply.text, {
+        photos: reply.photos,
+        reportHtml: reply.reportHtml,
+      });
+      if (reply.tutorialId) this.markFalconTutorial(reply.tutorialId);
+      this.renderFalconMessages();
+    }, options.fromGuide ? 280 : 420);
+  }
+
+  simulateFalconPhotoUpload(options = {}) {
+    this.pushFalconUser("📷 [Foto unit dari galeri]", { photo: true });
+    this.renderFalconMessages();
+    window.setTimeout(() => {
+      if (this.falconRole === "sales") {
+        this.pushFalconBot(
+          "Foto diterima (simulasi). Saya tautkan ke unit stok demo dan status “foto ter-update”. Di Mobix, upload foto lewat WA memutakhirkan galeri unit tenant Anda — di sini tidak mengubah DB production.",
+        );
+        this.markFalconTutorial("upload");
+      } else {
+        this.pushFalconBot(
+          "Foto stok diterima (simulasi Management). Bisa digabung ke multi-unit / merge photo seperti di Motovax. Tidak mengubah database production.",
+        );
+        this.markFalconTutorial("import");
+      }
+      this.renderFalconMessages();
+    }, options.fromGuide ? 280 : 400);
+  }
+
+  buildFalconReply(raw) {
+    const text = raw.toLocaleLowerCase("id");
+    const isSales = this.falconRole === "sales";
+
+    if (/management agent|ganti.*management|mode management|jadi management/.test(text)) {
+      if (isSales) return { roleSwitch: "management" };
+      return { text: "Anda sudah di mode Management Agent." };
+    }
+    if (/sales agent|kembali.*sales|mode sales|jadi sales/.test(text)) {
+      if (!isSales) return { roleSwitch: "sales" };
+      return { text: "Anda sudah di mode Sales Agent." };
+    }
+
+    if (
+      /laporan|aging|gross profit|margin|gp |analitik|analytics|performa sales|tren penjualan|insight/.test(
+        text,
+      )
+    ) {
+      if (isSales) {
+        return {
+          text: "Maaf, laporan management (aging internal, GP, margin, tren agregat) tidak tersedia di role Sales Agent. Selesaikan tutorial sales lalu ganti ke Management Agent, atau ketik “Ganti ke Management Agent”.",
+        };
+      }
+      return this.buildManagementReport(text);
+    }
+
+    if (/fitur (sales|management)|kemampuan|bisa (apa|bantu)|apa saja yang bisa/.test(text)) {
+      if (isSales || /sales/.test(text)) {
+        return {
+          tutorialId: isSales ? "features" : undefined,
+          text: isSales
+            ? "Fitur Falcon untuk Sales Agent (dari Motovax):\n• Cek stok & detail unit (whatsapp:unit_query)\n• Minta / kirim foto unit (photo_send)\n• Simulasi kredit & asuransi\n• Lokasi showroom / map\n• Image generation konten\n• Lead milik sendiri & handoff\n• Performa sales (terbatas)\n\nTidak bisa: laporan aging/GP internal, import Excel massal, edit unit penuh, data harga beli/HPP."
+            : this.managementFeaturesText(),
+        };
+      }
+      return { tutorialId: "features", text: this.managementFeaturesText() };
+    }
+
+    if (/minta foto|kirim foto|foto unit|lihat foto/.test(text)) {
+      const units = this.pickUnitsForChat(text, 2);
+      return {
+        tutorialId: isSales ? "photo" : "report_branch",
+        photos: units.map((u) => ({
+          label: `${u.brand} ${u.type}`,
+          meta: `${u.year} · ${this.titleCase(u.branch || "")} · mock foto`,
+        })),
+        text: units.length
+          ? `Berikut foto unit (mock) untuk ${units.map((u) => `${u.brand} ${u.type}`).join(" & ")}. Di Mobix foto dikirim dari galeri tenant.`
+          : "Belum ada unit cocok. Sebut merek/tipe unit dulu, ya.",
+      };
+    }
+
+    if (/simulasi|kredit|cicilan|dp |angsuran/.test(text)) {
+      const unit = this.pickUnitsForChat(text, 1)[0];
+      const price = unit?.cashPrice || unit?.cash_price || 250000000;
+      const dp = Math.round(price * 0.2);
+      const angsuran = Math.round((price - dp) / 48);
+      return {
+        tutorialId: isSales ? "finance" : undefined,
+        text: unit
+          ? `Simulasi kredit (demo) ${unit.brand} ${unit.type}: OTR ~ ${this.formatPrice(price)}, DP 20% ~ ${this.formatPrice(dp)}, tenor 48 bln → angsuran ~ ${this.formatPrice(angsuran)}/bln (belum asuransi). Rumus penuh di Motovax mengikuti KKB tenant.`
+          : "Simulasi kredit aktif. Sebut unit-nya (contoh Innova / Xpander) agar saya hitung DP & angsuran demo.",
+      };
+    }
+
+    if (/import|upload data|excel|handover|mrp/.test(text)) {
+      if (isSales) {
+        return {
+          text: "Import Excel inventory / handover / MRP adalah capability Management/Admin. Role Sales Agent tidak memproses import massal lewat Falcon. Ganti ke Management Agent untuk mencoba alur simulasi.",
+        };
+      }
+      return {
+        tutorialId: "import",
+        text: "Siap bantu import (simulasi Management): kirim file Excel inventory, handover, atau MRP. Di demo cukup ketik “import inventory” — di production Falcon memvalidasi baris & warning seperti di Upload Data.",
+      };
+    }
+
+    if (/unit|stok|tanya|halo|ready|innova|xpander|rush|hr-v|mobilio|serena|toyota|honda|mitsubishi|nissan|daihatsu|bmw|mazda/.test(text)) {
+      const units = this.pickUnitsForChat(text, 3);
+      if (!units.length) {
+        return {
+          text: "Stok demo belum termuat. Coba buka Manajemen Unit dulu atau Reset demo.",
+        };
+      }
+      const lines = units.map(
+        (u) =>
+          `• ${u.brand} ${u.type} ${u.year} — ${this.statusLabel(u.status)} · ${this.titleCase(u.branch || "-")} · OTR ${this.formatCompactPrice(u.cashPrice || u.cash_price || 0)}`,
+      );
+      return {
+        tutorialId: isSales ? "unit" : "report_branch",
+        text: `Berikut unit yang cocok (data demo real-like, bukan DB production):\n${lines.join("\n")}\n\nMau foto, simulasi kredit, atau detail salah satu unit?`,
+      };
+    }
+
+    return {
+      text: isSales
+        ? "Saya Falcon (Sales Agent). Coba: tanya unit, “minta foto”, simulasi kredit, “fitur sales agent”, atau “Ganti ke Management Agent”."
+        : "Saya Falcon (Management Agent). Coba: “laporan stok per cabang”, “laporan aging”, “fitur management”, atau “Kembali ke Sales Agent”.",
+    };
+  }
+
+  managementFeaturesText() {
+    return "Fitur Falcon untuk Management Agent (dari Motovax):\n• Semua kemampuan Sales (stok, foto, simulasi, map)\n• Laporan & analytics (whatsapp:analytics_query, sales trend, management)\n• Inventory analysis: aging, GP, rekomendasi stok\n• Unit edit, media upload, document upload/review\n• Excel import inventory\n• User/role/tenant config (sesuai permission)\n• Tidak diblokir guardrail harga internal (berbeda dari Sales)";
+  }
+
+  buildManagementReport(text) {
+    const rows = this.getBranchSummaries();
+    if (/aging/.test(text)) {
+      const aged = [...(this.units.length ? this.units : inventoryDemoSeed)]
+        .sort((a, b) => (b.aging || 0) - (a.aging || 0))
+        .slice(0, 4);
+      const lines = aged.map(
+        (u) =>
+          `• ${u.brand} ${u.type} — ${u.aging || 0} hari · ${this.titleCase(u.branch || "-")}`,
+      );
+      return {
+        tutorialId: "report_aging",
+        text: `Laporan aging (demo):\n${lines.join("\n")}\n\nRekomendasi: unit >60 hari diprioritaskan promo / penyesuaian harga. Data mock real-like, bukan production.`,
+      };
+    }
+    if (/gross|margin|gp|profit/.test(text)) {
+      return {
+        tutorialId: "report_aging",
+        text: "Insight GP/margin (demo Management): rata-rata GP prediksi demo ~8–12% pada unit Ready cabang Cinere & Pondok Bambu. Sales Agent tidak boleh melihat angka ini. Angka di sini ilustratif untuk tutorial.",
+      };
+    }
+    const lines = rows.length
+      ? rows.map(
+          (r) =>
+            `• ${this.titleCase(r.branch)}: Ready ${r.ready}, Booked ${r.booked}, Sold ${r.sold}, total ${r.total}`,
+        )
+      : ["• Belum ada ringkasan cabang — muat data inventory dulu."];
+    return {
+      tutorialId: "report_branch",
+      reportHtml: `<div class="wa-report">${rows
+        .slice(0, 4)
+        .map(
+          (r) =>
+            `<div><b>${this.escapeHtml(this.titleCase(r.branch))}</b><span>R ${r.ready} · B ${r.booked}</span></div>`,
+        )
+        .join("")}</div>`,
+      text: `Laporan stok per cabang (demo):\n${lines.join("\n")}\n\nIni capability Management (inventory analysis). Ketik “laporan aging” untuk insight perputaran stok.`,
+    };
+  }
+
+  pickUnitsForChat(text, limit = 3) {
+    const source = this.units.length ? this.units : inventoryDemoSeed;
+    const q = String(text || "").toLocaleLowerCase("id");
+    const scored = source.map((unit) => {
+      const hay = `${unit.brand} ${unit.type} ${unit.plate || ""}`.toLocaleLowerCase("id");
+      let score = 0;
+      for (const token of hay.split(/\s+/)) {
+        if (token.length > 2 && q.includes(token)) score += 2;
+      }
+      if (String(unit.status).toUpperCase().includes("READY")) score += 0.5;
+      return { unit, score };
+    });
+    scored.sort((a, b) => b.score - a.score);
+    const matched = scored.filter((s) => s.score >= 2).map((s) => s.unit);
+    if (matched.length) return matched.slice(0, limit);
+    return source.slice(0, limit);
   }
 
   getBranchSummaries() {

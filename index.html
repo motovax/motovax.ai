@@ -563,6 +563,10 @@
                 <svg class="demo-nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V4m0 0 4 4m-4-4-4 4M4 20h16"/></svg>
                 <span>Upload Data</span>
               </button>
+              <button type="button" data-ims-nav="falcon">
+                <svg class="demo-nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4v8Z"/></svg>
+                <span>AI Falcon</span>
+              </button>
             </nav>
             <div class="demo-sidebar-tip" data-ims-tip>
               <span>DEMO GUIDE</span>
@@ -576,6 +580,7 @@
               <button class="active" type="button" data-ims-nav="units">Manajemen Unit</button>
               <button type="button" data-ims-nav="per-cabang">Unit per Cabang</button>
               <button type="button" data-ims-nav="uploads">Upload Data</button>
+              <button type="button" data-ims-nav="falcon">AI Falcon</button>
             </div>
 
             <section class="ims-view is-active" data-ims-view="units">
@@ -766,6 +771,54 @@
                 </div>
               </div>
             </section>
+
+            <section class="ims-view" data-ims-view="falcon" hidden>
+              <div class="demo-page-heading">
+                <div>
+                  <span class="demo-breadcrumb">Operasional / AI Falcon</span>
+                  <h2>AI Falcon</h2>
+                  <p>Mock WhatsApp seperti di Mobix: chat Falcon sebagai <b>Sales Agent</b>, lalu berganti ke <b>Management Agent</b> untuk laporan.</p>
+                </div>
+                <button class="demo-primary-action" type="button" data-demo-guide>
+                  <span aria-hidden="true">▶</span> Panduan demo
+                </button>
+              </div>
+
+              <div class="falcon-demo-layout">
+                <div class="falcon-role-panel">
+                  <div class="falcon-role-badge" data-falcon-role-badge>
+                    <span>ROLE AKTIF</span>
+                    <b data-falcon-role-label>Sales Agent</b>
+                    <p data-falcon-role-hint>Falcon menjawab dengan capability Sales — tidak bisa laporan management.</p>
+                  </div>
+                  <ol class="falcon-tutorial-list" data-falcon-tutorial-list></ol>
+                  <div class="falcon-quick-prompts" data-falcon-quick-prompts></div>
+                </div>
+
+                <div class="iphone-frame" aria-label="Mock WhatsApp AI Falcon">
+                  <div class="iphone-notch" aria-hidden="true"></div>
+                  <div class="iphone-screen">
+                    <header class="wa-header">
+                      <div class="wa-header-left">
+                        <span class="wa-back" aria-hidden="true">‹</span>
+                        <span class="wa-avatar" data-falcon-avatar>SA</span>
+                        <div>
+                          <b data-falcon-contact>Sales Agent</b>
+                          <small data-falcon-status>online · Falcon AI</small>
+                        </div>
+                      </div>
+                      <span class="wa-header-actions" aria-hidden="true">⋮</span>
+                    </header>
+                    <div class="wa-messages" data-falcon-messages></div>
+                    <div class="wa-composer">
+                      <button type="button" class="wa-attach" data-falcon-attach title="Kirim foto (simulasi)" aria-label="Kirim foto simulasi">📎</button>
+                      <input type="text" data-falcon-input placeholder="Ketik pesan ke Falcon…" aria-label="Pesan ke Falcon" />
+                      <button type="button" class="wa-send" data-falcon-send aria-label="Kirim">➤</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </section>
           </main>
         </div>
       </div>
@@ -816,10 +869,14 @@
 
       <div class="demo-guide-popover" data-demo-guide-popover hidden>
         <button type="button" data-close-demo-guide aria-label="Tutup panduan">×</button>
-        <span>LANGKAH 1 DARI 3</span>
-        <h3>Tiga menu sama seperti Mobix</h3>
-        <p>Sidebar “Sistem Manajemen Inventaris” berisi Manajemen Unit, Unit per Cabang, dan Upload Data. Mulai dari pencarian unit di Manajemen Unit.</p>
-        <button type="button" data-demo-guide-start>Mulai coba</button>
+        <span data-demo-guide-step-label>LANGKAH 1 DARI 12</span>
+        <h3 data-demo-guide-title>Tiga modul SMI seperti Mobix</h3>
+        <p data-demo-guide-body>Sidebar Sistem Manajemen Inventaris berisi Manajemen Unit, Unit per Cabang, dan Upload Data. Lanjut untuk panduan step-by-step.</p>
+        <div class="demo-guide-actions">
+          <button type="button" class="demo-secondary-action" data-demo-guide-prev hidden>Kembali</button>
+          <button type="button" data-demo-guide-next>Lanjut</button>
+          <button type="button" data-demo-guide-finish hidden>Selesai</button>
+        </div>
       </div>
 
       <div class="demo-toast" role="status" aria-live="polite" data-demo-toast hidden>
