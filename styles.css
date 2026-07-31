@@ -4096,7 +4096,8 @@ body.demo-open {
 
 .demo-guide-popover {
   position: fixed;
-  z-index: 8;
+  /* Di atas sticky filter (12), export menu (20), toast (9), detail panel (6) */
+  z-index: 50;
   top: 92px;
   right: 28px;
   width: min(330px, calc(100% - 28px));
@@ -4977,7 +4978,7 @@ body.demo-open {
 
 /* CRM multi-view + unit card + auto follow + guide */
 .crm-guide-popover {
-  z-index: 12;
+  z-index: 50;
 }
 
 .crm-guide-highlight {
@@ -8417,7 +8418,7 @@ body.demo-open {
 }
 
 .social-guide-popover {
-  z-index: 12;
+  z-index: 50;
 }
 
 .social-heading-status span,
