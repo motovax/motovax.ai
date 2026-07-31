@@ -571,13 +571,13 @@ class InventoryProductDemo {
       {
         view: "falcon",
         title: "Sales: minta foto unit",
-        body: "photo_send — “Minta foto” unit. Falcon mengirim mock foto galeri tenant.",
+        body: "photo_send — “Minta foto” unit. Falcon mengirim foto real dari galeri tenant demo.",
         enter: () => this.sendFalconUserMessage("Minta foto", { fromGuide: true }),
       },
       {
         view: "falcon",
         title: "Sales: upload foto stok",
-        body: "Tekan 📎 di composer — simulasi update foto stok lewat WA (bukan DB production).",
+        body: "Tekan 📎 — kirim 2–3 foto unit real + pesan update nopol; stok demo ter-update.",
         enter: () => this.simulateFalconPhotoUpload({ fromGuide: true }),
       },
       {
@@ -1335,6 +1335,21 @@ class InventoryProductDemo {
     this.falconMessages.push({ role: "system", text });
   }
 
+  renderFalconPhotoGrid(photos, direction = "in") {
+    if (!Array.isArray(photos) || !photos.length) return "";
+    const cards = photos
+      .map((p) => {
+        const url = p.url || p.photoUrl || "";
+        const style = url
+          ? ` style="background-image:url('${String(url).replace(/'/g, "%27")}')"`
+          : "";
+        const cls = url ? "wa-photo-card has-photo" : "wa-photo-card";
+        return `<div class="${cls}"${style}><b>${this.escapeHtml(p.label || "")}</b><span>${this.escapeHtml(p.meta || "")}</span></div>`;
+      })
+      .join("");
+    return `<div class="wa-photo-grid wa-photo-grid-${direction}">${cards}</div>`;
+  }
+
   renderFalconMessages() {
     if (!this.falconMessagesEl) return;
     this.falconMessagesEl.innerHTML = this.falconMessages
@@ -1343,20 +1358,14 @@ class InventoryProductDemo {
           return `<div class="wa-system"><span>${this.escapeHtml(msg.text)}</span></div>`;
         }
         if (msg.role === "user") {
-          const media = msg.photo
-            ? `<div class="wa-media-thumb" aria-hidden="true">📷 Foto stok</div>`
-            : "";
+          const media = msg.photos?.length
+            ? this.renderFalconPhotoGrid(msg.photos, "out")
+            : msg.photo
+              ? `<div class="wa-media-thumb" aria-hidden="true">📷 Foto stok</div>`
+              : "";
           return `<div class="wa-bubble wa-out">${media}<p>${this.escapeHtml(msg.text)}</p></div>`;
         }
-        const media =
-          msg.photos
-            ? `<div class="wa-photo-grid">${msg.photos
-                .map(
-                  (p) =>
-                    `<div class="wa-photo-card"><b>${this.escapeHtml(p.label)}</b><span>${this.escapeHtml(p.meta)}</span></div>`,
-                )
-                .join("")}</div>`
-            : "";
+        const media = msg.photos?.length ? this.renderFalconPhotoGrid(msg.photos, "in") : "";
         const report = msg.reportHtml || "";
         return `<div class="wa-bubble wa-in">${media}${report}<p>${this.escapeHtml(msg.text)}</p></div>`;
       })
@@ -1399,18 +1408,104 @@ class InventoryProductDemo {
     }, options.fromGuide ? 280 : 420);
   }
 
+  unitPhotoUrl(unit) {
+    if (!unit) return "";
+    if (unit.photoUrl) return unit.photoUrl;
+    if (unit.id && /^[0-9a-f]{8}-[0-9a-f-]{27,}$/i.test(String(unit.id))) {
+      return `https://mobix.motovax.com/api/public/demo/motovax-ai/units/${unit.id}/cover`;
+    }
+    // Fallback: map seed brand/type → known demo-tenant unit ids (public cover API).
+    const map = {
+      serena: "1ba7674e-246d-4bdb-9902-f516cc59ba0e",
+      ertiga: "5d746149-b8dc-4b27-997f-04b704fd2037",
+      rush: "940611f0-9983-4e17-98a8-74de5917cef4",
+      "br-v": "e2aecacc-a138-430f-ae5d-e61bd12022fd",
+      brv: "e2aecacc-a138-430f-ae5d-e61bd12022fd",
+      xpander: "c15ff159-af47-4f18-8335-ce43770c99c5",
+      zenix: "29c03bc8-fa74-4d49-8dd0-bd714b4bae2d",
+      innova: "29c03bc8-fa74-4d49-8dd0-bd714b4bae2d",
+    };
+    const hay = `${unit.brand || ""} ${unit.type || ""}`.toLocaleLowerCase("id");
+    for (const [key, id] of Object.entries(map)) {
+      if (hay.includes(key)) {
+        return `https://mobix.motovax.com/api/public/demo/motovax-ai/units/${id}/cover`;
+      }
+    }
+    return "";
+  }
+
+  unitsForPhotoDemo(limit = 3) {
+    const source = this.units.length ? this.units : inventoryDemoSeed;
+    const ready = source.filter(
+      (u) => String(u.status).toUpperCase().includes("READY") || u.status === "UNIT READY",
+    );
+    const pool = (ready.length ? ready : source).slice();
+    // Prefer units that already resolve to a cover URL.
+    pool.sort((a, b) => Number(Boolean(this.unitPhotoUrl(b))) - Number(Boolean(this.unitPhotoUrl(a))));
+    return pool.slice(0, Math.max(2, Math.min(limit, 3)));
+  }
+
+  photoCardsFromUnits(units) {
+    return units.map((u) => ({
+      label: `${u.brand} ${u.type}`,
+      meta: `${u.plate || "—"} · ${u.year || ""}`,
+      url: this.unitPhotoUrl(u),
+      unitId: u.id,
+      plate: u.plate,
+    }));
+  }
+
   simulateFalconPhotoUpload(options = {}) {
-    this.pushFalconUser("📷 [Foto unit dari galeri]", { photo: true });
+    const units = this.unitsForPhotoDemo(3);
+    if (!units.length) {
+      this.pushFalconUser("📷 [Foto unit dari galeri]", { photo: true });
+      this.renderFalconMessages();
+      return;
+    }
+
+    const lines = units.map(
+      (u) =>
+        `tolong update unit ${u.brand} ${u.type} dengan nopol ${u.plate || "—"}`,
+    );
+    const userText = lines.join("\n");
+    const photos = this.photoCardsFromUnits(units);
+
+    this.pushFalconUser(userText, { photo: true, photos });
     this.renderFalconMessages();
+
     window.setTimeout(() => {
+      // Update demo stock photo counts (local seed / tenant snapshot in memory).
+      for (const unit of units) {
+        const live = this.units.find((item) => item.id === unit.id) || unit;
+        const nextCount = Math.max(Number(live.photos) || 0, 0) + 2;
+        live.photos = nextCount;
+        if (!live.photoUrl) live.photoUrl = this.unitPhotoUrl(live);
+        // Mirror onto this.units if the picked unit came from seed copy.
+        const idx = this.units.findIndex((item) => item.id === unit.id);
+        if (idx >= 0) {
+          this.units[idx].photos = nextCount;
+          if (!this.units[idx].photoUrl) this.units[idx].photoUrl = live.photoUrl;
+        }
+      }
+      this.render();
+
+      const updatedLines = units
+        .map((u) => {
+          const live = this.units.find((item) => item.id === u.id) || u;
+          return `• ${u.brand} ${u.type} · nopol ${u.plate || "—"} → ${live.photos || 0} foto (galeri demo)`;
+        })
+        .join("\n");
+
       if (this.falconRole === "sales") {
         this.pushFalconBot(
-          "Foto diterima (simulasi). Saya tautkan ke unit stok demo dan status “foto ter-update”. Di Mobix, upload foto lewat WA memutakhirkan galeri unit tenant Anda — di sini tidak mengubah DB production.",
+          `Foto diterima ✅ Saya tautkan ke unit stok demo:\n${updatedLines}\n\nDi Mobix, upload foto lewat WA memutakhirkan galeri unit tenant Anda. Demo ini hanya mengubah stok di sesi landing (bukan DB production).`,
+          { photos },
         );
         this.markFalconTutorial("upload");
       } else {
         this.pushFalconBot(
-          "Foto stok diterima (simulasi Management). Bisa digabung ke multi-unit / merge photo seperti di Motovax. Tidak mengubah database production.",
+          `Foto stok diterima (Management) ✅ Multi-unit merge:\n${updatedLines}\n\nSiap digabung ke galeri tenant seperti di Motovax. Demo landing tidak menulis ke DB production.`,
+          { photos },
         );
         this.markFalconTutorial("import");
       }
@@ -1527,15 +1622,20 @@ class InventoryProductDemo {
 
     // 8) Foto
     if (/minta foto|kirim foto|foto unit|lihat foto/.test(text)) {
-      const units = this.pickUnitsForChat(text, 2);
+      let units = this.pickUnitsForChat(text, 3);
+      // Prefer units that have a resolvable cover image.
+      units = units
+        .map((u) => ({ u, url: this.unitPhotoUrl(u) }))
+        .sort((a, b) => Number(Boolean(b.url)) - Number(Boolean(a.url)))
+        .map((x) => x.u)
+        .slice(0, 3);
+      if (!units.length) units = this.unitsForPhotoDemo(2);
+      const photos = this.photoCardsFromUnits(units);
       return {
         tutorialId: isSales ? "photo" : undefined,
-        photos: units.map((u) => ({
-          label: `${u.brand} ${u.type}`,
-          meta: `${u.year} · ${this.titleCase(u.branch || "")} · mock foto`,
-        })),
+        photos,
         text: units.length
-          ? `Berikut foto unit (mock photo_send) untuk ${units.map((u) => `${u.brand} ${u.type}`).join(" & ")}. Di Mobix foto dikirim dari galeri tenant.`
+          ? `Berikut foto unit (photo_send) untuk ${units.map((u) => `${u.brand} ${u.type} · ${u.plate || "—"}`).join(" & ")}. Foto diambil dari galeri tenant demo (cover real).`
           : "Belum ada unit cocok. Sebut merek/tipe unit dulu, ya.",
       };
     }
@@ -1631,9 +1731,9 @@ class InventoryProductDemo {
       "1. Cek stok & detail unit — whatsapp:unit_query\n" +
       "   Coba: “Halo mau tanya Innova / Xpander”\n" +
       "2. Minta foto unit — whatsapp:photo_send\n" +
-      "   Coba: “Minta foto”\n" +
+      "   Coba: “Minta foto” (foto real galeri tenant demo)\n" +
       "3. Upload foto update stok (via lampiran WA)\n" +
-      "   Coba: tekan 📎 di composer\n" +
+      "   Coba: tekan 📎 — pesan + 2–3 foto unit & nopol\n" +
       "4. Simulasi kredit & asuransi — whatsapp:finance_simulation\n" +
       "   Coba: “Simulasi kredit 20% DP 48 bulan”\n" +
       "5. Lokasi showroom / map\n" +
