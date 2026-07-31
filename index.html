@@ -1752,29 +1752,29 @@
 
         <div class="demo-layout" data-dashboard-workspace hidden>
           <aside class="demo-sidebar dashboard-sidebar" aria-label="Navigasi One Dashboard">
-            <nav>
-              <span class="demo-nav-section">Analytics</span>
-              <button class="active" type="button">
+            <nav data-dashboard-nav-list>
+              <span class="demo-nav-section" data-dashboard-nav-section>Analytics</span>
+              <button class="active" type="button" data-dashboard-nav="overview" aria-current="page">
                 <svg class="demo-nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3h7v8H3V3Zm11 0h7v5h-7V3ZM3 15h7v6H3v-6Zm11-3h7v9h-7v-9Z"/></svg>
-                <span>Executive Overview</span>
+                <span data-dashboard-nav-label>Executive Overview</span>
               </button>
-              <button type="button">
+              <button type="button" data-dashboard-nav="sales">
                 <svg class="demo-nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19V9m8 10V5m8 14v-7M2 19h20"/></svg>
-                <span>Sales Performance</span>
+                <span data-dashboard-nav-label>Sales Performance</span>
               </button>
-              <button type="button">
+              <button type="button" data-dashboard-nav="locations">
                 <svg class="demo-nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 21V7l8-4 8 4v14M8 10h2m4 0h2M8 14h2m4 0h2M8 18h8"/></svg>
-                <span>Branch Performance</span>
+                <span data-dashboard-nav-label>Branch Performance</span>
               </button>
-              <button type="button">
+              <button type="button" data-dashboard-nav="channels">
                 <svg class="demo-nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4v8Z"/></svg>
-                <span>Omnichannel</span>
+                <span data-dashboard-nav-label>Omnichannel</span>
               </button>
             </nav>
             <div class="demo-sidebar-tip dashboard-sidebar-tip">
-              <span>DASHBOARD ANDA</span>
-              <b>Satu data, beda kebutuhan</b>
-              <p>Direktur, Sales Manager, dan Kepala Cabang dapat memiliki susunan KPI serta widget masing-masing.</p>
+              <span data-dashboard-sidebar-kicker>DASHBOARD ANDA</span>
+              <b data-dashboard-sidebar-title>Satu data, beda kebutuhan</b>
+              <p data-dashboard-sidebar-copy>Direktur, Sales Manager, dan Kepala Cabang dapat memiliki susunan KPI serta widget masing-masing.</p>
               <button type="button" data-dashboard-customize-sidebar>Atur tampilan →</button>
             </div>
           </aside>
@@ -1782,7 +1782,7 @@
           <main class="demo-workspace dashboard-workspace">
             <div class="demo-page-heading dashboard-page-heading">
               <div>
-                <span class="demo-breadcrumb">Analytics / One Dashboard</span>
+                <span class="demo-breadcrumb" data-dashboard-breadcrumb>Analytics / One Dashboard</span>
                 <h2 data-dashboard-title>Executive Overview</h2>
                 <p data-dashboard-description>Ringkasan lintas cabang untuk keputusan strategis dan pertumbuhan bisnis.</p>
               </div>
@@ -1816,7 +1816,10 @@
             <section class="dashboard-content-grid">
               <article class="dashboard-panel dashboard-revenue-panel" data-dashboard-widget="revenue">
                 <header>
-                  <div><span>PENDAPATAN</span><h3>Tren Pendapatan + Forecast</h3></div>
+                  <div>
+                    <span data-dashboard-revenue-kicker>PENDAPATAN</span>
+                    <h3 data-dashboard-revenue-title>Tren Pendapatan + Forecast</h3>
+                  </div>
                   <div class="dashboard-legend"><span><i class="actual"></i> Aktual</span><span><i class="forecast"></i> Forecast</span></div>
                 </header>
                 <div class="dashboard-revenue-total"><b data-dashboard-revenue-total>Rp1,84 M</b><span data-dashboard-revenue-delta>↑ 18,6% vs periode lalu</span></div>
@@ -1824,7 +1827,13 @@
               </article>
 
               <article class="dashboard-panel dashboard-funnel-panel" data-dashboard-widget="pipeline">
-                <header><div><span>PIPELINE SALES</span><h3>Corong Konversi</h3></div><em data-dashboard-pipeline-total>1.248 lead</em></header>
+                <header>
+                  <div>
+                    <span data-dashboard-pipeline-kicker>PIPELINE SALES</span>
+                    <h3 data-dashboard-pipeline-title>Corong Konversi</h3>
+                  </div>
+                  <em data-dashboard-pipeline-total>1.248 lead</em>
+                </header>
                 <div class="dashboard-funnel" data-dashboard-funnel></div>
               </article>
 
@@ -1853,8 +1862,25 @@
               </article>
 
               <article class="dashboard-panel dashboard-agents-panel" data-dashboard-widget="agents">
-                <header><div><span>SALES TEAM</span><h3>Top Agent</h3></div><em>Bulan ini</em></header>
+                <header>
+                  <div>
+                    <span data-dashboard-agents-kicker>SALES TEAM</span>
+                    <h3 data-dashboard-agents-title>Top Agent</h3>
+                  </div>
+                  <em data-dashboard-agents-meta>Bulan ini</em>
+                </header>
                 <div class="dashboard-agent-list" data-dashboard-agent-list></div>
+              </article>
+
+              <article class="dashboard-panel dashboard-channels-panel" data-dashboard-widget="channels" hidden>
+                <header>
+                  <div>
+                    <span data-dashboard-channels-kicker>CHANNEL MIX</span>
+                    <h3 data-dashboard-channels-title>Performa Channel</h3>
+                  </div>
+                  <em data-dashboard-channels-meta>Bulan ini</em>
+                </header>
+                <div class="dashboard-channel-list" data-dashboard-channel-list></div>
               </article>
 
               <article class="dashboard-panel dashboard-alert-panel" data-dashboard-widget="alerts">

@@ -4845,20 +4845,123 @@ const dashboardDemoRoles = {
     title: "Executive Overview",
     description: "Ringkasan lintas cabang untuk keputusan strategis dan pertumbuhan bisnis.",
     widgets: ["kpi", "revenue", "pipeline", "branches", "agents", "alerts"],
+    navView: "overview",
   },
   sales: {
     label: "Sales Manager",
     title: "Sales Performance",
     description: "Pantau kualitas pipeline, produktivitas tim, dan peluang closing dari satu layar.",
     widgets: ["kpi", "revenue", "pipeline", "agents", "alerts"],
+    navView: "sales",
   },
   branch: {
     label: "Kepala Cabang",
     title: "Branch Command Center",
     description: "Fokus pada target, aktivitas sales, dan prioritas operasional cabang hari ini.",
     widgets: ["kpi", "pipeline", "branches", "agents", "alerts"],
+    navView: "locations",
   },
 };
+
+const dashboardNavViewWidgets = {
+  overview: ["kpi", "revenue", "pipeline", "branches", "agents", "alerts"],
+  sales: ["kpi", "revenue", "pipeline", "agents", "alerts"],
+  locations: ["kpi", "pipeline", "branches", "agents", "alerts"],
+  channels: ["kpi", "revenue", "pipeline", "channels", "alerts"],
+};
+
+function makeDashboardShell({
+  locationWord,
+  salesLabel = "Sales Performance",
+  channelsLabel = "Omnichannel",
+  overviewDesc,
+  salesDesc,
+  locationsDesc,
+  channelsDesc,
+  sidebarTitle,
+  sidebarCopy,
+  sectionLabel = "Analytics",
+}) {
+  const loc = locationWord;
+  return {
+    nav: [
+      { id: "overview", label: "Executive Overview" },
+      { id: "sales", label: salesLabel },
+      { id: "locations", label: loc === "Cabang" ? "Branch Performance" : `Performa ${loc}` },
+      { id: "channels", label: channelsLabel },
+    ],
+    views: {
+      overview: {
+        title: "Executive Overview",
+        description:
+          overviewDesc ||
+          `Ringkasan lintas ${loc.toLocaleLowerCase("id")} untuk keputusan strategis dan pertumbuhan bisnis.`,
+        widgets: dashboardNavViewWidgets.overview,
+        role: "director",
+        revenueKicker: "PENDAPATAN",
+        revenueTitle: "Tren Pendapatan + Forecast",
+        pipelineKicker: "PIPELINE SALES",
+        pipelineTitle: "Corong Konversi",
+        agentsKicker: "SALES TEAM",
+        agentsTitle: "Top Agent",
+        agentsMeta: "Bulan ini",
+      },
+      sales: {
+        title: salesLabel,
+        description:
+          salesDesc ||
+          `Pantau kualitas pipeline, produktivitas tim, dan peluang closing dari satu layar.`,
+        widgets: dashboardNavViewWidgets.sales,
+        role: "sales",
+        revenueKicker: "PENDAPATAN",
+        revenueTitle: "Tren Closing + Forecast",
+        pipelineKicker: "PIPELINE",
+        pipelineTitle: "Corong Konversi Sales",
+        agentsKicker: "SALES TEAM",
+        agentsTitle: "Top Performer",
+        agentsMeta: "Periode aktif",
+      },
+      locations: {
+        title: loc === "Cabang" ? "Branch Command Center" : `Command Center ${loc}`,
+        description:
+          locationsDesc ||
+          `Fokus pada target, aktivitas, dan prioritas operasional tiap ${loc.toLocaleLowerCase("id")} hari ini.`,
+        widgets: dashboardNavViewWidgets.locations,
+        role: "branch",
+        revenueKicker: "PENDAPATAN",
+        revenueTitle: `Tren per ${loc}`,
+        pipelineKicker: "PIPELINE",
+        pipelineTitle: `Funnel per ${loc}`,
+        agentsKicker: "TIM LOKAL",
+        agentsTitle: `Top Agent ${loc}`,
+        agentsMeta: "Bulan ini",
+      },
+      channels: {
+        title: channelsLabel,
+        description:
+          channelsDesc ||
+          `Pantau kontribusi tiap channel masuk ke pipeline dan closing bisnis Anda.`,
+        widgets: dashboardNavViewWidgets.channels,
+        role: null,
+        revenueKicker: "REVENUE CHANNEL",
+        revenueTitle: "Tren Atribusi Channel",
+        pipelineKicker: "CHANNEL FUNNEL",
+        pipelineTitle: "Lead Channel → Closing",
+        channelsKicker: "CHANNEL MIX",
+        channelsTitle: "Performa Channel",
+        channelsMeta: "Bulan ini",
+      },
+    },
+    sidebar: {
+      section: sectionLabel,
+      kicker: "DASHBOARD ANDA",
+      title: sidebarTitle || "Satu data, beda kebutuhan",
+      copy:
+        sidebarCopy ||
+        `Menu kiri menyesuaikan industri. Buka tiap view untuk layout ${loc.toLocaleLowerCase("id")}, sales, dan channel.`,
+    },
+  };
+}
 
 const dashboardDemoData = {
   branches: [
@@ -5324,10 +5427,174 @@ const dashboardVerticalPresets = {
   },
 };
 
+Object.assign(
+  dashboardVerticalPresets.automotive,
+  makeDashboardShell({
+    locationWord: "Cabang",
+    salesLabel: "Sales Performance",
+    channelsLabel: "Omnichannel",
+    overviewDesc: "Ringkasan lintas cabang untuk keputusan strategis dan pertumbuhan bisnis.",
+    salesDesc: "Pantau kualitas pipeline, produktivitas tim, dan peluang closing unit dari satu layar.",
+    locationsDesc: "Fokus pada target, aktivitas sales, dan prioritas operasional cabang hari ini.",
+    channelsDesc: "WhatsApp, Instagram, Facebook, dan Website — kontribusi lead sampai closing unit.",
+    sidebarTitle: "Satu data, beda kebutuhan",
+    sidebarCopy: "Direktur, Sales Manager, dan Kepala Cabang melihat layout berbeda dari menu kiri.",
+  }),
+  {
+    channels: [
+      { name: "WhatsApp", share: 42, leads: 524, conversion: 9.4, revenue: 620 },
+      { name: "Instagram", share: 24, leads: 298, conversion: 7.1, revenue: 310 },
+      { name: "Facebook", share: 18, leads: 224, conversion: 6.4, revenue: 240 },
+      { name: "Website", share: 16, leads: 202, conversion: 5.8, revenue: 190 },
+    ],
+  },
+);
+
+Object.assign(
+  dashboardVerticalPresets.property,
+  makeDashboardShell({
+    locationWord: "Proyek",
+    salesLabel: "Sales Booking",
+    channelsLabel: "Channel Leads",
+    overviewDesc: "Ringkasan lintas proyek properti: inquiry, site visit, booking, dan SP3K.",
+    salesDesc: "Pipeline booking, agent marketing, dan nilai unit yang sedang digarap.",
+    locationsDesc: "Komparasi performa tiap proyek/site: booking rate, revenue, dan target.",
+    channelsDesc: "IG Ads, portal properti, referral, dan walk-in — sumber inquiry terkuat.",
+    sidebarTitle: "Dashboard properti",
+    sidebarCopy: "Menu kiri: overview → booking → proyek → channel leads.",
+  }),
+  {
+    channels: [
+      { name: "Instagram Ads", share: 34, leads: 334, conversion: 6.2, revenue: 680 },
+      { name: "Portal Properti", share: 28, leads: 274, conversion: 5.1, revenue: 520 },
+      { name: "Referral", share: 22, leads: 216, conversion: 8.4, revenue: 460 },
+      { name: "Walk-in Site", share: 16, leads: 156, conversion: 11.2, revenue: 310 },
+    ],
+  },
+);
+
+Object.assign(
+  dashboardVerticalPresets.fnb,
+  makeDashboardShell({
+    locationWord: "Outlet",
+    salesLabel: "Sales Outlet",
+    channelsLabel: "Channel Order",
+    overviewDesc: "Ringkasan multi-outlet: revenue, ticket size, dan repeat order.",
+    salesDesc: "Performa shift, upsell, dan konversi order di seluruh outlet.",
+    locationsDesc: "Bandingkan outlet: antrian, transaksi, dan pencapaian target harian.",
+    channelsDesc: "Dine-in, GrabFood, Gofood, dan WhatsApp order — bauran channel F&B.",
+    sidebarTitle: "Dashboard F&B",
+    sidebarCopy: "Menu kiri menyesuaikan restoran multi-outlet dan channel order.",
+  }),
+  {
+    channels: [
+      { name: "Dine-in", share: 38, leads: 3190, conversion: 92, revenue: 410 },
+      { name: "GrabFood", share: 26, leads: 2180, conversion: 18.4, revenue: 280 },
+      { name: "Gofood", share: 22, leads: 1840, conversion: 17.1, revenue: 240 },
+      { name: "WhatsApp Order", share: 14, leads: 1190, conversion: 24.6, revenue: 160 },
+    ],
+  },
+);
+
+Object.assign(
+  dashboardVerticalPresets.retail,
+  makeDashboardShell({
+    locationWord: "Toko",
+    salesLabel: "Sales Retail",
+    channelsLabel: "Channel Commerce",
+    overviewDesc: "Ringkasan multi-toko: traffic, basket size, dan sell-through.",
+    salesDesc: "Order paid, conversion cart, dan ranking associate per toko.",
+    locationsDesc: "Performa tiap toko/mall vs online store dalam satu tampilan.",
+    channelsDesc: "Toko fisik, marketplace, website, dan social commerce.",
+    sidebarTitle: "Dashboard retail",
+    sidebarCopy: "Menu kiri: overview → sales → toko → channel commerce.",
+  }),
+  {
+    channels: [
+      { name: "Toko Fisik", share: 40, leads: 4960, conversion: 11.2, revenue: 620 },
+      { name: "Marketplace", share: 30, leads: 3720, conversion: 8.1, revenue: 480 },
+      { name: "Website", share: 18, leads: 2230, conversion: 6.4, revenue: 260 },
+      { name: "Social Commerce", share: 12, leads: 1490, conversion: 9.8, revenue: 170 },
+    ],
+  },
+);
+
+Object.assign(
+  dashboardVerticalPresets.healthcare,
+  makeDashboardShell({
+    locationWord: "Cabang",
+    salesLabel: "Booking & Visit",
+    channelsLabel: "Channel Booking",
+    overviewDesc: "Ringkasan multi-cabang klinik: booking, visit, dan no-show.",
+    salesDesc: "Pipeline inquiry → booking → hadir → paket lanjutan.",
+    locationsDesc: "Utilisasi slot dan revenue tiap cabang klinik.",
+    channelsDesc: "WhatsApp, call center, Google, dan partner asuransi.",
+    sidebarTitle: "Dashboard klinik",
+    sidebarCopy: "Menu kiri menyesuaikan alur booking pasien multi-cabang.",
+    sectionLabel: "Klinik Analytics",
+  }),
+  {
+    channels: [
+      { name: "WhatsApp", share: 36, leads: 670, conversion: 16.2, revenue: 360 },
+      { name: "Call Center", share: 28, leads: 520, conversion: 14.1, revenue: 290 },
+      { name: "Google Business", share: 22, leads: 410, conversion: 11.4, revenue: 220 },
+      { name: "Partner Asuransi", share: 14, leads: 260, conversion: 19.8, revenue: 200 },
+    ],
+  },
+);
+
+Object.assign(
+  dashboardVerticalPresets.education,
+  makeDashboardShell({
+    locationWord: "Kampus",
+    salesLabel: "Enrollment",
+    channelsLabel: "Channel Leads",
+    overviewDesc: "Ringkasan multi-kampus: lead, trial, dan enrollment lunas.",
+    salesDesc: "Produktivitas konsultan dan funnel trial → bayar.",
+    locationsDesc: "Performa enrollment tiap kampus vs target batch.",
+    channelsDesc: "Meta Ads, webinar, referral siswa, dan school visit.",
+    sidebarTitle: "Dashboard edukasi",
+    sidebarCopy: "Menu kiri: overview → enrollment → kampus → channel leads.",
+    sectionLabel: "Education Analytics",
+  }),
+  {
+    channels: [
+      { name: "Meta Ads", share: 32, leads: 1020, conversion: 9.1, revenue: 380 },
+      { name: "Webinar", share: 26, leads: 830, conversion: 14.6, revenue: 340 },
+      { name: "Referral Siswa", share: 24, leads: 770, conversion: 18.2, revenue: 310 },
+      { name: "School Visit", share: 18, leads: 580, conversion: 12.4, revenue: 210 },
+    ],
+  },
+);
+
+Object.assign(
+  dashboardVerticalPresets.custom,
+  makeDashboardShell({
+    locationWord: "Lokasi",
+    salesLabel: "Sales Performance",
+    channelsLabel: "Channel Mix",
+    overviewDesc: "Ringkasan generik multi-lokasi — sesuaikan highlight untuk bisnis Anda.",
+    salesDesc: "Pipeline dan produktivitas tim sales generik.",
+    locationsDesc: "Komparasi performa tiap lokasi operasional.",
+    channelsDesc: "Bauran channel lead/order generik untuk demo multi-industri.",
+    sidebarTitle: "Dashboard custom",
+    sidebarCopy: "Layout menu menyesuaikan deskripsi bisnis yang Anda isi di onboarding.",
+  }),
+  {
+    channels: [
+      { name: "WhatsApp", share: 35, leads: 350, conversion: 8.2, revenue: 420 },
+      { name: "Website", share: 25, leads: 250, conversion: 6.4, revenue: 280 },
+      { name: "Marketplace", share: 22, leads: 220, conversion: 5.9, revenue: 240 },
+      { name: "Referral", share: 18, leads: 180, conversion: 11.1, revenue: 200 },
+    ],
+  },
+);
+
 class OneDashboardDemo {
   constructor(root) {
     this.root = root;
     this.role = "director";
+    this.navView = "overview";
     this.period = "mtd";
     this.branch = "all";
     this.visibleWidgets = new Set(dashboardDemoRoles.director.widgets);
@@ -5350,6 +5617,7 @@ class OneDashboardDemo {
     this.funnel = root.querySelector("[data-dashboard-funnel]");
     this.branchTable = root.querySelector("[data-dashboard-branch-table]");
     this.agentList = root.querySelector("[data-dashboard-agent-list]");
+    this.channelList = root.querySelector("[data-dashboard-channel-list]");
     this.alertList = root.querySelector("[data-dashboard-alert-list]");
     this.branchSelect = root.querySelector("[data-dashboard-branch]");
     this.industryBadge = root.querySelector("[data-dashboard-industry-badge]");
@@ -5416,11 +5684,20 @@ class OneDashboardDemo {
       this.render();
     });
 
+    for (const button of this.root.querySelectorAll("[data-dashboard-nav]")) {
+      button.addEventListener("click", () => {
+        this.setNavView(button.dataset.dashboardNav || "overview");
+      });
+    }
+
     for (const button of this.root.querySelectorAll("[data-dashboard-role]")) {
       button.addEventListener("click", () => {
         this.role = button.dataset.dashboardRole || "director";
-        this.visibleWidgets = new Set(dashboardDemoRoles[this.role].widgets);
+        const roleNav = dashboardDemoRoles[this.role]?.navView || "overview";
+        this.navView = roleNav;
+        this.visibleWidgets = new Set(this.getViewConfig().widgets);
         this.syncWidgetInputs();
+        this.syncNavButtons();
         this.render();
       });
     }
@@ -5533,11 +5810,13 @@ class OneDashboardDemo {
     this.highlightsOverride = null;
     this.highlightsDirty = false;
     this.role = "director";
+    this.navView = "overview";
     this.period = "mtd";
     this.branch = "all";
-    this.visibleWidgets = new Set(dashboardDemoRoles.director.widgets);
+    this.visibleWidgets = new Set(this.getViewConfig().widgets);
     this.syncWidgetInputs();
     this.renderBranchSelect();
+    this.renderSidebarNav();
     this.syncHighlightEditors();
     this.hideOnboarding();
     this.render();
@@ -5556,6 +5835,68 @@ class OneDashboardDemo {
 
   getPreset() {
     return dashboardVerticalPresets[this.verticalId] || dashboardVerticalPresets.automotive;
+  }
+
+  getViewConfig() {
+    const preset = this.getPreset();
+    const views = preset.views || {};
+    return (
+      views[this.navView] ||
+      views.overview || {
+        title: "Executive Overview",
+        description: "Ringkasan performa bisnis.",
+        widgets: dashboardNavViewWidgets.overview,
+        role: "director",
+      }
+    );
+  }
+
+  setNavView(viewId) {
+    if (!this.verticalId) return;
+    const preset = this.getPreset();
+    const next = preset.views?.[viewId] ? viewId : "overview";
+    this.navView = next;
+    const view = this.getViewConfig();
+    if (view.role && dashboardDemoRoles[view.role]) {
+      this.role = view.role;
+    }
+    this.visibleWidgets = new Set(view.widgets || dashboardNavViewWidgets.overview);
+    this.syncWidgetInputs();
+    this.syncNavButtons();
+    this.render();
+  }
+
+  renderSidebarNav() {
+    const preset = this.getPreset();
+    const nav = preset.nav || [];
+    const sidebar = preset.sidebar || {};
+
+    const section = this.root.querySelector("[data-dashboard-nav-section]");
+    if (section) section.textContent = sidebar.section || "Analytics";
+
+    const kicker = this.root.querySelector("[data-dashboard-sidebar-kicker]");
+    const title = this.root.querySelector("[data-dashboard-sidebar-title]");
+    const copy = this.root.querySelector("[data-dashboard-sidebar-copy]");
+    if (kicker) kicker.textContent = sidebar.kicker || "DASHBOARD ANDA";
+    if (title) title.textContent = sidebar.title || "Satu data, beda kebutuhan";
+    if (copy) copy.textContent = sidebar.copy || "";
+
+    for (const button of this.root.querySelectorAll("[data-dashboard-nav]")) {
+      const id = button.dataset.dashboardNav;
+      const item = nav.find((entry) => entry.id === id);
+      const label = button.querySelector("[data-dashboard-nav-label]");
+      if (label && item) label.textContent = item.label;
+    }
+    this.syncNavButtons();
+  }
+
+  syncNavButtons() {
+    for (const button of this.root.querySelectorAll("[data-dashboard-nav]")) {
+      const active = button.dataset.dashboardNav === this.navView;
+      button.classList.toggle("active", active);
+      if (active) button.setAttribute("aria-current", "page");
+      else button.removeAttribute("aria-current");
+    }
   }
 
   getData() {
@@ -5601,6 +5942,7 @@ class OneDashboardDemo {
 
   reset() {
     this.role = "director";
+    this.navView = "overview";
     this.period = "mtd";
     this.branch = "all";
     this.verticalId = null;
@@ -5614,6 +5956,7 @@ class OneDashboardDemo {
     this.closeCustomizer();
     if (this.businessDescInput) this.businessDescInput.value = "";
     this.syncWidgetInputs();
+    this.syncNavButtons();
     this.showOnboarding(false);
   }
 
@@ -5808,34 +6151,68 @@ class OneDashboardDemo {
   render() {
     if (!this.verticalId) return;
 
-    const role = dashboardDemoRoles[this.role];
+    const view = this.getViewConfig();
     const props = this.getProperties();
     const data = this.getData();
     const kpisConfig = this.getKpisConfig();
     const preset = this.getPreset();
     const multiplier = this.periodMultiplier() * this.branchMultiplier();
     const periodLabel = this.period.toLocaleUpperCase("id");
+    const isChannelsView = this.navView === "channels";
+    const isLocationsView = this.navView === "locations";
 
-    this.root.querySelector("[data-dashboard-title]").textContent = role.title;
-    this.root.querySelector("[data-dashboard-description]").textContent = role.description;
+    this.syncNavButtons();
+
+    this.root.querySelector("[data-dashboard-title]").textContent = view.title;
+    this.root.querySelector("[data-dashboard-description]").textContent = view.description;
+
+    const breadcrumb = this.root.querySelector("[data-dashboard-breadcrumb]");
+    if (breadcrumb) {
+      const navItem = (preset.nav || []).find((item) => item.id === this.navView);
+      breadcrumb.textContent = `Analytics / ${preset.badge || "One Dashboard"} / ${navItem?.label || view.title}`;
+    }
 
     const bannerTitle = this.root.querySelector("[data-dashboard-banner-title]");
     const bannerCopy = this.root.querySelector("[data-dashboard-banner-copy]");
     if (bannerTitle) {
       bannerTitle.textContent = this.businessDescription
-        ? `Dashboard disesuaikan untuk bisnis Anda`
-        : "Tampilan ini bisa mengikuti cara kerja tim Anda";
+        ? `Layout “${view.title}” untuk bisnis Anda`
+        : `Layout menu: ${view.title}`;
     }
     if (bannerCopy) {
       bannerCopy.textContent = this.businessDescription
         ? this.businessDescription
-        : `Industri: ${preset.label}. Pilih peran, ${props.locationLabel.toLocaleLowerCase("id")}, periode, lalu tentukan widget & highlight.`;
+        : `Industri ${preset.label} · view ${view.title}. Ganti menu kiri untuk melihat layout ${props.locationLabel.toLocaleLowerCase("id")}, sales, atau channel.`;
     }
+
+    const setText = (selector, value) => {
+      const el = this.root.querySelector(selector);
+      if (el && value != null) el.textContent = value;
+    };
+
+    setText("[data-dashboard-revenue-kicker]", view.revenueKicker || "PENDAPATAN");
+    setText("[data-dashboard-revenue-title]", view.revenueTitle || "Tren Pendapatan + Forecast");
+    setText("[data-dashboard-pipeline-kicker]", view.pipelineKicker || "PIPELINE SALES");
+    setText("[data-dashboard-pipeline-title]", view.pipelineTitle || "Corong Konversi");
+    setText("[data-dashboard-agents-kicker]", view.agentsKicker || "SALES TEAM");
+    setText("[data-dashboard-agents-title]", view.agentsTitle || "Top Agent");
+    setText("[data-dashboard-agents-meta]", view.agentsMeta || "Bulan ini");
+    setText("[data-dashboard-channels-kicker]", view.channelsKicker || "CHANNEL MIX");
+    setText("[data-dashboard-channels-title]", view.channelsTitle || "Performa Channel");
+    setText("[data-dashboard-channels-meta]", view.channelsMeta || "Bulan ini");
 
     const panelKicker = this.root.querySelector("[data-dashboard-branch-panel-kicker]");
     const panelTitle = this.root.querySelector("[data-dashboard-branch-panel-title]");
-    if (panelKicker) panelKicker.textContent = preset.panelKicker || "MULTI-BRANCH";
-    if (panelTitle) panelTitle.textContent = preset.panelTitle || "Performa Cabang";
+    if (panelKicker) {
+      panelKicker.textContent = isLocationsView
+        ? `${props.locationLabel.toLocaleUpperCase("id")} DETAIL`
+        : preset.panelKicker || "MULTI-BRANCH";
+    }
+    if (panelTitle) {
+      panelTitle.textContent = isLocationsView
+        ? `Detail ${props.locationLabel}`
+        : preset.panelTitle || "Performa Cabang";
+    }
 
     const headRow = this.root.querySelector("[data-dashboard-table-head]");
     if (headRow) {
@@ -5867,43 +6244,124 @@ class OneDashboardDemo {
         : kpisConfig.closingSpeed;
 
     const pipelineBase = kpisConfig.pipelineBase;
-    const kpis = [
-      {
-        label: `Pendapatan ${periodLabel}`,
-        icon: "Rp",
-        value: this.formatRupiahCompact(kpisConfig.revenueBase * multiplier),
-        change: "18,6%",
-        context: "vs periode lalu",
-      },
-      {
-        label: "Pipeline Aktif",
-        icon: "PL",
-        value: `${Math.round(pipelineBase * multiplier).toLocaleString("id-ID")} ${props.pipelineTotalSuffix}`,
-        change: "12,4%",
-        context: "prospek bertumbuh",
-      },
-      {
-        label: "Tingkat Konversi",
-        icon: "%",
-        value: `${conversionValue}%`,
-        change: "1,2 pt",
-        context: "di atas target",
-      },
-      {
-        label: props.dealLabel,
-        icon: "AV",
-        value: kpisConfig.avgDeal,
-        change: "8,3%",
-        context: "nilai per closing",
-      },
-      {
-        label: props.closingSpeedLabel,
-        icon: "⏱",
-        value: closingSpeed,
-        change: "0,9 hari",
-        context: "lebih cepat",
-      },
-    ];
+    const channels = preset.channels || [];
+    const topChannel = channels[0];
+    const kpis = isChannelsView
+      ? [
+          {
+            label: `Revenue Channel ${periodLabel}`,
+            icon: "Rp",
+            value: this.formatRupiahCompact(kpisConfig.revenueBase * multiplier),
+            change: "18,6%",
+            context: "atribusi channel",
+          },
+          {
+            label: "Volume Channel",
+            icon: "CH",
+            value: `${Math.round(pipelineBase * multiplier).toLocaleString("id-ID")} ${props.pipelineTotalSuffix}`,
+            change: "12,4%",
+            context: "masuk dari semua channel",
+          },
+          {
+            label: "Konversi Channel",
+            icon: "%",
+            value: `${conversionValue}%`,
+            change: "1,2 pt",
+            context: "rata-rata channel",
+          },
+          {
+            label: "Channel Terbaik",
+            icon: "★",
+            value: topChannel?.name || "—",
+            change: topChannel ? `${topChannel.share}%` : "—",
+            context: "share volume tertinggi",
+          },
+          {
+            label: "Channel Aktif",
+            icon: "#",
+            value: `${channels.length || 4}`,
+            change: "stabil",
+            context: "sumber terpantau",
+          },
+        ]
+      : isLocationsView
+        ? [
+            {
+              label: `Revenue ${props.locationLabel} ${periodLabel}`,
+              icon: "Rp",
+              value: this.formatRupiahCompact(kpisConfig.revenueBase * multiplier),
+              change: "18,6%",
+              context: "vs periode lalu",
+            },
+            {
+              label: `${props.locationLabel} Aktif`,
+              icon: "LOC",
+              value: `${this.scopedBranches().length || data.branches.length}`,
+              change: "on track",
+              context: this.branch === "all" ? props.locationAll : this.getSelectedLocationName(),
+            },
+            {
+              label: "Tingkat Konversi",
+              icon: "%",
+              value: `${conversionValue}%`,
+              change: "1,2 pt",
+              context: `di ${props.locationLabel.toLocaleLowerCase("id")}`,
+            },
+            {
+              label: props.dealLabel,
+              icon: "AV",
+              value: kpisConfig.avgDeal,
+              change: "8,3%",
+              context: "nilai per closing",
+            },
+            {
+              label: "Target Tercapai",
+              icon: "🎯",
+              value: `${Math.round(
+                this.scopedBranches().reduce((sum, item) => sum + item.target, 0) /
+                  Math.max(1, this.scopedBranches().length),
+              )}%`,
+              change: "vs target",
+              context: "rata-rata lokasi",
+            },
+          ]
+        : [
+            {
+              label: `Pendapatan ${periodLabel}`,
+              icon: "Rp",
+              value: this.formatRupiahCompact(kpisConfig.revenueBase * multiplier),
+              change: "18,6%",
+              context: "vs periode lalu",
+            },
+            {
+              label: "Pipeline Aktif",
+              icon: "PL",
+              value: `${Math.round(pipelineBase * multiplier).toLocaleString("id-ID")} ${props.pipelineTotalSuffix}`,
+              change: "12,4%",
+              context: "prospek bertumbuh",
+            },
+            {
+              label: "Tingkat Konversi",
+              icon: "%",
+              value: `${conversionValue}%`,
+              change: "1,2 pt",
+              context: "di atas target",
+            },
+            {
+              label: props.dealLabel,
+              icon: "AV",
+              value: kpisConfig.avgDeal,
+              change: "8,3%",
+              context: "nilai per closing",
+            },
+            {
+              label: props.closingSpeedLabel,
+              icon: "⏱",
+              value: closingSpeed,
+              change: "0,9 hari",
+              context: "lebih cepat",
+            },
+          ];
 
     this.kpiGrid.innerHTML = kpis
       .map(
@@ -5987,6 +6445,26 @@ class OneDashboardDemo {
         `,
       )
       .join("");
+
+    if (this.channelList) {
+      this.channelList.innerHTML = channels
+        .slice(0, 4)
+        .map(
+          (channel, index) => `
+            <div class="dashboard-channel">
+              <span>${index + 1}</span>
+              <span class="dashboard-channel-avatar">${this.initials(channel.name)}</span>
+              <div>
+                <b>${channel.name}</b>
+                <small>${channel.share}% share · ${Math.round(channel.leads * multiplier).toLocaleString("id-ID")} ${props.pipelineTotalSuffix} · ${String(channel.conversion).replace(".", ",")}%</small>
+                <i class="dashboard-channel-bar" style="--share:${channel.share}%"></i>
+              </div>
+              <strong>${this.formatRupiahCompact(channel.revenue * this.periodMultiplier())}</strong>
+            </div>
+          `,
+        )
+        .join("");
+    }
 
     this.renderAlerts();
     this.renderWidgets();
