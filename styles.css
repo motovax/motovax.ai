@@ -2129,6 +2129,8 @@ body.demo-open {
   background: #fff;
   display: grid;
   gap: 8px;
+  max-height: min(420px, 50vh);
+  overflow-y: auto;
 }
 
 .falcon-tutorial-list li {

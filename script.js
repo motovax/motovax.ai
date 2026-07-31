@@ -553,13 +553,13 @@ class InventoryProductDemo {
       {
         view: "falcon",
         title: "Masuk AI Falcon",
-        body: "Mock iPhone WhatsApp. Kontak: Sales Agent — Falcon menjawab dengan role sales (tidak bisa laporan management).",
+        body: "Mock WhatsApp. Mode Sales Agent — Falcon demo semua fitur sales Motovax (tanpa laporan management).",
         enter: () => this.setFalconRole("sales", { greet: true }),
       },
       {
         view: "falcon",
-        title: "Sales: tanya unit",
-        body: `Kirim contoh: “Halo mau tanya ${samples.join(", ")}”. Falcon membalas detail unit real-like (data demo, bukan DB production).`,
+        title: "Sales: cek stok unit",
+        body: `Tanya unit (unit_query). Contoh: “Halo mau tanya ${samples.join(", ")}”.`,
         enter: () => {
           this.setFalconRole("sales");
           this.sendFalconUserMessage(
@@ -570,47 +570,143 @@ class InventoryProductDemo {
       },
       {
         view: "falcon",
-        title: "Sales: minta foto",
-        body: "Lanjut: “Minta foto” unit yang ditanyakan. Falcon mengirim mock foto unit.",
+        title: "Sales: minta foto unit",
+        body: "photo_send — “Minta foto” unit. Falcon mengirim mock foto galeri tenant.",
         enter: () => this.sendFalconUserMessage("Minta foto", { fromGuide: true }),
       },
       {
         view: "falcon",
-        title: "Sales: update foto stok",
-        body: "Tekan ikon lampiran 📎 di composer untuk mengirim foto (simulasi update stok). Tidak mengubah database production.",
+        title: "Sales: upload foto stok",
+        body: "Tekan 📎 di composer — simulasi update foto stok lewat WA (bukan DB production).",
         enter: () => this.simulateFalconPhotoUpload({ fromGuide: true }),
       },
       {
         view: "falcon",
-        title: "Sales: daftar fitur",
-        body: "Tanya “Fitur sales agent apa saja?” — Falcon merangkum capability Sales dari Motovax (unit query, simulasi kredit, foto, handoff, dll.).",
+        title: "Sales: simulasi kredit",
+        body: "finance_simulation — coba “Simulasi kredit 20% DP 48 bulan”.",
         enter: () =>
-          this.sendFalconUserMessage("Fitur sales agent apa saja?", { fromGuide: true }),
+          this.sendFalconUserMessage("Simulasi kredit 20% DP 48 bulan", { fromGuide: true }),
+      },
+      {
+        view: "falcon",
+        title: "Sales: lokasi showroom",
+        body: "location_map — “Lokasi showroom” / map cabang.",
+        enter: () => this.sendFalconUserMessage("Lokasi showroom", { fromGuide: true }),
+      },
+      {
+        view: "falcon",
+        title: "Sales: catat lead",
+        body: "lead_own — “Catat lead Budi 08123456789 minat Innova”.",
+        enter: () =>
+          this.sendFalconUserMessage("Catat lead Budi 08123456789 minat Innova", {
+            fromGuide: true,
+          }),
+      },
+      {
+        view: "falcon",
+        title: "Sales: handoff ke admin",
+        body: "handoff — “Hubungkan customer ke admin”.",
+        enter: () =>
+          this.sendFalconUserMessage("Hubungkan customer ke admin", { fromGuide: true }),
+      },
+      {
+        view: "falcon",
+        title: "Sales: generate konten",
+        body: "image_generation — “Buat caption promo unit”.",
+        enter: () =>
+          this.sendFalconUserMessage("Buat caption promo unit", { fromGuide: true }),
+      },
+      {
+        view: "falcon",
+        title: "Sales: performa sendiri",
+        body: "analytics:sales_performance (terbatas) — “Performa sales saya”. Bukan laporan management.",
+        enter: () =>
+          this.sendFalconUserMessage("Performa sales saya", { fromGuide: true }),
+      },
+      {
+        view: "falcon",
+        title: "Sales: ringkasan semua fitur",
+        body: "Falcon merangkum seluruh capability Sales Agent (bukan sekadar cek mode).",
+        enter: () =>
+          this.sendFalconUserMessage("Tampilkan semua fitur sales", { fromGuide: true }),
       },
       {
         view: "falcon",
         title: "Berganti ke Management Agent",
-        body: "Tutorial Sales selesai. Kontak WhatsApp berganti ke Management Agent — Falcon bisa laporan & insight bisnis.",
+        body: "Tutorial Sales selesai. Ganti ke Management — laporan, aging, GP, import, edit unit, dokumen, analytics.",
         enter: () => this.setFalconRole("management", { greet: true, fromGuide: true }),
       },
       {
         view: "falcon",
-        title: "Management: minta laporan",
-        body: "Coba “Laporan stok per cabang” atau “Laporan aging”. Falcon membalas ringkasan agregat (mock data demo).",
+        title: "Management: stok per cabang",
+        body: "Laporan stok agregat per cabang (mock demo).",
         enter: () =>
           this.sendFalconUserMessage("Laporan stok per cabang", { fromGuide: true }),
       },
       {
         view: "falcon",
-        title: "Management: daftar fitur",
-        body: "Tanya “Fitur management apa saja?” untuk melihat capability penuh (analytics, import, unit edit, inventory analysis).",
+        title: "Management: aging unit",
+        body: "Inventory analysis — “Laporan aging unit”.",
         enter: () =>
-          this.sendFalconUserMessage("Fitur management apa saja?", { fromGuide: true }),
+          this.sendFalconUserMessage("Laporan aging unit", { fromGuide: true }),
+      },
+      {
+        view: "falcon",
+        title: "Management: GP / margin",
+        body: "Insight GP & margin internal (hanya Management).",
+        enter: () =>
+          this.sendFalconUserMessage("Gross profit margin unit", { fromGuide: true }),
+      },
+      {
+        view: "falcon",
+        title: "Management: import Excel",
+        body: "excel_import — “Import inventory lewat WA”.",
+        enter: () =>
+          this.sendFalconUserMessage("Import inventory lewat WA", { fromGuide: true }),
+      },
+      {
+        view: "falcon",
+        title: "Management: edit unit",
+        body: "unit_edit — “Ubah status unit jadi Booked”.",
+        enter: () =>
+          this.sendFalconUserMessage("Ubah status unit jadi Booked", { fromGuide: true }),
+      },
+      {
+        view: "falcon",
+        title: "Management: dokumen",
+        body: "document_upload / review — “Upload dokumen unit”.",
+        enter: () =>
+          this.sendFalconUserMessage("Upload dokumen unit", { fromGuide: true }),
+      },
+      {
+        view: "falcon",
+        title: "Management: analisis stok",
+        body: "Rekomendasi inventory & perputaran stok.",
+        enter: () =>
+          this.sendFalconUserMessage("Analisis inventory dan rekomendasi stok", {
+            fromGuide: true,
+          }),
+      },
+      {
+        view: "falcon",
+        title: "Management: tren penjualan",
+        body: "analytics — “Tren penjualan bulan ini”.",
+        enter: () =>
+          this.sendFalconUserMessage("Tren penjualan bulan ini", { fromGuide: true }),
+      },
+      {
+        view: "falcon",
+        title: "Management: ringkasan fitur",
+        body: "Semua capability Management Agent dalam satu ringkasan demo.",
+        enter: () =>
+          this.sendFalconUserMessage("Tampilkan semua fitur management", {
+            fromGuide: true,
+          }),
       },
       {
         view: "falcon",
         title: "Panduan selesai",
-        body: "Anda sudah menelusuri 3 modul SMI dan AI Falcon (Sales → Management Agent). Silakan eksplor bebas atau Reset demo.",
+        body: "SMI + AI Falcon: tutorial Sales (tanpa report) dan Management (laporan & operasional penuh). Eksplor bebas atau Reset demo.",
       },
     ];
   }
@@ -848,7 +944,7 @@ class InventoryProductDemo {
       },
       falcon: {
         title: "Chat AI Falcon",
-        body: "Mulai sebagai Sales Agent, selesaikan tutorial sales, lalu berganti ke Management Agent untuk laporan.",
+        body: "Tutorial semua fitur Falcon: Sales Agent (tanpa report) dulu, lalu Management Agent (laporan, import, edit, analytics).",
       },
     };
     const tip = tips[next] || tips.units;
@@ -1090,12 +1186,12 @@ class InventoryProductDemo {
     if (options.greet) {
       if (next === "sales") {
         this.pushFalconBot(
-          "Halo! Saya Falcon untuk Sales Agent. Saya bantu cek stok, detail unit, foto, simulasi kredit, dan handoff lead. Tanya saja unit atau ketik “fitur sales agent”.",
+          "Halo! Saya Falcon untuk Sales Agent.\n\nSaya bisa bantu: cek stok/unit, foto, simulasi kredit, lokasi showroom, catat lead, handoff admin, generate konten, dan performa sales Anda.\n\nTidak bisa: laporan aging/GP, import Excel, edit unit massal, atau data harga internal.\n\nCoba chip di kiri, atau ketik “tampilkan semua fitur sales” untuk ringkasan + cara coba tiap fitur.",
         );
       } else {
         this.pushFalconSystem("Mode berganti ke Management Agent.");
         this.pushFalconBot(
-          "Halo! Saya Falcon untuk Management Agent. Saya bisa laporan stok/cabang/aging, insight bisnis, import, dan analisis inventory. Coba “laporan stok per cabang” atau “fitur management”.",
+          "Halo! Saya Falcon untuk Management Agent.\n\nSaya bisa semua fitur Sales + laporan stok/cabang/aging, GP/margin, import Excel, edit unit, dokumen, analisis inventory, dan analytics tren.\n\nCoba “laporan stok per cabang” atau “tampilkan semua fitur management”.",
         );
       }
     }
@@ -1125,21 +1221,35 @@ class InventoryProductDemo {
   }
 
   salesTutorialItems() {
+    // Capability Falcon role Salesperson (motovax-app IAM): unit_query, finance_simulation,
+    // image_generation, photo_send, lead_own, handoff, analytics:sales_performance (terbatas).
+    // Tidak termasuk: analytics_query/laporan management, excel_import, unit_edit, document_*.
     return [
-      { id: "unit", label: "Tanya detail unit (A/B/C real-like)" },
+      { id: "unit", label: "Cek stok & detail unit" },
       { id: "photo", label: "Minta foto unit" },
-      { id: "upload", label: "Kirim foto update stok (simulasi)" },
-      { id: "features", label: "Tanya semua fitur Sales Agent" },
-      { id: "finance", label: "Simulasi kredit (opsional)" },
+      { id: "upload", label: "Upload foto update stok" },
+      { id: "finance", label: "Simulasi kredit & asuransi" },
+      { id: "map", label: "Lokasi showroom / map" },
+      { id: "lead", label: "Catat lead customer" },
+      { id: "handoff", label: "Handoff customer ke admin" },
+      { id: "content", label: "Generate konten / caption" },
+      { id: "performance", label: "Performa sales sendiri" },
+      { id: "features", label: "Ringkasan semua fitur Sales" },
     ];
   }
 
   managementTutorialItems() {
+    // Management = fullTenantPermissions: semua Sales + laporan, import, edit, dokumen, analytics.
     return [
       { id: "report_branch", label: "Laporan stok per cabang" },
-      { id: "report_aging", label: "Laporan aging / insight" },
-      { id: "features", label: "Tanya semua fitur Management" },
-      { id: "import", label: "Import / upload data (simulasi)" },
+      { id: "report_aging", label: "Laporan aging unit" },
+      { id: "gp", label: "Insight GP / margin" },
+      { id: "import", label: "Import Excel inventory" },
+      { id: "unit_edit", label: "Edit data / status unit" },
+      { id: "document", label: "Upload / review dokumen" },
+      { id: "analysis", label: "Analisis inventory & rekomendasi" },
+      { id: "analytics", label: "Analytics / tren penjualan" },
+      { id: "features", label: "Ringkasan semua fitur Management" },
     ];
   }
 
@@ -1160,7 +1270,7 @@ class InventoryProductDemo {
       .join("");
 
     if (this.falconRole === "sales") {
-      const required = ["unit", "photo", "upload", "features"];
+      const required = this.salesTutorialItems().map((i) => i.id);
       const allDone = required.every((id) => doneMap[id]);
       if (allDone && !this.falconSalesDone) {
         this.falconSalesDone = true;
@@ -1182,17 +1292,26 @@ class InventoryProductDemo {
     const sales = [
       `Halo mau tanya ${samples.slice(0, 2).join(" dan ")}`,
       "Minta foto",
-      "Fitur sales agent apa saja?",
       "Simulasi kredit 20% DP 48 bulan",
+      "Lokasi showroom",
+      "Catat lead Budi 08123456789 minat Innova",
+      "Hubungkan customer ke admin",
+      "Buat caption promo unit",
+      "Performa sales saya",
+      "Tampilkan semua fitur sales",
       "Laporan aging stok",
       "Ganti ke Management Agent",
     ];
     const management = [
       "Laporan stok per cabang",
       "Laporan aging unit",
-      "Fitur management apa saja?",
-      "Import inventory lewat WA",
       "Gross profit / margin unit",
+      "Import inventory lewat WA",
+      "Ubah status unit jadi Booked",
+      "Upload dokumen unit",
+      "Analisis inventory dan rekomendasi stok",
+      "Tren penjualan bulan ini",
+      "Tampilkan semua fitur management",
       "Kembali ke Sales Agent",
     ];
     const list = this.falconRole === "sales" ? sales : management;
@@ -1303,55 +1422,126 @@ class InventoryProductDemo {
     const text = raw.toLocaleLowerCase("id");
     const isSales = this.falconRole === "sales";
 
-    if (/management agent|ganti.*management|mode management|jadi management/.test(text)) {
-      if (isSales) return { roleSwitch: "management" };
-      return { text: "Anda sudah di mode Management Agent." };
-    }
-    if (/sales agent|kembali.*sales|mode sales|jadi sales/.test(text)) {
-      if (!isSales) return { roleSwitch: "sales" };
-      return { text: "Anda sudah di mode Sales Agent." };
-    }
-
+    // 1) Ringkasan fitur HARUS diproses dulu — jangan tertangkap matcher "sales agent" / role-switch.
     if (
-      /laporan|aging|gross profit|margin|gp |analitik|analytics|performa sales|tren penjualan|insight/.test(
+      /fitur|kemampuan|bisa (apa|bantu)|apa saja yang bisa|tampilkan semua fitur|daftar fitur|tutorial fitur/.test(
         text,
       )
     ) {
       if (isSales) {
-        return {
-          text: "Maaf, laporan management (aging internal, GP, margin, tren agregat) tidak tersedia di role Sales Agent. Selesaikan tutorial sales lalu ganti ke Management Agent, atau ketik “Ganti ke Management Agent”.",
-        };
+        if (/management/.test(text) && !/sales/.test(text)) {
+          return {
+            text: "Daftar fitur Management hanya di mode Management Agent. Ketik “Ganti ke Management Agent” setelah menyelesaikan tutorial Sales, atau coba “tampilkan semua fitur sales” untuk capability role ini.",
+          };
+        }
+        return { tutorialId: "features", text: this.salesFeaturesText() };
       }
-      return this.buildManagementReport(text);
-    }
-
-    if (/fitur (sales|management)|kemampuan|bisa (apa|bantu)|apa saja yang bisa/.test(text)) {
-      if (isSales || /sales/.test(text)) {
+      if (/sales/.test(text) && !/management/.test(text)) {
         return {
-          tutorialId: isSales ? "features" : undefined,
-          text: isSales
-            ? "Fitur Falcon untuk Sales Agent (dari Motovax):\n• Cek stok & detail unit (whatsapp:unit_query)\n• Minta / kirim foto unit (photo_send)\n• Simulasi kredit & asuransi\n• Lokasi showroom / map\n• Image generation konten\n• Lead milik sendiri & handoff\n• Performa sales (terbatas)\n\nTidak bisa: laporan aging/GP internal, import Excel massal, edit unit penuh, data harga beli/HPP."
-            : this.managementFeaturesText(),
+          text: `Anda di mode Management. Ringkas fitur Sales:\n${this.salesFeaturesText()}\n\nKetik “Kembali ke Sales Agent” untuk demo role Sales, atau “tampilkan semua fitur management” untuk capability penuh Management.`,
         };
       }
       return { tutorialId: "features", text: this.managementFeaturesText() };
     }
 
+    // 2) Ganti role — hanya intent eksplisit (ganti/mode/kembali), bukan frasa "fitur sales agent".
+    if (
+      /ganti.*management|mode management|jadi management|ke management agent|management agent$/.test(
+        text,
+      ) ||
+      (text.includes("management agent") && /ganti|mode|jadi|switch|ke /.test(text))
+    ) {
+      if (isSales) return { roleSwitch: "management" };
+      return { text: "Anda sudah di mode Management Agent. Coba “tampilkan semua fitur management” atau laporan stok/aging." };
+    }
+    if (
+      /ganti.*sales|kembali.*sales|mode sales|jadi sales|ke sales agent|sales agent$/.test(text) ||
+      (text.includes("sales agent") && /ganti|mode|jadi|switch|kembali|ke /.test(text))
+    ) {
+      if (!isSales) return { roleSwitch: "sales" };
+      return { text: "Anda sudah di mode Sales Agent. Coba “tampilkan semua fitur sales” atau tanya unit." };
+    }
+
+    // 3) Performa sales sendiri (boleh Sales) vs laporan/analytics management (diblok Sales).
+    if (/performa sales|performa saya|kinerja sales|sales performance saya/.test(text)) {
+      if (isSales) {
+        return {
+          tutorialId: "performance",
+          text: "Performa sales Anda (demo, analytics:sales_performance terbatas):\n• Lead dicatat minggu ini: 12\n• Follow-up aktif: 5\n• Closing: 2 unit\n• Unit paling sering ditanya: Innova, Xpander\n\nIni metrik milik sales sendiri — bukan laporan aging/GP/tren cabang (itu Management).",
+        };
+      }
+      return {
+        tutorialId: "analytics",
+        text: "Performa sales (demo Management):\n• Tim: 8 agent aktif\n• Lead total minggu ini: 96\n• Closing rate demo: ~18%\n• Top agent: Rina (5 closing)\n\nDi production data dari analytics:sales_performance + analytics:management.",
+      };
+    }
+
+    if (
+      /laporan|aging|gross profit|margin|gp |analitik|analytics|tren penjualan|insight|rekomendasi stok|analisis inventory|analisis inventori/.test(
+        text,
+      )
+    ) {
+      if (isSales) {
+        return {
+          text: "Maaf, laporan management (aging internal, GP, margin, tren agregat, analisis inventory) tidak tersedia di role Sales Agent.\n\nYang boleh Sales: cek unit, foto, simulasi kredit, lead, handoff, performa sendiri.\n\nKetik “Ganti ke Management Agent” untuk demo laporan, atau “tampilkan semua fitur sales” untuk capability lengkap role ini.",
+        };
+      }
+      return this.buildManagementReport(text);
+    }
+
+    // 4) Lokasi / map
+    if (/lokasi|showroom|peta|map|alamat cabang|jam buka/.test(text)) {
+      return {
+        tutorialId: isSales ? "map" : undefined,
+        text: "Lokasi showroom (demo):\n• Cinere — Jl. Cinere Raya No. 12 · [MAP: Showroom Cinere | -6.333, 106.783]\n• Pondok Bambu — Jl. Pahlawan Revolusi · [MAP: Showroom PDB | -6.241, 106.901]\n\nDi Motovax, Falcon mengirim token map & jam operasional cabang tenant.",
+      };
+    }
+
+    // 5) Lead capture
+    if (/catat lead|daftar lead|lead baru|customer baru|simpan lead|lapor lead/.test(text)) {
+      const nameMatch = raw.match(/(?:lead|customer)\s+([A-Za-zÀ-ÿ.]+)/i);
+      const name = nameMatch?.[1] || "Budi";
+      return {
+        tutorialId: isSales ? "lead" : undefined,
+        text: `Lead dicatat (simulasi lead_own) ✅\n• Nama: ${name}\n• HP: 08123456789\n• Minat: Innova / unit demo\n• Assign: ke akun Sales yang chat\n\nDi production Falcon memanggil lead_update_admin; Sales hanya mengelola lead miliknya. Lanjut handoff? Ketik “Hubungkan customer ke admin”.`,
+      };
+    }
+
+    // 6) Handoff
+    if (/handoff|hubungkan.*admin|sambungkan.*admin|hubungi admin|daftar admin|pic agent/.test(text)) {
+      return {
+        tutorialId: isSales ? "handoff" : undefined,
+        text: "Handoff ke admin (demo whatsapp:handoff):\n1. Anggun — Admin · wa.me/628111000001\n2. Rudi — PIC Agent Officer · wa.me/628111000002\n\nPilih nomor/nama admin. Di production Falcon menampilkan daftar PIC lalu memproses handoff tanpa konfirmasi ulang setelah dipilih.",
+      };
+    }
+
+    // 7) Generate konten / image
+    if (/caption|konten|promo|image generation|generate (gambar|image|konten)|buat (caption|konten|copy)/.test(text)) {
+      const unit = this.pickUnitsForChat(text, 1)[0];
+      const label = unit ? `${unit.brand} ${unit.type} ${unit.year}` : "unit Ready pilihan";
+      return {
+        tutorialId: isSales ? "content" : undefined,
+        text: `Konten promo (demo image_generation) untuk ${label}:\n\n“🔥 Ready stok ${label}! Kilometer rapi, full original, siap survey. DP ringan & proses kredit dibantu sampai approved. Chat sekarang — slot unit terbatas.”\n\nDi Motovax, Falcon bisa bantu draft caption + generate visual sesuai unit tenant.`,
+      };
+    }
+
+    // 8) Foto
     if (/minta foto|kirim foto|foto unit|lihat foto/.test(text)) {
       const units = this.pickUnitsForChat(text, 2);
       return {
-        tutorialId: isSales ? "photo" : "report_branch",
+        tutorialId: isSales ? "photo" : undefined,
         photos: units.map((u) => ({
           label: `${u.brand} ${u.type}`,
           meta: `${u.year} · ${this.titleCase(u.branch || "")} · mock foto`,
         })),
         text: units.length
-          ? `Berikut foto unit (mock) untuk ${units.map((u) => `${u.brand} ${u.type}`).join(" & ")}. Di Mobix foto dikirim dari galeri tenant.`
+          ? `Berikut foto unit (mock photo_send) untuk ${units.map((u) => `${u.brand} ${u.type}`).join(" & ")}. Di Mobix foto dikirim dari galeri tenant.`
           : "Belum ada unit cocok. Sebut merek/tipe unit dulu, ya.",
       };
     }
 
-    if (/simulasi|kredit|cicilan|dp |angsuran/.test(text)) {
+    // 9) Simulasi kredit
+    if (/simulasi|kredit|cicilan|dp |angsuran|asuransi/.test(text)) {
       const unit = this.pickUnitsForChat(text, 1)[0];
       const price = unit?.cashPrice || unit?.cash_price || 250000000;
       const dp = Math.round(price * 0.2);
@@ -1359,24 +1549,58 @@ class InventoryProductDemo {
       return {
         tutorialId: isSales ? "finance" : undefined,
         text: unit
-          ? `Simulasi kredit (demo) ${unit.brand} ${unit.type}: OTR ~ ${this.formatPrice(price)}, DP 20% ~ ${this.formatPrice(dp)}, tenor 48 bln → angsuran ~ ${this.formatPrice(angsuran)}/bln (belum asuransi). Rumus penuh di Motovax mengikuti KKB tenant.`
+          ? `Simulasi kredit (demo finance_simulation) ${unit.brand} ${unit.type}:\n• OTR ~ ${this.formatPrice(price)}\n• DP 20% ~ ${this.formatPrice(dp)}\n• Tenor 48 bln → angsuran ~ ${this.formatPrice(angsuran)}/bln\n• Asuransi: bisa dihitung ADDM/ADDB di production\n\nRumus penuh mengikuti KKB tenant Motovax.`
           : "Simulasi kredit aktif. Sebut unit-nya (contoh Innova / Xpander) agar saya hitung DP & angsuran demo.",
       };
     }
 
+    // 10) Edit unit (Management)
+    if (/ubah status|edit unit|update unit|jadi booked|jadi ready|unit_edit|ganti harga jual/.test(text)) {
+      if (isSales) {
+        return {
+          text: "Edit unit penuh (whatsapp:unit_edit) hanya untuk Management/Admin. Sales Agent boleh cek stok & minta foto, tapi tidak mengubah status/harga master unit. Ketik “Ganti ke Management Agent” untuk demo edit.",
+        };
+      }
+      const unit = this.pickUnitsForChat(text, 1)[0];
+      const label = unit ? `${unit.brand} ${unit.type}` : "unit demo";
+      return {
+        tutorialId: "unit_edit",
+        text: `Edit unit (simulasi unit_edit) ✅\n• Unit: ${label}\n• Status → BOOKED (demo)\n• Catatan: “Di-hold untuk customer survey”\n\nDi production Falcon memvalidasi permission whatsapp:unit_edit sebelum menulis ke inventory.`,
+      };
+    }
+
+    // 11) Dokumen (Management)
+    if (/dokumen|document|stnk|bpkb|upload dokumen|review dokumen/.test(text)) {
+      if (isSales) {
+        return {
+          text: "Upload/review dokumen unit (document_upload / document_review) adalah capability Management. Sales Agent tidak memproses unggahan dokumen legal lewat Falcon. Ganti ke Management Agent untuk demo.",
+        };
+      }
+      return {
+        tutorialId: "document",
+        text: "Dokumen (simulasi Management) ✅\n• Jenis: STNK + BPKB (mock)\n• Status review: lengkap · 2 file\n• Unit tertaut: inventaris demo\n\nDi production Falcon memandu upload via WA lalu menandai review sesuai permission.",
+      };
+    }
+
+    // 12) Import
     if (/import|upload data|excel|handover|mrp/.test(text)) {
       if (isSales) {
         return {
-          text: "Import Excel inventory / handover / MRP adalah capability Management/Admin. Role Sales Agent tidak memproses import massal lewat Falcon. Ganti ke Management Agent untuk mencoba alur simulasi.",
+          text: "Import Excel inventory / handover / MRP (whatsapp:excel_import) adalah capability Management/Admin. Role Sales Agent tidak memproses import massal lewat Falcon. Ganti ke Management Agent untuk mencoba alur simulasi.",
         };
       }
       return {
         tutorialId: "import",
-        text: "Siap bantu import (simulasi Management): kirim file Excel inventory, handover, atau MRP. Di demo cukup ketik “import inventory” — di production Falcon memvalidasi baris & warning seperti di Upload Data.",
+        text: "Import (simulasi Management / excel_import):\n• File: inventory_demo.xlsx\n• Baris diproses: 48\n• Unit diupdate: 45\n• Warning: 3 baris perlu cek plate\n\nDi production Falcon memvalidasi baris & warning seperti di Upload Data SMI.",
       };
     }
 
-    if (/unit|stok|tanya|halo|ready|innova|xpander|rush|hr-v|mobilio|serena|toyota|honda|mitsubishi|nissan|daihatsu|bmw|mazda/.test(text)) {
+    // 13) Unit query / stok
+    if (
+      /unit|stok|tanya|halo|ready|innova|xpander|rush|hr-v|mobilio|serena|toyota|honda|mitsubishi|nissan|daihatsu|bmw|mazda/.test(
+        text,
+      )
+    ) {
       const units = this.pickUnitsForChat(text, 3);
       if (!units.length) {
         return {
@@ -1388,20 +1612,74 @@ class InventoryProductDemo {
           `• ${u.brand} ${u.type} ${u.year} — ${this.statusLabel(u.status)} · ${this.titleCase(u.branch || "-")} · OTR ${this.formatCompactPrice(u.cashPrice || u.cash_price || 0)}`,
       );
       return {
-        tutorialId: isSales ? "unit" : "report_branch",
-        text: `Berikut unit yang cocok (data demo real-like, bukan DB production):\n${lines.join("\n")}\n\nMau foto, simulasi kredit, atau detail salah satu unit?`,
+        tutorialId: isSales ? "unit" : undefined,
+        text: `Berikut unit yang cocok (unit_query, data demo real-like):\n${lines.join("\n")}\n\nMau foto, simulasi kredit, atau detail salah satu unit?`,
       };
     }
 
     return {
       text: isSales
-        ? "Saya Falcon (Sales Agent). Coba: tanya unit, “minta foto”, simulasi kredit, “fitur sales agent”, atau “Ganti ke Management Agent”."
-        : "Saya Falcon (Management Agent). Coba: “laporan stok per cabang”, “laporan aging”, “fitur management”, atau “Kembali ke Sales Agent”.",
+        ? "Saya Falcon (Sales Agent). Coba chip fitur di kiri, “tampilkan semua fitur sales”, tanya unit, minta foto, simulasi kredit, catat lead, handoff, atau “Ganti ke Management Agent”."
+        : "Saya Falcon (Management Agent). Coba “tampilkan semua fitur management”, laporan stok/aging, GP, import, edit unit, dokumen, atau “Kembali ke Sales Agent”.",
     };
   }
 
+  salesFeaturesText() {
+    return (
+      "📦 Fitur Falcon — Sales Agent (dari Motovax / role Salesperson)\n\n" +
+      "Yang BISA dilakukan:\n" +
+      "1. Cek stok & detail unit — whatsapp:unit_query\n" +
+      "   Coba: “Halo mau tanya Innova / Xpander”\n" +
+      "2. Minta foto unit — whatsapp:photo_send\n" +
+      "   Coba: “Minta foto”\n" +
+      "3. Upload foto update stok (via lampiran WA)\n" +
+      "   Coba: tekan 📎 di composer\n" +
+      "4. Simulasi kredit & asuransi — whatsapp:finance_simulation\n" +
+      "   Coba: “Simulasi kredit 20% DP 48 bulan”\n" +
+      "5. Lokasi showroom / map\n" +
+      "   Coba: “Lokasi showroom”\n" +
+      "6. Catat lead milik sendiri — whatsapp:lead_own\n" +
+      "   Coba: “Catat lead Budi 0812… minat Innova”\n" +
+      "7. Handoff customer ke admin — whatsapp:handoff\n" +
+      "   Coba: “Hubungkan customer ke admin”\n" +
+      "8. Generate konten / caption — whatsapp:image_generation\n" +
+      "   Coba: “Buat caption promo unit”\n" +
+      "9. Performa sales sendiri — analytics:sales_performance\n" +
+      "   Coba: “Performa sales saya”\n\n" +
+      "❌ Tidak bisa (role Sales):\n" +
+      "• Laporan aging / GP / margin / tren cabang (butuh Management)\n" +
+      "• Import Excel inventory massal\n" +
+      "• Edit unit penuh (status/harga master)\n" +
+      "• Upload/review dokumen legal unit\n" +
+      "• Data internal: HPP, harga beli, bottom price, profit\n\n" +
+      "Centang checklist di kiri sambil mencoba tiap fitur. Data demo, bukan production."
+    );
+  }
+
   managementFeaturesText() {
-    return "Fitur Falcon untuk Management Agent (dari Motovax):\n• Semua kemampuan Sales (stok, foto, simulasi, map)\n• Laporan & analytics (whatsapp:analytics_query, sales trend, management)\n• Inventory analysis: aging, GP, rekomendasi stok\n• Unit edit, media upload, document upload/review\n• Excel import inventory\n• User/role/tenant config (sesuai permission)\n• Tidak diblokir guardrail harga internal (berbeda dari Sales)";
+    return (
+      "📊 Fitur Falcon — Management Agent (dari Motovax / role Management)\n\n" +
+      "Termasuk semua kemampuan Sales, plus:\n" +
+      "1. Laporan stok per cabang — inventory analysis\n" +
+      "   Coba: “Laporan stok per cabang”\n" +
+      "2. Laporan aging unit\n" +
+      "   Coba: “Laporan aging unit”\n" +
+      "3. Insight GP / margin (tanpa guardrail harga internal)\n" +
+      "   Coba: “Gross profit margin unit”\n" +
+      "4. Import Excel inventory / handover / MRP — whatsapp:excel_import\n" +
+      "   Coba: “Import inventory lewat WA”\n" +
+      "5. Edit data & status unit — whatsapp:unit_edit\n" +
+      "   Coba: “Ubah status unit jadi Booked”\n" +
+      "6. Upload & review dokumen — document_upload / document_review\n" +
+      "   Coba: “Upload dokumen unit”\n" +
+      "7. Analisis inventory & rekomendasi stok\n" +
+      "   Coba: “Analisis inventory dan rekomendasi stok”\n" +
+      "8. Analytics / tren penjualan — whatsapp:analytics_query, analytics:*\n" +
+      "   Coba: “Tren penjualan bulan ini”\n" +
+      "9. Media upload & operasional inventory seperti admin\n" +
+      "10. Konfigurasi user/role/tenant (sesuai permission penuh)\n\n" +
+      "Centang checklist di kiri untuk menyelesaikan tutorial Management. Data mock demo."
+    );
   }
 
   buildManagementReport(text) {
@@ -1421,8 +1699,20 @@ class InventoryProductDemo {
     }
     if (/gross|margin|gp|profit/.test(text)) {
       return {
-        tutorialId: "report_aging",
-        text: "Insight GP/margin (demo Management): rata-rata GP prediksi demo ~8–12% pada unit Ready cabang Cinere & Pondok Bambu. Sales Agent tidak boleh melihat angka ini. Angka di sini ilustratif untuk tutorial.",
+        tutorialId: "gp",
+        text: "Insight GP/margin (demo Management):\n• Rata-rata GP prediksi demo ~8–12% unit Ready Cinere & Pondok Bambu\n• Unit aging tinggi: margin ditekan — pertimbangkan promo\n\nSales Agent tidak boleh melihat angka ini. Angka di sini ilustratif untuk tutorial.",
+      };
+    }
+    if (/analisis|rekomendasi stok|inventory analysis/.test(text)) {
+      return {
+        tutorialId: "analysis",
+        text: "Analisis inventory (demo Management):\n• Ready tinggi di Cinere — dorong campaign lokal\n• Pondok Bambu: 3 unit aging >90 hari → prioritas diskon/PD form\n• Rasio foto lengkap: ~70% — lengkapi galeri agar Falcon photo_send optimal\n\nRekomendasi: fokus promo MPV Ready + lengkapi foto unit tanpa media.",
+      };
+    }
+    if (/tren|analitik|analytics|penjualan|conversion|performa tim/.test(text)) {
+      return {
+        tutorialId: "analytics",
+        text: "Analytics / tren penjualan (demo):\n• Lead masuk 30 hari: 420 (+12% MoM)\n• Closing: 38 unit · conversion ~9%\n• Channel terkuat: WhatsApp & Walk-in\n• Unit terlaris: Innova, Xpander, HR-V\n\nSumber production: whatsapp:analytics_query + analytics:management / sales_trend.",
       };
     }
     const lines = rows.length
@@ -1440,7 +1730,7 @@ class InventoryProductDemo {
             `<div><b>${this.escapeHtml(this.titleCase(r.branch))}</b><span>R ${r.ready} · B ${r.booked}</span></div>`,
         )
         .join("")}</div>`,
-      text: `Laporan stok per cabang (demo):\n${lines.join("\n")}\n\nIni capability Management (inventory analysis). Ketik “laporan aging” untuk insight perputaran stok.`,
+      text: `Laporan stok per cabang (demo):\n${lines.join("\n")}\n\nIni capability Management (inventory analysis). Ketik “laporan aging” atau “tren penjualan” untuk insight lain.`,
     };
   }
 
