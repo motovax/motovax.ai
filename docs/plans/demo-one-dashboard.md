@@ -3,7 +3,7 @@
 **Repo target:** `motovax.ai` (landing static + product demos)  
 **Produk:** One Dashboard (Executive Command Center)  
 **Tanggal plan:** 2026-07-31  
-**Status:** plan siap implementasi (baseline demo sudah bagus — hanya tambah 2 poin di bawah)
+**Status:** diimplementasikan (2026-07-31) — onboarding + multi-vertical + highlight custom live di `#dashboardDemo`
 
 ---
 

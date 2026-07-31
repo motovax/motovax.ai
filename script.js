@@ -4821,6 +4821,447 @@ const dashboardDemoData = {
   ],
 };
 
+const dashboardChartSeed = dashboardDemoData.chart;
+
+const dashboardVerticalPresets = {
+  automotive: {
+    id: "automotive",
+    label: "Otomotif / Dealer",
+    badge: "Otomotif",
+    panelKicker: "MULTI-BRANCH",
+    panelTitle: "Performa Cabang",
+    properties: {
+      entitySingular: "unit",
+      entityPlural: "unit",
+      locationLabel: "Cabang",
+      locationAll: "Semua Cabang",
+      pipelineTotalSuffix: "lead",
+      dealLabel: "Rata-rata Deal",
+      closingSpeedLabel: "Kecepatan Closing",
+      agentMetric: "closing",
+      tableHeaders: ["Cabang", "Revenue", "Closing", "Konversi", "Target"],
+      funnelStages: [
+        ["Lead Baru", 1248, 100],
+        ["Terhubung", 864, 69],
+        ["Prospek", 512, 41],
+        ["Hot", 226, 18],
+        ["Deal", 96, 8],
+      ],
+    },
+    data: null,
+    kpis: null,
+    highlights: null,
+  },
+  property: {
+    id: "property",
+    label: "Properti / Real Estate",
+    badge: "Properti",
+    panelKicker: "MULTI-PROYEK",
+    panelTitle: "Performa Proyek",
+    properties: {
+      entitySingular: "unit",
+      entityPlural: "unit",
+      locationLabel: "Proyek",
+      locationAll: "Semua Proyek",
+      pipelineTotalSuffix: "prospek",
+      dealLabel: "Rata-rata Nilai Booking",
+      closingSpeedLabel: "Siklus Closing",
+      agentMetric: "booking",
+      tableHeaders: ["Proyek", "Revenue", "Booking", "Konversi", "Target"],
+      funnelStages: [
+        ["Inquiry", 980, 100],
+        ["Site Visit", 420, 43],
+        ["Negosiasi", 210, 21],
+        ["Booking", 96, 10],
+        ["Akad / SP3K", 54, 5.5],
+      ],
+    },
+    data: {
+      branches: [
+        { id: "bsd", name: "BSD City", revenue: 920, closing: 18, conversion: 5.4, target: 88 },
+        { id: "cibubur-prop", name: "Cibubur", revenue: 640, closing: 14, conversion: 4.9, target: 79 },
+        { id: "bekasi", name: "Bekasi Timur", revenue: 410, closing: 9, conversion: 4.1, target: 71 },
+      ],
+      agents: [
+        { name: "Sari Wulandari", branch: "BSD City", closing: 8, revenue: 410 },
+        { name: "Doni Prasetyo", branch: "Cibubur", closing: 6, revenue: 298 },
+        { name: "Mega Anggraini", branch: "Bekasi Timur", closing: 5, revenue: 242 },
+        { name: "Raka Firmansyah", branch: "BSD City", closing: 4, revenue: 196 },
+      ],
+      chart: dashboardChartSeed,
+    },
+    kpis: {
+      revenueBase: 1970,
+      pipelineBase: 980,
+      conversionBase: 5.5,
+      avgDeal: "Rp412 jt",
+      closingSpeed: "18 hari",
+      closingSpeedAlt: "16 hari",
+      altBranchId: "bsd",
+    },
+    highlights: [
+      {
+        type: "warning",
+        icon: "!",
+        title: "12 inquiry hot tanpa site visit",
+        copy: "{location} · potensi booking Rp2,4 M menunggu follow-up.",
+      },
+      {
+        type: "positive",
+        icon: "↑",
+        title: "Booking rate naik 14%",
+        copy: "Kanal Instagram Ads mengungguli referral minggu ini.",
+      },
+      {
+        type: "info",
+        icon: "i",
+        title: "Forecast 102% target Q",
+        copy: "Prioritaskan SP3K yang jatuh tempo 7 hari ke depan.",
+      },
+    ],
+  },
+  fnb: {
+    id: "fnb",
+    label: "F&B / Restoran",
+    badge: "F&B",
+    panelKicker: "MULTI-OUTLET",
+    panelTitle: "Performa Outlet",
+    properties: {
+      entitySingular: "trx",
+      entityPlural: "trx",
+      locationLabel: "Outlet",
+      locationAll: "Semua Outlet",
+      pipelineTotalSuffix: "pesanan",
+      dealLabel: "Rata-rata Ticket",
+      closingSpeedLabel: "Waktu Saji",
+      agentMetric: "trx",
+      tableHeaders: ["Outlet", "Revenue", "Transaksi", "Konversi", "Target"],
+      funnelStages: [
+        ["Kunjungan", 8400, 100],
+        ["Order", 6120, 73],
+        ["Upsell", 2840, 34],
+        ["Repeat", 1680, 20],
+        ["Membership", 620, 7],
+      ],
+    },
+    data: {
+      branches: [
+        { id: "kemang", name: "Kemang", revenue: 380, closing: 1240, conversion: 18.2, target: 94 },
+        { id: "scbd", name: "SCBD", revenue: 420, closing: 1380, conversion: 19.4, target: 97 },
+        { id: "pik", name: "PIK Avenue", revenue: 290, closing: 960, conversion: 16.1, target: 81 },
+      ],
+      agents: [
+        { name: "Budi Santoso", branch: "SCBD", closing: 420, revenue: 128 },
+        { name: "Lina Marlina", branch: "Kemang", closing: 390, revenue: 112 },
+        { name: "Andi Wijaya", branch: "PIK Avenue", closing: 310, revenue: 94 },
+        { name: "Sinta Dewi", branch: "SCBD", closing: 280, revenue: 86 },
+      ],
+      chart: dashboardChartSeed,
+    },
+    kpis: {
+      revenueBase: 1090,
+      pipelineBase: 8400,
+      conversionBase: 18.1,
+      avgDeal: "Rp128 rb",
+      closingSpeed: "12 mnt",
+      closingSpeedAlt: "9 mnt",
+      altBranchId: "scbd",
+    },
+    highlights: [
+      {
+        type: "warning",
+        icon: "!",
+        title: "Antrian peak hour > 18 menit",
+        copy: "{location} · risiko churn di jam makan siang.",
+      },
+      {
+        type: "positive",
+        icon: "↑",
+        title: "Ticket size naik 9%",
+        copy: "Bundle dessert + drink mengungguli promo a-la-carte.",
+      },
+      {
+        type: "info",
+        icon: "i",
+        title: "Repeat rate 22%",
+        copy: "Dorong membership loyalty di weekend untuk mengamankan target.",
+      },
+    ],
+  },
+  retail: {
+    id: "retail",
+    label: "Retail / Toko",
+    badge: "Retail",
+    panelKicker: "MULTI-TOKO",
+    panelTitle: "Performa Toko",
+    properties: {
+      entitySingular: "order",
+      entityPlural: "order",
+      locationLabel: "Toko",
+      locationAll: "Semua Toko",
+      pipelineTotalSuffix: "order",
+      dealLabel: "Basket Size",
+      closingSpeedLabel: "Siklus Order",
+      agentMetric: "order",
+      tableHeaders: ["Toko", "Revenue", "Order", "Konversi", "Target"],
+      funnelStages: [
+        ["Traffic", 12400, 100],
+        ["Browse", 6200, 50],
+        ["Cart", 2480, 20],
+        ["Checkout", 1480, 12],
+        ["Paid", 1120, 9],
+      ],
+    },
+    data: {
+      branches: [
+        { id: "mall-tbs", name: "Mall TB Simatupang", revenue: 510, closing: 420, conversion: 9.2, target: 86 },
+        { id: "mall-pi", name: "Mall Pondok Indah", revenue: 640, closing: 510, conversion: 10.1, target: 93 },
+        { id: "online", name: "Online Store", revenue: 380, closing: 680, conversion: 7.4, target: 78 },
+      ],
+      agents: [
+        { name: "Rina Kusuma", branch: "Mall Pondok Indah", closing: 180, revenue: 210 },
+        { name: "Hendra Gunawan", branch: "Mall TB Simatupang", closing: 150, revenue: 168 },
+        { name: "Putri Ayu", branch: "Online Store", closing: 240, revenue: 142 },
+        { name: "Yoga Pratama", branch: "Mall Pondok Indah", closing: 120, revenue: 118 },
+      ],
+      chart: dashboardChartSeed,
+    },
+    kpis: {
+      revenueBase: 1530,
+      pipelineBase: 2480,
+      conversionBase: 9.0,
+      avgDeal: "Rp486 rb",
+      closingSpeed: "2,4 hari",
+      closingSpeedAlt: "1,8 hari",
+      altBranchId: "mall-pi",
+    },
+    highlights: [
+      {
+        type: "warning",
+        icon: "!",
+        title: "Cart abandonment 38%",
+        copy: "{location} · pulihkan checkout dengan reminder WA 1 jam.",
+      },
+      {
+        type: "positive",
+        icon: "↑",
+        title: "Sell-through naik 11%",
+        copy: "SKU hero kategori fashion memimpin kontribusi margin.",
+      },
+      {
+        type: "info",
+        icon: "i",
+        title: "Stok kritis 14 SKU",
+        copy: "Reorder sebelum weekend campaign untuk hindari stockout.",
+      },
+    ],
+  },
+  healthcare: {
+    id: "healthcare",
+    label: "Klinik / Healthcare",
+    badge: "Klinik",
+    panelKicker: "MULTI-CABANG",
+    panelTitle: "Performa Cabang Klinik",
+    properties: {
+      entitySingular: "visit",
+      entityPlural: "visit",
+      locationLabel: "Cabang",
+      locationAll: "Semua Cabang",
+      pipelineTotalSuffix: "booking",
+      dealLabel: "Rata-rata Biaya Visit",
+      closingSpeedLabel: "Waktu Tunggu",
+      agentMetric: "visit",
+      tableHeaders: ["Cabang", "Revenue", "Visit", "Konversi", "Target"],
+      funnelStages: [
+        ["Inquiry", 1860, 100],
+        ["Booking", 1240, 67],
+        ["Hadir", 980, 53],
+        ["Follow-up", 420, 23],
+        ["Paket Lanjutan", 186, 10],
+      ],
+    },
+    data: {
+      branches: [
+        { id: "klinik-sb", name: "Senayan", revenue: 420, closing: 310, conversion: 14.2, target: 90 },
+        { id: "klinik-kb", name: "Kelapa Gading", revenue: 360, closing: 280, conversion: 13.1, target: 84 },
+        { id: "klinik-depok", name: "Depok", revenue: 290, closing: 240, conversion: 12.4, target: 77 },
+      ],
+      agents: [
+        { name: "dr. Maya Sari", branch: "Senayan", closing: 98, revenue: 142 },
+        { name: "dr. Farhan", branch: "Kelapa Gading", closing: 86, revenue: 118 },
+        { name: "Ns. Dinda", branch: "Depok", closing: 74, revenue: 96 },
+        { name: "dr. Arief", branch: "Senayan", closing: 68, revenue: 88 },
+      ],
+      chart: dashboardChartSeed,
+    },
+    kpis: {
+      revenueBase: 1070,
+      pipelineBase: 1240,
+      conversionBase: 13.4,
+      avgDeal: "Rp860 rb",
+      closingSpeed: "22 mnt",
+      closingSpeedAlt: "16 mnt",
+      altBranchId: "klinik-sb",
+    },
+    highlights: [
+      {
+        type: "warning",
+        icon: "!",
+        title: "No-show rate 11%",
+        copy: "{location} · kirim reminder H-1 untuk menekan absensi.",
+      },
+      {
+        type: "positive",
+        icon: "↑",
+        title: "Booking online naik 21%",
+        copy: "WhatsApp booking mengungguli call center minggu ini.",
+      },
+      {
+        type: "info",
+        icon: "i",
+        title: "Slot dokter penuhi 96%",
+        copy: "Buka shift sore di cabang terpadat untuk serap demand.",
+      },
+    ],
+  },
+  education: {
+    id: "education",
+    label: "Edukasi / Kursus",
+    badge: "Edukasi",
+    panelKicker: "MULTI-KAMPUS",
+    panelTitle: "Performa Kampus",
+    properties: {
+      entitySingular: "siswa",
+      entityPlural: "siswa",
+      locationLabel: "Kampus",
+      locationAll: "Semua Kampus",
+      pipelineTotalSuffix: "pendaftar",
+      dealLabel: "Rata-rata Biaya Program",
+      closingSpeedLabel: "Siklus Enrollment",
+      agentMetric: "enroll",
+      tableHeaders: ["Kampus", "Revenue", "Enrollment", "Konversi", "Target"],
+      funnelStages: [
+        ["Lead", 3200, 100],
+        ["Trial Class", 1280, 40],
+        ["Konsultasi", 760, 24],
+        ["Daftar", 420, 13],
+        ["Bayar Lunas", 310, 10],
+      ],
+    },
+    data: {
+      branches: [
+        { id: "kampus-jkt", name: "Jakarta Selatan", revenue: 520, closing: 140, conversion: 11.2, target: 88 },
+        { id: "kampus-bdg", name: "Bandung", revenue: 380, closing: 110, conversion: 10.4, target: 82 },
+        { id: "kampus-sby", name: "Surabaya", revenue: 340, closing: 96, conversion: 9.8, target: 76 },
+      ],
+      agents: [
+        { name: "Citra Ananda", branch: "Jakarta Selatan", closing: 48, revenue: 168 },
+        { name: "Bagas Putra", branch: "Bandung", closing: 36, revenue: 124 },
+        { name: "Nisa Rahma", branch: "Surabaya", closing: 32, revenue: 110 },
+        { name: "Eko Saputra", branch: "Jakarta Selatan", closing: 28, revenue: 98 },
+      ],
+      chart: dashboardChartSeed,
+    },
+    kpis: {
+      revenueBase: 1240,
+      pipelineBase: 3200,
+      conversionBase: 10.6,
+      avgDeal: "Rp4,8 jt",
+      closingSpeed: "9 hari",
+      closingSpeedAlt: "7 hari",
+      altBranchId: "kampus-jkt",
+    },
+    highlights: [
+      {
+        type: "warning",
+        icon: "!",
+        title: "64 lead trial belum di-follow",
+        copy: "{location} · potensi enrollment Rp280 jt menunggu konsultan.",
+      },
+      {
+        type: "positive",
+        icon: "↑",
+        title: "Conversion trial naik 3,2 pt",
+        copy: "Skript demo kelas hybrid meningkatkan closing.",
+      },
+      {
+        type: "info",
+        icon: "i",
+        title: "Batch baru 2 minggu lagi",
+        copy: "Isi kuota early bird sebelum harga normal berlaku.",
+      },
+    ],
+  },
+  custom: {
+    id: "custom",
+    label: "Lainnya",
+    badge: "Custom",
+    panelKicker: "MULTI-LOKASI",
+    panelTitle: "Performa Lokasi",
+    properties: {
+      entitySingular: "trx",
+      entityPlural: "trx",
+      locationLabel: "Lokasi",
+      locationAll: "Semua Lokasi",
+      pipelineTotalSuffix: "prospek",
+      dealLabel: "Rata-rata Nilai",
+      closingSpeedLabel: "Siklus Closing",
+      agentMetric: "closing",
+      tableHeaders: ["Lokasi", "Revenue", "Closing", "Konversi", "Target"],
+      funnelStages: [
+        ["Lead", 1000, 100],
+        ["Terhubung", 680, 68],
+        ["Kualifikasi", 420, 42],
+        ["Proposal", 210, 21],
+        ["Deal", 96, 10],
+      ],
+    },
+    data: {
+      branches: [
+        { id: "lokasi-a", name: "Lokasi A", revenue: 520, closing: 28, conversion: 7.2, target: 85 },
+        { id: "lokasi-b", name: "Lokasi B", revenue: 440, closing: 22, conversion: 6.8, target: 78 },
+        { id: "lokasi-c", name: "Lokasi C", revenue: 360, closing: 18, conversion: 6.1, target: 72 },
+      ],
+      agents: [
+        { name: "Agent Satu", branch: "Lokasi A", closing: 12, revenue: 180 },
+        { name: "Agent Dua", branch: "Lokasi B", closing: 10, revenue: 150 },
+        { name: "Agent Tiga", branch: "Lokasi C", closing: 8, revenue: 120 },
+        { name: "Agent Empat", branch: "Lokasi A", closing: 7, revenue: 110 },
+      ],
+      chart: dashboardChartSeed,
+    },
+    kpis: {
+      revenueBase: 1320,
+      pipelineBase: 1000,
+      conversionBase: 6.8,
+      avgDeal: "Rp18,4 jt",
+      closingSpeed: "6,2 hari",
+      closingSpeedAlt: "5,1 hari",
+      altBranchId: "lokasi-a",
+    },
+    highlights: [
+      {
+        type: "warning",
+        icon: "!",
+        title: "9 prospek hot tanpa follow-up",
+        copy: "{location} · amankan peluang sebelum cold.",
+      },
+      {
+        type: "positive",
+        icon: "↑",
+        title: "Pipeline tumbuh 12%",
+        copy: "Sumber omnichannel mendorong prospek baru.",
+      },
+      {
+        type: "info",
+        icon: "i",
+        title: "Sesuaikan highlight board",
+        copy: "Edit prioritas di panel personalisasi agar relevan bisnis Anda.",
+      },
+    ],
+  },
+};
+
 class OneDashboardDemo {
   constructor(root) {
     this.root = root;
@@ -4829,9 +5270,16 @@ class OneDashboardDemo {
     this.branch = "all";
     this.visibleWidgets = new Set(dashboardDemoRoles.director.widgets);
     this.lastFocusedElement = null;
-    this.hasOpened = false;
+    this.hasOpenedCustomizer = false;
     this.liveMetrics = null;
+    this.verticalId = null;
+    this.pendingVerticalId = "automotive";
+    this.businessDescription = "";
+    this.highlightsOverride = null;
+    this.highlightsDirty = false;
 
+    this.onboarding = root.querySelector("[data-dashboard-onboarding]");
+    this.workspace = root.querySelector("[data-dashboard-workspace]");
     this.customizer = root.querySelector("[data-dashboard-customizer]");
     this.customizerBackdrop = root.querySelector("[data-dashboard-customizer-backdrop]");
     this.toast = root.querySelector("[data-dashboard-toast]");
@@ -4842,13 +5290,19 @@ class OneDashboardDemo {
     this.agentList = root.querySelector("[data-dashboard-agent-list]");
     this.alertList = root.querySelector("[data-dashboard-alert-list]");
     this.branchSelect = root.querySelector("[data-dashboard-branch]");
+    this.industryBadge = root.querySelector("[data-dashboard-industry-badge]");
+    this.changeBusinessBtn = root.querySelector("[data-dashboard-change-business]");
+    this.businessDescInput = root.querySelector("[data-dashboard-business-desc]");
+    this.highlightEditors = root.querySelector("[data-dashboard-highlight-editors]");
 
     this.bind();
-    this.render();
-    publicDemoData.snapshot().then((snapshot) => {
-      this.liveMetrics = snapshot.leads;
-      this.render();
-    }).catch(() => {});
+    publicDemoData
+      .snapshot()
+      .then((snapshot) => {
+        this.liveMetrics = snapshot.leads;
+        if (this.verticalId) this.render();
+      })
+      .catch(() => {});
   }
 
   bind() {
@@ -4861,11 +5315,32 @@ class OneDashboardDemo {
     }
 
     this.root.querySelector("[data-dashboard-reset]").addEventListener("click", () => this.reset());
+    this.changeBusinessBtn.addEventListener("click", () => this.showOnboarding(true));
+    this.root.querySelector("[data-dashboard-skip-onboarding]").addEventListener("click", () => {
+      this.applyVertical("automotive", this.businessDescInput?.value || "");
+    });
+    this.root.querySelector("[data-dashboard-generate]").addEventListener("click", () => {
+      this.applyVertical(this.pendingVerticalId || "automotive", this.businessDescInput?.value || "");
+    });
+
+    for (const button of this.root.querySelectorAll("[data-dashboard-vertical]")) {
+      button.addEventListener("click", () => {
+        this.pendingVerticalId = button.dataset.dashboardVertical || "automotive";
+        this.syncVerticalCards();
+      });
+    }
+
     this.root.querySelector("[data-dashboard-customize]").addEventListener("click", () => this.openCustomizer());
     this.root.querySelector("[data-dashboard-customize-banner]").addEventListener("click", () => this.openCustomizer());
     this.root.querySelector("[data-dashboard-customize-sidebar]").addEventListener("click", () => this.openCustomizer());
     this.root.querySelector("[data-dashboard-customizer-close]").addEventListener("click", () => this.closeCustomizer());
     this.customizerBackdrop.addEventListener("click", () => this.closeCustomizer());
+    this.root.querySelector("[data-dashboard-highlight-reset]").addEventListener("click", () => {
+      this.highlightsOverride = null;
+      this.highlightsDirty = false;
+      this.syncHighlightEditors();
+      this.renderAlerts();
+    });
 
     for (const button of this.root.querySelectorAll("[data-dashboard-period]")) {
       button.addEventListener("click", () => {
@@ -4899,9 +5374,14 @@ class OneDashboardDemo {
     }
 
     this.root.querySelector("[data-dashboard-save]").addEventListener("click", () => {
+      if (this.highlightsDirty) this.readHighlightEditors();
       this.closeCustomizer();
-      this.root.querySelector("[data-dashboard-toast-copy]").textContent =
-        `Dashboard ${dashboardDemoRoles[this.role].label} siap digunakan.`;
+      const preset = this.getPreset();
+      const badge = preset.badge || "Demo";
+      const desc = this.businessDescription.trim();
+      this.root.querySelector("[data-dashboard-toast-copy]").textContent = desc
+        ? `Dashboard ${dashboardDemoRoles[this.role].label} · ${badge} siap · “${desc.slice(0, 48)}${desc.length > 48 ? "…" : ""}”`
+        : `Dashboard ${dashboardDemoRoles[this.role].label} untuk ${badge} siap digunakan.`;
       this.toast.hidden = false;
       this.toast.querySelector("[data-dashboard-toast-close]").focus();
     });
@@ -4916,6 +5396,8 @@ class OneDashboardDemo {
         this.toast.hidden = true;
       } else if (this.customizer.classList.contains("is-open")) {
         this.closeCustomizer();
+      } else if (this.onboarding && !this.onboarding.hidden && this.verticalId) {
+        this.hideOnboarding();
       } else {
         this.close();
       }
@@ -4927,11 +5409,18 @@ class OneDashboardDemo {
     this.root.classList.add("is-open");
     this.root.setAttribute("aria-hidden", "false");
     document.body.classList.add("demo-open");
-    this.root.querySelector("[data-close-dashboard-demo]").focus();
 
-    if (!this.hasOpened) {
+    if (!this.verticalId) {
+      this.showOnboarding(false);
+      this.root.querySelector("[data-close-dashboard-demo]").focus();
+      return;
+    }
+
+    this.hideOnboarding();
+    this.root.querySelector("[data-close-dashboard-demo]").focus();
+    if (!this.hasOpenedCustomizer) {
       this.openCustomizer();
-      this.hasOpened = true;
+      this.hasOpenedCustomizer = true;
     }
   }
 
@@ -4944,7 +5433,98 @@ class OneDashboardDemo {
     if (this.lastFocusedElement) this.lastFocusedElement.focus();
   }
 
+  showOnboarding(keepWorkspace) {
+    this.closeCustomizer();
+    this.toast.hidden = true;
+    this.pendingVerticalId = this.verticalId || this.pendingVerticalId || "automotive";
+    if (this.businessDescInput) this.businessDescInput.value = this.businessDescription;
+    this.syncVerticalCards();
+    if (this.onboarding) this.onboarding.hidden = false;
+    if (this.workspace && !keepWorkspace) this.workspace.hidden = true;
+    if (this.workspace && keepWorkspace) this.workspace.hidden = true;
+    this.changeBusinessBtn.hidden = true;
+    if (this.industryBadge) this.industryBadge.hidden = true;
+  }
+
+  hideOnboarding() {
+    if (this.onboarding) this.onboarding.hidden = true;
+    if (this.workspace) this.workspace.hidden = false;
+    this.changeBusinessBtn.hidden = !this.verticalId;
+    if (this.industryBadge) {
+      this.industryBadge.hidden = !this.verticalId;
+    }
+  }
+
+  syncVerticalCards() {
+    for (const button of this.root.querySelectorAll("[data-dashboard-vertical]")) {
+      const active = button.dataset.dashboardVertical === this.pendingVerticalId;
+      button.classList.toggle("active", active);
+      button.setAttribute("aria-selected", String(active));
+    }
+  }
+
+  applyVertical(id, description) {
+    const preset = dashboardVerticalPresets[id] || dashboardVerticalPresets.automotive;
+    this.verticalId = preset.id;
+    this.pendingVerticalId = preset.id;
+    this.businessDescription = (description || "").trim().slice(0, 280);
+    this.highlightsOverride = null;
+    this.highlightsDirty = false;
+    this.role = "director";
+    this.period = "mtd";
+    this.branch = "all";
+    this.visibleWidgets = new Set(dashboardDemoRoles.director.widgets);
+    this.syncWidgetInputs();
+    this.renderBranchSelect();
+    this.syncHighlightEditors();
+    this.hideOnboarding();
+    this.render();
+
+    if (this.industryBadge) {
+      this.industryBadge.textContent = preset.badge;
+      this.industryBadge.hidden = false;
+    }
+    this.changeBusinessBtn.hidden = false;
+
+    if (!this.hasOpenedCustomizer) {
+      this.openCustomizer();
+      this.hasOpenedCustomizer = true;
+    }
+  }
+
+  getPreset() {
+    return dashboardVerticalPresets[this.verticalId] || dashboardVerticalPresets.automotive;
+  }
+
+  getData() {
+    const preset = this.getPreset();
+    return preset.data || dashboardDemoData;
+  }
+
+  getProperties() {
+    return this.getPreset().properties;
+  }
+
+  getKpisConfig() {
+    const preset = this.getPreset();
+    if (preset.kpis) return preset.kpis;
+    return {
+      revenueBase: 1840,
+      pipelineBase: this.liveMetrics?.total || 1248,
+      conversionBase: this.liveMetrics?.conversion_rate || 7.7,
+      avgDeal: "Rp23,6 jt",
+      closingSpeed: "4,8 hari",
+      closingSpeedAlt: "4,2 hari",
+      altBranchId: "cinere",
+      conversionBoostBranchId: "pondok-bambu",
+      conversionBoost: 0.7,
+      isAutomotive: true,
+    };
+  }
+
   openCustomizer() {
+    if (!this.verticalId) return;
+    this.syncHighlightEditors();
     this.customizer.classList.add("is-open");
     this.customizer.setAttribute("aria-hidden", "false");
     this.customizerBackdrop.hidden = false;
@@ -4961,11 +5541,18 @@ class OneDashboardDemo {
     this.role = "director";
     this.period = "mtd";
     this.branch = "all";
-    this.branchSelect.value = "all";
+    this.verticalId = null;
+    this.pendingVerticalId = "automotive";
+    this.businessDescription = "";
+    this.highlightsOverride = null;
+    this.highlightsDirty = false;
+    this.hasOpenedCustomizer = false;
     this.visibleWidgets = new Set(dashboardDemoRoles.director.widgets);
     this.toast.hidden = true;
+    this.closeCustomizer();
+    if (this.businessDescInput) this.businessDescInput.value = "";
     this.syncWidgetInputs();
-    this.render();
+    this.showOnboarding(false);
   }
 
   syncWidgetInputs() {
@@ -4981,24 +5568,217 @@ class OneDashboardDemo {
   }
 
   branchMultiplier() {
-    if (this.branch === "pondok-bambu") return 0.4;
-    if (this.branch === "cinere") return 0.335;
-    if (this.branch === "cibubur") return 0.265;
-    return 1;
+    if (this.branch === "all") return 1;
+    if (this.verticalId === "automotive") {
+      if (this.branch === "pondok-bambu") return 0.4;
+      if (this.branch === "cinere") return 0.335;
+      if (this.branch === "cibubur") return 0.265;
+    }
+    const branches = this.getData().branches;
+    const total = branches.reduce((sum, item) => sum + item.revenue, 0) || 1;
+    const found = branches.find((item) => item.id === this.branch);
+    return found ? found.revenue / total : 1;
   }
 
   scopedBranches() {
-    if (this.branch === "all") return dashboardDemoData.branches;
-    return dashboardDemoData.branches.filter((branch) => branch.id === this.branch);
+    const branches = this.getData().branches;
+    if (this.branch === "all") return branches;
+    return branches.filter((branch) => branch.id === this.branch);
+  }
+
+  getSelectedLocationName() {
+    if (!this.branchSelect || this.branchSelect.selectedIndex < 0) {
+      return this.getProperties().locationAll;
+    }
+    return this.branchSelect.options[this.branchSelect.selectedIndex].text;
+  }
+
+  renderBranchSelect() {
+    const props = this.getProperties();
+    const data = this.getData();
+    const labelEl = this.root.querySelector("[data-dashboard-location-label]");
+    if (labelEl) labelEl.textContent = props.locationLabel;
+
+    const options = [
+      `<option value="all">${props.locationAll}</option>`,
+      ...data.branches.map((branch) => `<option value="${branch.id}">${branch.name}</option>`),
+    ];
+    this.branchSelect.innerHTML = options.join("");
+    this.branch = "all";
+    this.branchSelect.value = "all";
+  }
+
+  getActiveHighlights() {
+    if (this.highlightsOverride) {
+      return this.highlightsOverride.map((item) => ({ ...item }));
+    }
+    return this.buildDefaultHighlights();
+  }
+
+  buildDefaultHighlights() {
+    const locationName = this.getSelectedLocationName();
+    const preset = this.getPreset();
+
+    if (preset.highlights) {
+      return preset.highlights.map((item) => ({
+        type: item.type,
+        icon: item.icon,
+        title: item.title,
+        copy: String(item.copy).replaceAll("{location}", locationName),
+      }));
+    }
+
+    return [
+      {
+        type: "warning",
+        icon: "!",
+        title: "7 lead HOT belum ditindaklanjuti",
+        copy: `${locationName} · potensi Rp186 jt menunggu respons sales.`,
+      },
+      {
+        type: "positive",
+        icon: "↑",
+        title: "Konversi naik 18,6%",
+        copy: "WhatsApp menjadi sumber dengan pertumbuhan closing tertinggi.",
+      },
+      {
+        type: "info",
+        icon: "i",
+        title: "Forecast mencapai 108% target",
+        copy: "Pertahankan kecepatan follow-up untuk mengamankan proyeksi.",
+      },
+    ];
+  }
+
+  syncHighlightEditors() {
+    if (!this.highlightEditors) return;
+    const highlights = this.getActiveHighlights();
+    this.highlightEditors.innerHTML = highlights
+      .map(
+        (item, index) => `
+          <div class="dashboard-highlight-editor" data-highlight-index="${index}">
+            <div class="dashboard-highlight-editor-top">
+              <label>
+                <span>Tipe</span>
+                <select data-highlight-type>
+                  <option value="warning"${item.type === "warning" ? " selected" : ""}>Warning</option>
+                  <option value="positive"${item.type === "positive" ? " selected" : ""}>Positif</option>
+                  <option value="info"${item.type === "info" ? " selected" : ""}>Info</option>
+                </select>
+              </label>
+              <label class="dashboard-highlight-title-field">
+                <span>Judul</span>
+                <input type="text" data-highlight-title maxlength="80" value="" />
+              </label>
+            </div>
+            <label>
+              <span>Copy</span>
+              <textarea data-highlight-copy maxlength="160" rows="2"></textarea>
+            </label>
+          </div>
+        `,
+      )
+      .join("");
+
+    for (const [index, item] of highlights.entries()) {
+      const block = this.highlightEditors.querySelector(`[data-highlight-index="${index}"]`);
+      if (!block) continue;
+      block.querySelector("[data-highlight-title]").value = item.title;
+      block.querySelector("[data-highlight-copy]").value = item.copy;
+    }
+
+    for (const input of this.highlightEditors.querySelectorAll("input, select, textarea")) {
+      input.addEventListener("input", () => {
+        this.highlightsDirty = true;
+        this.readHighlightEditors();
+        this.renderAlerts();
+      });
+      input.addEventListener("change", () => {
+        this.highlightsDirty = true;
+        this.readHighlightEditors();
+        this.renderAlerts();
+      });
+    }
+  }
+
+  readHighlightEditors() {
+    if (!this.highlightEditors) return;
+    const blocks = [...this.highlightEditors.querySelectorAll(".dashboard-highlight-editor")];
+    if (!blocks.length) return;
+    this.highlightsOverride = blocks.map((block) => {
+      const type = block.querySelector("[data-highlight-type]")?.value || "info";
+      const icon = type === "warning" ? "!" : type === "positive" ? "↑" : "i";
+      return {
+        type,
+        icon,
+        title: (block.querySelector("[data-highlight-title]")?.value || "").trim() || "Highlight",
+        copy: (block.querySelector("[data-highlight-copy]")?.value || "").trim() || "—",
+      };
+    });
+  }
+
+  renderAlerts() {
+    if (!this.alertList) return;
+    const alerts = this.getActiveHighlights();
+    this.alertList.innerHTML = alerts
+      .map(
+        (alert) => `
+          <div class="dashboard-alert-item ${alert.type}">
+            <span>${alert.icon}</span>
+            <div><b></b><p></p></div>
+          </div>
+        `,
+      )
+      .join("");
+
+    const nodes = this.alertList.querySelectorAll(".dashboard-alert-item");
+    alerts.forEach((alert, index) => {
+      const node = nodes[index];
+      if (!node) return;
+      node.querySelector("b").textContent = alert.title;
+      node.querySelector("p").textContent = alert.copy;
+    });
+
+    const countEl = this.root.querySelector("[data-dashboard-alert-count]");
+    if (countEl) countEl.textContent = `${alerts.length} perlu perhatian`;
   }
 
   render() {
+    if (!this.verticalId) return;
+
     const role = dashboardDemoRoles[this.role];
+    const props = this.getProperties();
+    const data = this.getData();
+    const kpisConfig = this.getKpisConfig();
+    const preset = this.getPreset();
     const multiplier = this.periodMultiplier() * this.branchMultiplier();
     const periodLabel = this.period.toLocaleUpperCase("id");
 
     this.root.querySelector("[data-dashboard-title]").textContent = role.title;
     this.root.querySelector("[data-dashboard-description]").textContent = role.description;
+
+    const bannerTitle = this.root.querySelector("[data-dashboard-banner-title]");
+    const bannerCopy = this.root.querySelector("[data-dashboard-banner-copy]");
+    if (bannerTitle) {
+      bannerTitle.textContent = this.businessDescription
+        ? `Dashboard disesuaikan untuk bisnis Anda`
+        : "Tampilan ini bisa mengikuti cara kerja tim Anda";
+    }
+    if (bannerCopy) {
+      bannerCopy.textContent = this.businessDescription
+        ? this.businessDescription
+        : `Industri: ${preset.label}. Pilih peran, ${props.locationLabel.toLocaleLowerCase("id")}, periode, lalu tentukan widget & highlight.`;
+    }
+
+    const panelKicker = this.root.querySelector("[data-dashboard-branch-panel-kicker]");
+    const panelTitle = this.root.querySelector("[data-dashboard-branch-panel-title]");
+    if (panelKicker) panelKicker.textContent = preset.panelKicker || "MULTI-BRANCH";
+    if (panelTitle) panelTitle.textContent = preset.panelTitle || "Performa Cabang";
+
+    const headRow = this.root.querySelector("[data-dashboard-table-head]");
+    if (headRow) {
+      headRow.innerHTML = props.tableHeaders.map((header) => `<th>${header}</th>`).join("");
+    }
 
     for (const button of this.root.querySelectorAll("[data-dashboard-period]")) {
       const active = button.dataset.dashboardPeriod === this.period;
@@ -5012,39 +5792,52 @@ class OneDashboardDemo {
       button.setAttribute("aria-pressed", String(active));
     }
 
+    const conversionBoost =
+      kpisConfig.conversionBoostBranchId && this.branch === kpisConfig.conversionBoostBranchId
+        ? kpisConfig.conversionBoost || 0
+        : this.branch === "pondok-bambu" && kpisConfig.isAutomotive
+          ? 0.7
+          : 0;
+    const conversionValue = (kpisConfig.conversionBase + conversionBoost).toFixed(1).replace(".", ",");
+    const closingSpeed =
+      kpisConfig.altBranchId && this.branch === kpisConfig.altBranchId
+        ? kpisConfig.closingSpeedAlt || kpisConfig.closingSpeed
+        : kpisConfig.closingSpeed;
+
+    const pipelineBase = kpisConfig.pipelineBase;
     const kpis = [
       {
         label: `Pendapatan ${periodLabel}`,
         icon: "Rp",
-        value: this.formatRupiahCompact(1840 * multiplier),
+        value: this.formatRupiahCompact(kpisConfig.revenueBase * multiplier),
         change: "18,6%",
         context: "vs periode lalu",
       },
       {
         label: "Pipeline Aktif",
         icon: "PL",
-        value: `${Math.round((this.liveMetrics?.total || 1248) * multiplier).toLocaleString("id-ID")} lead`,
+        value: `${Math.round(pipelineBase * multiplier).toLocaleString("id-ID")} ${props.pipelineTotalSuffix}`,
         change: "12,4%",
         context: "prospek bertumbuh",
       },
       {
         label: "Tingkat Konversi",
         icon: "%",
-        value: `${((this.liveMetrics?.conversion_rate || 7.7) + (this.branch === "pondok-bambu" ? 0.7 : 0)).toFixed(1).replace(".", ",")}%`,
+        value: `${conversionValue}%`,
         change: "1,2 pt",
         context: "di atas target",
       },
       {
-        label: "Rata-rata Deal",
+        label: props.dealLabel,
         icon: "AV",
-        value: "Rp23,6 jt",
+        value: kpisConfig.avgDeal,
         change: "8,3%",
         context: "nilai per closing",
       },
       {
-        label: "Kecepatan Closing",
+        label: props.closingSpeedLabel,
         icon: "⏱",
-        value: this.branch === "cinere" ? "4,2 hari" : "4,8 hari",
+        value: closingSpeed,
         change: "0,9 hari",
         context: "lebih cepat",
       },
@@ -5063,7 +5856,8 @@ class OneDashboardDemo {
       .join("");
 
     const chartScale = Math.min(1.08, 0.76 + this.periodMultiplier() * 0.12);
-    this.chart.innerHTML = dashboardDemoData.chart
+    const chartData = data.chart || dashboardDemoData.chart;
+    this.chart.innerHTML = chartData
       .map((point) => {
         const actual = point.actual
           ? `<i style="height:${Math.min(100, point.actual * chartScale)}%" title="Aktual ${point.label}"></i>`
@@ -5076,19 +5870,14 @@ class OneDashboardDemo {
       .join("");
 
     this.root.querySelector("[data-dashboard-revenue-total]").textContent =
-      this.formatRupiahCompact(1840 * multiplier);
+      this.formatRupiahCompact(kpisConfig.revenueBase * multiplier);
     this.root.querySelector("[data-dashboard-revenue-delta]").textContent =
       `↑ ${this.period === "ytd" ? "24,1" : "18,6"}% vs periode lalu`;
 
-    const pipeline = [
-      ["Lead Baru", 1248, 100],
-      ["Terhubung", 864, 69],
-      ["Prospek", 512, 41],
-      ["Hot", 226, 18],
-      ["Deal", 96, 8],
-    ];
+    const pipeline = props.funnelStages;
+    const pipelineLeadCount = pipeline[0]?.[1] || pipelineBase;
     this.root.querySelector("[data-dashboard-pipeline-total]").textContent =
-      `${Math.round(1248 * multiplier).toLocaleString("id-ID")} lead`;
+      `${Math.round(pipelineLeadCount * multiplier).toLocaleString("id-ID")} ${props.pipelineTotalSuffix}`;
     this.funnel.innerHTML = pipeline
       .map(
         ([label, count, width]) => `
@@ -5107,7 +5896,7 @@ class OneDashboardDemo {
           <tr>
             <td>${branch.name}</td>
             <td>${this.formatRupiahCompact(branch.revenue * this.periodMultiplier())}</td>
-            <td>${Math.round(branch.closing * this.periodMultiplier())} unit</td>
+            <td>${Math.round(branch.closing * this.periodMultiplier()).toLocaleString("id-ID")} ${props.entityPlural}</td>
             <td>${branch.conversion.toFixed(1).replace(".", ",")}%</td>
             <td><span class="dashboard-target-cell"><i style="--progress:${branch.target}%"></i>${branch.target}%</span></td>
           </tr>
@@ -5115,9 +5904,14 @@ class OneDashboardDemo {
       )
       .join("");
 
-    const agents = this.branch === "all"
-      ? dashboardDemoData.agents
-      : dashboardDemoData.agents.filter((agent) => agent.branch.toLocaleLowerCase("id").replaceAll(" ", "-") === this.branch);
+    const locationName =
+      this.branch === "all"
+        ? null
+        : data.branches.find((item) => item.id === this.branch)?.name || null;
+    const agents =
+      this.branch === "all"
+        ? data.agents
+        : data.agents.filter((agent) => agent.branch === locationName);
     this.agentList.innerHTML = agents
       .slice(0, 4)
       .map(
@@ -5125,45 +5919,14 @@ class OneDashboardDemo {
           <div class="dashboard-agent">
             <span>${index + 1}</span>
             <span class="dashboard-agent-avatar">${this.initials(agent.name)}</span>
-            <div><b>${agent.name}</b><small>${agent.branch} · ${Math.round(agent.closing * this.periodMultiplier())} closing</small></div>
+            <div><b>${agent.name}</b><small>${agent.branch} · ${Math.round(agent.closing * this.periodMultiplier()).toLocaleString("id-ID")} ${props.agentMetric}</small></div>
             <strong>${this.formatRupiahCompact(agent.revenue * this.periodMultiplier())}</strong>
           </div>
         `,
       )
       .join("");
 
-    const branchName = this.branchSelect.options[this.branchSelect.selectedIndex].text;
-    const alerts = [
-      {
-        type: "warning",
-        icon: "!",
-        title: "7 lead HOT belum ditindaklanjuti",
-        copy: `${branchName} · potensi Rp186 jt menunggu respons sales.`,
-      },
-      {
-        type: "positive",
-        icon: "↑",
-        title: "Konversi naik 18,6%",
-        copy: "WhatsApp menjadi sumber dengan pertumbuhan closing tertinggi.",
-      },
-      {
-        type: "info",
-        icon: "i",
-        title: "Forecast mencapai 108% target",
-        copy: "Pertahankan kecepatan follow-up untuk mengamankan proyeksi.",
-      },
-    ];
-    this.alertList.innerHTML = alerts
-      .map(
-        (alert) => `
-          <div class="dashboard-alert-item ${alert.type}">
-            <span>${alert.icon}</span>
-            <div><b>${alert.title}</b><p>${alert.copy}</p></div>
-          </div>
-        `,
-      )
-      .join("");
-
+    this.renderAlerts();
     this.renderWidgets();
   }
 
