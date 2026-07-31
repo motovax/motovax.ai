@@ -591,16 +591,16 @@ class InventoryProductDemo {
       {
         view: "falcon",
         title: "Sales: minta foto unit",
-        body: `Lanjut unit yang sama — “Boleh minta fotonya? Depan, samping, sama interior”.`,
+        body: `Lanjut unit yang sama — “Boleh minta fotonya?” (2–3 foto real unit).`,
         enter: () =>
-          this.sendFalconUserMessage("Boleh minta fotonya? Depan, samping, sama interior", {
+          this.sendFalconUserMessage("Boleh minta fotonya?", {
             fromGuide: true,
           }),
       },
       {
         view: "falcon",
         title: "Sales: upload foto stok",
-        body: "📎 update galeri unit yang sama: +2 foto baru → total 5 foto.",
+        body: "📎 update galeri unit yang sama: +2 foto berbeda → total 5.",
         enter: () => this.simulateFalconPhotoUpload({ fromGuide: true }),
       },
       {
@@ -1624,7 +1624,7 @@ class InventoryProductDemo {
     const story = this.falconStoryLabel();
     const sales = [
       `Halo, mau tanya ${story} dong, masih ready?`,
-      "Boleh minta fotonya? Depan, samping, sama interior",
+      "Boleh minta fotonya?",
       `Simulasi kredit ${story} DP 20% tenor 48 bulan`,
       "Lokasi showroom",
       `Catat lead Budi 08123456789 minat ${story}`,
@@ -1673,11 +1673,10 @@ class InventoryProductDemo {
     const cards = photos
       .map((p) => {
         const url = p.url || p.photoUrl || "";
-        const style = url
-          ? ` style="background-image:url('${String(url).replace(/'/g, "%27")}')"`
-          : "";
-        const cls = url ? "wa-photo-card has-photo" : "wa-photo-card";
-        return `<div class="${cls}"${style}><b>${this.escapeHtml(p.label || "")}</b><span>${this.escapeHtml(p.meta || "")}</span></div>`;
+        if (!url) return "";
+        // Tanpa label sudut — hanya foto real unit (1 unit, beberapa frame).
+        const safe = String(url).replace(/'/g, "%27").replace(/"/g, "&quot;");
+        return `<div class="wa-photo-card has-photo is-plain" style="background-image:url('${safe}')" role="img" aria-label="Foto unit"></div>`;
       })
       .join("");
     return `<div class="wa-photo-grid wa-photo-grid-${direction}">${cards}</div>`;
@@ -1806,14 +1805,13 @@ class InventoryProductDemo {
     if (!this.falconFocus?.unit) return;
     const unit = this.falconFocus.unit;
     if (this.falconFocus.gallery.length >= 3) return;
-    const baseLabels = ["Foto depan", "Foto samping", "Foto interior"];
-    this.falconFocus.gallery = baseLabels.map((label, slot) => ({
-      label,
+    // 3 foto berbeda dari unit yang sama — tanpa label sudut.
+    this.falconFocus.gallery = [0, 1, 2].map((slot) => ({
       slot,
       url: this.unitPhotoUrl(unit, slot),
-      meta: `${unit.plate || "—"} · ${label}`,
+      unitId: unit.id,
+      plate: unit.plate,
     }));
-    // Baseline stock photo count = 3 if still empty/low.
     const live = this.units.find((u) => u.id === unit.id);
     if (live && (!live.photos || live.photos < 3)) {
       live.photos = 3;
@@ -1832,8 +1830,6 @@ class InventoryProductDemo {
       const existing = this.falconFocus.gallery.find((g) => g.slot === slot);
       if (existing) return { ...existing, unitId: unit.id, plate: unit.plate };
       return {
-        label: `Foto ${slot + 1}`,
-        meta: unit.plate || "—",
         slot,
         url: this.unitPhotoUrl(unit, slot),
         unitId: unit.id,
@@ -1851,16 +1847,13 @@ class InventoryProductDemo {
     }
     this.ensureFocusGalleryBase();
 
-    // Before update: baseline 3 (depan/samping/interior). Upload adds 2 new angles.
+    // Baseline 3 foto → upload +2 foto berbeda unit yang sama → total 5.
     const beforeCount = Math.max(this.falconFocus.gallery.length, Number(unit.photos) || 0, 3);
-    const newSlots = [beforeCount, beforeCount + 1]; // e.g. 3,4 → total 5
-    const newLabels = ["Foto mesin / detail", "Foto dashboard / kabin"];
-    const newPhotos = newSlots.map((slot, idx) => {
+    const newSlots = [beforeCount, beforeCount + 1];
+    const newPhotos = newSlots.map((slot) => {
       const card = {
-        label: newLabels[idx] || `Foto baru ${idx + 1}`,
         slot,
         url: this.unitPhotoUrl(unit, slot),
-        meta: `${unit.plate || "—"} · baru`,
         unitId: unit.id,
         plate: unit.plate,
       };
@@ -1870,7 +1863,7 @@ class InventoryProductDemo {
 
     const userText =
       `Tolong update unit ${unit.brand} ${unit.type} dengan nopol ${unit.plate || "—"}.\n` +
-      `Saya kirim 2 foto tambahan (mesin & dashboard) ya.`;
+      `Saya kirim 2 foto tambahan ya.`;
     this.pushFalconUser(userText, { photo: true, photos: newPhotos });
     this.renderFalconMessages();
 
@@ -1887,17 +1880,11 @@ class InventoryProductDemo {
       unit.photos = afterCount;
       this.render();
 
-      const allPhotos = this.falconFocus.gallery.map((g) => ({
-        ...g,
-        meta: `${unit.plate || "—"} · ${g.label}`,
-      }));
-
       this.pushFalconBot(
         `Siap ✅ Foto untuk ${unit.brand} ${unit.type} (nopol ${unit.plate || "—"}) sudah saya tautkan.\n\n` +
-          `Galeri unit ini: ${beforeCount} foto → +${newPhotos.length} baru → sekarang ${afterCount} foto ` +
-          `(depan, samping, interior, ${newPhotos.map((p) => p.label.replace(/^Foto\s+/i, "").toLowerCase()).join(", ")}).\n\n` +
+          `Galeri unit ini: ${beforeCount} foto → +${newPhotos.length} baru → sekarang ${afterCount} foto berbeda.\n\n` +
           `Kalau mau, bilang saja untuk simulasi kredit atau jadwal survey.`,
-        { photos: allPhotos },
+        { photos: this.falconFocus.gallery.slice() },
       );
       this.markFalconTutorial(this.falconRole === "sales" ? "upload" : "import");
       this.renderFalconMessages();
@@ -2011,23 +1998,21 @@ class InventoryProductDemo {
       };
     }
 
-    // 8) Foto — always one focus unit, multiple angles
-    if (/minta foto|kirim foto|foto unit|lihat foto|fotonya|foto depan|foto samping|foto interior/.test(text)) {
+    // 8) Foto — 1 unit, 3 foto berbeda (tanpa label sudut)
+    if (/minta foto|kirim foto|foto unit|lihat foto|fotonya/.test(text)) {
       const unit = this.pickFocusUnit(raw);
       if (!unit) {
         return { text: "Unit-nya yang mana dulu, Kak? Misalnya sebut Serena atau nopol-nya." };
       }
       this.ensureFocusGalleryBase();
       const photos = this.focusGalleryCards([0, 1, 2]);
-      const live = this.units.find((u) => u.id === unit.id) || unit;
       return {
         tutorialId: isSales ? "photo" : undefined,
         photos,
         text:
-          `Siap, ini galeri ${unit.brand} ${unit.type} (nopol ${unit.plate || "—"}) — ` +
-          `${this.statusLabel(unit.status)} di ${this.titleCase(unit.branch || "cabang demo")}.\n\n` +
-          `Saya kirim 3 foto: depan, samping, dan interior. Total di galeri unit ini sekarang ${live.photos || photos.length} foto.\n` +
-          `Kalau ada foto tambahan (mesin/dashboard), bisa dikirim lewat lampiran 📎 biar saya update stoknya.`,
+          `Siap, Kak. Ini beberapa foto ${unit.brand} ${unit.type} (nopol ${unit.plate || "—"}) ` +
+          `— ${this.statusLabel(unit.status)} di ${this.titleCase(unit.branch || "cabang demo")}.\n\n` +
+          `Saya kirim 3 foto unit ini. Kalau ada foto tambahan, kirim lewat lampiran 📎 biar saya update galeri stoknya.`,
       };
     }
 
@@ -2130,9 +2115,9 @@ class InventoryProductDemo {
       "1. Cek stok & detail unit — whatsapp:unit_query\n" +
       "   Coba: “Halo, mau tanya Nissan Serena HWS AT dong, masih ready?”\n" +
       "2. Minta foto unit — whatsapp:photo_send\n" +
-      "   Coba: “Boleh minta fotonya? Depan, samping, sama interior”\n" +
+      "   Coba: “Boleh minta fotonya?” (beberapa foto unit yang sama)\n" +
       "3. Upload foto update stok (via lampiran WA)\n" +
-      "   Coba: tekan 📎 — update unit yang sama + nopol\n" +
+      "   Coba: tekan 📎 — +2 foto unit yang sama + nopol\n" +
       "4. Simulasi kredit & asuransi — whatsapp:finance_simulation\n" +
       "   Coba: “Simulasi kredit Serena DP 20% tenor 48 bulan”\n" +
       "5. Lokasi showroom / map\n" +
