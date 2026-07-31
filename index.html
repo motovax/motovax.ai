@@ -235,8 +235,8 @@
               </div>
               <h3>Inventory Management System</h3>
               <p>
-                Kelola stok secara real-time dengan sinkronisasi multi-branch dan integrasi leasing.
-                Akurat, cepat, dan selalu up-to-date.
+                Kelola stok real-time seperti di Mobix: Manajemen Unit, Unit per Cabang, dan Upload Data
+                dalam satu Sistem Manajemen Inventaris.
               </p>
               <div class="unit-card">
                 <div class="car-visual" aria-hidden="true"></div>
@@ -532,8 +532,8 @@
             <span class="demo-brand"><span>MOTO</span><strong>VAX</strong></span>
             <span class="demo-divider" aria-hidden="true"></span>
             <div>
-              <b id="inventoryDemoTitle">Inventory Management</b>
-              <span>Workspace demo · Tampilan produk</span>
+              <b id="inventoryDemoTitle">Sistem Manajemen Inventaris</b>
+              <span>IMS demo · Selaras menu Mobix</span>
             </div>
           </div>
           <div class="demo-topbar-actions">
@@ -550,133 +550,219 @@
         <div class="demo-layout">
           <aside class="demo-sidebar" aria-label="Navigasi demo">
             <nav>
-              <span class="demo-nav-section">Workspace</span>
-              <button type="button">
-                <svg class="demo-nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 13h6V4H4v9Zm0 7h6v-4H4v4Zm10 0h6v-9h-6v9Zm0-16v4h6V4h-6Z"/></svg>
-                <span>Dashboard</span>
-              </button>
-              <button class="active" type="button">
+              <span class="demo-nav-section">Sistem Manajemen Inventaris</span>
+              <button class="active" type="button" data-ims-nav="units" aria-current="page">
                 <svg class="demo-nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5h14v5H5V5Zm0 9h14v5H5v-5ZM8 7.5h.01M8 16.5h.01"/></svg>
-                <span>Inventory</span>
+                <span>Manajemen Unit</span>
               </button>
-              <button type="button">
-                <svg class="demo-nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2m7-10a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm13 10v-2a4 4 0 0 0-3-3.87m-2-12a4 4 0 0 1 0 7.75"/></svg>
-                <span>Prospek</span>
+              <button type="button" data-ims-nav="per-cabang">
+                <svg class="demo-nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7-4.5-7-10a7 7 0 1 1 14 0c0 5.5-7 10-7 10Zm0-8a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z"/></svg>
+                <span>Unit per Cabang</span>
               </button>
-              <button type="button">
-                <svg class="demo-nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19V9m8 10V5m8 14v-7M2 19h20"/></svg>
-                <span>Penjualan</span>
-              </button>
-              <button type="button">
-                <svg class="demo-nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m3 17 6-6 4 4 8-9m-5 0h5v5"/></svg>
-                <span>Analytics</span>
+              <button type="button" data-ims-nav="uploads">
+                <svg class="demo-nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V4m0 0 4 4m-4-4-4 4M4 20h16"/></svg>
+                <span>Upload Data</span>
               </button>
             </nav>
-            <div class="demo-sidebar-tip">
+            <div class="demo-sidebar-tip" data-ims-tip>
               <span>DEMO GUIDE</span>
-              <b>Coba cari dan filter unit</b>
-              <p>Klik salah satu unit untuk melihat detail lalu coba ubah statusnya menjadi booked.</p>
+              <b data-ims-tip-title>Coba cari dan filter unit</b>
+              <p data-ims-tip-body>Klik salah satu unit untuk melihat detail lalu coba ubah statusnya menjadi booked.</p>
             </div>
           </aside>
 
           <main class="demo-workspace">
-            <div class="demo-page-heading">
-              <div>
-                <span class="demo-breadcrumb">Home / Inventory / Semua Unit</span>
-                <h2>Inventory Unit</h2>
-                <p>Pantau stok, harga, aging, dan posisi unit di seluruh cabang.</p>
-              </div>
-              <button class="demo-primary-action" type="button" data-demo-guide>
-                <span aria-hidden="true">▶</span> Panduan demo
-              </button>
+            <div class="ims-mobile-nav" role="navigation" aria-label="Menu IMS mobile">
+              <button class="active" type="button" data-ims-nav="units">Manajemen Unit</button>
+              <button type="button" data-ims-nav="per-cabang">Unit per Cabang</button>
+              <button type="button" data-ims-nav="uploads">Upload Data</button>
             </div>
 
-            <section class="demo-stat-grid" aria-label="Ringkasan inventory">
-              <button class="demo-stat active" type="button" data-status-filter="ALL">
-                <span class="demo-stat-icon indigo">▦</span>
-                <span><small>Semua Unit</small><b data-stat-all>0</b></span>
-                <em>100%</em>
-              </button>
-              <button class="demo-stat" type="button" data-status-filter="UNIT READY">
-                <span class="demo-stat-icon green">✓</span>
-                <span><small>Unit Ready</small><b data-stat-ready>0</b></span>
-                <em class="positive">Siap jual</em>
-              </button>
-              <button class="demo-stat" type="button" data-status-filter="BOOKED">
-                <span class="demo-stat-icon amber">◷</span>
-                <span><small>Booked</small><b data-stat-booked>0</b></span>
-                <em>Follow-up</em>
-              </button>
-              <button class="demo-stat" type="button" data-status-filter="SOLD">
-                <span class="demo-stat-icon blue">◆</span>
-                <span><small>Sold</small><b data-stat-sold>0</b></span>
-                <em class="positive">Terjual</em>
-              </button>
+            <section class="ims-view is-active" data-ims-view="units">
+              <div class="demo-page-heading">
+                <div>
+                  <span class="demo-breadcrumb">Operasional / Manajemen Unit</span>
+                  <h2>Manajemen Unit</h2>
+                  <p>Pantau stok, harga, aging, dan posisi unit di seluruh cabang — sama seperti di Mobix.</p>
+                </div>
+                <button class="demo-primary-action" type="button" data-demo-guide>
+                  <span aria-hidden="true">▶</span> Panduan demo
+                </button>
+              </div>
+
+              <section class="demo-stat-grid" aria-label="Ringkasan inventory">
+                <button class="demo-stat active" type="button" data-status-filter="ALL">
+                  <span class="demo-stat-icon indigo">▦</span>
+                  <span><small>Semua Unit</small><b data-stat-all>0</b></span>
+                  <em>100%</em>
+                </button>
+                <button class="demo-stat" type="button" data-status-filter="UNIT READY">
+                  <span class="demo-stat-icon green">✓</span>
+                  <span><small>Unit Ready</small><b data-stat-ready>0</b></span>
+                  <em class="positive">Siap jual</em>
+                </button>
+                <button class="demo-stat" type="button" data-status-filter="BOOKED">
+                  <span class="demo-stat-icon amber">◷</span>
+                  <span><small>Booked</small><b data-stat-booked>0</b></span>
+                  <em>Follow-up</em>
+                </button>
+                <button class="demo-stat" type="button" data-status-filter="SOLD">
+                  <span class="demo-stat-icon blue">◆</span>
+                  <span><small>Sold</small><b data-stat-sold>0</b></span>
+                  <em class="positive">Terjual</em>
+                </button>
+              </section>
+
+              <section class="demo-inventory-panel">
+                <div class="demo-toolbar">
+                  <label class="demo-search">
+                    <span aria-hidden="true">⌕</span>
+                    <input
+                      type="search"
+                      placeholder="Cari merek, tipe, atau plat nomor..."
+                      aria-label="Cari unit"
+                      data-demo-search
+                    />
+                  </label>
+                  <label class="demo-select-wrap">
+                    <span>Cabang</span>
+                    <select aria-label="Filter cabang" data-demo-branch>
+                      <option value="ALL">Semua cabang</option>
+                      <option value="CINERE">Cinere</option>
+                      <option value="PONDOK BAMBU">Pondok Bambu</option>
+                      <option value="BINTARO">Bintaro</option>
+                      <option value="BEKASI">Bekasi</option>
+                    </select>
+                  </label>
+                  <label class="demo-select-wrap">
+                    <span>Urutkan</span>
+                    <select aria-label="Urutkan unit" data-demo-sort>
+                      <option value="newest">Aging terendah</option>
+                      <option value="oldest">Aging tertinggi</option>
+                      <option value="price-high">Harga tertinggi</option>
+                      <option value="price-low">Harga terendah</option>
+                    </select>
+                  </label>
+                </div>
+
+                <div class="demo-filter-row">
+                  <div class="demo-filter-pills" role="group" aria-label="Filter status unit">
+                    <button class="active" type="button" data-status-filter="ALL">Semua</button>
+                    <button type="button" data-status-filter="UNIT READY">Unit Ready</button>
+                    <button type="button" data-status-filter="BOOKED">Booked</button>
+                    <button type="button" data-status-filter="SOLD">Sold</button>
+                  </div>
+                  <span class="demo-result-count" data-demo-result-count></span>
+                </div>
+
+                <div class="demo-table-wrap">
+                  <table class="demo-table">
+                    <thead>
+                      <tr>
+                        <th>Unit</th>
+                        <th>Plat</th>
+                        <th>Harga Beli</th>
+                        <th>Harga Jual (OTR)</th>
+                        <th>Odo &amp; Aging</th>
+                        <th>Cabang &amp; Lokasi</th>
+                        <th>Status</th>
+                      </tr>
+                    </thead>
+                    <tbody data-demo-table-body></tbody>
+                  </table>
+                  <div class="demo-mobile-list" data-demo-mobile-list></div>
+                  <div class="demo-empty-state" data-demo-empty hidden>
+                    <span>⌕</span>
+                    <b>Unit tidak ditemukan</b>
+                    <p>Coba kata kunci atau filter lainnya.</p>
+                    <button type="button" data-demo-clear-filter>Reset filter</button>
+                  </div>
+                </div>
+              </section>
             </section>
 
-            <section class="demo-inventory-panel">
-              <div class="demo-toolbar">
-                <label class="demo-search">
-                  <span aria-hidden="true">⌕</span>
-                  <input
-                    type="search"
-                    placeholder="Cari merek, tipe, atau plat nomor..."
-                    aria-label="Cari unit"
-                    data-demo-search
-                  />
-                </label>
-                <label class="demo-select-wrap">
-                  <span>Cabang</span>
-                  <select aria-label="Filter cabang" data-demo-branch>
-                    <option value="ALL">Semua cabang</option>
-                    <option value="CINERE">Cinere</option>
-                    <option value="PONDOK BAMBU">Pondok Bambu</option>
-                    <option value="BINTARO">Bintaro</option>
-                    <option value="BEKASI">Bekasi</option>
-                  </select>
-                </label>
-                <label class="demo-select-wrap">
-                  <span>Urutkan</span>
-                  <select aria-label="Urutkan unit" data-demo-sort>
-                    <option value="newest">Aging terendah</option>
-                    <option value="oldest">Aging tertinggi</option>
-                    <option value="price-high">Harga tertinggi</option>
-                    <option value="price-low">Harga terendah</option>
-                  </select>
-                </label>
-              </div>
-
-              <div class="demo-filter-row">
-                <div class="demo-filter-pills" role="group" aria-label="Filter status unit">
-                  <button class="active" type="button" data-status-filter="ALL">Semua</button>
-                  <button type="button" data-status-filter="UNIT READY">Unit Ready</button>
-                  <button type="button" data-status-filter="BOOKED">Booked</button>
-                  <button type="button" data-status-filter="SOLD">Sold</button>
+            <section class="ims-view" data-ims-view="per-cabang" hidden>
+              <div class="demo-page-heading">
+                <div>
+                  <span class="demo-breadcrumb">Operasional / Manajemen Unit / Unit per Cabang</span>
+                  <h2>Unit per Cabang</h2>
+                  <p>Ringkasan stok Ready, Booked, dan kelengkapan foto per cabang — selaras menu Mobix.</p>
                 </div>
-                <span class="demo-result-count" data-demo-result-count></span>
               </div>
 
-              <div class="demo-table-wrap">
-                <table class="demo-table">
-                  <thead>
-                    <tr>
-                      <th>Unit</th>
-                      <th>Plat</th>
-                      <th>Harga Beli</th>
-                      <th>Harga Jual (OTR)</th>
-                      <th>Odo &amp; Aging</th>
-                      <th>Cabang &amp; Lokasi</th>
-                      <th>Status</th>
-                    </tr>
-                  </thead>
-                  <tbody data-demo-table-body></tbody>
-                </table>
-                <div class="demo-mobile-list" data-demo-mobile-list></div>
-                <div class="demo-empty-state" data-demo-empty hidden>
-                  <span>⌕</span>
-                  <b>Unit tidak ditemukan</b>
-                  <p>Coba kata kunci atau filter lainnya.</p>
-                  <button type="button" data-demo-clear-filter>Reset filter</button>
+              <div class="ims-branch-totals" data-ims-branch-totals aria-label="Total stok cabang"></div>
+              <div class="ims-branch-grid" data-ims-branch-grid></div>
+            </section>
+
+            <section class="ims-view" data-ims-view="uploads" hidden>
+              <div class="demo-page-heading">
+                <div>
+                  <span class="demo-breadcrumb">Operasional / Manajemen Unit / Upload Data</span>
+                  <h2>Upload Data</h2>
+                  <p>Impor inventory, foto unit, handover, dan MRP dari satu tempat — sama seperti di Mobix.</p>
+                </div>
+              </div>
+
+              <div class="ims-upload-tabs" role="tablist" aria-label="Jenis upload">
+                <button class="active" type="button" role="tab" aria-selected="true" data-ims-upload-tab="inventory">Import Inventory</button>
+                <button type="button" role="tab" aria-selected="false" data-ims-upload-tab="foto">Upload Foto</button>
+                <button type="button" role="tab" aria-selected="false" data-ims-upload-tab="handover">Handover Sales</button>
+                <button type="button" role="tab" aria-selected="false" data-ims-upload-tab="mrp">Upload MRP</button>
+              </div>
+
+              <div class="ims-upload-panel" data-ims-upload-panel="inventory">
+                <div class="ims-upload-drop">
+                  <span class="ims-upload-icon" aria-hidden="true">⇪</span>
+                  <b>Unggah file Excel inventory</b>
+                  <p>Format DSF / Bintaro / multi-cabang. Di Mobix file diproses dengan validasi warning per baris.</p>
+                  <button class="demo-primary-action" type="button" data-ims-upload-sim="inventory">Pilih file (simulasi)</button>
+                </div>
+                <ul class="ims-upload-steps">
+                  <li><em>1</em><div><b>Validasi kolom</b><span>Plat, chassis, status, cabang, harga</span></div></li>
+                  <li><em>2</em><div><b>Review warning</b><span>Konflik identitas &amp; unit hilang diperbaiki di satu halaman</span></div></li>
+                  <li><em>3</em><div><b>Terapkan ke stok</b><span>Stok live sinkron ke Manajemen Unit &amp; katalog</span></div></li>
+                </ul>
+              </div>
+
+              <div class="ims-upload-panel" data-ims-upload-panel="foto" hidden>
+                <div class="ims-upload-drop">
+                  <span class="ims-upload-icon" aria-hidden="true">🖼</span>
+                  <b>Upload foto unit</b>
+                  <p>Gabungkan foto per plat/chassis. Di smartphone tersedia opsi kamera atau galeri.</p>
+                  <button class="demo-primary-action" type="button" data-ims-upload-sim="foto">Pilih foto (simulasi)</button>
+                </div>
+                <div class="ims-upload-meta">
+                  <div><small>Tanpa foto</small><b data-ims-photo-missing>0</b></div>
+                  <div><small>Sudah berfoto</small><b data-ims-photo-ready>0</b></div>
+                  <div><small>Mode merge</small><b>Otomatis</b></div>
+                </div>
+              </div>
+
+              <div class="ims-upload-panel" data-ims-upload-panel="handover" hidden>
+                <div class="ims-upload-drop">
+                  <span class="ims-upload-icon" aria-hidden="true">⇄</span>
+                  <b>Import handover sales</b>
+                  <p>Samakan unit terjual dengan data customer handover agar stok &amp; CRM konsisten.</p>
+                  <button class="demo-primary-action" type="button" data-ims-upload-sim="handover">Pilih file (simulasi)</button>
+                </div>
+                <ul class="ims-upload-steps">
+                  <li><em>1</em><div><b>Cocokkan plat</b><span>Unit SOLD tidak muncul lagi di stok ready</span></div></li>
+                  <li><em>2</em><div><b>Link customer</b><span>Pipeline CRM terbarui otomatis</span></div></li>
+                  <li><em>3</em><div><b>Audit trail</b><span>Riwayat import tersimpan di tenant</span></div></li>
+                </ul>
+              </div>
+
+              <div class="ims-upload-panel" data-ims-upload-panel="mrp" hidden>
+                <div class="ims-upload-drop">
+                  <span class="ims-upload-icon" aria-hidden="true">Rp</span>
+                  <b>Upload &amp; publish MRP</b>
+                  <p>Perbarui harga jual (OTR) massal. Hanya role dengan permission MRP yang bisa publish.</p>
+                  <button class="demo-primary-action" type="button" data-ims-upload-sim="mrp">Pilih file MRP (simulasi)</button>
+                </div>
+                <div class="ims-upload-meta">
+                  <div><small>Harga live</small><b>OTR</b></div>
+                  <div><small>Publish</small><b>Manual</b></div>
+                  <div><small>Scope</small><b>Per cabang</b></div>
                 </div>
               </div>
             </section>
@@ -731,8 +817,8 @@
       <div class="demo-guide-popover" data-demo-guide-popover hidden>
         <button type="button" data-close-demo-guide aria-label="Tutup panduan">×</button>
         <span>LANGKAH 1 DARI 3</span>
-        <h3>Mulai dari pencarian cepat</h3>
-        <p>Cari “Toyota”, pilih cabang, atau klik kartu status untuk melihat stok yang relevan.</p>
+        <h3>Tiga menu sama seperti Mobix</h3>
+        <p>Sidebar “Sistem Manajemen Inventaris” berisi Manajemen Unit, Unit per Cabang, dan Upload Data. Mulai dari pencarian unit di Manajemen Unit.</p>
         <button type="button" data-demo-guide-start>Mulai coba</button>
       </div>
 

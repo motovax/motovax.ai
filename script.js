@@ -292,6 +292,8 @@ class InventoryProductDemo {
     this.dataError = "";
     this.lastFocusedElement = null;
     this.hasOpenedGuide = false;
+    this.activeView = "units";
+    this.activeUploadTab = "inventory";
 
     this.tableBody = root.querySelector("[data-demo-table-body]");
     this.mobileList = root.querySelector("[data-demo-mobile-list]");
@@ -306,8 +308,13 @@ class InventoryProductDemo {
     this.toast = root.querySelector("[data-demo-toast]");
     this.bookingButton = root.querySelector("[data-demo-book-unit]");
     this.bookingCopy = root.querySelector("[data-demo-booking-copy]");
+    this.branchTotals = root.querySelector("[data-ims-branch-totals]");
+    this.branchGrid = root.querySelector("[data-ims-branch-grid]");
+    this.tipTitle = root.querySelector("[data-ims-tip-title]");
+    this.tipBody = root.querySelector("[data-ims-tip-body]");
 
     this.bind();
+    this.setView("units");
     this.render();
     this.loadTenantData();
   }
@@ -352,6 +359,34 @@ class InventoryProductDemo {
       button.addEventListener("click", () => this.close());
     }
 
+    for (const button of this.root.querySelectorAll("[data-ims-nav]")) {
+      button.addEventListener("click", () => {
+        this.setView(button.dataset.imsNav || "units");
+      });
+    }
+
+    for (const button of this.root.querySelectorAll("[data-ims-upload-tab]")) {
+      button.addEventListener("click", () => {
+        this.setUploadTab(button.dataset.imsUploadTab || "inventory");
+      });
+    }
+
+    for (const button of this.root.querySelectorAll("[data-ims-upload-sim]")) {
+      button.addEventListener("click", () => {
+        const kind = button.dataset.imsUploadSim || "inventory";
+        const labels = {
+          inventory: "Import inventory",
+          foto: "Upload foto",
+          handover: "Handover sales",
+          mrp: "Upload MRP",
+        };
+        this.toast.querySelector("b").textContent = `${labels[kind] || "Upload"} disimulasikan`;
+        this.toast.querySelector("p").textContent =
+          "Di Mobix file diunggah ke tenant Anda; demo ini hanya menampilkan alur yang sama.";
+        this.toast.hidden = false;
+      });
+    }
+
     for (const button of this.root.querySelectorAll("[data-status-filter]")) {
       button.addEventListener("click", () => {
         this.status = button.dataset.statusFilter || "ALL";
@@ -379,6 +414,24 @@ class InventoryProductDemo {
     this.mobileList.addEventListener("click", (event) => this.handleUnitActivation(event));
     this.mobileList.addEventListener("keydown", (event) => this.handleUnitActivation(event));
 
+    const handleBranchFilterClick = (event) => {
+      const card = event.target.closest("[data-ims-branch-filter]");
+      if (!card) return;
+      const branch = card.dataset.imsBranchFilter || "ALL";
+      const status = card.dataset.imsStatusFilter || "ALL";
+      this.branch = branch;
+      this.status = status;
+      if (this.branchSelect && [...this.branchSelect.options].some((opt) => opt.value === branch)) {
+        this.branchSelect.value = branch;
+      } else if (this.branchSelect && branch === "ALL") {
+        this.branchSelect.value = "ALL";
+      }
+      this.setView("units");
+      this.render();
+    };
+    this.branchTotals?.addEventListener("click", handleBranchFilterClick);
+    this.branchGrid?.addEventListener("click", handleBranchFilterClick);
+
     for (const button of this.root.querySelectorAll("[data-close-demo-detail]")) {
       button.addEventListener("click", () => this.closeDetail());
     }
@@ -395,6 +448,7 @@ class InventoryProductDemo {
     this.root.querySelector("[data-close-demo-guide]").addEventListener("click", () => this.closeGuide());
     this.root.querySelector("[data-demo-guide-start]").addEventListener("click", () => {
       this.closeGuide();
+      this.setView("units");
       this.searchInput.focus();
     });
     this.root.querySelector("[data-close-demo-toast]").addEventListener("click", () => {
@@ -413,6 +467,61 @@ class InventoryProductDemo {
         this.close();
       }
     });
+  }
+
+  setView(view) {
+    const next = ["units", "per-cabang", "uploads"].includes(view) ? view : "units";
+    this.activeView = next;
+
+    for (const button of this.root.querySelectorAll("[data-ims-nav]")) {
+      const isActive = button.dataset.imsNav === next;
+      button.classList.toggle("active", isActive);
+      if (isActive) button.setAttribute("aria-current", "page");
+      else button.removeAttribute("aria-current");
+    }
+
+    for (const panel of this.root.querySelectorAll("[data-ims-view]")) {
+      const isActive = panel.dataset.imsView === next;
+      panel.classList.toggle("is-active", isActive);
+      panel.hidden = !isActive;
+    }
+
+    const tips = {
+      units: {
+        title: "Coba cari dan filter unit",
+        body: "Klik salah satu unit untuk melihat detail lalu coba ubah statusnya menjadi booked.",
+      },
+      "per-cabang": {
+        title: "Pantau stok per cabang",
+        body: "Klik kartu cabang untuk membuka Manajemen Unit dengan filter cabang yang sama seperti di Mobix.",
+      },
+      uploads: {
+        title: "Alur upload data",
+        body: "Pilih tab Import Inventory, Foto, Handover, atau MRP — tiga menu IMS ini sama dengan Mobix.",
+      },
+    };
+    const tip = tips[next] || tips.units;
+    if (this.tipTitle) this.tipTitle.textContent = tip.title;
+    if (this.tipBody) this.tipBody.textContent = tip.body;
+
+    if (next !== "units") this.closeDetail();
+    this.renderBranchSummary();
+    this.renderUploadMeta();
+  }
+
+  setUploadTab(tab) {
+    const next = ["inventory", "foto", "handover", "mrp"].includes(tab) ? tab : "inventory";
+    this.activeUploadTab = next;
+
+    for (const button of this.root.querySelectorAll("[data-ims-upload-tab]")) {
+      const isActive = button.dataset.imsUploadTab === next;
+      button.classList.toggle("active", isActive);
+      button.setAttribute("aria-selected", isActive ? "true" : "false");
+    }
+
+    for (const panel of this.root.querySelectorAll("[data-ims-upload-panel]")) {
+      panel.hidden = panel.dataset.imsUploadPanel !== next;
+    }
   }
 
   open(trigger) {
@@ -463,13 +572,131 @@ class InventoryProductDemo {
     this.closeDetail();
     this.toast.hidden = true;
     this.clearFilters();
+    this.setView("units");
+    this.setUploadTab("inventory");
     this.loadTenantData(true);
   }
 
+  getBranchSummaries() {
+    const map = new Map();
+    for (const unit of this.units) {
+      const key = (unit.branch || "Lainnya").toLocaleUpperCase("id");
+      if (!map.has(key)) {
+        map.set(key, {
+          branch: key,
+          ready: 0,
+          booked: 0,
+          sold: 0,
+          total: 0,
+          withPhotos: 0,
+          withoutPhotos: 0,
+        });
+      }
+      const row = map.get(key);
+      row.total += 1;
+      if (unit.status === "UNIT READY") row.ready += 1;
+      if (unit.status === "BOOKED") row.booked += 1;
+      if (unit.status === "SOLD") row.sold += 1;
+      if ((unit.photos || 0) > 0) row.withPhotos += 1;
+      else if (unit.status !== "SOLD") row.withoutPhotos += 1;
+    }
+    return [...map.values()].sort((a, b) => a.branch.localeCompare(b.branch, "id"));
+  }
+
+  renderBranchSummary() {
+    if (!this.branchTotals || !this.branchGrid) return;
+    const rows = this.getBranchSummaries();
+    const totals = rows.reduce(
+      (acc, row) => {
+        acc.stock += row.ready + row.booked;
+        acc.ready += row.ready;
+        acc.booked += row.booked;
+        acc.withPhotos += row.withPhotos;
+        acc.withoutPhotos += row.withoutPhotos;
+        return acc;
+      },
+      { stock: 0, ready: 0, booked: 0, withPhotos: 0, withoutPhotos: 0 },
+    );
+
+    this.branchTotals.innerHTML = `
+      <button type="button" data-ims-branch-filter="ALL" data-ims-status-filter="ALL">
+        <small>Stok Cabang</small><b>${totals.stock}</b>
+      </button>
+      <button type="button" data-ims-branch-filter="ALL" data-ims-status-filter="UNIT READY">
+        <small>Ready</small><b>${totals.ready}</b>
+      </button>
+      <button type="button" data-ims-branch-filter="ALL" data-ims-status-filter="BOOKED">
+        <small>Booked</small><b>${totals.booked}</b>
+      </button>
+      <button type="button" class="sky" data-ims-branch-filter="ALL" data-ims-status-filter="ALL">
+        <small>Ada Foto</small><b>${totals.withPhotos}</b>
+      </button>
+      <button type="button" class="rose" data-ims-branch-filter="ALL" data-ims-status-filter="ALL">
+        <small>Tanpa Foto</small><b>${totals.withoutPhotos}</b>
+      </button>
+    `;
+
+    if (!rows.length) {
+      this.branchGrid.innerHTML = `
+        <div class="ims-branch-empty">
+          <b>Belum ada data cabang</b>
+          <p>${this.dataError || "Muat ulang demo untuk mengambil stok tenant."}</p>
+        </div>
+      `;
+      return;
+    }
+
+    this.branchGrid.innerHTML = rows
+      .map(
+        (row) => `
+        <article class="ims-branch-card">
+          <header>
+            <span class="ims-branch-pin" aria-hidden="true">📍</span>
+            <div>
+              <b>${this.titleCase(row.branch)}</b>
+              <span>${row.total} unit tercatat</span>
+            </div>
+          </header>
+          <div class="ims-branch-metrics">
+            <button type="button" data-ims-branch-filter="${row.branch}" data-ims-status-filter="UNIT READY">
+              <small>Ready</small><b>${row.ready}</b>
+            </button>
+            <button type="button" data-ims-branch-filter="${row.branch}" data-ims-status-filter="BOOKED">
+              <small>Booked</small><b>${row.booked}</b>
+            </button>
+            <button type="button" data-ims-branch-filter="${row.branch}" data-ims-status-filter="SOLD">
+              <small>Sold</small><b>${row.sold}</b>
+            </button>
+            <button type="button" class="sky" data-ims-branch-filter="${row.branch}" data-ims-status-filter="ALL">
+              <small>Foto</small><b>${row.withPhotos}</b>
+            </button>
+          </div>
+          <button class="ims-branch-open" type="button" data-ims-branch-filter="${row.branch}" data-ims-status-filter="ALL">
+            Buka di Manajemen Unit →
+          </button>
+        </article>
+      `,
+      )
+      .join("");
+  }
+
+  renderUploadMeta() {
+    const withPhotos = this.units.filter((unit) => (unit.photos || 0) > 0).length;
+    const withoutPhotos = this.units.filter(
+      (unit) => unit.status !== "SOLD" && (unit.photos || 0) === 0,
+    ).length;
+    const missing = this.root.querySelector("[data-ims-photo-missing]");
+    const ready = this.root.querySelector("[data-ims-photo-ready]");
+    if (missing) missing.textContent = String(withoutPhotos);
+    if (ready) ready.textContent = String(withPhotos);
+  }
+
   getVisibleUnits() {
+    const branchFilter = String(this.branch || "ALL").toLocaleUpperCase("id");
     const visible = this.units.filter((unit) => {
       const matchesStatus = this.status === "ALL" || unit.status === this.status;
-      const matchesBranch = this.branch === "ALL" || unit.branch === this.branch;
+      const unitBranch = String(unit.branch || "").toLocaleUpperCase("id");
+      const matchesBranch = branchFilter === "ALL" || unitBranch === branchFilter;
       const haystack = `${unit.brand} ${unit.type} ${unit.plate}`.toLocaleLowerCase("id");
       return matchesStatus && matchesBranch && haystack.includes(this.query);
     });
@@ -488,6 +715,8 @@ class InventoryProductDemo {
     this.renderFilters();
     this.renderTable(visibleUnits);
     this.renderMobileList(visibleUnits);
+    this.renderBranchSummary();
+    this.renderUploadMeta();
     this.resultCount.textContent = this.dataError ||
       `${visibleUnits.length} dari ${this.units.length} unit ditampilkan`;
     this.emptyState.hidden = visibleUnits.length > 0;
