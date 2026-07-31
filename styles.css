@@ -3057,11 +3057,24 @@ body.demo-open {
   height: 38px;
   display: grid;
   place-items: center;
+  overflow: hidden;
   border-radius: 9px;
   color: #2563eb;
   background: linear-gradient(145deg, #eff6ff, #dbeafe);
   font-size: 9px;
   font-weight: 900;
+  flex-shrink: 0;
+}
+
+.demo-unit-thumb.has-photo {
+  background: #0f172a;
+}
+
+.demo-unit-thumb.has-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
 }
 
 .demo-unit-cell b,
@@ -3250,9 +3263,11 @@ body.demo-open {
 }
 
 .demo-detail-car {
+  position: relative;
   height: 145px;
   display: grid;
   place-items: center;
+  overflow: hidden;
   border: 1px solid #dbeafe;
   border-radius: 14px;
   background:
@@ -3266,6 +3281,23 @@ body.demo-open {
   font-size: 26px;
   font-weight: 900;
   letter-spacing: 0.16em;
+}
+
+.demo-detail-car img[data-detail-photo] {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 1;
+}
+
+.demo-detail-car.has-photo {
+  background: #0f172a;
+}
+
+.demo-detail-car.has-photo span {
+  display: none;
 }
 
 .demo-detail-status-row {
@@ -7547,6 +7579,24 @@ body.demo-open {
   background: linear-gradient(145deg, #e2e8f0, #f8fafc);
 }
 
+.social-vehicle-thumb.has-photo {
+  background: #0f172a;
+}
+
+.social-vehicle-thumb.has-photo img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 2;
+}
+
+.social-vehicle-thumb.has-photo::before,
+.social-vehicle-thumb.has-photo::after {
+  display: none;
+}
+
 .social-vehicle-thumb::before {
   position: absolute;
   right: 5px;
@@ -8089,6 +8139,28 @@ body.demo-open {
 
 .social-car-art i:last-child {
   right: 13%;
+}
+
+.social-car-art.has-photo {
+  right: 6%;
+  bottom: 18%;
+  left: 6%;
+  height: 42%;
+  border-radius: 10px;
+  overflow: hidden;
+  background-size: cover;
+  background-position: center;
+  filter: drop-shadow(0 12px 14px rgba(15, 23, 42, 0.35));
+}
+
+.social-car-art.has-photo::before,
+.social-car-art.has-photo::after,
+.social-car-art.has-photo i {
+  display: none;
+}
+
+.social-creative-frame.has-photo .social-creative-copy {
+  text-shadow: 0 1px 8px rgba(15, 23, 42, 0.55);
 }
 
 .social-creative-offer {

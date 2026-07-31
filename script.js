@@ -652,14 +652,19 @@ class InventoryProductDemo {
           creditPrice: unit.credit_price ?? seed.creditPrice,
           aging: unit.aging ?? seed.aging ?? 0,
           source: unit.source || seed.source || "Inventory tenant demo",
-          photos: unit.photos ?? seed.photos ?? 0,
-          bodyType: unit.body_type || unit.bodyType || seed.bodyType,
+          photos: unit.photo_count ?? unit.photos ?? seed.photos ?? 0,
+          photoUrl: unit.photo_url || seed.photoUrl || "",
+          bodyType: unit.body_type || unit.bodyType || seed.bodyType || unit.category,
           fuel: unit.fuel || seed.fuel,
           engine: unit.engine || seed.engine,
           seats: unit.seats || seed.seats,
           features: unit.features || seed.features || [],
         };
       });
+      // Share live photo URLs with Social Growth Studio (same tenant inventory).
+      if (typeof window.__motovaxApplyInventoryPhotos === "function") {
+        window.__motovaxApplyInventoryPhotos(this.units);
+      }
       this.render();
     } catch (error) {
       this.units = inventoryDemoSeed.map((unit) => ({ ...unit }));
@@ -1633,10 +1638,14 @@ class InventoryProductDemo {
           <tr data-unit-id="${unit.id}" tabindex="0" aria-label="Buka detail ${unit.brand} ${unit.type}">
             <td>
               <div class="demo-unit-cell">
-                <span class="demo-unit-thumb">${this.initials(unit.brand)}</span>
+                ${
+                  unit.photoUrl
+                    ? `<span class="demo-unit-thumb has-photo"><img src="${unit.photoUrl}" alt="" loading="lazy" /></span>`
+                    : `<span class="demo-unit-thumb">${this.initials(unit.brand)}</span>`
+                }
                 <div>
                   <b>${unit.brand} ${unit.type}</b>
-                  <span>${unit.color} · ${unit.year} · ${unit.photos} foto</span>
+                  <span>${unit.color} · ${unit.year} · ${unit.photos || 0} foto</span>
                 </div>
               </div>
             </td>
@@ -1715,6 +1724,21 @@ class InventoryProductDemo {
     this.root.querySelector("[data-detail-position]").textContent = unit.position;
     this.root.querySelector("[data-detail-aging]").textContent = `${unit.aging} hari`;
     this.root.querySelector("[data-detail-source]").textContent = unit.source;
+
+    const carVisual = this.root.querySelector(".demo-detail-car");
+    const carPhoto = this.root.querySelector("[data-detail-photo]");
+    if (carVisual && carPhoto) {
+      if (unit.photoUrl) {
+        carPhoto.src = unit.photoUrl;
+        carPhoto.hidden = false;
+        carPhoto.alt = `${unit.brand} ${unit.type}`;
+        carVisual.classList.add("has-photo");
+      } else {
+        carPhoto.removeAttribute("src");
+        carPhoto.hidden = true;
+        carVisual.classList.remove("has-photo");
+      }
+    }
 
     const bodyEl = this.root.querySelector("[data-detail-body]");
     const fuelEl = this.root.querySelector("[data-detail-fuel]");
@@ -5039,6 +5063,16 @@ class SocialGrowthDemo {
   async loadTenantPosts(force = false) {
     try {
       const snapshot = await publicDemoData.snapshot(force);
+      if (Array.isArray(snapshot.inventory) && snapshot.inventory.length) {
+        this.applyInventoryPhotos(
+          snapshot.inventory.map((unit) => ({
+            id: unit.id,
+            brand: unit.brand,
+            type: unit.type,
+            photoUrl: unit.photo_url || "",
+          })),
+        );
+      }
       if (snapshot.social_posts.length) {
         this.posts = snapshot.social_posts.map((post) => ({
           date: post.scheduled_at.slice(0, 10),
@@ -5409,6 +5443,32 @@ class SocialGrowthDemo {
     this.renderInsight();
   }
 
+  applyInventoryPhotos(units) {
+    if (!Array.isArray(units) || !units.length) return;
+    const tokens = {
+      zenix: ["zenix", "innova"],
+      brv: ["br-v", "brv"],
+      xpander: ["xpander"],
+      raize: ["raize"],
+      pajero: ["pajero"],
+      ertiga: ["ertiga"],
+      crv: ["cr-v", "crv"],
+      almaz: ["almaz"],
+    };
+    for (const vehicle of socialDemoVehicles) {
+      const keys = tokens[vehicle.id] || [vehicle.shortName.toLowerCase()];
+      const match = units.find((unit) => {
+        const hay = `${unit.brand || ""} ${unit.type || ""}`.toLowerCase();
+        return keys.some((key) => hay.includes(key));
+      });
+      if (match?.photoUrl) {
+        vehicle.photoUrl = match.photoUrl;
+        vehicle.unitId = match.id;
+      }
+    }
+    this.renderStudio();
+  }
+
   renderVehicles() {
     const countEl = this.root.querySelector("[data-social-vehicle-count]");
     if (countEl) countEl.textContent = `${socialDemoVehicles.length} unit ready`;
@@ -5416,9 +5476,12 @@ class SocialGrowthDemo {
     this.vehicleOptions.innerHTML = socialDemoVehicles
       .map((vehicle) => {
         const featureHint = (vehicle.features || []).slice(0, 2).join(" · ");
+        const thumb = vehicle.photoUrl
+          ? `<span class="social-vehicle-thumb has-photo" style="--car-color:${vehicle.color}"><img src="${vehicle.photoUrl}" alt="" loading="lazy" /></span>`
+          : `<span class="social-vehicle-thumb" style="--car-color:${vehicle.color}"></span>`;
         return `
           <button class="social-vehicle-card ${vehicle.id === this.vehicleId ? "active" : ""}" type="button" data-social-vehicle="${vehicle.id}">
-            <span class="social-vehicle-thumb" style="--car-color:${vehicle.color}"></span>
+            ${thumb}
             <span>
               <b>${vehicle.shortName}</b>
               <small>${vehicle.year} · ${vehicle.price}</small>
@@ -5451,14 +5514,22 @@ class SocialGrowthDemo {
       story: "Instagram Story · 9:16",
     };
     const creative = this.root.querySelector("[data-social-creative]");
-    creative.className = `social-creative-frame ${this.format}`;
+    creative.className = `social-creative-frame ${this.format}${vehicle.photoUrl ? " has-photo" : ""}`;
     this.root.querySelector("[data-social-preview-format]").textContent = formatLabels[this.format];
     this.root.querySelector("[data-social-creative-title]").textContent = vehicle.name;
     const featureTag = (vehicle.features || [])[0];
     this.root.querySelector("[data-social-creative-year]").textContent = featureTag
       ? `${vehicle.year} · ${vehicle.specs} · ${featureTag}`
       : `${vehicle.year} · ${vehicle.specs}`;
-    this.root.querySelector("[data-social-car-art]").style.setProperty("--preview-car", vehicle.color);
+    const carArt = this.root.querySelector("[data-social-car-art]");
+    carArt.style.setProperty("--preview-car", vehicle.color);
+    if (vehicle.photoUrl) {
+      carArt.style.backgroundImage = `url("${vehicle.photoUrl}")`;
+      carArt.classList.add("has-photo");
+    } else {
+      carArt.style.backgroundImage = "";
+      carArt.classList.remove("has-photo");
+    }
     const platformCount = this.platforms.size;
     this.root.querySelector("[data-social-platform-count]").textContent =
       `${platformCount} platform`;
@@ -5677,8 +5748,12 @@ class SocialGrowthDemo {
 }
 
 const socialDemoMount = document.getElementById("socialDemo");
+let socialGrowthDemoInstance = null;
 if (socialDemoMount) {
-  new SocialGrowthDemo(socialDemoMount);
+  socialGrowthDemoInstance = new SocialGrowthDemo(socialDemoMount);
+  window.__motovaxApplyInventoryPhotos = (units) => {
+    socialGrowthDemoInstance?.applyInventoryPhotos(units);
+  };
 }
 
 const insightDemoSources = [
