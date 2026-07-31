@@ -548,7 +548,7 @@ class InventoryProductDemo {
   }
 
   guideSteps() {
-    const samples = this.sampleUnitNames();
+    const story = this.falconStoryLabel();
     return [
       {
         view: "units",
@@ -579,11 +579,11 @@ class InventoryProductDemo {
       {
         view: "falcon",
         title: "Sales: cek stok unit",
-        body: `Tanya unit (unit_query). Contoh: “Halo mau tanya ${samples.join(", ")}”.`,
+        body: `Tanya satu unit (unit_query). Contoh: “Halo, mau tanya ${story} dong, masih ready?”.`,
         enter: () => {
           this.setFalconRole("sales");
           this.sendFalconUserMessage(
-            `Halo mau tanya ${samples.join(", ")}`,
+            `Halo, mau tanya ${story} dong, masih ready?`,
             { fromGuide: true },
           );
         },
@@ -591,21 +591,27 @@ class InventoryProductDemo {
       {
         view: "falcon",
         title: "Sales: minta foto unit",
-        body: "photo_send — fokus 1 unit, Falcon balas 3 foto (depan · samping · interior).",
-        enter: () => this.sendFalconUserMessage("Minta foto", { fromGuide: true }),
+        body: `Lanjut unit yang sama — “Boleh minta fotonya? Depan, samping, sama interior”.`,
+        enter: () =>
+          this.sendFalconUserMessage("Boleh minta fotonya? Depan, samping, sama interior", {
+            fromGuide: true,
+          }),
       },
       {
         view: "falcon",
         title: "Sales: upload foto stok",
-        body: "📎 update unit yang sama: +2 foto baru → total 5 foto berbeda.",
+        body: "📎 update galeri unit yang sama: +2 foto baru → total 5 foto.",
         enter: () => this.simulateFalconPhotoUpload({ fromGuide: true }),
       },
       {
         view: "falcon",
         title: "Sales: simulasi kredit",
-        body: "finance_simulation — coba “Simulasi kredit 20% DP 48 bulan”.",
+        body: `finance_simulation — “Simulasi kredit ${story} DP 20% tenor 48 bulan”.`,
         enter: () =>
-          this.sendFalconUserMessage("Simulasi kredit 20% DP 48 bulan", { fromGuide: true }),
+          this.sendFalconUserMessage(
+            `Simulasi kredit ${story} DP 20% tenor 48 bulan`,
+            { fromGuide: true },
+          ),
       },
       {
         view: "falcon",
@@ -616,11 +622,12 @@ class InventoryProductDemo {
       {
         view: "falcon",
         title: "Sales: catat lead",
-        body: "lead_own — “Catat lead Budi 08123456789 minat Innova”.",
+        body: "lead_own — catat lead minat unit yang sama (Serena).",
         enter: () =>
-          this.sendFalconUserMessage("Catat lead Budi 08123456789 minat Innova", {
-            fromGuide: true,
-          }),
+          this.sendFalconUserMessage(
+            `Catat lead Budi 08123456789 minat ${this.falconStoryLabel()}`,
+            { fromGuide: true },
+          ),
       },
       {
         view: "falcon",
@@ -737,6 +744,24 @@ class InventoryProductDemo {
       .slice(0, 3);
     const pool = ready.length ? ready : (this.units.length ? this.units : inventoryDemoSeed).slice(0, 3);
     return pool.map((u) => `${u.brand} ${u.type}`);
+  }
+
+  /** Satu unit “cerita” demo Falcon — prioritaskan Serena agar alur tanya → foto → update nyambung. */
+  falconStoryUnit() {
+    const source = this.units.length ? this.units : inventoryDemoSeed;
+    const prefer = source.find((u) =>
+      `${u.brand} ${u.type}`.toLocaleLowerCase("id").includes("serena"),
+    );
+    if (prefer) return prefer;
+    const ready = source.find(
+      (u) => String(u.status).toUpperCase().includes("READY") || u.status === "UNIT READY",
+    );
+    return ready || source[0] || null;
+  }
+
+  falconStoryLabel() {
+    const u = this.falconStoryUnit();
+    return u ? `${u.brand} ${u.type}` : "Nissan Serena HWS AT";
   }
 
   async loadTenantData(force = false) {
@@ -1596,15 +1621,15 @@ class InventoryProductDemo {
 
   renderFalconQuickPrompts() {
     if (!this.falconQuickPrompts) return;
-    const samples = this.sampleUnitNames();
+    const story = this.falconStoryLabel();
     const sales = [
-      `Halo mau tanya ${samples.slice(0, 2).join(" dan ")}`,
-      "Minta foto",
-      "Simulasi kredit 20% DP 48 bulan",
+      `Halo, mau tanya ${story} dong, masih ready?`,
+      "Boleh minta fotonya? Depan, samping, sama interior",
+      `Simulasi kredit ${story} DP 20% tenor 48 bulan`,
       "Lokasi showroom",
-      "Catat lead Budi 08123456789 minat Innova",
+      `Catat lead Budi 08123456789 minat ${story}`,
       "Hubungkan customer ke admin",
-      "Buat caption promo unit",
+      `Buat caption promo ${story}`,
       "Performa sales saya",
       "Tampilkan semua fitur sales",
       "Laporan aging stok",
@@ -1745,31 +1770,33 @@ class InventoryProductDemo {
     return `https://mobix.motovax.com/api/public/demo/motovax-ai/units/${id}/cover?i=${index}`;
   }
 
-  /** Pick a single focus unit for Falcon photo flows (prefer Ready + resolvable cover). */
+  /** Pick a single focus unit for Falcon photo flows (story unit → Serena by default). */
   pickFocusUnit(text = "") {
     if (this.falconFocus?.unit) {
-      // Keep the same unit across minta foto → update foto in one demo session.
+      // Keep the same unit across tanya → minta foto → update in one demo session.
       const live =
         this.units.find((u) => u.id === this.falconFocus.unit.id) || this.falconFocus.unit;
       this.falconFocus.unit = live;
       return live;
     }
-    const matched = this.pickUnitsForChat(text, 8);
-    const pool = matched.length
-      ? matched
-      : (this.units.length ? this.units : inventoryDemoSeed).filter(
-          (u) => String(u.status).toUpperCase().includes("READY") || u.status === "UNIT READY",
-        );
-    const sorted = [...pool].sort(
-      (a, b) => Number(Boolean(this.resolveDemoUnitId(b))) - Number(Boolean(this.resolveDemoUnitId(a))),
-    );
-    const unit = sorted[0] || (this.units[0] || inventoryDemoSeed[0]);
+
+    // Prefer explicit match from the user message; otherwise the story unit (Serena).
+    const matched = this.pickUnitsForChat(text, 4);
+    const story = this.falconStoryUnit();
+    let unit = null;
+    if (matched.length && String(text || "").trim()) {
+      // If the user named a model, use the best match; else fall back to story unit.
+      const q = String(text).toLocaleLowerCase("id");
+      const named = matched.find((u) => {
+        const hay = `${u.brand} ${u.type}`.toLocaleLowerCase("id");
+        return hay.split(/\s+/).some((tok) => tok.length > 3 && q.includes(tok));
+      });
+      unit = named || matched[0];
+    }
+    if (!unit) unit = story || matched[0] || this.units[0] || inventoryDemoSeed[0];
+
     if (unit) {
-      this.falconFocus = {
-        unit,
-        gallery: [],
-      };
-      // Seed baseline 3 gallery slots for this unit (depan/samping/interior).
+      this.falconFocus = { unit, gallery: [] };
       this.ensureFocusGalleryBase();
     }
     return unit;
@@ -1841,7 +1868,9 @@ class InventoryProductDemo {
       return card;
     });
 
-    const userText = `tolong update unit ${unit.brand} ${unit.type} dengan nopol ${unit.plate || "—"}`;
+    const userText =
+      `Tolong update unit ${unit.brand} ${unit.type} dengan nopol ${unit.plate || "—"}.\n` +
+      `Saya kirim 2 foto tambahan (mesin & dashboard) ya.`;
     this.pushFalconUser(userText, { photo: true, photos: newPhotos });
     this.renderFalconMessages();
 
@@ -1864,11 +1893,10 @@ class InventoryProductDemo {
       }));
 
       this.pushFalconBot(
-        `Foto diterima ✅ Unit ${unit.brand} ${unit.type} (nopol ${unit.plate || "—"})\n` +
-          `• Sebelumnya: ${beforeCount} foto\n` +
-          `• Ditambah: ${newPhotos.length} foto baru (${newPhotos.map((p) => p.label).join(", ")})\n` +
-          `• Sekarang: ${afterCount} foto berbeda di galeri unit ini\n\n` +
-          `Di Mobix upload WA memutakhirkan galeri unit tenant. Demo landing hanya update stok di sesi ini.`,
+        `Siap ✅ Foto untuk ${unit.brand} ${unit.type} (nopol ${unit.plate || "—"}) sudah saya tautkan.\n\n` +
+          `Galeri unit ini: ${beforeCount} foto → +${newPhotos.length} baru → sekarang ${afterCount} foto ` +
+          `(depan, samping, interior, ${newPhotos.map((p) => p.label.replace(/^Foto\s+/i, "").toLowerCase()).join(", ")}).\n\n` +
+          `Kalau mau, bilang saja untuk simulasi kredit atau jadwal survey.`,
         { photos: allPhotos },
       );
       this.markFalconTutorial(this.falconRole === "sales" ? "upload" : "import");
@@ -1984,10 +2012,10 @@ class InventoryProductDemo {
     }
 
     // 8) Foto — always one focus unit, multiple angles
-    if (/minta foto|kirim foto|foto unit|lihat foto/.test(text)) {
+    if (/minta foto|kirim foto|foto unit|lihat foto|fotonya|foto depan|foto samping|foto interior/.test(text)) {
       const unit = this.pickFocusUnit(raw);
       if (!unit) {
-        return { text: "Belum ada unit cocok. Sebut merek/tipe unit dulu, ya." };
+        return { text: "Unit-nya yang mana dulu, Kak? Misalnya sebut Serena atau nopol-nya." };
       }
       this.ensureFocusGalleryBase();
       const photos = this.focusGalleryCards([0, 1, 2]);
@@ -1996,12 +2024,10 @@ class InventoryProductDemo {
         tutorialId: isSales ? "photo" : undefined,
         photos,
         text:
-          `Detail unit (photo_send):\n` +
-          `• ${unit.brand} ${unit.type} ${unit.year || ""}\n` +
-          `• Nopol ${unit.plate || "—"}\n` +
-          `• Status ${this.statusLabel(unit.status)} · ${this.titleCase(unit.branch || "-")}\n` +
-          `• Galeri: ${live.photos || photos.length} foto\n\n` +
-          `Saya kirim 3 foto unit ini: depan, samping, dan interior (dari galeri tenant demo).`,
+          `Siap, ini galeri ${unit.brand} ${unit.type} (nopol ${unit.plate || "—"}) — ` +
+          `${this.statusLabel(unit.status)} di ${this.titleCase(unit.branch || "cabang demo")}.\n\n` +
+          `Saya kirim 3 foto: depan, samping, dan interior. Total di galeri unit ini sekarang ${live.photos || photos.length} foto.\n` +
+          `Kalau ada foto tambahan (mesin/dashboard), bisa dikirim lewat lampiran 📎 biar saya update stoknya.`,
       };
     }
 
@@ -2060,25 +2086,33 @@ class InventoryProductDemo {
       };
     }
 
-    // 13) Unit query / stok
+    // 13) Unit query / stok — satu unit fokus biar alur foto nyambung
     if (
       /unit|stok|tanya|halo|ready|innova|xpander|rush|hr-v|mobilio|serena|toyota|honda|mitsubishi|nissan|daihatsu|bmw|mazda/.test(
         text,
       )
     ) {
-      const units = this.pickUnitsForChat(text, 3);
-      if (!units.length) {
+      const unit = this.pickFocusUnit(raw);
+      if (!unit) {
         return {
           text: "Stok demo belum termuat. Coba buka Manajemen Unit dulu atau Reset demo.",
         };
       }
-      const lines = units.map(
-        (u) =>
-          `• ${u.brand} ${u.type} ${u.year} — ${this.statusLabel(u.status)} · ${this.titleCase(u.branch || "-")} · OTR ${this.formatCompactPrice(u.cashPrice || u.cash_price || 0)}`,
-      );
+      const price = this.formatCompactPrice(unit.cashPrice || unit.cash_price || 0);
+      const km =
+        typeof unit.odometer === "number"
+          ? `${unit.odometer.toLocaleString("id-ID")} KM`
+          : "—";
       return {
         tutorialId: isSales ? "unit" : undefined,
-        text: `Berikut unit yang cocok (unit_query, data demo real-like):\n${lines.join("\n")}\n\nMau foto, simulasi kredit, atau detail salah satu unit?`,
+        text:
+          `Boleh, Kak. ${unit.brand} ${unit.type} ${unit.year || ""} masih ${this.statusLabel(unit.status)}.\n\n` +
+          `• Nopol: ${unit.plate || "—"}\n` +
+          `• Warna: ${unit.color || "—"}\n` +
+          `• Odometer: ${km}\n` +
+          `• Cabang: ${this.titleCase(unit.branch || "-")} · ${unit.position || "Showroom"}\n` +
+          `• OTR: ${price}\n\n` +
+          `Mau saya kirim fotonya, hitung simulasi kredit, atau langsung catat lead?`,
       };
     }
 
@@ -2094,21 +2128,21 @@ class InventoryProductDemo {
       "📦 Fitur Falcon — Sales Agent (dari Motovax / role Salesperson)\n\n" +
       "Yang BISA dilakukan:\n" +
       "1. Cek stok & detail unit — whatsapp:unit_query\n" +
-      "   Coba: “Halo mau tanya Innova / Xpander”\n" +
+      "   Coba: “Halo, mau tanya Nissan Serena HWS AT dong, masih ready?”\n" +
       "2. Minta foto unit — whatsapp:photo_send\n" +
-      "   Coba: “Minta foto” (foto real galeri tenant demo)\n" +
+      "   Coba: “Boleh minta fotonya? Depan, samping, sama interior”\n" +
       "3. Upload foto update stok (via lampiran WA)\n" +
-      "   Coba: tekan 📎 — pesan + 2–3 foto unit & nopol\n" +
+      "   Coba: tekan 📎 — update unit yang sama + nopol\n" +
       "4. Simulasi kredit & asuransi — whatsapp:finance_simulation\n" +
-      "   Coba: “Simulasi kredit 20% DP 48 bulan”\n" +
+      "   Coba: “Simulasi kredit Serena DP 20% tenor 48 bulan”\n" +
       "5. Lokasi showroom / map\n" +
       "   Coba: “Lokasi showroom”\n" +
       "6. Catat lead milik sendiri — whatsapp:lead_own\n" +
-      "   Coba: “Catat lead Budi 0812… minat Innova”\n" +
+      "   Coba: “Catat lead Budi 0812… minat Serena”\n" +
       "7. Handoff customer ke admin — whatsapp:handoff\n" +
       "   Coba: “Hubungkan customer ke admin”\n" +
       "8. Generate konten / caption — whatsapp:image_generation\n" +
-      "   Coba: “Buat caption promo unit”\n" +
+      "   Coba: “Buat caption promo Serena”\n" +
       "9. Performa sales sendiri — analytics:sales_performance\n" +
       "   Coba: “Performa sales saya”\n\n" +
       "Centang checklist di kiri sambil mencoba tiap fitur. Data demo, bukan production."
