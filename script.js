@@ -2922,7 +2922,7 @@ class OmnichannelAIDemo {
       const isOut = message.role === "assistant" || message.role === "agent" || message.role === "mr" || message.role === "system";
       row.className = `cc-msg ${isOut ? "out" : "in"} ${message.role}${message.blocked ? " blocked" : ""}`;
       const bubble = document.createElement("div");
-      bubble.className = "bubble";
+      bubble.className = "cc-bubble";
       bubble.textContent = message.content;
       const meta = document.createElement("div");
       meta.className = "meta";
@@ -3243,7 +3243,7 @@ class OmnichannelAIDemo {
       const isOut = message.role !== "customer";
       row.className = `cc-msg ${isOut ? "out" : ""} ${message.role}`;
       const bubble = document.createElement("div");
-      bubble.className = "bubble";
+      bubble.className = "cc-bubble";
       bubble.textContent = message.content;
       row.append(bubble);
       chat.appendChild(row);
@@ -3251,12 +3251,12 @@ class OmnichannelAIDemo {
     if (c.bucket === "mr" && c.mrUnanswered) {
       const row = document.createElement("div");
       row.className = "cc-msg out mr";
-      row.innerHTML = `<div class="bubble"><span class="cc-ai-badge" style="color:#ea580c">PREVIEW</span><br/>MR belum membalas di production. Di preview ini Anda melihat shell role MR.</div>`;
+      row.innerHTML = `<div class="cc-bubble"><span class="cc-ai-badge" style="color:#ea580c">PREVIEW</span><br/>MR belum membalas di production. Di preview ini Anda melihat shell role MR.</div>`;
       chat.appendChild(row);
     } else if (c.bucket !== "mr") {
       const row = document.createElement("div");
       row.className = "cc-msg out mr";
-      row.innerHTML = `<div class="bubble">Preview role MR. Lakukan Handoff dulu agar lead benar-benar pindah bucket MR (seperti produksi).</div>`;
+      row.innerHTML = `<div class="cc-bubble">Preview role MR. Lakukan Handoff dulu agar lead benar-benar pindah bucket MR (seperti produksi).</div>`;
       chat.appendChild(row);
     }
     this.openModal("mr");
