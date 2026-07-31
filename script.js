@@ -581,6 +581,14 @@ class InventoryProductDemo {
       this.sendFalconUserMessage(chip.dataset.falconPrompt || chip.textContent);
     });
 
+    this._onGuideReposition = () => {
+      if (!this.guide.hidden) this.positionGuide();
+    };
+    window.addEventListener("resize", this._onGuideReposition);
+    this.root.querySelector(".demo-workspace")?.addEventListener("scroll", this._onGuideReposition, {
+      passive: true,
+    });
+
     document.addEventListener("keydown", (event) => {
       if (event.key !== "Escape" || !this.root.classList.contains("is-open")) return;
       if (!this.toast.hidden) {
@@ -694,6 +702,92 @@ class InventoryProductDemo {
 
   closeGuide() {
     this.guide.hidden = true;
+    this.clearGuidePosition();
+  }
+
+  clearGuidePosition() {
+    if (!this.guide) return;
+    this.guide.classList.remove("is-falcon-anchor");
+    this.guide.style.top = "";
+    this.guide.style.left = "";
+    this.guide.style.right = "";
+    this.guide.style.bottom = "";
+    this.guide.style.maxWidth = "";
+  }
+
+  /**
+   * Posisikan popover panduan agar tidak menutupi mockup iPhone di view AI Falcon.
+   * Langkah non-Falcon tetap di kanan atas (CSS default).
+   */
+  positionGuide() {
+    if (!this.guide || this.guide.hidden) return;
+
+    const steps = this.guideSteps();
+    const step = steps[this.guideStepIndex] || steps[0];
+    const isFalcon = step?.view === "falcon";
+
+    if (!isFalcon) {
+      this.clearGuidePosition();
+      return;
+    }
+
+    this.guide.classList.add("is-falcon-anchor");
+
+    const rectIsVisible = (el) => {
+      const r = el.getBoundingClientRect();
+      return r.width > 0 && r.height > 0;
+    };
+
+    const place = () => {
+      if (!this.guide || this.guide.hidden) return;
+      const phone = this.root.querySelector(".iphone-frame");
+      if (!phone || !rectIsVisible(phone)) {
+        // Fallback: kiri area workspace, jauh dari mockup iPhone
+        this.guide.style.top = "92px";
+        this.guide.style.right = "auto";
+        this.guide.style.left = "16px";
+        this.guide.style.bottom = "auto";
+        return;
+      }
+
+      const rect = phone.getBoundingClientRect();
+      const gw = Math.min(330, window.innerWidth - 32);
+      const gh = this.guide.offsetHeight || 200;
+      const gap = 16;
+      const minTop = 76;
+
+      let left = rect.left - gw - gap;
+      let top = rect.top;
+
+      if (left >= 12) {
+        // Cukup ruang di kiri iPhone — letakkan di samping (kolom role panel)
+        top = Math.max(minTop, Math.min(top, window.innerHeight - gh - 16));
+      } else {
+        // Layout sempit / stacked: di atas iPhone, atau di bawah jika tidak muat
+        left = Math.max(12, Math.min(rect.left, window.innerWidth - gw - 12));
+        top = rect.top - gh - gap;
+        if (top < minTop) {
+          top = Math.min(rect.bottom + gap, window.innerHeight - gh - 16);
+          left = Math.max(
+            12,
+            Math.min(rect.left + (rect.width - gw) / 2, window.innerWidth - gw - 12),
+          );
+        }
+      }
+
+      this.guide.style.top = `${Math.round(top)}px`;
+      this.guide.style.left = `${Math.round(left)}px`;
+      this.guide.style.right = "auto";
+      this.guide.style.bottom = "auto";
+      this.guide.style.maxWidth = `${gw}px`;
+    };
+
+    // Tunggu layout view Falcon + bubble chat selesai
+    requestAnimationFrame(() => {
+      requestAnimationFrame(place);
+      // enter() bisa menambah bubble; reposisi sekali lagi setelah layout stabil
+      window.setTimeout(place, 80);
+    });
   }
 
   renderGuideStep() {
@@ -719,6 +813,7 @@ class InventoryProductDemo {
 
     if (step.view) this.setView(step.view);
     if (typeof step.enter === "function") step.enter();
+    this.positionGuide();
   }
 
   nextGuideStep() {

@@ -3392,6 +3392,19 @@ body.demo-open {
   box-shadow: 0 24px 70px rgba(15, 23, 42, 0.22);
 }
 
+/* Saat langkah AI Falcon: popover diposisikan JS di kiri mockup iPhone (tidak menimpa) */
+.demo-guide-popover.is-falcon-anchor {
+  right: auto;
+  pointer-events: auto;
+  box-shadow: 0 24px 70px rgba(15, 23, 42, 0.28);
+}
+
+/* Pastikan mockup iPhone tetap di atas konten workspace, di bawah popover panduan */
+.falcon-demo-layout .iphone-frame {
+  position: relative;
+  z-index: 1;
+}
+
 .demo-guide-popover > button {
   position: absolute;
   top: 12px;
