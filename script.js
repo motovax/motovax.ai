@@ -1825,23 +1825,48 @@ if (inventoryDemoMount) {
   new InventoryProductDemo(inventoryDemoMount);
 }
 
+const crmIntentLabels = {
+  aware: "Contacted",
+  considering: "Interested",
+  comparing: "Viewing",
+  ready_to_buy: "Negotiation",
+  postponed: "Postponed",
+};
+
+function crmResolveUnit(unitId) {
+  return inventoryDemoSeed.find((u) => u.id === unitId) || null;
+}
+
+function crmUnitLabel(unit) {
+  if (!unit) return "Unit Motovax";
+  return `${unit.brand} ${unit.type} ${unit.year}`;
+}
+
+function crmLeadValue(lead) {
+  if (typeof lead.value === "number" && lead.value > 0) return lead.value;
+  const unit = crmResolveUnit(lead.unitId);
+  return unit?.cashPrice || 0;
+}
+
 const crmDemoSeed = [
   {
     id: "lead-nadia",
     name: "Nadia Demo",
-    unit: "Mitsubishi Xpander Ultimate 2023",
+    unitId: "unit-006",
     stage: "warm",
     score: 62,
-    value: 320000000,
+    value: null,
     days: 8,
     source: "whatsapp",
+    intent: "considering",
     handler: "AI Bot · Dimas",
     ai: true,
+    phone: "62812****901",
     summary:
-      "Nadia menanyakan cicilan Xpander dan sudah menyebut kisaran uang muka. Respons terakhir positif, tetapi belum ada tindak lanjut selama 8 hari.",
+      "Nadia menanyakan cicilan Xpander Ultimate dan sudah menyebut kisaran uang muka. Respons terakhir positif, tetapi belum ada tindak lanjut selama 8 hari.",
     recommendation: "Kirim simulasi cicilan dan tawarkan jadwal test drive.",
     message:
-      "Halo Kak Nadia, saya Dimas dari Motovax. Simulasi cicilan Xpander Ultimate yang Kakak tanyakan sudah siap. Apakah saya boleh kirimkan rinciannya sekaligus bantu jadwalkan test drive minggu ini?",
+      "Halo Kak Nadia, saya Dimas dari Motovax. Simulasi cicilan Xpander Ultimate (B 1206 MVX) yang Kakak tanyakan sudah siap. Boleh saya kirimkan rinciannya sekaligus bantu jadwalkan test drive minggu ini?",
     events: [
       { icon: "WA", title: "Menanyakan simulasi cicilan", detail: "WhatsApp masuk", time: "8 hari lalu" },
       { icon: "AI", title: "AI mengidentifikasi minat tinggi", detail: "Intent: financing", time: "8 hari lalu" },
@@ -1851,18 +1876,20 @@ const crmDemoSeed = [
   {
     id: "lead-bayu",
     name: "Bayu Prakoso",
-    unit: "Toyota Raize GR Sport 2022",
+    unitId: "unit-012",
     stage: "cold",
     score: 28,
-    value: 236000000,
+    value: null,
     days: 2,
     source: "instagram",
+    intent: "aware",
     handler: "AI Bot · Rani",
     ai: true,
-    summary: "Bayu menyimpan konten unit dari Instagram dan baru menanyakan ketersediaan warna.",
-    recommendation: "Kirim pilihan warna dan foto unit yang tersedia.",
+    phone: "62813****442",
+    summary: "Bayu menyimpan konten Raize GR Sport dari Instagram dan baru menanyakan ketersediaan warna.",
+    recommendation: "Kirim pilihan warna dan foto unit stok yang tersedia.",
     message:
-      "Halo Kak Bayu, warna Toyota Raize yang Kakak tanyakan masih tersedia. Saya bisa kirim foto unit dan detail harganya di sini.",
+      "Halo Kak Bayu, warna Toyota Raize GR Sport yang Kakak tanyakan masih tersedia di showroom Cinere. Saya bisa kirim foto unit dan detail harganya di sini.",
     events: [
       { icon: "IG", title: "Membalas Instagram Story", detail: "Instagram DM", time: "2 hari lalu" },
       { icon: "AI", title: "AI menjawab ketersediaan", detail: "Respons otomatis", time: "2 hari lalu" },
@@ -1871,18 +1898,20 @@ const crmDemoSeed = [
   {
     id: "lead-sinta",
     name: "Sinta Maharani",
-    unit: "Honda BR-V Prestige 2021",
+    unitId: "unit-010",
     stage: "cold",
     score: 34,
-    value: 255000000,
+    value: null,
     days: 5,
     source: "facebook",
+    intent: "aware",
     handler: "AI Bot",
     ai: true,
-    summary: "Sinta mengisi formulir iklan dan tertarik menukar unit lama, tetapi belum memberi detail kendaraan.",
+    phone: "62821****118",
+    summary: "Sinta mengisi formulir iklan BR-V dan tertarik trade-in, tetapi belum memberi detail unit lama.",
     recommendation: "Minta data singkat unit trade-in untuk estimasi awal.",
     message:
-      "Halo Kak Sinta, terima kasih sudah tertarik dengan Honda BR-V. Boleh kirim tipe, tahun, dan foto unit lama Kakak agar tim kami bantu estimasi trade-in?",
+      "Halo Kak Sinta, terima kasih sudah tertarik dengan Honda BR-V Prestige. Boleh kirim tipe, tahun, dan foto unit lama agar tim kami bantu estimasi trade-in?",
     events: [
       { icon: "FB", title: "Lead dari Facebook Ads", detail: "Form iklan", time: "5 hari lalu" },
       { icon: "AI", title: "Lead berhasil dikualifikasi", detail: "Minat: trade-in", time: "5 hari lalu" },
@@ -1891,15 +1920,17 @@ const crmDemoSeed = [
   {
     id: "lead-andi",
     name: "Andi Saputra",
-    unit: "Toyota Rush G AT 2022",
+    unitId: "unit-002",
     stage: "warm",
     score: 55,
-    value: 190000000,
+    value: null,
     days: 4,
     source: "excel_import",
+    intent: "considering",
     handler: "Ayu",
     ai: false,
-    summary: "Andi berasal dari daftar pameran dan sudah menerima katalog harga.",
+    phone: "62856****773",
+    summary: "Andi berasal dari daftar pameran dan sudah menerima katalog harga Rush G AT.",
     recommendation: "Konfirmasi kebutuhan tenor dan target pembelian.",
     message:
       "Halo Pak Andi, saya Ayu dari Motovax. Apakah katalog Toyota Rush sudah sempat dilihat? Saya bisa bantu hitungkan cicilan sesuai tenor yang Bapak inginkan.",
@@ -1911,18 +1942,20 @@ const crmDemoSeed = [
   {
     id: "lead-farhan",
     name: "Farhan Rizki",
-    unit: "Honda HR-V S CVT 2020",
+    unitId: "unit-004",
     stage: "warm",
     score: 58,
-    value: 248000000,
+    value: null,
     days: 7,
     source: "whatsapp",
+    intent: "comparing",
     handler: "AI Bot · Dimas",
     ai: true,
-    summary: "Farhan meminta video kondisi interior dan membandingkan dua pilihan unit.",
+    phone: "62818****905",
+    summary: "Farhan meminta video kondisi interior HR-V dan membandingkan dua pilihan unit.",
     recommendation: "Kirim video walkaround dan tekankan hasil inspeksi.",
     message:
-      "Halo Kak Farhan, video interior HR-V dan ringkasan inspeksinya sudah siap. Saya kirimkan sekarang agar Kakak bisa membandingkan kedua unitnya.",
+      "Halo Kak Farhan, video interior HR-V S CVT dan ringkasan inspeksinya sudah siap. Saya kirimkan sekarang agar Kakak bisa membandingkan kedua unitnya.",
     events: [
       { icon: "WA", title: "Meminta video unit", detail: "WhatsApp masuk", time: "7 hari lalu" },
       { icon: "AI", title: "Kebutuhan dicatat AI", detail: "Intent: unit comparison", time: "7 hari lalu" },
@@ -1931,18 +1964,20 @@ const crmDemoSeed = [
   {
     id: "lead-rizky",
     name: "Rizky Ramadhan",
-    unit: "Suzuki Ertiga GX Hybrid 2023",
+    unitId: "unit-007",
     stage: "hot",
     score: 88,
-    value: 243000000,
+    value: null,
     days: 1,
     source: "whatsapp",
+    intent: "ready_to_buy",
     handler: "Rani",
     ai: false,
-    summary: "Rizky sudah menyetujui kisaran cicilan dan ingin melihat unit akhir pekan ini.",
-    recommendation: "Kunci jadwal test drive dan siapkan unit.",
+    phone: "62877****221",
+    summary: "Rizky sudah menyetujui kisaran cicilan Ertiga Hybrid dan ingin melihat unit akhir pekan ini.",
+    recommendation: "Kunci jadwal test drive dan siapkan unit di Bekasi.",
     message:
-      "Halo Pak Rizky, kami siap jadwalkan test drive Ertiga Hybrid akhir pekan ini. Bapak lebih nyaman datang Sabtu atau Minggu?",
+      "Halo Pak Rizky, kami siap jadwalkan test drive Ertiga GX Hybrid akhir pekan ini. Bapak lebih nyaman datang Sabtu atau Minggu?",
     events: [
       { icon: "WA", title: "Menyetujui kisaran cicilan", detail: "WhatsApp", time: "1 hari lalu" },
       { icon: "R", title: "Rani menawarkan test drive", detail: "Aktivitas sales", time: "1 hari lalu" },
@@ -1951,15 +1986,17 @@ const crmDemoSeed = [
   {
     id: "lead-laras",
     name: "Laras Wulandari",
-    unit: "Daihatsu Rocky 1.2 X CVT 2022",
+    unitId: "unit-009",
     stage: "hot",
     score: 79,
-    value: 189000000,
+    value: null,
     days: 3,
     source: "instagram",
+    intent: "ready_to_buy",
     handler: "AI Bot · Ayu",
     ai: true,
-    summary: "Laras sudah mengirim KTP untuk pengecekan awal dan menunggu pilihan paket pembiayaan.",
+    phone: "62896****334",
+    summary: "Laras sudah mengirim KTP untuk pengecekan awal Rocky dan menunggu paket pembiayaan.",
     recommendation: "Kirim dua opsi paket pembiayaan terbaik.",
     message:
       "Halo Kak Laras, pengecekan awal sudah selesai. Saya punya dua pilihan paket pembiayaan Rocky yang paling sesuai. Boleh saya kirimkan perbandingannya?",
@@ -1971,15 +2008,17 @@ const crmDemoSeed = [
   {
     id: "lead-yoga",
     name: "Yoga Permana",
-    unit: "Toyota Avanza G CVT 2022",
+    unitId: "unit-008",
     stage: "prospect",
     score: 91,
-    value: 229000000,
+    value: null,
     days: 1,
     source: "walk_in",
+    intent: "ready_to_buy",
     handler: "Dimas",
     ai: false,
-    summary: "Yoga sudah test drive, memilih unit, dan sedang melengkapi dokumen pemesanan.",
+    phone: "62811****667",
+    summary: "Yoga sudah test drive Avanza, memilih unit, dan sedang melengkapi dokumen pemesanan.",
     recommendation: "Pastikan kelengkapan dokumen dan konfirmasi metode pembayaran.",
     message:
       "Halo Pak Yoga, terima kasih sudah test drive Avanza. Saya bantu cek kembali kelengkapan dokumen agar proses pemesanannya bisa segera dilanjutkan.",
@@ -1991,22 +2030,80 @@ const crmDemoSeed = [
   {
     id: "lead-maya",
     name: "Maya Lestari",
-    unit: "Nissan Serena HWS AT 2023",
+    unitId: "unit-001",
     stage: "prospect",
     score: 86,
-    value: 350000000,
+    value: null,
     days: 2,
     source: "excel_import",
+    intent: "comparing",
     handler: "Ayu",
     ai: false,
-    summary: "Maya telah menerima penawaran final dan meminta waktu untuk persetujuan keluarga.",
+    phone: "62852****890",
+    summary: "Maya telah menerima penawaran final Serena HWS dan meminta waktu untuk persetujuan keluarga.",
     recommendation: "Follow-up singkat dengan masa berlaku penawaran.",
     message:
-      "Halo Ibu Maya, saya ingin mengingatkan bahwa penawaran Serena berlaku sampai Jumat. Jika ada bagian yang ingin didiskusikan bersama keluarga, saya siap membantu.",
+      "Halo Ibu Maya, saya ingin mengingatkan bahwa penawaran Serena HWS berlaku sampai Jumat. Jika ada bagian yang ingin didiskusikan bersama keluarga, saya siap membantu.",
     events: [
       { icon: "XL", title: "Lead pelanggan lama", detail: "Excel Import", time: "9 hari lalu" },
       { icon: "A", title: "Penawaran final dikirim", detail: "Ayu", time: "2 hari lalu" },
     ],
+  },
+];
+
+const crmClosedSeed = [
+  {
+    id: "closed-raka",
+    name: "Raka Demo",
+    unitId: "unit-011",
+    status: "deal",
+    value: null,
+  },
+  {
+    id: "closed-putri",
+    name: "Putri Demo",
+    unitId: "unit-004",
+    status: "handover",
+    value: null,
+  },
+];
+
+const crmAutoFollowPrograms = [
+  {
+    id: "af-nurture",
+    name: "New Lead Nurture 24j",
+    type: "Nurture",
+    channel: "WhatsApp",
+    schedule: "Setiap hari 09:00",
+    contacts: 42,
+    active: true,
+  },
+  {
+    id: "af-warm",
+    name: "Warm ≥7 hari",
+    type: "Follow-up",
+    channel: "WhatsApp",
+    schedule: "Sen–Jum 10:00",
+    contacts: 18,
+    active: true,
+  },
+  {
+    id: "af-hot",
+    name: "Hot closing push",
+    type: "Hot FU",
+    channel: "WA + Call task",
+    schedule: "Setiap hari 14:00",
+    contacts: 11,
+    active: true,
+  },
+  {
+    id: "af-reeng",
+    name: "Re-engagement Cold 30h",
+    type: "Re-engagement",
+    channel: "WhatsApp",
+    schedule: "Rabu 11:00",
+    contacts: 27,
+    active: false,
   },
 ];
 
@@ -2021,16 +2118,25 @@ class AutopilotCRMDemo {
   constructor(root) {
     this.root = root;
     this.leads = this.cloneSeed();
+    this.closed = this.cloneClosed();
+    this.programs = crmAutoFollowPrograms.map((p) => ({ ...p }));
+    this.cycleRun = 0;
     this.source = "all";
     this.query = "";
+    this.customerQuery = "";
     this.mobileStage = "cold";
+    this.view = "pipeline";
     this.selectedId = null;
     this.lastFocusedElement = null;
     this.hasOpenedGuide = false;
+    this.guideStepIndex = 0;
 
     this.board = root.querySelector("[data-crm-board]");
     this.stageTabs = root.querySelector("[data-crm-stage-tabs]");
     this.searchInput = root.querySelector("[data-crm-search]");
+    this.customerList = root.querySelector("[data-crm-customer-list]");
+    this.customerSearch = root.querySelector("[data-crm-customer-search]");
+    this.afList = root.querySelector("[data-crm-af-list]");
     this.detailPanel = root.querySelector(".crm-detail-panel");
     this.detailBackdrop = root.querySelector("[data-crm-detail-backdrop]");
     this.guide = root.querySelector("[data-crm-guide-popover]");
@@ -2040,6 +2146,7 @@ class AutopilotCRMDemo {
     this.closedList = root.querySelector("[data-crm-closed-list]");
 
     this.bind();
+    this.switchView("pipeline");
     this.render();
   }
 
@@ -2048,6 +2155,96 @@ class AutopilotCRMDemo {
       ...lead,
       events: lead.events.map((event) => ({ ...event })),
     }));
+  }
+
+  cloneClosed() {
+    return crmClosedSeed.map((item) => ({ ...item }));
+  }
+
+  guideSteps() {
+    return [
+      {
+        view: "pipeline",
+        title: "Menu Autopilot CRM",
+        body: "Sidebar selaras Motovax: Customer, Pipeline, Auto Follow Customer, dan Panduan. Campaign diganti Auto Follow Customer.",
+        enter: () => this.highlightAnchor("sidebar"),
+      },
+      {
+        view: "pipeline",
+        title: "Pipeline & filter",
+        body: "Lihat nilai pipeline, forecast, dan KPI. Filter Semua / Omnichannel / Excel Import seperti di produk.",
+        enter: () => {
+          this.source = "all";
+          this.render();
+          this.highlightAnchor("kpi-grid");
+        },
+      },
+      {
+        view: "pipeline",
+        title: "Lead prioritas Nadia",
+        body: "Buka kartu Nadia Demo bertanda “Coba ini” — Warm, stale ≥7 hari, siap follow-up AI.",
+        enter: () => {
+          this.closeDetail();
+          this.source = "all";
+          this.mobileStage = "warm";
+          this.render();
+          this.highlightAnchor("board");
+          requestAnimationFrame(() => {
+            const card = this.root.querySelector('[data-lead-id="lead-nadia"]');
+            card?.scrollIntoView({ block: "nearest", behavior: "smooth" });
+            card?.focus();
+          });
+        },
+      },
+      {
+        view: "pipeline",
+        title: "Unit = stok Motovax",
+        body: "Detail lead menampilkan unit dari katalog inventory: plate, cabang, status, harga, dan fitur.",
+        enter: () => {
+          this.openDetail("lead-nadia", { keepGuide: true });
+          this.highlightAnchor("unit-card");
+        },
+      },
+      {
+        view: "pipeline",
+        title: "AI Co-Pilot",
+        body: "Baca ringkasan AI dan rekomendasi berikutnya — input untuk follow-up otomatis.",
+        enter: () => {
+          this.openDetail("lead-nadia", { keepGuide: true });
+          this.highlightAnchor("ai-summary");
+        },
+      },
+      {
+        view: "pipeline",
+        title: "Simulasi follow-up AI",
+        body: "Siapkan pesan WhatsApp buatan AI, lalu Kirim simulasi. Stage naik, skor naik — pesan tidak dikirim ke customer.",
+        enter: () => {
+          this.openDetail("lead-nadia", { keepGuide: true });
+          this.prepareFollowup();
+          this.highlightAnchor("followup");
+        },
+      },
+      {
+        view: "auto-follow",
+        title: "Auto Follow Customer",
+        body: "Program follow-up terjadwal (nurture, warm ≥7h, hot push). Ganti menu Campaign di Motovax.",
+        enter: () => {
+          this.closeDetail();
+          this.highlightAnchor("auto-follow");
+        },
+      },
+      {
+        view: "pipeline",
+        title: "Dampak di pipeline",
+        body: "Setelah follow-up, lead pindah kolom dan forecast berubah. Siap ditutup sales. Selesai — silakan eksplor bebas.",
+        enter: () => {
+          this.closeDetail();
+          this.mobileStage = this.leads.find((l) => l.id === "lead-nadia")?.stage || "hot";
+          this.render();
+          this.highlightAnchor("board");
+        },
+      },
+    ];
   }
 
   bind() {
@@ -2059,6 +2256,13 @@ class AutopilotCRMDemo {
       button.addEventListener("click", () => this.close());
     }
 
+    this.root.addEventListener("click", (event) => {
+      const nav = event.target.closest("[data-crm-nav]");
+      if (nav && this.root.contains(nav)) {
+        this.switchView(nav.dataset.crmNav || "pipeline");
+      }
+    });
+
     for (const button of this.root.querySelectorAll("[data-crm-source]")) {
       button.addEventListener("click", () => {
         this.source = button.dataset.crmSource || "all";
@@ -2066,14 +2270,24 @@ class AutopilotCRMDemo {
       });
     }
 
-    this.searchInput.addEventListener("input", () => {
+    this.searchInput?.addEventListener("input", () => {
       this.query = this.searchInput.value.trim().toLocaleLowerCase("id");
       this.render();
     });
 
-    this.board.addEventListener("click", (event) => this.handleLeadActivation(event));
-    this.board.addEventListener("keydown", (event) => this.handleLeadActivation(event));
-    this.stageTabs.addEventListener("click", (event) => {
+    this.customerSearch?.addEventListener("input", () => {
+      this.customerQuery = this.customerSearch.value.trim().toLocaleLowerCase("id");
+      this.renderCustomers();
+    });
+
+    this.board?.addEventListener("click", (event) => this.handleLeadActivation(event));
+    this.board?.addEventListener("keydown", (event) => this.handleLeadActivation(event));
+    this.customerList?.addEventListener("click", (event) => {
+      const row = event.target.closest("[data-lead-id]");
+      if (row) this.openDetail(row.dataset.leadId);
+    });
+
+    this.stageTabs?.addEventListener("click", (event) => {
       const button = event.target.closest("[data-crm-stage]");
       if (!button) return;
       this.mobileStage = button.dataset.crmStage;
@@ -2083,29 +2297,25 @@ class AutopilotCRMDemo {
     for (const button of this.root.querySelectorAll("[data-close-crm-detail]")) {
       button.addEventListener("click", () => this.closeDetail());
     }
-    this.detailBackdrop.addEventListener("click", () => this.closeDetail());
+    this.detailBackdrop?.addEventListener("click", () => this.closeDetail());
 
-    this.prepareButton.addEventListener("click", () => this.prepareFollowup());
-    this.root.querySelector("[data-crm-send-followup]").addEventListener("click", () => this.sendFollowup());
-    this.root.querySelector("[data-crm-reset]").addEventListener("click", () => this.reset());
+    this.prepareButton?.addEventListener("click", () => this.prepareFollowup());
+    this.root.querySelector("[data-crm-send-followup]")?.addEventListener("click", () => this.sendFollowup());
+    this.root.querySelector("[data-crm-reset]")?.addEventListener("click", () => this.reset());
 
-    this.root.querySelector("[data-crm-guide]").addEventListener("click", () => this.openGuide());
-    this.root.querySelector("[data-close-crm-guide]").addEventListener("click", () => this.closeGuide());
-    this.root.querySelector("[data-crm-guide-start]").addEventListener("click", () => {
-      this.closeGuide();
-      this.source = "all";
-      this.query = "";
-      this.searchInput.value = "";
-      this.mobileStage = "warm";
-      this.render();
-      const featuredLead = this.root.querySelector('[data-lead-id="lead-nadia"]');
-      if (featuredLead) featuredLead.focus();
-    });
-    this.root.querySelector("[data-close-crm-toast]").addEventListener("click", () => {
+    for (const button of this.root.querySelectorAll("[data-crm-guide]")) {
+      button.addEventListener("click", () => this.openGuide(0));
+    }
+    this.root.querySelector("[data-close-crm-guide]")?.addEventListener("click", () => this.closeGuide());
+    this.root.querySelector("[data-crm-guide-next]")?.addEventListener("click", () => this.nextGuideStep());
+    this.root.querySelector("[data-crm-guide-prev]")?.addEventListener("click", () => this.prevGuideStep());
+    this.root.querySelector("[data-crm-guide-finish]")?.addEventListener("click", () => this.closeGuide());
+
+    this.root.querySelector("[data-close-crm-toast]")?.addEventListener("click", () => {
       this.toast.hidden = true;
     });
 
-    this.root.querySelector("[data-crm-toggle-closed]").addEventListener("click", (event) => {
+    this.root.querySelector("[data-crm-toggle-closed]")?.addEventListener("click", (event) => {
       const button = event.currentTarget;
       const isExpanded = button.getAttribute("aria-expanded") === "true";
       button.setAttribute("aria-expanded", String(!isExpanded));
@@ -2113,11 +2323,13 @@ class AutopilotCRMDemo {
       this.root.querySelector("[data-crm-closed-chevron]").textContent = isExpanded ? "⌄" : "⌃";
     });
 
+    this.root.querySelector("[data-crm-af-run]")?.addEventListener("click", () => this.runAutoFollowCycle());
+
     document.addEventListener("keydown", (event) => {
       if (event.key !== "Escape" || !this.root.classList.contains("is-open")) return;
       if (!this.toast.hidden) {
         this.toast.hidden = true;
-      } else if (!this.guide.hidden) {
+      } else if (this.guide && !this.guide.hidden) {
         this.closeGuide();
       } else if (this.detailPanel.classList.contains("is-open")) {
         this.closeDetail();
@@ -2127,14 +2339,32 @@ class AutopilotCRMDemo {
     });
   }
 
+  switchView(view) {
+    const allowed = ["customer", "pipeline", "auto-follow", "panduan"];
+    this.view = allowed.includes(view) ? view : "pipeline";
+    for (const section of this.root.querySelectorAll("[data-crm-view]")) {
+      const active = section.dataset.crmView === this.view;
+      section.hidden = !active;
+      section.classList.toggle("is-active", active);
+    }
+    for (const button of this.root.querySelectorAll("[data-crm-nav]")) {
+      const active = button.dataset.crmNav === this.view;
+      button.classList.toggle("active", active);
+      if (active) button.setAttribute("aria-current", "page");
+      else button.removeAttribute("aria-current");
+    }
+    if (this.view === "customer") this.renderCustomers();
+    if (this.view === "auto-follow") this.renderAutoFollow();
+  }
+
   open(trigger) {
     this.lastFocusedElement = trigger;
     this.root.classList.add("is-open");
     this.root.setAttribute("aria-hidden", "false");
     document.body.classList.add("demo-open");
-    this.root.querySelector("[data-close-crm-demo]").focus();
+    this.root.querySelector("[data-close-crm-demo]")?.focus();
     if (!this.hasOpenedGuide) {
-      this.openGuide();
+      this.openGuide(0);
       this.hasOpenedGuide = true;
     }
   }
@@ -2149,39 +2379,114 @@ class AutopilotCRMDemo {
     if (this.lastFocusedElement) this.lastFocusedElement.focus();
   }
 
-  openGuide() {
+  openGuide(startIndex = 0) {
+    if (!this.guide) return;
+    this.guideStepIndex = Math.max(0, startIndex);
     this.guide.hidden = false;
-    this.guide.querySelector("[data-crm-guide-start]").focus();
+    this.renderGuideStep();
+    const focusBtn =
+      this.guide.querySelector("[data-crm-guide-next]:not([hidden])") ||
+      this.guide.querySelector("[data-crm-guide-finish]:not([hidden])");
+    focusBtn?.focus();
   }
 
   closeGuide() {
+    if (!this.guide) return;
     this.guide.hidden = true;
+    this.clearHighlight();
+  }
+
+  highlightAnchor(name) {
+    this.clearHighlight();
+    const el = this.root.querySelector(`[data-crm-anchor="${name}"]`);
+    if (el) {
+      el.classList.add("crm-guide-highlight");
+      el.scrollIntoView({ block: "nearest", behavior: "smooth" });
+    }
+  }
+
+  clearHighlight() {
+    for (const el of this.root.querySelectorAll(".crm-guide-highlight")) {
+      el.classList.remove("crm-guide-highlight");
+    }
+  }
+
+  renderGuideStep() {
+    if (!this.guide) return;
+    const steps = this.guideSteps();
+    const step = steps[this.guideStepIndex] || steps[0];
+    const total = steps.length;
+    const index = this.guideStepIndex + 1;
+
+    this.guide.querySelector("[data-crm-guide-step-label]").textContent =
+      `LANGKAH ${index} DARI ${total}`;
+    this.guide.querySelector("[data-crm-guide-title]").textContent = step.title;
+    this.guide.querySelector("[data-crm-guide-body]").textContent = step.body;
+
+    const prev = this.guide.querySelector("[data-crm-guide-prev]");
+    const next = this.guide.querySelector("[data-crm-guide-next]");
+    const finish = this.guide.querySelector("[data-crm-guide-finish]");
+    const isLast = this.guideStepIndex >= total - 1;
+    const isFirst = this.guideStepIndex <= 0;
+
+    if (prev) prev.hidden = isFirst;
+    if (next) next.hidden = isLast;
+    if (finish) finish.hidden = !isLast;
+
+    if (step.view) this.switchView(step.view);
+    if (typeof step.enter === "function") step.enter();
+  }
+
+  nextGuideStep() {
+    const steps = this.guideSteps();
+    if (this.guideStepIndex >= steps.length - 1) {
+      this.closeGuide();
+      return;
+    }
+    this.guideStepIndex += 1;
+    this.renderGuideStep();
+  }
+
+  prevGuideStep() {
+    if (this.guideStepIndex <= 0) return;
+    this.guideStepIndex -= 1;
+    this.renderGuideStep();
   }
 
   reset() {
     this.leads = this.cloneSeed();
+    this.closed = this.cloneClosed();
+    this.programs = crmAutoFollowPrograms.map((p) => ({ ...p }));
+    this.cycleRun = 0;
     this.source = "all";
     this.query = "";
+    this.customerQuery = "";
     this.mobileStage = "cold";
     this.selectedId = null;
-    this.searchInput.value = "";
+    if (this.searchInput) this.searchInput.value = "";
+    if (this.customerSearch) this.customerSearch.value = "";
     this.closedList.hidden = true;
     const closedToggle = this.root.querySelector("[data-crm-toggle-closed]");
-    closedToggle.setAttribute("aria-expanded", "false");
-    this.root.querySelector("[data-crm-closed-chevron]").textContent = "⌄";
+    if (closedToggle) {
+      closedToggle.setAttribute("aria-expanded", "false");
+      this.root.querySelector("[data-crm-closed-chevron]").textContent = "⌄";
+    }
     this.closeDetail();
     this.toast.hidden = true;
+    this.switchView("pipeline");
     this.render();
   }
 
   getVisibleLeads() {
     return this.leads.filter((lead) => {
+      const unit = crmResolveUnit(lead.unitId);
+      const unitLabel = crmUnitLabel(unit);
       const isOmnichannel = ["whatsapp", "instagram", "facebook"].includes(lead.source);
       const matchesSource =
         this.source === "all" ||
         (this.source === "omnichannel" && isOmnichannel) ||
         (this.source === "excel" && lead.source === "excel_import");
-      const haystack = `${lead.name} ${lead.unit} ${lead.handler}`.toLocaleLowerCase("id");
+      const haystack = `${lead.name} ${unitLabel} ${lead.handler}`.toLocaleLowerCase("id");
       return matchesSource && haystack.includes(this.query);
     });
   }
@@ -2192,25 +2497,35 @@ class AutopilotCRMDemo {
     this.renderFilters();
     this.renderStageTabs(visibleLeads);
     this.renderBoard(visibleLeads);
+    this.renderClosed();
+    if (this.view === "customer") this.renderCustomers();
+    if (this.view === "auto-follow") this.renderAutoFollow();
   }
 
   renderSummary() {
-    const pipeline = this.leads.reduce((total, lead) => total + lead.value, 0);
+    const pipeline = this.leads.reduce((total, lead) => total + crmLeadValue(lead), 0);
     const forecast = this.leads.reduce(
-      (total, lead) => total + lead.value * crmStageConfig[lead.stage].probability,
+      (total, lead) => total + crmLeadValue(lead) * (crmStageConfig[lead.stage]?.probability || 0),
       0,
     );
-    this.root.querySelector("[data-crm-pipeline-value]").textContent = this.formatCompactPrice(pipeline);
-    this.root.querySelector("[data-crm-forecast]").textContent = this.formatCompactPrice(forecast);
-    this.root.querySelector("[data-crm-active-count]").textContent = String(this.leads.length);
-    this.root.querySelector("[data-crm-followup-count]").textContent = String(
-      this.leads.filter((lead) => lead.days >= 7).length,
+    const setText = (sel, value) => {
+      const el = this.root.querySelector(sel);
+      if (el) el.textContent = value;
+    };
+    setText("[data-crm-pipeline-value]", this.formatCompactPrice(pipeline));
+    setText("[data-crm-forecast]", this.formatCompactPrice(forecast));
+    setText("[data-crm-active-count]", String(this.leads.length));
+    setText(
+      "[data-crm-followup-count]",
+      String(this.leads.filter((lead) => lead.days >= 7).length),
     );
-    this.root.querySelector("[data-crm-hot-count]").textContent = String(
-      this.leads.filter((lead) => lead.stage === "hot").length,
+    setText(
+      "[data-crm-hot-count]",
+      String(this.leads.filter((lead) => lead.stage === "hot").length),
     );
-    this.root.querySelector("[data-crm-ai-count]").textContent = String(
-      this.leads.filter((lead) => lead.ai).length,
+    setText(
+      "[data-crm-ai-count]",
+      String(this.leads.filter((lead) => lead.ai).length),
     );
   }
 
@@ -2221,6 +2536,7 @@ class AutopilotCRMDemo {
   }
 
   renderStageTabs(leads) {
+    if (!this.stageTabs) return;
     this.stageTabs.innerHTML = Object.entries(crmStageConfig)
       .map(([stage, config]) => {
         const count = leads.filter((lead) => lead.stage === stage).length;
@@ -2230,10 +2546,11 @@ class AutopilotCRMDemo {
   }
 
   renderBoard(leads) {
+    if (!this.board) return;
     this.board.innerHTML = Object.entries(crmStageConfig)
       .map(([stage, config]) => {
         const stageLeads = leads.filter((lead) => lead.stage === stage);
-        const stageValue = stageLeads.reduce((total, lead) => total + lead.value, 0);
+        const stageValue = stageLeads.reduce((total, lead) => total + crmLeadValue(lead), 0);
         const cards = stageLeads.length
           ? stageLeads.map((lead) => this.renderLeadCard(lead)).join("")
           : '<div class="crm-empty">Belum ada lead pada filter ini.</div>';
@@ -2251,7 +2568,11 @@ class AutopilotCRMDemo {
   }
 
   renderLeadCard(lead) {
+    const unit = crmResolveUnit(lead.unitId);
+    const unitLabel = crmUnitLabel(unit);
+    const value = crmLeadValue(lead);
     const isFeatured = lead.id === "lead-nadia" && !lead.followedUp;
+    const intent = lead.intent ? crmIntentLabels[lead.intent] : null;
     return `
       <article class="crm-lead-card ${isFeatured ? "featured" : ""}" data-lead-id="${lead.id}" tabindex="0" aria-label="Buka detail ${lead.name}">
         ${isFeatured ? '<span class="crm-try-badge">Coba ini</span>' : ""}
@@ -2259,17 +2580,129 @@ class AutopilotCRMDemo {
           <h3>${lead.name}</h3>
           <span class="crm-score">${lead.score}/100</span>
         </div>
-        <p class="crm-lead-unit">${lead.unit}</p>
+        <p class="crm-lead-unit">${unitLabel}</p>
         <div class="crm-lead-meta">
           <span class="crm-source-badge ${lead.source}">${this.sourceLabel(lead.source)}</span>
-          <b>${this.formatCompactPrice(lead.value)}</b>
+          ${intent ? `<span class="crm-intent-chip">${intent}</span>` : ""}
+          <b>${this.formatCompactPrice(value)}</b>
         </div>
         <div class="crm-lead-card-footer">
-          <span class="crm-handler">${lead.handler}</span>
+          <span class="crm-handler">${lead.ai ? "AI · " : ""}${lead.handler}</span>
           <span class="crm-stale ${lead.days >= 7 ? "high" : ""}">${lead.days} hari di stage</span>
         </div>
       </article>
     `;
+  }
+
+  renderClosed() {
+    if (!this.closedList) return;
+    let total = 0;
+    this.closedList.innerHTML = this.closed
+      .map((item) => {
+        const unit = crmResolveUnit(item.unitId);
+        const value = item.value || unit?.cashPrice || 0;
+        total += value;
+        const statusClass = item.status === "deal" ? "sold" : "ready";
+        const statusLabel = item.status === "deal" ? "DEAL" : "HANDOVER";
+        return `<article><span class="demo-status ${statusClass}">${statusLabel}</span><div><b>${item.name}</b><small>${crmUnitLabel(unit)}${unit ? ` · ${unit.plate}` : ""}</small></div><strong>${this.formatCompactPrice(value)}</strong></article>`;
+      })
+      .join("");
+    const summary = this.root.querySelector("[data-crm-closed-summary]");
+    if (summary) {
+      summary.textContent = `${this.closed.length} transaksi · ${this.formatCompactPrice(total)}`;
+    }
+  }
+
+  renderCustomers() {
+    if (!this.customerList) return;
+    const rows = this.leads.filter((lead) => {
+      const unit = crmResolveUnit(lead.unitId);
+      const haystack = `${lead.name} ${crmUnitLabel(unit)} ${lead.handler}`.toLocaleLowerCase("id");
+      return haystack.includes(this.customerQuery);
+    });
+    this.customerList.innerHTML = rows.length
+      ? rows
+          .map((lead) => {
+            const unit = crmResolveUnit(lead.unitId);
+            return `
+              <tr data-lead-id="${lead.id}" tabindex="0" role="button" aria-label="Buka detail ${lead.name}">
+                <td><b>${lead.name}</b><small class="crm-muted">${lead.phone || "—"}</small></td>
+                <td>${crmUnitLabel(unit)}</td>
+                <td><span class="crm-stage-badge ${lead.stage}">${crmStageConfig[lead.stage].label}</span></td>
+                <td><span class="crm-source-badge ${lead.source}">${this.sourceLabel(lead.source)}</span></td>
+                <td>${lead.handler}</td>
+                <td><b>${lead.score}</b></td>
+              </tr>`;
+          })
+          .join("")
+      : `<tr><td colspan="6" class="crm-empty-cell">Tidak ada customer pada pencarian ini.</td></tr>`;
+  }
+
+  renderAutoFollow() {
+    const active = this.programs.filter((p) => p.active).length;
+    const covered = this.programs.reduce((s, p) => s + p.contacts, 0);
+    const week = 34 + this.cycleRun * 6;
+    const rate = Math.min(48, 31 + this.cycleRun * 4);
+    const setText = (sel, v) => {
+      const el = this.root.querySelector(sel);
+      if (el) el.textContent = v;
+    };
+    setText("[data-crm-af-active]", String(active));
+    setText("[data-crm-af-covered]", String(covered));
+    setText("[data-crm-af-week]", String(week));
+    setText("[data-crm-af-rate]", `${rate}%`);
+
+    if (!this.afList) return;
+    this.afList.innerHTML = this.programs
+      .map(
+        (p) => `
+        <article class="crm-af-card ${p.active ? "is-active" : ""}">
+          <div class="crm-af-card-head">
+            <div>
+              <span class="crm-af-type">${p.type}</span>
+              <h3>${p.name}</h3>
+            </div>
+            <em class="${p.active ? "on" : "off"}">${p.active ? "Aktif" : "Nonaktif"}</em>
+          </div>
+          <div class="crm-af-card-meta">
+            <span>${p.channel}</span>
+            <span>${p.schedule}</span>
+            <span>${p.contacts} lead</span>
+          </div>
+          <p class="crm-af-note">Simulasi tenant demo · tidak mengirim ke channel nyata</p>
+        </article>`,
+      )
+      .join("");
+  }
+
+  runAutoFollowCycle() {
+    this.cycleRun += 1;
+    const stale = this.leads
+      .filter((l) => l.days >= 7 && !l.followedUp)
+      .sort((a, b) => b.days - a.days)[0];
+    if (stale) {
+      const nextStage = { cold: "warm", warm: "hot", hot: "prospect", prospect: "prospect" };
+      const old = stale.stage;
+      stale.stage = nextStage[stale.stage];
+      stale.score = Math.min(95, stale.score + 12);
+      stale.days = 0;
+      stale.followedUp = true;
+      stale.events.unshift({
+        icon: "AI",
+        title: "Auto Follow siklus dijalankan",
+        detail: `Program · ${old} → ${stale.stage}`,
+        time: "baru saja",
+      });
+      this.toast.querySelector("b").textContent = `Siklus follow-up: ${stale.name}`;
+      this.toast.querySelector("p").textContent =
+        `Lead naik ke ${crmStageConfig[stale.stage].label}. Pesan tidak dikirim ke nomor nyata.`;
+    } else {
+      this.toast.querySelector("b").textContent = "Siklus follow-up selesai";
+      this.toast.querySelector("p").textContent =
+        "Tidak ada lead stale tersisa. Metrik program diperbarui (simulasi).";
+    }
+    this.toast.hidden = false;
+    this.render();
   }
 
   handleLeadActivation(event) {
@@ -2280,31 +2713,73 @@ class AutopilotCRMDemo {
     this.openDetail(card.dataset.leadId);
   }
 
-  openDetail(leadId) {
+  openDetail(leadId, options = {}) {
     const lead = this.leads.find((item) => item.id === leadId);
     if (!lead) return;
     this.selectedId = lead.id;
-    this.closeGuide();
+    if (!options.keepGuide) this.closeGuide();
     this.populateDetail(lead);
     this.detailBackdrop.hidden = false;
     this.detailPanel.classList.add("is-open");
     this.detailPanel.setAttribute("aria-hidden", "false");
-    this.detailPanel.querySelector("[data-close-crm-detail]").focus();
+    if (!options.keepGuide) {
+      this.detailPanel.querySelector("[data-close-crm-detail]")?.focus();
+    }
   }
 
   populateDetail(lead) {
+    const unit = crmResolveUnit(lead.unitId);
+    const unitLabel = crmUnitLabel(unit);
+    const value = crmLeadValue(lead);
+
     this.root.querySelector("[data-crm-detail-name]").textContent = lead.name;
-    this.root.querySelector("[data-crm-detail-unit]").textContent = lead.unit;
+    this.root.querySelector("[data-crm-detail-unit]").textContent = unitLabel;
+
     const stageBadge = this.root.querySelector("[data-crm-detail-stage]");
     stageBadge.className = `crm-stage-badge ${lead.stage}`;
     stageBadge.textContent = crmStageConfig[lead.stage].label;
+
     const sourceBadge = this.root.querySelector("[data-crm-detail-source]");
     sourceBadge.className = `crm-source-badge ${lead.source}`;
     sourceBadge.textContent = this.sourceLabel(lead.source);
+
     this.root.querySelector("[data-crm-detail-score]").textContent = `Skor ${lead.score}/100`;
-    this.root.querySelector("[data-crm-detail-value]").textContent = this.formatCompactPrice(lead.value);
+
+    const intentBadge = this.root.querySelector("[data-crm-detail-intent]");
+    if (lead.intent && crmIntentLabels[lead.intent]) {
+      intentBadge.hidden = false;
+      intentBadge.textContent = crmIntentLabels[lead.intent];
+    } else {
+      intentBadge.hidden = true;
+    }
+
+    this.root.querySelector("[data-crm-detail-value]").textContent = this.formatCompactPrice(value);
     this.root.querySelector("[data-crm-detail-days]").textContent = `${lead.days} hari`;
     this.root.querySelector("[data-crm-detail-handler]").textContent = lead.handler;
+    this.root.querySelector("[data-crm-handler-mode]").textContent = lead.ai
+      ? "AI Bot (aktif)"
+      : "Handler manual";
+    this.root.querySelector("[data-crm-handler-icon]").textContent = lead.ai ? "AI" : "MR";
+    this.root.querySelector("[data-crm-handler-icon]").className =
+      `crm-handler-icon ${lead.ai ? "ai" : "human"}`;
+
+    this.root.querySelector("[data-crm-unit-title]").textContent = unitLabel;
+    this.root.querySelector("[data-crm-unit-status]").textContent = unit?.status || "—";
+    this.root.querySelector("[data-crm-unit-plate]").textContent = unit?.plate || "—";
+    this.root.querySelector("[data-crm-unit-branch]").textContent = unit
+      ? `${unit.branch} · ${unit.position}`
+      : "—";
+    this.root.querySelector("[data-crm-unit-year]").textContent = unit ? String(unit.year) : "—";
+    this.root.querySelector("[data-crm-unit-color]").textContent = unit?.color || "—";
+    this.root.querySelector("[data-crm-unit-trans]").textContent = unit?.transmission || "—";
+    this.root.querySelector("[data-crm-unit-odo]").textContent = unit
+      ? `${unit.odometer.toLocaleString("id-ID")} km`
+      : "—";
+    this.root.querySelector("[data-crm-unit-features]").innerHTML = (unit?.features || [])
+      .slice(0, 4)
+      .map((f) => `<span>${f}</span>`)
+      .join("");
+
     this.root.querySelector("[data-crm-detail-summary]").textContent = lead.summary;
     this.root.querySelector("[data-crm-detail-recommendation]").textContent = lead.recommendation;
     this.root.querySelector("[data-crm-message]").textContent = lead.message;
@@ -2321,7 +2796,14 @@ class AutopilotCRMDemo {
       .join("");
     this.messagePreview.hidden = true;
     this.prepareButton.disabled = Boolean(lead.followedUp);
-    this.prepareButton.textContent = lead.followedUp ? "Follow-up sudah disimulasikan" : "Siapkan follow-up AI";
+    this.prepareButton.textContent = lead.followedUp
+      ? "Follow-up sudah disimulasikan"
+      : "Siapkan follow-up AI";
+    const sendButton = this.root.querySelector("[data-crm-send-followup]");
+    if (sendButton) {
+      sendButton.disabled = false;
+      sendButton.textContent = "Kirim simulasi";
+    }
   }
 
   closeDetail() {
@@ -2335,19 +2817,20 @@ class AutopilotCRMDemo {
     const lead = this.leads.find((item) => item.id === this.selectedId);
     if (!lead || lead.followedUp) return;
     this.messagePreview.hidden = false;
-    this.root.querySelector("[data-crm-send-followup]").focus();
+    this.root.querySelector("[data-crm-send-followup]")?.focus();
   }
 
   async sendFollowup() {
     const lead = this.leads.find((item) => item.id === this.selectedId);
     if (!lead || lead.followedUp) return;
+    const unit = crmResolveUnit(lead.unitId);
     const sendButton = this.root.querySelector("[data-crm-send-followup]");
     sendButton.disabled = true;
     sendButton.textContent = "Menyimpan ke tenant demo…";
     try {
       await publicDemoData.submit("crm_followup", {
         message: lead.message,
-        unit_interest: lead.unit,
+        unit_interest: crmUnitLabel(unit),
       });
     } catch (error) {
       sendButton.disabled = false;
@@ -2367,8 +2850,18 @@ class AutopilotCRMDemo {
       "Follow-up simulasi mendapat respons positif. Lead meminta rincian berikutnya dan kini masuk prioritas tinggi.";
     lead.recommendation = "Hubungi secara personal untuk mengunci jadwal test drive.";
     lead.events.unshift(
-      { icon: "✓", title: "Lead merespons positif (simulasi)", detail: "Stage dan skor diperbarui", time: "baru saja" },
-      { icon: "AI", title: "Follow-up AI dicatat", detail: "Tersimpan di tenant demo; tidak dikirim ke channel nyata", time: "baru saja" },
+      {
+        icon: "✓",
+        title: "Lead merespons positif (simulasi)",
+        detail: "Stage dan skor diperbarui",
+        time: "baru saja",
+      },
+      {
+        icon: "AI",
+        title: "Follow-up AI dicatat",
+        detail: "Tersimpan di tenant demo; tidak dikirim ke channel nyata",
+        time: "baru saja",
+      },
     );
     this.mobileStage = lead.stage;
     this.render();
@@ -2382,6 +2875,9 @@ class AutopilotCRMDemo {
   sourceLabel(source) {
     if (source === "excel_import") return "Excel";
     if (source === "walk_in") return "Walk-in";
+    if (source === "whatsapp") return "WhatsApp";
+    if (source === "instagram") return "Instagram";
+    if (source === "facebook") return "Facebook";
     return source;
   }
 

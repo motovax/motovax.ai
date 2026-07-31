@@ -924,108 +924,225 @@
         </header>
 
         <div class="demo-layout">
-          <aside class="demo-sidebar" aria-label="Navigasi Autopilot CRM">
+          <aside class="demo-sidebar" aria-label="Navigasi Autopilot CRM" data-crm-anchor="sidebar">
             <nav>
               <span class="demo-nav-section">Autopilot CRM</span>
-              <button type="button">
-                <svg class="demo-nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 13h6V4H4v9Zm0 7h6v-4H4v4Zm10 0h6v-9h-6v9Zm0-16v4h6V4h-6Z"/></svg>
-                <span>Sales Performance</span>
-              </button>
-              <button type="button">
+              <button type="button" data-crm-nav="customer">
                 <svg class="demo-nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2m7-10a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm13 10v-2a4 4 0 0 0-3-3.87m-2-12a4 4 0 0 1 0 7.75"/></svg>
                 <span>Customer</span>
               </button>
-              <button class="active" type="button">
+              <button class="active" type="button" data-crm-nav="pipeline" aria-current="page">
                 <svg class="demo-nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h4v16H4V4Zm6 0h4v16h-4V4Zm6 0h4v16h-4V4Z"/></svg>
                 <span>Pipeline</span>
               </button>
-              <button type="button">
-                <svg class="demo-nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m3 11 18-5v12L3 13v-2Zm4 3v5m9-1v3"/></svg>
-                <span>Program</span>
+              <button type="button" data-crm-nav="auto-follow">
+                <svg class="demo-nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4v8Zm-7-4h4m-8 0h.01M10 11a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z"/></svg>
+                <span>Auto Follow Customer</span>
               </button>
-              <button type="button">
+              <button type="button" data-crm-nav="panduan">
                 <svg class="demo-nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20M4 19.5V5a2 2 0 0 1 2-2h14v18H6.5A2.5 2.5 0 0 1 4 18.5"/></svg>
-                <span>Guideline</span>
+                <span>Panduan</span>
               </button>
             </nav>
             <div class="demo-sidebar-tip crm-sidebar-tip">
               <span>DEMO GUIDE</span>
               <b>Coba follow-up dengan AI</b>
-              <p>Buka lead Nadia Demo yang ditandai, baca rekomendasi AI, lalu jalankan simulasi follow-up.</p>
+              <p>Buka lead Nadia di Pipeline, cek unit stok Motovax, lalu jalankan simulasi follow-up. Menu selaras Motovax — Campaign diganti Auto Follow Customer.</p>
+              <button type="button" class="demo-secondary-action" data-crm-guide style="margin-top:10px;width:100%">Buka panduan demo</button>
             </div>
           </aside>
 
           <main class="demo-workspace crm-workspace">
-            <div class="demo-page-heading crm-page-heading">
-              <div>
-                <span class="demo-breadcrumb">Sales / Pipeline</span>
-                <h2>Pipeline</h2>
-                <p>Pantau prioritas lead dan jalankan tindak lanjut dari satu workspace.</p>
-              </div>
-              <div class="crm-heading-actions">
-                <div class="crm-heading-metric">
-                  <span>Pipeline</span>
-                  <b data-crm-pipeline-value>Rp 0</b>
+            <!-- VIEW: Customer -->
+            <section class="crm-view" data-crm-view="customer" hidden>
+              <div class="demo-page-heading crm-page-heading">
+                <div>
+                  <span class="demo-breadcrumb">Autopilot CRM / Customer</span>
+                  <h2>Customer</h2>
+                  <p>Daftar customer &amp; lead aktif — klik baris untuk membuka detail (sama dengan Pipeline).</p>
                 </div>
-                <div class="crm-heading-metric forecast">
-                  <span>Forecast</span>
-                  <b data-crm-forecast>Rp 0</b>
+                <div class="crm-heading-actions">
+                  <button class="demo-primary-action" type="button" data-crm-guide>
+                    <span aria-hidden="true">▶</span> Panduan demo
+                  </button>
                 </div>
-                <button class="demo-primary-action" type="button" data-crm-guide>
-                  <span aria-hidden="true">▶</span> Panduan demo
-                </button>
               </div>
-            </div>
-
-            <section class="crm-kpi-grid" aria-label="Ringkasan Autopilot CRM">
-              <article>
-                <span class="crm-kpi-icon indigo">◎</span>
-                <div><small>Lead Aktif</small><b data-crm-active-count>0</b></div>
-                <em>Semua channel</em>
-              </article>
-              <article>
-                <span class="crm-kpi-icon amber">!</span>
-                <div><small>Perlu Follow-up</small><b data-crm-followup-count>0</b></div>
-                <em>≥ 7 hari</em>
-              </article>
-              <article>
-                <span class="crm-kpi-icon green">↗</span>
-                <div><small>Hot Leads</small><b data-crm-hot-count>0</b></div>
-                <em>Prioritas tinggi</em>
-              </article>
-              <article>
-                <span class="crm-kpi-icon violet">AI</span>
-                <div><small>Ditangani AI</small><b data-crm-ai-count>0</b></div>
-                <em>Aktif sekarang</em>
-              </article>
+              <div class="crm-customer-panel" data-crm-anchor="customers">
+                <label class="crm-search crm-customer-search">
+                  <span aria-hidden="true">⌕</span>
+                  <input type="search" placeholder="Cari nama atau unit..." aria-label="Cari customer" data-crm-customer-search />
+                </label>
+                <div class="crm-customer-table-wrap">
+                  <table class="crm-customer-table">
+                    <thead>
+                      <tr>
+                        <th>Nama</th>
+                        <th>Unit minat</th>
+                        <th>Stage</th>
+                        <th>Sumber</th>
+                        <th>Handler</th>
+                        <th>Skor</th>
+                      </tr>
+                    </thead>
+                    <tbody data-crm-customer-list></tbody>
+                  </table>
+                </div>
+              </div>
             </section>
 
-            <section class="crm-pipeline-panel">
-              <div class="crm-source-toolbar">
-                <div class="crm-source-groups" role="group" aria-label="Filter sumber lead">
-                  <button class="active" type="button" data-crm-source="all">Semua</button>
-                  <button type="button" data-crm-source="omnichannel">Omnichannel</button>
-                  <button type="button" data-crm-source="excel">Excel Import</button>
+            <!-- VIEW: Pipeline (default) -->
+            <section class="crm-view is-active" data-crm-view="pipeline">
+              <div class="demo-page-heading crm-page-heading">
+                <div>
+                  <span class="demo-breadcrumb">Autopilot CRM / Pipeline</span>
+                  <h2>Pipeline</h2>
+                  <p>Pantau prioritas lead dan jalankan tindak lanjut dari satu workspace.</p>
                 </div>
-                <label class="crm-search">
-                  <span aria-hidden="true">⌕</span>
-                  <input type="search" placeholder="Cari lead atau unit..." aria-label="Cari lead" data-crm-search />
-                </label>
-                <span class="crm-demo-safety">Aktivitas tersimpan · Tidak mengirim pesan</span>
+                <div class="crm-heading-actions">
+                  <div class="crm-heading-metric" data-crm-anchor="kpi">
+                    <span>Pipeline</span>
+                    <b data-crm-pipeline-value>Rp 0</b>
+                  </div>
+                  <div class="crm-heading-metric forecast">
+                    <span>Forecast</span>
+                    <b data-crm-forecast>Rp 0</b>
+                  </div>
+                  <button class="demo-primary-action" type="button" data-crm-guide>
+                    <span aria-hidden="true">▶</span> Panduan demo
+                  </button>
+                </div>
               </div>
 
-              <div class="crm-stage-tabs" role="tablist" aria-label="Pilih stage pipeline" data-crm-stage-tabs></div>
-              <div class="crm-kanban" data-crm-board></div>
+              <section class="crm-kpi-grid" aria-label="Ringkasan Autopilot CRM" data-crm-anchor="kpi-grid">
+                <article>
+                  <span class="crm-kpi-icon indigo">◎</span>
+                  <div><small>Lead Aktif</small><b data-crm-active-count>0</b></div>
+                  <em>Semua channel</em>
+                </article>
+                <article>
+                  <span class="crm-kpi-icon amber">!</span>
+                  <div><small>Perlu Follow-up</small><b data-crm-followup-count>0</b></div>
+                  <em>≥ 7 hari</em>
+                </article>
+                <article>
+                  <span class="crm-kpi-icon green">↗</span>
+                  <div><small>Hot Leads</small><b data-crm-hot-count>0</b></div>
+                  <em>Prioritas tinggi</em>
+                </article>
+                <article>
+                  <span class="crm-kpi-icon violet">AI</span>
+                  <div><small>Ditangani AI</small><b data-crm-ai-count>0</b></div>
+                  <em>Aktif sekarang</em>
+                </article>
+              </section>
 
-              <div class="crm-closed-section">
-                <button type="button" data-crm-toggle-closed aria-expanded="false">
-                  <span><i>✓</i><b>Deal &amp; Handover</b><em>2 transaksi · Rp 683 jt</em></span>
-                  <span data-crm-closed-chevron>⌄</span>
-                </button>
-                <div class="crm-closed-list" data-crm-closed-list hidden>
-                  <article><span class="demo-status sold">DEAL</span><div><b>Raka Demo</b><small>Toyota Innova Zenix · B 2201 MVX</small></div><strong>Rp 425 jt</strong></article>
-                  <article><span class="demo-status ready">HANDOVER</span><div><b>Putri Demo</b><small>Honda HR-V SE · B 2202 MVX</small></div><strong>Rp 258 jt</strong></article>
+              <section class="crm-pipeline-panel" data-crm-anchor="board">
+                <div class="crm-source-toolbar">
+                  <div class="crm-source-groups" role="group" aria-label="Filter sumber lead">
+                    <button class="active" type="button" data-crm-source="all">Semua</button>
+                    <button type="button" data-crm-source="omnichannel">Omnichannel</button>
+                    <button type="button" data-crm-source="excel">Excel Import</button>
+                  </div>
+                  <label class="crm-search">
+                    <span aria-hidden="true">⌕</span>
+                    <input type="search" placeholder="Cari lead atau unit..." aria-label="Cari lead" data-crm-search />
+                  </label>
+                  <span class="crm-demo-safety">Aktivitas tersimpan · Tidak mengirim pesan</span>
                 </div>
+
+                <div class="crm-stage-tabs" role="tablist" aria-label="Pilih stage pipeline" data-crm-stage-tabs></div>
+                <div class="crm-kanban" data-crm-board></div>
+
+                <div class="crm-closed-section" data-crm-anchor="closed">
+                  <button type="button" data-crm-toggle-closed aria-expanded="false">
+                    <span><i>✓</i><b>Deal &amp; Handover</b><em data-crm-closed-summary>2 transaksi</em></span>
+                    <span data-crm-closed-chevron>⌄</span>
+                  </button>
+                  <div class="crm-closed-list" data-crm-closed-list hidden></div>
+                </div>
+              </section>
+            </section>
+
+            <!-- VIEW: Auto Follow Customer -->
+            <section class="crm-view" data-crm-view="auto-follow" hidden>
+              <div class="demo-page-heading crm-page-heading">
+                <div>
+                  <span class="demo-breadcrumb">Autopilot CRM / Auto Follow Customer</span>
+                  <h2>Auto Follow Customer</h2>
+                  <p>Program follow-up otomatis terjadwal — simulasi tenant demo, tidak mengirim pesan nyata.</p>
+                </div>
+                <div class="crm-heading-actions">
+                  <button class="demo-primary-action" type="button" data-crm-guide>
+                    <span aria-hidden="true">▶</span> Panduan demo
+                  </button>
+                </div>
+              </div>
+
+              <section class="crm-kpi-grid crm-af-kpi" aria-label="Ringkasan Auto Follow" data-crm-anchor="auto-follow">
+                <article>
+                  <span class="crm-kpi-icon indigo">◎</span>
+                  <div><small>Program Aktif</small><b data-crm-af-active>0</b></div>
+                  <em>Berjalan</em>
+                </article>
+                <article>
+                  <span class="crm-kpi-icon green">↗</span>
+                  <div><small>Lead Tercakup</small><b data-crm-af-covered>0</b></div>
+                  <em>Dalam program</em>
+                </article>
+                <article>
+                  <span class="crm-kpi-icon amber">!</span>
+                  <div><small>Follow-up 7h</small><b data-crm-af-week>0</b></div>
+                  <em>Simulasi</em>
+                </article>
+                <article>
+                  <span class="crm-kpi-icon violet">AI</span>
+                  <div><small>Respons Rate</small><b data-crm-af-rate>0%</b></div>
+                  <em>Mock</em>
+                </article>
+              </section>
+
+              <div class="crm-af-toolbar">
+                <span class="crm-demo-safety">Tenant demo · Tidak mengirim pesan ke nomor customer</span>
+                <button class="demo-primary-action" type="button" data-crm-af-run>Jalankan 1 siklus follow-up</button>
+              </div>
+
+              <div class="crm-af-list" data-crm-af-list></div>
+            </section>
+
+            <!-- VIEW: Panduan -->
+            <section class="crm-view" data-crm-view="panduan" hidden>
+              <div class="demo-page-heading crm-page-heading">
+                <div>
+                  <span class="demo-breadcrumb">Autopilot CRM / Panduan</span>
+                  <h2>Panduan</h2>
+                  <p>Cara memakai Autopilot CRM di Motovax — ringkas untuk sales &amp; demo.</p>
+                </div>
+              </div>
+              <div class="crm-panduan-grid" data-crm-anchor="panduan-page">
+                <article>
+                  <span>01</span>
+                  <h3>Customer</h3>
+                  <p>Lihat semua lead/customer, filter cepat, buka detail unit &amp; riwayat.</p>
+                  <button type="button" class="demo-secondary-action" data-crm-nav="customer">Buka Customer</button>
+                </article>
+                <article>
+                  <span>02</span>
+                  <h3>Pipeline</h3>
+                  <p>Kanban Cold → Prospect, filter Omnichannel/Excel, Deal &amp; Handover.</p>
+                  <button type="button" class="demo-secondary-action" data-crm-nav="pipeline">Buka Pipeline</button>
+                </article>
+                <article>
+                  <span>03</span>
+                  <h3>Auto Follow Customer</h3>
+                  <p>Program follow-up terjadwal menggantikan menu Campaign — AI nudge lead stale.</p>
+                  <button type="button" class="demo-secondary-action" data-crm-nav="auto-follow">Buka Auto Follow</button>
+                </article>
+                <article>
+                  <span>04</span>
+                  <h3>Panduan interaktif</h3>
+                  <p>Tour step-by-step: menu, pipeline, unit Motovax, follow-up AI, dampak board.</p>
+                  <button type="button" class="demo-primary-action" data-crm-guide>Mulai Panduan Demo</button>
+                </article>
               </div>
             </section>
           </main>
@@ -1033,7 +1150,7 @@
       </div>
 
       <div class="demo-detail-backdrop" data-crm-detail-backdrop hidden></div>
-      <aside class="demo-detail-panel crm-detail-panel" aria-labelledby="crmDetailTitle" aria-hidden="true">
+      <aside class="demo-detail-panel crm-detail-panel" aria-labelledby="crmDetailTitle" aria-hidden="true" data-crm-anchor="detail">
         <div class="demo-detail-header">
           <div>
             <span>DETAIL LEAD</span>
@@ -1047,26 +1164,55 @@
             <span data-crm-detail-stage></span>
             <span data-crm-detail-source></span>
             <span class="crm-score-badge" data-crm-detail-score></span>
+            <span class="crm-intent-badge" data-crm-detail-intent hidden></span>
           </div>
 
-          <div class="crm-lead-overview">
-            <div><small>Estimasi Nilai</small><b data-crm-detail-value></b></div>
-            <div><small>Hari di Stage</small><b data-crm-detail-days></b></div>
-            <div><small>Penanggung Jawab</small><b data-crm-detail-handler></b></div>
-          </div>
+          <section class="crm-unit-card" data-crm-anchor="unit-card">
+            <div class="crm-unit-card-head">
+              <span>UNIT MOTOVAX</span>
+              <em data-crm-unit-status></em>
+            </div>
+            <h4 data-crm-unit-title>—</h4>
+            <p class="crm-unit-meta">
+              <span data-crm-unit-plate></span>
+              <span data-crm-unit-branch></span>
+            </p>
+            <div class="crm-unit-specs">
+              <div><small>Tahun</small><b data-crm-unit-year>—</b></div>
+              <div><small>Warna</small><b data-crm-unit-color>—</b></div>
+              <div><small>Transmisi</small><b data-crm-unit-trans>—</b></div>
+              <div><small>Odo</small><b data-crm-unit-odo>—</b></div>
+            </div>
+            <div class="crm-unit-price-row">
+              <div><small>Harga cash / deal</small><b data-crm-detail-value>—</b></div>
+              <div><small>Hari di stage</small><b data-crm-detail-days>—</b></div>
+            </div>
+            <div class="crm-unit-features" data-crm-unit-features></div>
+          </section>
 
-          <section class="crm-ai-summary">
+          <section class="crm-conversation-status">
+            <p class="crm-section-label">Status Percakapan</p>
+            <div class="crm-conversation-row">
+              <span class="crm-handler-icon" data-crm-handler-icon>AI</span>
+              <div>
+                <b data-crm-detail-handler>—</b>
+                <small data-crm-handler-mode></small>
+              </div>
+            </div>
+          </section>
+
+          <section class="crm-ai-summary" data-crm-anchor="ai-summary">
             <div><span>✦</span><b>Ringkasan AI</b></div>
             <p data-crm-detail-summary></p>
           </section>
 
-          <section class="crm-recommendation">
+          <section class="crm-recommendation" data-crm-anchor="recommendation">
             <span>REKOMENDASI BERIKUTNYA</span>
             <b data-crm-detail-recommendation></b>
             <p>AI mempertimbangkan isi percakapan, skor potensi, dan waktu terakhir berinteraksi.</p>
           </section>
 
-          <section class="crm-message-preview" data-crm-message-preview hidden>
+          <section class="crm-message-preview" data-crm-message-preview hidden data-crm-anchor="followup">
             <div class="crm-message-preview-head">
               <div><span>PREVIEW FOLLOW-UP</span><b>WhatsApp · dibuat AI</b></div>
               <span class="crm-simulation-pill">SIMULASI</span>
@@ -1092,10 +1238,14 @@
 
       <div class="demo-guide-popover crm-guide-popover" data-crm-guide-popover hidden>
         <button type="button" data-close-crm-guide aria-label="Tutup panduan">×</button>
-        <span>SIMULASI AUTOPILOT</span>
-        <h3>Ubah lead Warm menjadi Hot</h3>
-        <p>Buka kartu Nadia Demo yang bertanda “Coba ini”, tinjau ringkasan AI, lalu jalankan follow-up simulasi.</p>
-        <button type="button" data-crm-guide-start>Mulai simulasi</button>
+        <span data-crm-guide-step-label>LANGKAH 1 DARI 8</span>
+        <h3 data-crm-guide-title>Menu Autopilot CRM</h3>
+        <p data-crm-guide-body>Sidebar selaras Motovax: Customer, Pipeline, Auto Follow Customer, dan Panduan.</p>
+        <div class="demo-guide-actions">
+          <button type="button" class="demo-secondary-action" data-crm-guide-prev hidden>Kembali</button>
+          <button type="button" data-crm-guide-next>Lanjut</button>
+          <button type="button" data-crm-guide-finish hidden>Selesai</button>
+        </div>
       </div>
 
       <div class="demo-toast crm-toast" role="status" aria-live="polite" data-crm-toast hidden>
