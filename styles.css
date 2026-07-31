@@ -1767,23 +1767,29 @@ body.demo-open {
 
 .demo-app {
   position: relative;
+  display: flex;
+  flex-direction: column;
   width: 100%;
   height: 100%;
+  min-height: 0;
   overflow: hidden;
 }
 
 .demo-topbar {
   position: relative;
   z-index: 4;
+  flex: 0 0 auto;
   min-height: 68px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 20px;
-  padding: 0 22px;
+  flex-wrap: wrap;
+  gap: 12px 20px;
+  padding: 8px 22px;
   border-bottom: 1px solid #e2e8f0;
   background: rgba(255, 255, 255, 0.96);
   box-shadow: 0 2px 12px rgba(15, 23, 42, 0.04);
+  min-width: 0;
 }
 
 .demo-brand-wrap,
@@ -1794,6 +1800,8 @@ body.demo-open {
 
 .demo-brand-wrap {
   gap: 14px;
+  min-width: 0;
+  flex: 1 1 auto;
 }
 
 .demo-brand {
@@ -1816,10 +1824,15 @@ body.demo-open {
 .demo-brand-wrap > div {
   display: grid;
   gap: 2px;
+  min-width: 0;
 }
 
 .demo-brand-wrap b {
   font-size: 13px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: min(320px, 42vw);
 }
 
 .demo-brand-wrap div span {
@@ -1829,6 +1842,10 @@ body.demo-open {
 
 .demo-topbar-actions {
   gap: 10px;
+  flex: 0 1 auto;
+  min-width: 0;
+  flex-wrap: wrap;
+  justify-content: flex-end;
 }
 
 .demo-mode {
@@ -1901,7 +1918,9 @@ body.demo-open {
 }
 
 .demo-layout {
-  height: calc(100vh - 68px);
+  flex: 1 1 auto;
+  height: auto;
+  min-height: 0;
   display: grid;
   grid-template-columns: 220px minmax(0, 1fr);
 }
@@ -1913,6 +1932,8 @@ body.demo-open {
   padding: 18px 12px;
   border-right: 1px solid #e2e8f0;
   background: #fff;
+  min-height: 0;
+  overflow: auto;
 }
 
 .demo-sidebar nav {
@@ -1994,9 +2015,12 @@ body.demo-open {
 
 .demo-workspace {
   min-width: 0;
+  min-height: 0;
   overflow: auto;
+  overflow-x: hidden;
   padding: 25px 28px 30px;
   background: #f8fafc;
+  -webkit-overflow-scrolling: touch;
 }
 
 .ims-view[hidden] {
@@ -2073,15 +2097,18 @@ body.demo-open {
 
 .falcon-demo-layout {
   display: grid;
-  grid-template-columns: minmax(220px, 1fr) minmax(280px, 340px);
+  grid-template-columns: minmax(0, 1fr) minmax(min(100%, 260px), 340px);
   gap: 22px;
   align-items: start;
   margin-top: 18px;
+  min-width: 0;
+  width: 100%;
 }
 
 .falcon-role-panel {
   display: grid;
   gap: 14px;
+  min-width: 0;
 }
 
 .falcon-role-badge {
@@ -2130,8 +2157,9 @@ body.demo-open {
   background: #fff;
   display: grid;
   gap: 8px;
-  max-height: min(420px, 50vh);
+  max-height: min(420px, 50vh, 42dvh);
   overflow-y: auto;
+  min-width: 0;
 }
 
 .falcon-tutorial-list li {
@@ -2151,10 +2179,12 @@ body.demo-open {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
+  min-width: 0;
 }
 
 .falcon-quick-prompts button {
   min-height: 30px;
+  max-width: 100%;
   padding: 0 10px;
   border: 1px solid #e2e8f0;
   border-radius: 999px;
@@ -2165,6 +2195,9 @@ body.demo-open {
   font-weight: 700;
   cursor: pointer;
   text-align: left;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .falcon-quick-prompts button:hover {
@@ -2173,15 +2206,18 @@ body.demo-open {
 
 .iphone-frame {
   width: min(100%, 320px);
+  max-width: 100%;
   margin: 0 auto;
   padding: 12px 10px 18px;
   border-radius: 36px;
   background: linear-gradient(160deg, #1e293b, #0f172a);
   box-shadow: 0 24px 50px rgba(15, 23, 42, 0.28);
+  justify-self: center;
+  box-sizing: border-box;
 }
 
 .iphone-notch {
-  width: 110px;
+  width: min(110px, 40%);
   height: 18px;
   margin: 0 auto 8px;
   border-radius: 0 0 12px 12px;
@@ -2191,10 +2227,12 @@ body.demo-open {
 .iphone-screen {
   overflow: hidden;
   display: grid;
-  grid-template-rows: auto 1fr auto;
-  height: 560px;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  height: min(560px, max(340px, calc(100dvh - 220px)));
+  max-height: min(560px, 72dvh);
   border-radius: 28px;
   background: #ece5dd;
+  min-height: 0;
 }
 
 .wa-header {
@@ -2242,12 +2280,24 @@ body.demo-open {
   display: block;
   font-size: 13px;
   line-height: 1.2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
 }
 
 .wa-header small {
   display: block;
   color: rgba(255, 255, 255, 0.8);
   font-size: 10px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
+}
+
+.wa-header-left > div {
+  min-width: 0;
 }
 
 .wa-header-actions {
@@ -2413,11 +2463,12 @@ body.demo-open {
 
 .wa-composer {
   display: grid;
-  grid-template-columns: 36px 1fr 36px;
+  grid-template-columns: 36px minmax(0, 1fr) 36px;
   gap: 6px;
   align-items: center;
   padding: 8px;
   background: #f0f2f5;
+  min-width: 0;
 }
 
 .wa-composer input {
@@ -2454,14 +2505,56 @@ body.demo-open {
   font-size: 13px;
 }
 
-@media (max-width: 900px) {
+/* Stack lebih awal: zoom 150% di laptop ~900–1100 CSS px agar kolom tidak remuk */
+@media (max-width: 1100px) {
   .falcon-demo-layout {
     grid-template-columns: 1fr;
+    gap: 16px;
   }
 
   .iphone-frame {
     width: min(100%, 340px);
   }
+}
+
+/* Viewport pendek (zoom 150% pada tinggi 768–900) */
+@media (max-height: 720px) {
+  .iphone-screen {
+    height: min(460px, max(300px, calc(100dvh - 180px)));
+    max-height: min(460px, 68dvh);
+  }
+
+  .falcon-tutorial-list {
+    max-height: min(260px, 34dvh, 40vh);
+  }
+
+  .ims-view[data-ims-view="falcon"] .demo-page-heading p {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+}
+
+/* Heading AI Falcon: aman wrap saat lebar efektif menyusut (zoom) */
+.ims-view[data-ims-view="falcon"] .demo-page-heading {
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 12px 16px;
+}
+
+.ims-view[data-ims-view="falcon"] .demo-page-heading > div {
+  min-width: 0;
+  flex: 1 1 220px;
+}
+
+.ims-view[data-ims-view="falcon"] .demo-page-heading p {
+  max-width: min(62ch, 100%);
+  overflow-wrap: anywhere;
+}
+
+.ims-view[data-ims-view="falcon"] .demo-page-heading .demo-primary-action {
+  flex: 0 0 auto;
 }
 
 .ims-branch-totals {
@@ -6560,7 +6653,9 @@ body.demo-open {
   }
 
   .demo-layout {
-    height: calc(100vh - 64px);
+    /* tinggi mengikuti flex parent (.demo-app), bukan calc topbar tetap */
+    height: auto;
+    min-height: 0;
   }
 
   .demo-workspace {
