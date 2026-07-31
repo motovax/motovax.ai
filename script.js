@@ -493,6 +493,8 @@ class InventoryProductDemo {
     this.falconMessages = [];
     this.falconSalesDone = false;
     this.falconTutorialDone = { sales: {}, management: {} };
+    /** Focus unit for Falcon photo demo: { unit, gallery: [{label, slot, url}] } */
+    this.falconFocus = null;
 
     this.tableBody = root.querySelector("[data-demo-table-body]");
     this.mobileList = root.querySelector("[data-demo-mobile-list]");
@@ -571,13 +573,13 @@ class InventoryProductDemo {
       {
         view: "falcon",
         title: "Sales: minta foto unit",
-        body: "photo_send — “Minta foto” unit. Falcon mengirim foto real dari galeri tenant demo.",
+        body: "photo_send — fokus 1 unit, Falcon balas 3 foto (depan · samping · interior).",
         enter: () => this.sendFalconUserMessage("Minta foto", { fromGuide: true }),
       },
       {
         view: "falcon",
         title: "Sales: upload foto stok",
-        body: "Tekan 📎 — kirim 2–3 foto unit real + pesan update nopol; stok demo ter-update.",
+        body: "📎 update unit yang sama: +2 foto baru → total 5 foto berbeda.",
         enter: () => this.simulateFalconPhotoUpload({ fromGuide: true }),
       },
       {
@@ -1160,6 +1162,7 @@ class InventoryProductDemo {
     this.guideStepIndex = 0;
     this.falconSalesDone = false;
     this.falconTutorialDone = { sales: {}, management: {} };
+    this.falconFocus = null;
     this.setFalconRole("sales", { greet: true, reset: true });
     this.setView("units");
     this.setUploadTab("inventory");
@@ -1167,6 +1170,7 @@ class InventoryProductDemo {
   }
 
   initFalconChat() {
+    this.falconFocus = null;
     this.setFalconRole("sales", { greet: true, reset: true });
   }
 
@@ -1177,6 +1181,7 @@ class InventoryProductDemo {
 
     if (options.reset) {
       this.falconMessages = [];
+      this.falconFocus = null;
     }
 
     this.renderFalconChrome();
@@ -1408,13 +1413,9 @@ class InventoryProductDemo {
     }, options.fromGuide ? 280 : 420);
   }
 
-  unitPhotoUrl(unit) {
+  resolveDemoUnitId(unit) {
     if (!unit) return "";
-    if (unit.photoUrl) return unit.photoUrl;
-    if (unit.id && /^[0-9a-f]{8}-[0-9a-f-]{27,}$/i.test(String(unit.id))) {
-      return `https://mobix.motovax.com/api/public/demo/motovax-ai/units/${unit.id}/cover`;
-    }
-    // Fallback: map seed brand/type → known demo-tenant unit ids (public cover API).
+    if (unit.id && /^[0-9a-f]{8}-[0-9a-f-]{27,}$/i.test(String(unit.id))) return unit.id;
     const map = {
       serena: "1ba7674e-246d-4bdb-9902-f516cc59ba0e",
       ertiga: "5d746149-b8dc-4b27-997f-04b704fd2037",
@@ -1427,88 +1428,147 @@ class InventoryProductDemo {
     };
     const hay = `${unit.brand || ""} ${unit.type || ""}`.toLocaleLowerCase("id");
     for (const [key, id] of Object.entries(map)) {
-      if (hay.includes(key)) {
-        return `https://mobix.motovax.com/api/public/demo/motovax-ai/units/${id}/cover`;
-      }
+      if (hay.includes(key)) return id;
     }
     return "";
   }
 
-  unitsForPhotoDemo(limit = 3) {
-    const source = this.units.length ? this.units : inventoryDemoSeed;
-    const ready = source.filter(
-      (u) => String(u.status).toUpperCase().includes("READY") || u.status === "UNIT READY",
-    );
-    const pool = (ready.length ? ready : source).slice();
-    // Prefer units that already resolve to a cover URL.
-    pool.sort((a, b) => Number(Boolean(this.unitPhotoUrl(b))) - Number(Boolean(this.unitPhotoUrl(a))));
-    return pool.slice(0, Math.max(2, Math.min(limit, 3)));
+  unitPhotoUrl(unit, slot = 0) {
+    if (!unit) return "";
+    const id = this.resolveDemoUnitId(unit);
+    if (!id) return unit.photoUrl || "";
+    const index = Math.max(0, Number(slot) || 0);
+    // Cache-bust per slot so the browser shows distinct frames after seed.
+    return `https://mobix.motovax.com/api/public/demo/motovax-ai/units/${id}/cover?i=${index}`;
   }
 
-  photoCardsFromUnits(units) {
-    return units.map((u) => ({
-      label: `${u.brand} ${u.type}`,
-      meta: `${u.plate || "—"} · ${u.year || ""}`,
-      url: this.unitPhotoUrl(u),
-      unitId: u.id,
-      plate: u.plate,
+  /** Pick a single focus unit for Falcon photo flows (prefer Ready + resolvable cover). */
+  pickFocusUnit(text = "") {
+    if (this.falconFocus?.unit) {
+      // Keep the same unit across minta foto → update foto in one demo session.
+      const live =
+        this.units.find((u) => u.id === this.falconFocus.unit.id) || this.falconFocus.unit;
+      this.falconFocus.unit = live;
+      return live;
+    }
+    const matched = this.pickUnitsForChat(text, 8);
+    const pool = matched.length
+      ? matched
+      : (this.units.length ? this.units : inventoryDemoSeed).filter(
+          (u) => String(u.status).toUpperCase().includes("READY") || u.status === "UNIT READY",
+        );
+    const sorted = [...pool].sort(
+      (a, b) => Number(Boolean(this.resolveDemoUnitId(b))) - Number(Boolean(this.resolveDemoUnitId(a))),
+    );
+    const unit = sorted[0] || (this.units[0] || inventoryDemoSeed[0]);
+    if (unit) {
+      this.falconFocus = {
+        unit,
+        gallery: [],
+      };
+      // Seed baseline 3 gallery slots for this unit (depan/samping/interior).
+      this.ensureFocusGalleryBase();
+    }
+    return unit;
+  }
+
+  ensureFocusGalleryBase() {
+    if (!this.falconFocus?.unit) return;
+    const unit = this.falconFocus.unit;
+    if (this.falconFocus.gallery.length >= 3) return;
+    const baseLabels = ["Foto depan", "Foto samping", "Foto interior"];
+    this.falconFocus.gallery = baseLabels.map((label, slot) => ({
+      label,
+      slot,
+      url: this.unitPhotoUrl(unit, slot),
+      meta: `${unit.plate || "—"} · ${label}`,
     }));
+    // Baseline stock photo count = 3 if still empty/low.
+    const live = this.units.find((u) => u.id === unit.id);
+    if (live && (!live.photos || live.photos < 3)) {
+      live.photos = 3;
+      live.photoUrl = this.unitPhotoUrl(live, 0);
+    }
+    if (!unit.photos || unit.photos < 3) {
+      unit.photos = 3;
+      unit.photoUrl = this.unitPhotoUrl(unit, 0);
+    }
+  }
+
+  focusGalleryCards(slots) {
+    if (!this.falconFocus?.unit) return [];
+    const unit = this.falconFocus.unit;
+    return slots.map((slot) => {
+      const existing = this.falconFocus.gallery.find((g) => g.slot === slot);
+      if (existing) return { ...existing, unitId: unit.id, plate: unit.plate };
+      return {
+        label: `Foto ${slot + 1}`,
+        meta: unit.plate || "—",
+        slot,
+        url: this.unitPhotoUrl(unit, slot),
+        unitId: unit.id,
+        plate: unit.plate,
+      };
+    });
   }
 
   simulateFalconPhotoUpload(options = {}) {
-    const units = this.unitsForPhotoDemo(3);
-    if (!units.length) {
+    const unit = this.pickFocusUnit("");
+    if (!unit) {
       this.pushFalconUser("📷 [Foto unit dari galeri]", { photo: true });
       this.renderFalconMessages();
       return;
     }
+    this.ensureFocusGalleryBase();
 
-    const lines = units.map(
-      (u) =>
-        `tolong update unit ${u.brand} ${u.type} dengan nopol ${u.plate || "—"}`,
-    );
-    const userText = lines.join("\n");
-    const photos = this.photoCardsFromUnits(units);
+    // Before update: baseline 3 (depan/samping/interior). Upload adds 2 new angles.
+    const beforeCount = Math.max(this.falconFocus.gallery.length, Number(unit.photos) || 0, 3);
+    const newSlots = [beforeCount, beforeCount + 1]; // e.g. 3,4 → total 5
+    const newLabels = ["Foto mesin / detail", "Foto dashboard / kabin"];
+    const newPhotos = newSlots.map((slot, idx) => {
+      const card = {
+        label: newLabels[idx] || `Foto baru ${idx + 1}`,
+        slot,
+        url: this.unitPhotoUrl(unit, slot),
+        meta: `${unit.plate || "—"} · baru`,
+        unitId: unit.id,
+        plate: unit.plate,
+      };
+      this.falconFocus.gallery.push(card);
+      return card;
+    });
 
-    this.pushFalconUser(userText, { photo: true, photos });
+    const userText = `tolong update unit ${unit.brand} ${unit.type} dengan nopol ${unit.plate || "—"}`;
+    this.pushFalconUser(userText, { photo: true, photos: newPhotos });
     this.renderFalconMessages();
 
     window.setTimeout(() => {
-      // Update demo stock photo counts (local seed / tenant snapshot in memory).
-      for (const unit of units) {
-        const live = this.units.find((item) => item.id === unit.id) || unit;
-        const nextCount = Math.max(Number(live.photos) || 0, 0) + 2;
-        live.photos = nextCount;
-        if (!live.photoUrl) live.photoUrl = this.unitPhotoUrl(live);
-        // Mirror onto this.units if the picked unit came from seed copy.
-        const idx = this.units.findIndex((item) => item.id === unit.id);
-        if (idx >= 0) {
-          this.units[idx].photos = nextCount;
-          if (!this.units[idx].photoUrl) this.units[idx].photoUrl = live.photoUrl;
-        }
+      const afterCount = this.falconFocus.gallery.length; // 5
+      const live = this.units.find((item) => item.id === unit.id) || unit;
+      live.photos = afterCount;
+      live.photoUrl = this.unitPhotoUrl(live, 0);
+      const idx = this.units.findIndex((item) => item.id === unit.id);
+      if (idx >= 0) {
+        this.units[idx].photos = afterCount;
+        this.units[idx].photoUrl = live.photoUrl;
       }
+      unit.photos = afterCount;
       this.render();
 
-      const updatedLines = units
-        .map((u) => {
-          const live = this.units.find((item) => item.id === u.id) || u;
-          return `• ${u.brand} ${u.type} · nopol ${u.plate || "—"} → ${live.photos || 0} foto (galeri demo)`;
-        })
-        .join("\n");
+      const allPhotos = this.falconFocus.gallery.map((g) => ({
+        ...g,
+        meta: `${unit.plate || "—"} · ${g.label}`,
+      }));
 
-      if (this.falconRole === "sales") {
-        this.pushFalconBot(
-          `Foto diterima ✅ Saya tautkan ke unit stok demo:\n${updatedLines}\n\nDi Mobix, upload foto lewat WA memutakhirkan galeri unit tenant Anda. Demo ini hanya mengubah stok di sesi landing (bukan DB production).`,
-          { photos },
-        );
-        this.markFalconTutorial("upload");
-      } else {
-        this.pushFalconBot(
-          `Foto stok diterima (Management) ✅ Multi-unit merge:\n${updatedLines}\n\nSiap digabung ke galeri tenant seperti di Motovax. Demo landing tidak menulis ke DB production.`,
-          { photos },
-        );
-        this.markFalconTutorial("import");
-      }
+      this.pushFalconBot(
+        `Foto diterima ✅ Unit ${unit.brand} ${unit.type} (nopol ${unit.plate || "—"})\n` +
+          `• Sebelumnya: ${beforeCount} foto\n` +
+          `• Ditambah: ${newPhotos.length} foto baru (${newPhotos.map((p) => p.label).join(", ")})\n` +
+          `• Sekarang: ${afterCount} foto berbeda di galeri unit ini\n\n` +
+          `Di Mobix upload WA memutakhirkan galeri unit tenant. Demo landing hanya update stok di sesi ini.`,
+        { photos: allPhotos },
+      );
+      this.markFalconTutorial(this.falconRole === "sales" ? "upload" : "import");
       this.renderFalconMessages();
     }, options.fromGuide ? 280 : 400);
   }
@@ -1620,23 +1680,25 @@ class InventoryProductDemo {
       };
     }
 
-    // 8) Foto
+    // 8) Foto — always one focus unit, multiple angles
     if (/minta foto|kirim foto|foto unit|lihat foto/.test(text)) {
-      let units = this.pickUnitsForChat(text, 3);
-      // Prefer units that have a resolvable cover image.
-      units = units
-        .map((u) => ({ u, url: this.unitPhotoUrl(u) }))
-        .sort((a, b) => Number(Boolean(b.url)) - Number(Boolean(a.url)))
-        .map((x) => x.u)
-        .slice(0, 3);
-      if (!units.length) units = this.unitsForPhotoDemo(2);
-      const photos = this.photoCardsFromUnits(units);
+      const unit = this.pickFocusUnit(raw);
+      if (!unit) {
+        return { text: "Belum ada unit cocok. Sebut merek/tipe unit dulu, ya." };
+      }
+      this.ensureFocusGalleryBase();
+      const photos = this.focusGalleryCards([0, 1, 2]);
+      const live = this.units.find((u) => u.id === unit.id) || unit;
       return {
         tutorialId: isSales ? "photo" : undefined,
         photos,
-        text: units.length
-          ? `Berikut foto unit (photo_send) untuk ${units.map((u) => `${u.brand} ${u.type} · ${u.plate || "—"}`).join(" & ")}. Foto diambil dari galeri tenant demo (cover real).`
-          : "Belum ada unit cocok. Sebut merek/tipe unit dulu, ya.",
+        text:
+          `Detail unit (photo_send):\n` +
+          `• ${unit.brand} ${unit.type} ${unit.year || ""}\n` +
+          `• Nopol ${unit.plate || "—"}\n` +
+          `• Status ${this.statusLabel(unit.status)} · ${this.titleCase(unit.branch || "-")}\n` +
+          `• Galeri: ${live.photos || photos.length} foto\n\n` +
+          `Saya kirim 3 foto unit ini: depan, samping, dan interior (dari galeri tenant demo).`,
       };
     }
 

@@ -2309,13 +2309,17 @@ body.demo-open {
 
 .wa-photo-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(auto-fit, minmax(78px, 1fr));
   gap: 6px;
   margin-bottom: 8px;
 }
 
 .wa-photo-grid-out {
   grid-template-columns: repeat(auto-fit, minmax(88px, 1fr));
+}
+
+.wa-photo-grid-in {
+  grid-template-columns: repeat(auto-fit, minmax(78px, 1fr));
 }
 
 .wa-photo-card {
