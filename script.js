@@ -495,6 +495,18 @@ class InventoryProductDemo {
     this.falconTutorialDone = { sales: {}, management: {} };
     /** Focus unit for Falcon photo demo: { unit, gallery: [{label, slot, url}] } */
     this.falconFocus = null;
+    this.advOpen = false;
+    this.advFilters = {
+      brand: "",
+      type: "",
+      plate: "",
+      transmission: "",
+      bodyType: "",
+      minPrice: "",
+      maxPrice: "",
+      minAging: "",
+      maxAging: "",
+    };
 
     this.tableBody = root.querySelector("[data-demo-table-body]");
     this.mobileList = root.querySelector("[data-demo-mobile-list]");
@@ -503,6 +515,12 @@ class InventoryProductDemo {
     this.branchSelect = root.querySelector("[data-demo-branch]");
     this.sortSelect = root.querySelector("[data-demo-sort]");
     this.resultCount = root.querySelector("[data-demo-result-count]");
+    this.advPanel = root.querySelector("[data-ims-adv-panel]");
+    this.advToggle = root.querySelector("[data-ims-adv-toggle]");
+    this.advBadge = root.querySelector("[data-ims-adv-badge]");
+    this.activeChips = root.querySelector("[data-ims-active-chips]");
+    this.exportToggle = root.querySelector("[data-ims-export-toggle]");
+    this.exportMenu = root.querySelector("[data-ims-export-menu]");
     this.detailPanel = root.querySelector(".demo-detail-panel");
     this.detailBackdrop = root.querySelector("[data-demo-detail-backdrop]");
     this.guide = root.querySelector("[data-demo-guide-popover]");
@@ -540,7 +558,7 @@ class InventoryProductDemo {
       {
         view: "units",
         title: "Manajemen Unit",
-        body: "Cari merek/tipe, filter status Ready/Booked/Sold, lalu buka detail unit. Coba booking unit Ready (tersimpan di tenant demo).",
+        body: "UI selaras Motovax App: cari plat/brand, filter Stok Aktif/Ready/Booked, Filter Lanjutan, lalu buka detail unit. Coba booking unit Ready (tersimpan di tenant demo).",
       },
       {
         view: "per-cabang",
@@ -815,25 +833,93 @@ class InventoryProductDemo {
       });
     }
 
-    this.searchInput.addEventListener("input", () => {
+    this.searchInput?.addEventListener("input", () => {
       this.query = this.searchInput.value.trim().toLocaleLowerCase("id");
       this.render();
     });
 
-    this.branchSelect.addEventListener("change", () => {
+    this.branchSelect?.addEventListener("change", () => {
       this.branch = this.branchSelect.value;
       this.render();
     });
 
-    this.sortSelect.addEventListener("change", () => {
+    this.sortSelect?.addEventListener("change", () => {
       this.sort = this.sortSelect.value;
+      this.syncAdvSortControl();
       this.render();
     });
 
-    this.tableBody.addEventListener("click", (event) => this.handleUnitActivation(event));
-    this.tableBody.addEventListener("keydown", (event) => this.handleUnitActivation(event));
-    this.mobileList.addEventListener("click", (event) => this.handleUnitActivation(event));
-    this.mobileList.addEventListener("keydown", (event) => this.handleUnitActivation(event));
+    this.advToggle?.addEventListener("click", () => {
+      this.advOpen = !this.advOpen;
+      this.renderAdvPanel();
+    });
+
+    this.root.querySelector("[data-ims-adv-reset]")?.addEventListener("click", () => {
+      this.resetAdvFilters();
+      this.render();
+    });
+
+    for (const field of this.root.querySelectorAll("[data-ims-adv]")) {
+      const key = field.dataset.imsAdv;
+      const handler = () => {
+        if (key === "sort") {
+          this.sort = field.value || "newest";
+          if (this.sortSelect) this.sortSelect.value = this.sort;
+        } else if (key && Object.prototype.hasOwnProperty.call(this.advFilters, key)) {
+          this.advFilters[key] = field.value.trim();
+        }
+        this.render();
+      };
+      field.addEventListener("input", handler);
+      field.addEventListener("change", handler);
+    }
+
+    this.exportToggle?.addEventListener("click", (event) => {
+      event.stopPropagation();
+      const open = this.exportMenu && this.exportMenu.hidden;
+      if (this.exportMenu) this.exportMenu.hidden = !open;
+      this.exportToggle.setAttribute("aria-expanded", open ? "true" : "false");
+    });
+
+    for (const button of this.root.querySelectorAll("[data-ims-export]")) {
+      button.addEventListener("click", () => {
+        this.exportUnits(button.dataset.imsExport || "csv");
+        if (this.exportMenu) this.exportMenu.hidden = true;
+        this.exportToggle?.setAttribute("aria-expanded", "false");
+      });
+    }
+
+    document.addEventListener("click", (event) => {
+      if (!this.exportMenu || this.exportMenu.hidden) return;
+      if (event.target.closest("[data-ims-export-toggle]") || event.target.closest("[data-ims-export-menu]")) {
+        return;
+      }
+      this.exportMenu.hidden = true;
+      this.exportToggle?.setAttribute("aria-expanded", "false");
+    });
+
+    this.activeChips?.addEventListener("click", (event) => {
+      const chipBtn = event.target.closest("[data-ims-chip-clear]");
+      if (!chipBtn) return;
+      const kind = chipBtn.dataset.imsChipClear;
+      if (kind === "branch") {
+        this.branch = "ALL";
+        if (this.branchSelect) this.branchSelect.value = "ALL";
+      } else if (kind === "status") {
+        this.status = "ALL";
+      } else if (kind === "adv") {
+        this.resetAdvFilters();
+      } else if (kind === "all") {
+        this.clearFilters();
+        return;
+      }
+      this.render();
+    });
+
+    this.tableBody?.addEventListener("click", (event) => this.handleUnitActivation(event));
+    this.tableBody?.addEventListener("keydown", (event) => this.handleUnitActivation(event));
+    this.mobileList?.addEventListener("click", (event) => this.handleUnitActivation(event));
+    this.mobileList?.addEventListener("keydown", (event) => this.handleUnitActivation(event));
 
     const handleBranchFilterClick = (event) => {
       const card = event.target.closest("[data-ims-branch-filter]");
@@ -856,14 +942,16 @@ class InventoryProductDemo {
     for (const button of this.root.querySelectorAll("[data-close-demo-detail]")) {
       button.addEventListener("click", () => this.closeDetail());
     }
-    this.detailBackdrop.addEventListener("click", () => this.closeDetail());
+    this.detailBackdrop?.addEventListener("click", () => this.closeDetail());
 
-    this.bookingButton.addEventListener("click", () => this.bookSelectedUnit());
-    this.root.querySelector("[data-demo-reset]").addEventListener("click", () => this.reset());
-    this.root.querySelector("[data-demo-clear-filter]").addEventListener("click", () => {
-      this.clearFilters();
-      this.searchInput.focus();
-    });
+    this.bookingButton?.addEventListener("click", () => this.bookSelectedUnit());
+    this.root.querySelector("[data-demo-reset]")?.addEventListener("click", () => this.reset());
+    for (const button of this.root.querySelectorAll("[data-demo-clear-filter]")) {
+      button.addEventListener("click", () => {
+        this.clearFilters();
+        this.searchInput?.focus();
+      });
+    }
 
     for (const button of this.root.querySelectorAll("[data-demo-guide]")) {
       button.addEventListener("click", () => this.openGuide(0));
@@ -933,8 +1021,8 @@ class InventoryProductDemo {
 
     const tips = {
       units: {
-        title: "Coba cari dan filter unit",
-        body: "Klik salah satu unit untuk melihat detail lalu coba ubah statusnya menjadi booked.",
+        title: "Coba filter seperti di app",
+        body: "Pakai bar filter (cabang, status, Filter Lanjutan) lalu klik unit untuk detail — layout mirip Manajemen Unit Motovax App.",
       },
       "per-cabang": {
         title: "Pantau stok per cabang",
@@ -1148,10 +1236,225 @@ class InventoryProductDemo {
     this.branch = "ALL";
     this.query = "";
     this.sort = "newest";
-    this.searchInput.value = "";
-    this.branchSelect.value = "ALL";
-    this.sortSelect.value = "newest";
+    if (this.searchInput) this.searchInput.value = "";
+    if (this.branchSelect) this.branchSelect.value = "ALL";
+    if (this.sortSelect) this.sortSelect.value = "newest";
+    this.resetAdvFilters();
     this.render();
+  }
+
+  resetAdvFilters() {
+    this.advFilters = {
+      brand: "",
+      type: "",
+      plate: "",
+      transmission: "",
+      bodyType: "",
+      minPrice: "",
+      maxPrice: "",
+      minAging: "",
+      maxAging: "",
+    };
+    this.sort = "newest";
+    if (this.sortSelect) this.sortSelect.value = "newest";
+    for (const field of this.root.querySelectorAll("[data-ims-adv]")) {
+      const key = field.dataset.imsAdv;
+      if (key === "sort") {
+        field.value = "newest";
+      } else {
+        field.value = "";
+      }
+    }
+  }
+
+  syncAdvSortControl() {
+    const sortField = this.root.querySelector('[data-ims-adv="sort"]');
+    if (sortField) sortField.value = this.sort;
+  }
+
+  countActiveAdvFilters() {
+    return Object.values(this.advFilters).filter((value) => String(value || "").trim() !== "").length;
+  }
+
+  renderAdvPanel() {
+    if (this.advPanel) this.advPanel.hidden = !this.advOpen;
+    if (this.advToggle) {
+      this.advToggle.classList.toggle("is-open", this.advOpen);
+      this.advToggle.setAttribute("aria-expanded", this.advOpen ? "true" : "false");
+      const count = this.countActiveAdvFilters();
+      this.advToggle.classList.toggle("has-filters", count > 0);
+      if (this.advBadge) {
+        this.advBadge.hidden = count === 0;
+        this.advBadge.textContent = String(count);
+      }
+    }
+  }
+
+  renderActiveChips() {
+    if (!this.activeChips) return;
+    const chips = [];
+    if (this.branch && this.branch !== "ALL") {
+      chips.push(
+        `<span class="ims-chip">Cabang: ${this.escapeHtml(this.titleCase(this.branch))} <button type="button" data-ims-chip-clear="branch" aria-label="Hapus filter cabang">×</button></span>`,
+      );
+    }
+    if (this.status && this.status !== "ALL") {
+      const label =
+        this.status === "ACTIVE"
+          ? "Stok Aktif"
+          : this.status === "UNIT READY"
+            ? "Ready"
+            : this.status === "BOOKED"
+              ? "Booked"
+              : this.status === "SOLD"
+                ? "Sold"
+                : this.status;
+      chips.push(
+        `<span class="ims-chip">Status: ${this.escapeHtml(label)} <button type="button" data-ims-chip-clear="status" aria-label="Hapus filter status">×</button></span>`,
+      );
+    }
+    const advCount = this.countActiveAdvFilters();
+    if (advCount > 0) {
+      chips.push(
+        `<span class="ims-chip">Filter Lanjutan (${advCount}) <button type="button" data-ims-chip-clear="adv" aria-label="Hapus filter lanjutan">×</button></span>`,
+      );
+    }
+    if (chips.length) {
+      chips.push(`<button type="button" class="ims-chip-clear" data-ims-chip-clear="all">Hapus semua</button>`);
+    }
+    this.activeChips.innerHTML = chips.join("");
+  }
+
+  escapeHtml(value) {
+    return String(value ?? "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#39;");
+  }
+
+  matchesAdvFilters(unit) {
+    const f = this.advFilters;
+    if (f.brand && !`${unit.brand || ""}`.toLocaleLowerCase("id").includes(f.brand.toLocaleLowerCase("id"))) {
+      return false;
+    }
+    if (f.type && !`${unit.type || ""}`.toLocaleLowerCase("id").includes(f.type.toLocaleLowerCase("id"))) {
+      return false;
+    }
+    if (f.plate && !`${unit.plate || ""}`.toLocaleLowerCase("id").includes(f.plate.toLocaleLowerCase("id"))) {
+      return false;
+    }
+    if (f.transmission) {
+      const unitTrans = `${unit.transmission || ""}`.toLocaleLowerCase("id");
+      if (!unitTrans.includes(f.transmission.toLocaleLowerCase("id"))) return false;
+    }
+    if (f.bodyType) {
+      const body = `${unit.bodyType || unit.category || ""}`.toLocaleLowerCase("id");
+      if (body !== f.bodyType.toLocaleLowerCase("id")) return false;
+    }
+    const price = Number(unit.cashPrice || 0);
+    if (f.minPrice !== "" && Number.isFinite(Number(f.minPrice))) {
+      if (price < Number(f.minPrice) * 1000000) return false;
+    }
+    if (f.maxPrice !== "" && Number.isFinite(Number(f.maxPrice))) {
+      if (price > Number(f.maxPrice) * 1000000) return false;
+    }
+    const aging = Number(unit.aging || 0);
+    if (f.minAging !== "" && Number.isFinite(Number(f.minAging)) && aging < Number(f.minAging)) {
+      return false;
+    }
+    if (f.maxAging !== "" && Number.isFinite(Number(f.maxAging)) && aging > Number(f.maxAging)) {
+      return false;
+    }
+    return true;
+  }
+
+  agingClass(unit) {
+    if (unit.status === "SOLD") return "sold";
+    if ((unit.aging || 0) > 60) return "high";
+    if ((unit.aging || 0) > 30) return "mid";
+    return "ok";
+  }
+
+  agingLabel(unit) {
+    const aging = unit.aging ?? "-";
+    if (unit.status === "SOLD") return `${aging} hr aging saat terjual`;
+    return `${aging} hr aging`;
+  }
+
+  formatFullPrice(value) {
+    if (value === null || value === undefined || value === 0) return "-";
+    return `Rp ${new Intl.NumberFormat("id-ID").format(value)}`;
+  }
+
+  exportUnits(kind) {
+    const units = this.getVisibleUnits();
+    if (!units.length) {
+      this.toast.querySelector("b").textContent = "Tidak ada data unit";
+      this.toast.querySelector("p").textContent = "Sesuaikan filter lalu coba export lagi.";
+      this.toast.hidden = false;
+      return;
+    }
+
+    if (kind === "pdf") {
+      const rows = units
+        .map(
+          (unit) =>
+            `<tr><td>${this.escapeHtml(unit.plate)}</td><td>${this.escapeHtml(unit.brand)}</td><td>${this.escapeHtml(unit.type)}</td><td>${this.escapeHtml(unit.status)}</td><td>${this.escapeHtml(unit.aging)}</td><td>${this.escapeHtml(unit.branch)}</td></tr>`,
+        )
+        .join("");
+      const printWindow = window.open("", "_blank", "width=1200,height=800");
+      if (!printWindow) {
+        this.toast.querySelector("b").textContent = "Popup diblokir";
+        this.toast.querySelector("p").textContent = "Izinkan popup browser untuk export PDF.";
+        this.toast.hidden = false;
+        return;
+      }
+      printWindow.document.write(`<!doctype html><html><head><title>Export Unit</title>
+        <style>body{font-family:Arial,sans-serif;padding:24px}table{width:100%;border-collapse:collapse}th,td{border:1px solid #d1d5db;padding:8px;font-size:12px;text-align:left}th{background:#f3f4f6}</style>
+        </head><body><h1>Manajemen Unit - Export Data</h1><p>Total data: ${units.length}</p>
+        <table><thead><tr><th>Plate No</th><th>Brand</th><th>Type</th><th>Status</th><th>Aging (hr)</th><th>Branch</th></tr></thead>
+        <tbody>${rows}</tbody></table></body></html>`);
+      printWindow.document.close();
+      printWindow.focus();
+      setTimeout(() => printWindow.print(), 200);
+      return;
+    }
+
+    const headers = [
+      "Plate No",
+      "Brand",
+      "Type",
+      "Year",
+      "Color",
+      "Status",
+      "Aging (hr)",
+      "Branch",
+      "Harga Beli",
+      "Harga Jual Cash",
+    ];
+    const escapeCsv = (value) => `"${String(value ?? "").replace(/"/g, '""')}"`;
+    const rows = units.map((unit) => [
+      unit.plate,
+      unit.brand,
+      unit.type,
+      unit.year,
+      unit.color,
+      unit.status,
+      unit.aging,
+      unit.branch,
+      unit.buyingPrice ?? "",
+      unit.cashPrice ?? "",
+    ]);
+    const csv = [headers, ...rows].map((row) => row.map(escapeCsv).join(",")).join("\n");
+    const blob = new Blob([`\uFEFF${csv}`], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement("a");
+    anchor.href = url;
+    anchor.download = `units-export-${new Date().toISOString().slice(0, 19).replace(/[:T]/g, "-")}.csv`;
+    anchor.click();
+    URL.revokeObjectURL(url);
   }
 
   reset() {
@@ -2025,32 +2328,69 @@ class InventoryProductDemo {
   getVisibleUnits() {
     const branchFilter = String(this.branch || "ALL").toLocaleUpperCase("id");
     const visible = this.units.filter((unit) => {
-      const matchesStatus = this.status === "ALL" || unit.status === this.status;
+      let matchesStatus = true;
+      if (this.status === "ACTIVE") {
+        matchesStatus = unit.status === "UNIT READY" || unit.status === "BOOKED";
+      } else if (this.status !== "ALL") {
+        matchesStatus = unit.status === this.status;
+      }
       const unitBranch = String(unit.branch || "").toLocaleUpperCase("id");
       const matchesBranch = branchFilter === "ALL" || unitBranch === branchFilter;
-      const haystack = `${unit.brand} ${unit.type} ${unit.plate}`.toLocaleLowerCase("id");
-      return matchesStatus && matchesBranch && haystack.includes(this.query);
+      const haystack = `${unit.brand} ${unit.type} ${unit.plate} ${unit.year || ""}`.toLocaleLowerCase("id");
+      const matchesQuery = !this.query || haystack.includes(this.query);
+      return matchesStatus && matchesBranch && matchesQuery && this.matchesAdvFilters(unit);
     });
 
-    return visible.sort((left, right) => {
+    const sorted = visible.sort((left, right) => {
       if (this.sort === "oldest") return right.aging - left.aging;
-      if (this.sort === "price-high") return right.cashPrice - left.cashPrice;
-      if (this.sort === "price-low") return left.cashPrice - right.cashPrice;
-      return left.aging - right.aging;
+      if (this.sort === "price-high") return (right.cashPrice || 0) - (left.cashPrice || 0);
+      if (this.sort === "price-low") return (left.cashPrice || 0) - (right.cashPrice || 0);
+      return (left.aging || 0) - (right.aging || 0);
     });
+
+    // Match motovax-app Ready view secondary sort: branch → location → brand → type → price
+    if (this.status === "UNIT READY") {
+      sorted.sort((left, right) => {
+        const branchCompare = String(left.branch || "").localeCompare(String(right.branch || ""), "id", {
+          sensitivity: "base",
+        });
+        if (branchCompare !== 0) return branchCompare;
+        const locationCompare = String(left.position || "").localeCompare(String(right.position || ""), "id", {
+          sensitivity: "base",
+        });
+        if (locationCompare !== 0) return locationCompare;
+        const brandCompare = String(left.brand || "").localeCompare(String(right.brand || ""), "id", {
+          sensitivity: "base",
+        });
+        if (brandCompare !== 0) return brandCompare;
+        const typeCompare = String(left.type || "").localeCompare(String(right.type || ""), "id", {
+          sensitivity: "base",
+        });
+        if (typeCompare !== 0) return typeCompare;
+        return (left.cashPrice || 0) - (right.cashPrice || 0);
+      });
+    }
+
+    return sorted;
   }
 
   render() {
     const visibleUnits = this.getVisibleUnits();
     this.renderStats();
     this.renderFilters();
+    this.renderAdvPanel();
+    this.renderActiveChips();
     this.renderTable(visibleUnits);
     this.renderMobileList(visibleUnits);
     this.renderBranchSummary();
     this.renderUploadMeta();
-    this.resultCount.textContent = this.dataError ||
-      `${visibleUnits.length} dari ${this.units.length} unit ditampilkan`;
-    this.emptyState.hidden = visibleUnits.length > 0;
+    if (this.resultCount) {
+      this.resultCount.textContent = this.dataError || `${visibleUnits.length} unit`;
+    }
+    if (this.emptyState) this.emptyState.hidden = visibleUnits.length > 0;
+    if (this.branchSelect) {
+      this.branchSelect.classList.toggle("is-active", this.branch && this.branch !== "ALL");
+    }
   }
 
   renderStats() {
@@ -2065,10 +2405,14 @@ class InventoryProductDemo {
       { all: 0, ready: 0, booked: 0, sold: 0 },
     );
 
-    this.root.querySelector("[data-stat-all]").textContent = String(counts.all);
-    this.root.querySelector("[data-stat-ready]").textContent = String(counts.ready);
-    this.root.querySelector("[data-stat-booked]").textContent = String(counts.booked);
-    this.root.querySelector("[data-stat-sold]").textContent = String(counts.sold);
+    const allEl = this.root.querySelector("[data-stat-all]");
+    const readyEl = this.root.querySelector("[data-stat-ready]");
+    const bookedEl = this.root.querySelector("[data-stat-booked]");
+    const soldEl = this.root.querySelector("[data-stat-sold]");
+    if (allEl) allEl.textContent = String(counts.all);
+    if (readyEl) readyEl.textContent = String(counts.ready);
+    if (bookedEl) bookedEl.textContent = String(counts.booked);
+    if (soldEl) soldEl.textContent = String(counts.sold);
   }
 
   renderFilters() {
@@ -2078,56 +2422,75 @@ class InventoryProductDemo {
   }
 
   renderTable(units) {
+    if (!this.tableBody) return;
     this.tableBody.innerHTML = units
-      .map(
-        (unit) => `
-          <tr data-unit-id="${unit.id}" tabindex="0" aria-label="Buka detail ${unit.brand} ${unit.type}">
+      .map((unit) => {
+        const buyLabel = unit.buyingPrice ? this.formatFullPrice(unit.buyingPrice) : "-";
+        const sellMain =
+          unit.status === "SOLD" && unit.soldPrice
+            ? unit.soldPrice
+            : unit.cashPrice && unit.cashPrice > 0
+              ? unit.cashPrice
+              : unit.creditPrice || null;
+        const creditLabel =
+          unit.creditPrice && unit.creditPrice > 0
+            ? `Crd: ${this.formatFullPrice(unit.creditPrice)}`
+            : "Crd: -";
+        return `
+          <tr data-unit-id="${unit.id}" tabindex="0" aria-label="Buka detail ${this.escapeHtml(unit.brand)} ${this.escapeHtml(unit.type)}">
             <td>
-              <div class="demo-unit-cell">
-                ${
-                  unit.photoUrl
-                    ? `<span class="demo-unit-thumb has-photo"><img src="${unit.photoUrl}" alt="" loading="lazy" /></span>`
-                    : `<span class="demo-unit-thumb">${this.initials(unit.brand)}</span>`
-                }
-                <div>
-                  <b>${unit.brand} ${unit.type}</b>
-                  <span>${unit.color} · ${unit.year} · ${unit.photos || 0} foto</span>
-                </div>
+              <div class="ims-unit-title-cell">
+                <b>${this.escapeHtml(unit.brand || "-")} ${this.escapeHtml(unit.type || "")}</b>
+                <span>${this.escapeHtml(unit.color || "Warna -")} · ${this.escapeHtml(unit.year || "Tahun -")} · ${this.escapeHtml(unit.transmission || "Trans -")} · ${unit.photos || 0} foto</span>
+                <em>Buka detail unit</em>
               </div>
             </td>
-            <td><span class="demo-plate">${unit.plate}</span></td>
-            <td><div class="demo-cell-stack"><b>${unit.buyingPrice ? this.formatCompactPrice(unit.buyingPrice) : "Privat"}</b><span>${unit.buyingPrice ? "Modal awal" : "Tidak ditampilkan"}</span></div></td>
-            <td><div class="demo-cell-stack"><b class="price">${this.formatCompactPrice(unit.cashPrice)}</b><span>Kredit ${this.formatCompactPrice(unit.creditPrice)}</span></div></td>
-            <td><div class="demo-cell-stack"><b>${unit.odometer.toLocaleString("id-ID")} KM</b><span class="demo-aging ${unit.aging >= 60 ? "high" : ""}">${unit.aging} hari di stok</span></div></td>
-            <td><div class="demo-cell-stack"><b>${this.titleCase(unit.branch)}</b><span>${unit.position}</span></div></td>
+            <td style="text-align:center"><span class="demo-plate">${this.escapeHtml(unit.plate || "N/A")}</span></td>
+            <td><div class="demo-cell-stack"><b>${buyLabel}</b><span>Modal Awal</span></div></td>
+            <td><div class="demo-cell-stack"><b class="price">${this.formatFullPrice(sellMain)}</b><span>${creditLabel}</span></div></td>
+            <td><div class="demo-cell-stack"><b>${(unit.odometer || 0).toLocaleString("id-ID")} KM</b><span class="demo-aging ${this.agingClass(unit)}">${this.agingLabel(unit)}</span></div></td>
+            <td>
+              <div class="ims-branch-cell">
+                <b>Cabang: ${this.escapeHtml(unit.branch || "-")}</b>
+                <span>Lokasi Aktual: ${this.escapeHtml(unit.position || "-")}</span>
+              </div>
+            </td>
             <td style="text-align:center"><span class="demo-status ${this.statusClass(unit.status)}">${this.statusLabel(unit.status)}</span></td>
           </tr>
-        `,
-      )
+        `;
+      })
       .join("");
   }
 
   renderMobileList(units) {
+    if (!this.mobileList) return;
     this.mobileList.innerHTML = units
-      .map(
-        (unit) => `
-          <article class="demo-mobile-card" data-unit-id="${unit.id}" tabindex="0" aria-label="Buka detail ${unit.brand} ${unit.type}">
+      .map((unit) => {
+        const sellMain =
+          unit.cashPrice && unit.cashPrice > 0
+            ? unit.cashPrice
+            : unit.creditPrice || null;
+        return `
+          <article class="demo-mobile-card" data-unit-id="${unit.id}" tabindex="0" aria-label="Buka detail ${this.escapeHtml(unit.brand)} ${this.escapeHtml(unit.type)}">
             <div class="demo-mobile-card-top">
               <div>
-                <h3>${unit.brand} ${unit.type}</h3>
-                <span class="demo-plate">${unit.plate}</span>
+                <h3>${this.escapeHtml(unit.brand || "-")} ${this.escapeHtml(unit.type || "")}</h3>
+                <span style="display:block;margin-top:4px;font-size:10px;color:#64748b;text-transform:uppercase;letter-spacing:0.04em">
+                  ${this.escapeHtml(unit.color || "Warna -")} · ${this.escapeHtml(unit.year || "Tahun -")} · ${this.escapeHtml(unit.transmission || "Trans -")} · ${unit.photos || 0} foto
+                </span>
+                <span class="demo-plate" style="margin-top:6px;display:inline-block;background:#f1f5f9;padding:2px 6px;border-radius:4px">${this.escapeHtml(unit.plate || "N/A")}</span>
               </div>
               <span class="demo-status ${this.statusClass(unit.status)}">${this.statusLabel(unit.status)}</span>
             </div>
             <div class="demo-mobile-card-meta">
-              <div><small>Harga Jual</small><b>${this.formatCompactPrice(unit.cashPrice)}</b></div>
-              <div><small>Cabang</small><b>${this.titleCase(unit.branch)}</b></div>
-              <div><small>Odometer</small><b>${unit.odometer.toLocaleString("id-ID")} KM</b></div>
-              <div><small>Aging</small><b class="demo-aging ${unit.aging >= 60 ? "high" : ""}">${unit.aging} hari</b></div>
+              <div><small>Harga Beli</small><b>${unit.buyingPrice ? this.formatFullPrice(unit.buyingPrice) : "-"}</b></div>
+              <div><small>Harga Jual</small><b>${this.formatFullPrice(sellMain)}</b></div>
+              <div><small>Cabang</small><b>${this.escapeHtml(unit.branch || "-")}${unit.position ? ` · ${this.escapeHtml(unit.position)}` : ""}</b></div>
+              <div><small>Odo &amp; Aging</small><b>${(unit.odometer || 0).toLocaleString("id-ID")} KM · <span class="demo-aging ${this.agingClass(unit)}">${this.agingLabel(unit)}</span></b></div>
             </div>
           </article>
-        `,
-      )
+        `;
+      })
       .join("");
   }
 
