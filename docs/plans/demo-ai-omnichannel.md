@@ -6,7 +6,61 @@
 - Kode: `apps/frontend/src/pages/call-center/*`  
 - Desain: `motovax-app/docs/handoff-call-center-design.md`  
 **UI MR (referensi):** `apps/frontend/src/pages/sales/percakapan/MRConversationView.tsx`  
-**Status dokumen:** plan (belum implementasi) · 2026-07-31
+**Status dokumen:** plan (keputusan human dikunci) · 2026-07-31  
+**Visual merge:** [`visual-merge-call-center-ai-lab.html`](./visual-merge-call-center-ai-lab.html)
+
+---
+
+## 0. Keputusan human (terkunci)
+
+| # | Topik | Keputusan |
+|---|--------|-----------|
+| 1 | UI | **Perketat** parity **3 kolom dense produksi** Call Center |
+| 2 | Fitur / aksi | **Semua aksi** operator Call Center (bukan hanya 3 chip) — inventaris §0.1 |
+| 3 | Faneling | **Wajib tab produksi** (Saya Handle · AI · Semua + group + channel) |
+| 4 | Pipeline | **Pipeline lead** di panel CC **dan** **pipeline CRM** di demo `#crmDemo` terpisah |
+| 5 | UI MR | **Tutorial demo guided** yang menjelaskan **2 role: Call Center & MR** (bukan banner saja) |
+| 6 | AI Lab | **Digabung** ke shell CC; **visualisasi dulu** (wireframe HTML) sebelum implementasi |
+| 7 | Handoff | **Sesuai produksi** → **Handoff ke MR** |
+
+### 0.1 Inventaris “semua aksi” (scope demo = simulasi klikable)
+
+| Area | Aksi |
+|------|------|
+| Queue | Search, filter tag Cold/Warm/Hot/Booking, (opsional) filter cabang mock |
+| Faneling | Tab Saya Handle · AI · Semua; group Ditangani AI / Menunggu Agent / MR Belum–Sudah Balas / per agent; sub-tab WA·FB·IG |
+| Row | Pilih chat, Pin, Ambil (pending), badge ESKALASI / MR BELUM BALAS |
+| Bulk | Select + Bulk Close (dialog mock) |
+| Header chat | Toggle detail, Aktifkan AI / release takeover, **Handoff ke MR**, Copy conversation, Close Lead |
+| Banner | AI aktif, pending human, claimed by other, Ambil alih dari MR, previous handler |
+| Aksi Cepat | Simulasi Kredit · Cek Inventori · Tanya Falcon (+ modal/sheet) |
+| Dialog | Escalate, HandoffToMR, TakeoverFromMR, CloseLead, Manual Lead, Lead Source Templates, Analytics (jika di header) |
+| Composer | Kirim teks (= takeover); media/emoji/mic boleh UI-only bertanda demo |
+| Context | Detail lead, MR assign, unit, **PipelineSteps**, catatan, refresh ringkasan |
+| Riwayat | Timeline event + cuplikan chat |
+| AI Lab merge | Tab **AI Trace** (router/tool/grounding/eval/guardrail) |
+| Tutorial | Overlay step-by-step **role Call Center** lalu **role MR** |
+| CRM terpisah | Demo Autopilot CRM (`#crmDemo`) tetap; tautkan narasi sinkron stage |
+
+Media upload/voice **nyata** ke channel customer: out of scope (UI boleh ada).
+
+### 0.2 Tutorial 2 role (alur presentasi)
+
+1. Buka lead bucket **Ditangani AI** (role sistem AI).  
+2. **Ambil alih** → jelaskan **role Call Center** (inbox omnichannel, aksi operator).  
+3. Pakai **Aksi Cepat** + lihat **Detail / Riwayat / Pipeline lead**.  
+4. **Handoff ke MR** (dialog produksi).  
+5. Buka **preview UI MR** + jelaskan **role MR** (workspace sales penutup deal, bukan inbox CC).  
+6. Opsional: tab **AI Trace** (guardrail / grounding).  
+7. Sebut **CRM pipeline** terpisah di demo Autopilot CRM.
+
+### 0.3 Merge AI Lab (disetujui secara konsep; visual di HTML)
+
+- Hilangkan sidebar “AI Test Lab” sebagai shell utama.  
+- Shell = **MotoVax Call Center** 3 kolom.  
+- Panel kanan tabs: **Detail Lead | Riwayat | AI Trace**.  
+- Scenario chips + eval pindah ke Trace / strip di chat.  
+- Lihat wireframe: `docs/plans/visual-merge-call-center-ai-lab.html`.
 
 ---
 
@@ -291,25 +345,23 @@ Rekomendasi: **A + strip skenario** di atas composer (mirip production “saran�
 
 ---
 
-## 9. Rekomendasi default (jika human setuju tanpa debat panjang)
+## 9. Keputusan final (menggantikan “rekomendasi default”)
 
-Agar bisa start cepat, usulan default:
-
-| Keputusan | Default |
-|-----------|---------|
-| Visual | Parity layout 3 kolom dense (a) |
-| Fitur | P0 saja (§4); P1 jika sisa waktu |
-| Repo | Hanya `motovax.ai` static |
-| Faneling | Tab AI / Call Center / MR **plus** group Menunggu Agent & MR Belum Balas |
-| Pipeline | PipelineSteps lead di panel kanan |
+| Keputusan | Final (human 2026-07-31) |
+|-----------|--------------------------|
+| Visual | **Parity ketat** 3 kolom dense produksi |
+| Fitur | **Semua aksi** operator CC (inventaris §0.1), simulasi |
+| Repo | `motovax.ai` static (referensi UI dari `motovax-app`) |
+| Faneling | **Tab produksi wajib** + group bucket lengkap |
+| Pipeline | Lead steps di CC **+** CRM kanban demo terpisah |
 | Riwayat | Tab Riwayat context panel |
-| Aksi Cepat | 3 chips produksi + Handoff MR + Takeover |
-| UI MR | Banner + modal preview ringkas (b) |
-| AI Lab | Tab “AI Trace” di panel kanan + scenario strip |
-| Agent name | Falcon (selaras produk) + subtitle Jasmine bila perlu |
-| Data | Mock only + badge DEMO |
-| Mobile | Desktop-first; stack acceptable di HP |
-| Deploy | `main` + Coolify setelah QA |
+| Handoff | Ke **MR** (produksi) |
+| UI MR | **Tutorial guided 2 role** CC & MR + preview UI MR |
+| AI Lab | Digabung tab **AI Trace**; wireframe dulu (§0.3 + HTML) |
+| Agent name | Falcon + Jasmine sesuai label produksi |
+| Data | Mock only + badge DEMO / DATA SIMULASI |
+| Mobile | Desktop-first presentasi; stack HP acceptable |
+| Deploy | `main` + Coolify setelah QA implementasi |
 
 ---
 
