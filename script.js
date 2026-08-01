@@ -2715,6 +2715,7 @@ class InventoryProductDemo {
     this.closeGuide();
     this.setUnitDetailTab("detail");
     this.populateDetail(unit);
+    this.root.classList.add("is-unit-detail-open");
     this.detailBackdrop.hidden = false;
     this.detailPanel.classList.add("is-open");
     this.detailPanel.setAttribute("aria-hidden", "false");
@@ -2956,6 +2957,7 @@ class InventoryProductDemo {
   }
 
   closeDetail() {
+    this.root.classList.remove("is-unit-detail-open");
     this.detailPanel.classList.remove("is-open");
     this.detailPanel.setAttribute("aria-hidden", "true");
     this.detailBackdrop.hidden = true;

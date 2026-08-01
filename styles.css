@@ -4166,18 +4166,35 @@ body.demo-open {
 }
 
 /* —— Full-page unit detail (Mobix parity) —— */
+/* Saat detail unit terbuka: sembunyikan list + filter sticky (bukan tembus di belakang) */
+.inventory-demo.is-unit-detail-open .demo-layout {
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.inventory-demo.is-unit-detail-open .demo-detail-backdrop {
+  z-index: 40;
+  inset: 68px 0 0;
+  background: #f1f5f9;
+  backdrop-filter: none;
+}
+
 .demo-detail-panel.ims-unit-detail {
   top: 68px;
   left: 0;
   right: 0;
+  bottom: 0;
   width: 100%;
   max-width: none;
+  z-index: 41;
   box-shadow: none;
-  transform: translateY(12px);
+  transform: translateY(8px);
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.18s ease, transform 0.18s ease;
   background: #f8fafc;
+  /* Ruang luar agar tidak nempel tepi demo */
+  padding: 0;
 }
 
 .demo-detail-panel.ims-unit-detail.is-open {
@@ -4186,9 +4203,18 @@ body.demo-open {
   pointer-events: auto;
 }
 
-.demo-detail-backdrop:has(+ .ims-unit-detail.is-open),
-.inventory-demo:has(.ims-unit-detail.is-open) .demo-detail-backdrop:not([hidden]) {
-  background: rgba(15, 23, 42, 0.45);
+.ims-ud-shell {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  height: auto;
+  margin: 12px 16px 16px;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 8px 28px rgba(15, 23, 42, 0.06);
+  overflow: hidden;
 }
 
 .ims-ud-breadcrumb-bar {
@@ -4196,10 +4222,11 @@ body.demo-open {
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  min-height: 44px;
-  padding: 8px 18px;
+  min-height: 48px;
+  padding: 10px 20px;
   border-bottom: 1px solid #e2e8f0;
   background: #fff;
+  flex-shrink: 0;
 }
 
 .ims-ud-breadcrumb {
@@ -4259,9 +4286,10 @@ body.demo-open {
   justify-content: space-between;
   gap: 16px;
   flex-wrap: wrap;
-  padding: 12px 18px;
+  padding: 14px 20px;
   background: #0f172a;
   color: #fff;
+  flex-shrink: 0;
 }
 
 .ims-ud-header-left {
@@ -4360,10 +4388,11 @@ body.demo-open {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 12px 18px;
+  padding: 12px 20px;
   border-bottom: 1px solid #cbd5e1;
   background: #f8fafc;
   overflow-x: auto;
+  flex-shrink: 0;
 }
 
 .ims-ud-tabs button {
@@ -4387,12 +4416,20 @@ body.demo-open {
 }
 
 .ims-unit-detail .demo-detail-content.ims-ud-content {
+  flex: 1;
+  min-height: 0;
   padding: 0;
   background: #fff;
+  overflow: auto;
 }
 
 .ims-ud-tab-panel {
-  padding: 0;
+  padding: 0 0 8px;
+}
+
+.ims-ud-tab-panel[data-ims-ud-panel="detail"] {
+  /* konten tabel full-bleed di dalam card shell */
+  padding-bottom: 12px;
 }
 
 .ims-ud-tab-panel[hidden] {
@@ -4684,6 +4721,11 @@ body.demo-open {
 }
 
 @media (max-width: 900px) {
+  .ims-ud-shell {
+    margin: 8px 10px 12px;
+    border-radius: 10px;
+  }
+
   .ims-ud-grid-2 {
     grid-template-columns: 1fr;
   }
@@ -4699,6 +4741,10 @@ body.demo-open {
 
   .ims-ud-breadcrumb-bar {
     padding: 8px 14px;
+  }
+
+  .ims-ud-tabs {
+    padding: 10px 14px;
   }
 }
 
