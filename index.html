@@ -584,16 +584,17 @@
             </div>
 
             <section class="ims-view is-active ims-units-view" data-ims-view="units">
-              <div class="demo-page-heading ims-units-heading">
-                <div>
-                  <span class="demo-breadcrumb">Dashboard / Manajemen Unit</span>
-                </div>
-                <div class="ims-units-heading-actions">
-                  <button class="demo-secondary-action ims-guide-btn" type="button" data-demo-guide>
-                    <span aria-hidden="true">▶</span> Panduan demo
-                  </button>
+              <!-- Header bar: breadcrumb Operasional + Export (seperti Mobix) -->
+              <div class="ims-units-topbar">
+                <nav class="ims-units-breadcrumb" aria-label="Breadcrumb">
+                  <span>Operasional</span>
+                  <span class="ims-bc-sep" aria-hidden="true">›</span>
+                  <strong>Manajemen Unit</strong>
+                </nav>
+                <div class="ims-units-topbar-actions">
+                  <button class="ims-guide-link" type="button" data-demo-guide title="Panduan demo">Panduan</button>
                   <div class="ims-export-menu">
-                    <button class="demo-secondary-action ims-export-trigger" type="button" data-ims-export-toggle aria-haspopup="true" aria-expanded="false">
+                    <button class="ims-export-trigger" type="button" data-ims-export-toggle aria-haspopup="true" aria-expanded="false">
                       Export <span aria-hidden="true">▾</span>
                     </button>
                     <div class="ims-export-dropdown" data-ims-export-menu hidden>
@@ -612,11 +613,29 @@
                 <b data-stat-sold>0</b>
               </div>
 
+              <!-- Hidden native selects kept for JS compatibility -->
+              <select class="ims-sort-hidden" aria-hidden="true" tabindex="-1" data-demo-branch hidden>
+                <option value="ALL">Semua Cabang</option>
+                <option value="CINERE">cinere</option>
+                <option value="PONDOK BAMBU">pondok-bambu</option>
+                <option value="BINTARO">bintaro</option>
+                <option value="BEKASI">bekasi</option>
+                <option value="BANDUNG">bandung</option>
+              </select>
+              <select class="ims-sort-hidden" aria-hidden="true" tabindex="-1" data-demo-sort hidden>
+                <option value="newest">Aging terendah</option>
+                <option value="oldest">Aging tertinggi</option>
+                <option value="price-high">Harga tertinggi</option>
+                <option value="price-low">Harga terendah</option>
+              </select>
+
               <section class="demo-inventory-panel ims-units-panel">
                 <div class="ims-units-filters">
                   <div class="ims-filter-main">
                     <label class="demo-search ims-units-search">
-                      <span aria-hidden="true">⌕</span>
+                      <span class="ims-search-ico" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+                      </span>
                       <input
                         type="search"
                         placeholder="Cari plat, brand, tipe, tahun..."
@@ -625,41 +644,37 @@
                       />
                     </label>
 
-                    <label class="ims-branch-select">
-                      <select aria-label="Filter cabang" data-demo-branch>
-                        <option value="ALL">Semua Cabang</option>
-                        <option value="CINERE">CINERE</option>
-                        <option value="PONDOK BAMBU">PONDOK BAMBU</option>
-                        <option value="BINTARO">BINTARO</option>
-                        <option value="BEKASI">BEKASI</option>
-                      </select>
-                      <span class="ims-branch-chevron" aria-hidden="true">▾</span>
-                    </label>
+                    <div class="ims-branch-popover" data-ims-branch-popover>
+                      <button type="button" class="ims-branch-btn" data-ims-branch-trigger aria-haspopup="listbox" aria-expanded="false">
+                        <span data-ims-branch-label>Semua Cabang</span>
+                        <span aria-hidden="true">▾</span>
+                      </button>
+                      <div class="ims-branch-menu" data-ims-branch-menu hidden role="listbox">
+                        <button type="button" role="option" data-ims-branch-opt="ALL" class="is-selected">Semua Cabang</button>
+                        <button type="button" role="option" data-ims-branch-opt="BANDUNG">bandung</button>
+                        <button type="button" role="option" data-ims-branch-opt="CINERE">cinere</button>
+                        <button type="button" role="option" data-ims-branch-opt="BINTARO">bintaro</button>
+                        <button type="button" role="option" data-ims-branch-opt="PONDOK BAMBU">pondok-bambu</button>
+                        <button type="button" role="option" data-ims-branch-opt="BEKASI">bekasi</button>
+                      </div>
+                    </div>
 
-                    <div class="demo-filter-pills ims-status-pills" role="group" aria-label="Filter status unit">
-                      <button class="active pill-all" type="button" data-status-filter="ALL">Semua Status</button>
+                    <div class="ims-status-pills" role="group" aria-label="Filter status unit">
+                      <button class="pill-all" type="button" data-status-filter="ALL">Semua Status</button>
                       <button class="pill-active" type="button" data-status-filter="ACTIVE">Stok Aktif</button>
-                      <button class="pill-ready" type="button" data-status-filter="UNIT READY">Ready</button>
+                      <button class="pill-ready active" type="button" data-status-filter="UNIT READY">Ready</button>
                       <button class="pill-booked" type="button" data-status-filter="BOOKED">Booked</button>
-                      <button class="pill-sold" type="button" data-status-filter="SOLD">Sold</button>
                     </div>
 
                     <button class="ims-adv-toggle" type="button" data-ims-adv-toggle aria-expanded="false">
-                      <span aria-hidden="true">⚙</span> Filter Lanjutan
+                      <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 6h16M7 12h10M10 18h4"/></svg>
+                      Filter Lanjutan
                       <em class="ims-adv-badge" data-ims-adv-badge hidden>0</em>
                     </button>
 
                     <button class="ims-reset-btn" type="button" data-demo-clear-filter>
                       <span aria-hidden="true">↺</span> Reset
                     </button>
-
-                    <!-- Keep sort select for JS; placed in advanced panel -->
-                    <select class="ims-sort-hidden" aria-label="Urutkan unit" data-demo-sort hidden>
-                      <option value="newest">Aging terendah</option>
-                      <option value="oldest">Aging tertinggi</option>
-                      <option value="price-high">Harga tertinggi</option>
-                      <option value="price-low">Harga terendah</option>
-                    </select>
                   </div>
 
                   <div class="ims-filter-meta">
@@ -669,22 +684,36 @@
 
                   <div class="ims-adv-panel" data-ims-adv-panel hidden>
                     <div class="ims-adv-header">
-                      <b>Filter Spesifik</b>
+                      <b><span aria-hidden="true">▽</span> Filter Spesifik</b>
                       <button type="button" data-ims-adv-reset>Reset Semua</button>
                     </div>
                     <div class="ims-adv-grid">
+                      <label><span>Merek</span><input type="text" placeholder="Toyota..." data-ims-adv="brand" /></label>
+                      <label><span>Tipe</span><input type="text" placeholder="Avanza..." data-ims-adv="type" /></label>
+                      <label><span>Plat</span><input type="text" placeholder="B 1234..." data-ims-adv="plate" /></label>
                       <label>
-                        <span>Merek</span>
-                        <input type="text" placeholder="Toyota..." data-ims-adv="brand" />
+                        <span>Cabang</span>
+                        <select data-ims-adv="branch">
+                          <option value="">Semua Cabang</option>
+                          <option value="BANDUNG">bandung</option>
+                          <option value="CINERE">cinere</option>
+                          <option value="BINTARO">bintaro</option>
+                          <option value="PONDOK BAMBU">pondok-bambu</option>
+                          <option value="BEKASI">bekasi</option>
+                        </select>
                       </label>
-                      <label>
-                        <span>Tipe</span>
-                        <input type="text" placeholder="Avanza..." data-ims-adv="type" />
-                      </label>
-                      <label>
-                        <span>Plat</span>
-                        <input type="text" placeholder="B 1234..." data-ims-adv="plate" />
-                      </label>
+                      <label><span>Warna</span><input type="text" placeholder="Putih..." data-ims-adv="color" /></label>
+                      <label><span>Tahun</span><input type="number" min="1990" max="2030" placeholder="2023" data-ims-adv="year" /></label>
+
+                      <label><span>Harga Jual Min</span><input type="number" min="0" placeholder="Min" data-ims-adv="minPrice" /></label>
+                      <label><span>Harga Jual Max</span><input type="number" min="0" placeholder="Max" data-ims-adv="maxPrice" /></label>
+                      <label><span>Harga Beli Min</span><input type="number" min="0" placeholder="Min" data-ims-adv="minBuyingPrice" /></label>
+                      <label><span>Harga Beli Max</span><input type="number" min="0" placeholder="Max" data-ims-adv="maxBuyingPrice" /></label>
+                      <label><span>Aging Min (Hari)</span><input type="number" min="0" placeholder="0" data-ims-adv="minAging" /></label>
+                      <label><span>Aging Max (Hari)</span><input type="number" min="0" placeholder="100" data-ims-adv="maxAging" /></label>
+
+                      <label><span>Foto Min</span><input type="number" min="0" placeholder="0" data-ims-adv="minPhotoCount" /></label>
+                      <label><span>Foto Max</span><input type="number" min="0" placeholder="20" data-ims-adv="maxPhotoCount" /></label>
                       <label>
                         <span>Transmisi</span>
                         <select data-ims-adv="transmission">
@@ -702,33 +731,11 @@
                           <option value="Hatchback">Hatchback</option>
                           <option value="Sedan">Sedan</option>
                           <option value="LCGC">LCGC</option>
+                          <option value="Pickup">Pickup</option>
                         </select>
                       </label>
-                      <label>
-                        <span>Urutkan</span>
-                        <select data-ims-adv="sort">
-                          <option value="newest">Aging terendah</option>
-                          <option value="oldest">Aging tertinggi</option>
-                          <option value="price-high">Harga tertinggi</option>
-                          <option value="price-low">Harga terendah</option>
-                        </select>
-                      </label>
-                      <label>
-                        <span>Harga Min (jt)</span>
-                        <input type="number" min="0" placeholder="0" data-ims-adv="minPrice" />
-                      </label>
-                      <label>
-                        <span>Harga Max (jt)</span>
-                        <input type="number" min="0" placeholder="500" data-ims-adv="maxPrice" />
-                      </label>
-                      <label>
-                        <span>Aging Min (hr)</span>
-                        <input type="number" min="0" placeholder="0" data-ims-adv="minAging" />
-                      </label>
-                      <label>
-                        <span>Aging Max (hr)</span>
-                        <input type="number" min="0" placeholder="120" data-ims-adv="maxAging" />
-                      </label>
+                      <label><span>Periode Dari</span><input type="month" data-ims-adv="dateFrom" /></label>
+                      <label><span>Periode Sampai</span><input type="month" data-ims-adv="dateTo" /></label>
                     </div>
                   </div>
                 </div>

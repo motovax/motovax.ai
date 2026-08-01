@@ -3014,48 +3014,97 @@ body.demo-open {
   box-shadow: 0 10px 28px rgba(15, 23, 42, 0.04);
 }
 
-/* —— Manajemen Unit parity dengan motovax-app —— */
+/* —— Manajemen Unit parity persis screenshot Mobix —— */
 .ims-units-view {
   display: flex;
   flex-direction: column;
   min-height: 0;
+  margin: -8px -4px 0;
 }
 
-.ims-units-heading {
-  margin-bottom: 10px;
+.ims-units-topbar {
+  display: flex;
   align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 44px;
+  margin-bottom: 0;
+  padding: 8px 4px 10px;
 }
 
-.ims-units-heading .demo-breadcrumb {
-  font-size: 12px;
-  font-weight: 600;
+.ims-units-breadcrumb {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
   color: #64748b;
+  font-size: 13px;
+  font-weight: 500;
 }
 
-.ims-units-heading-actions {
+.ims-units-breadcrumb strong {
+  color: #0f172a;
+  font-weight: 700;
+}
+
+.ims-bc-sep {
+  color: #cbd5e1;
+  font-weight: 400;
+}
+
+.ims-units-topbar-actions {
   display: flex;
   align-items: center;
   gap: 8px;
-  flex-wrap: wrap;
 }
 
-.ims-guide-btn,
-.ims-export-trigger {
+.ims-guide-link {
   min-height: 32px;
-  padding: 0 12px;
-  font-size: 11px;
-  font-weight: 700;
+  padding: 0 10px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: #64748b;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.ims-guide-link:hover {
+  color: #334155;
+  background: #f1f5f9;
 }
 
 .ims-export-menu {
   position: relative;
 }
 
+.ims-export-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 32px;
+  padding: 0 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  background: #fff;
+  color: #334155;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  box-shadow: none;
+  cursor: pointer;
+}
+
+.ims-export-trigger:hover {
+  background: #f8fafc;
+}
+
 .ims-export-dropdown {
   position: absolute;
   top: calc(100% + 4px);
   right: 0;
-  z-index: 20;
+  z-index: 30;
   min-width: 150px;
   padding: 4px;
   border: 1px solid #e2e8f0;
@@ -3074,7 +3123,7 @@ body.demo-open {
   background: transparent;
   color: #334155;
   font: inherit;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 600;
   text-align: left;
   cursor: pointer;
@@ -3099,8 +3148,11 @@ body.demo-open {
 .ims-units-panel {
   display: flex;
   flex-direction: column;
+  border: 1px solid #e2e8f0;
   border-radius: 10px;
-  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03);
+  overflow: hidden;
 }
 
 .ims-units-filters {
@@ -3110,9 +3162,9 @@ body.demo-open {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  padding: 10px 14px;
+  padding: 10px 14px 12px;
   border-bottom: 1px solid #e2e8f0;
-  background: rgba(255, 255, 255, 0.96);
+  background: rgba(255, 255, 255, 0.97);
   backdrop-filter: blur(6px);
 }
 
@@ -3124,52 +3176,113 @@ body.demo-open {
 }
 
 .ims-units-search {
-  flex: 1 1 200px;
-  min-width: 180px;
+  flex: 1 1 220px;
+  min-width: 200px;
   min-height: 36px;
   border-radius: 8px;
+  border-color: #e2e8f0;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03);
+  grid-template-columns: 28px 1fr;
+  padding-left: 8px;
+}
+
+.ims-search-ico {
+  display: grid;
+  place-items: center;
+  color: #94a3b8;
 }
 
 .ims-units-search input {
-  font-size: 12px;
+  font-size: 13px;
+  font-weight: 400;
 }
 
-.ims-branch-select {
+.ims-branch-popover {
   position: relative;
-  display: inline-flex;
-  align-items: center;
-  min-height: 36px;
   flex: 0 0 auto;
 }
 
-.ims-branch-select select {
-  appearance: none;
-  -webkit-appearance: none;
+.ims-branch-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   min-height: 36px;
-  padding: 0 28px 0 12px;
+  padding: 0 12px;
   border: 1px solid #e2e8f0;
   border-radius: 8px;
   background: #fff;
   color: #334155;
   font: inherit;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 600;
-  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03);
   cursor: pointer;
+  white-space: nowrap;
 }
 
-.ims-branch-select select.is-active {
+.ims-branch-btn.is-active {
   border-color: #8b5cf6;
   background: #f5f3ff;
   color: #6d28d9;
 }
 
-.ims-branch-chevron {
-  position: absolute;
-  right: 10px;
-  pointer-events: none;
+.ims-branch-btn span:last-child {
   color: #94a3b8;
   font-size: 10px;
+}
+
+.ims-branch-menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  z-index: 25;
+  min-width: 180px;
+  padding: 0;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 10px 28px rgba(15, 23, 42, 0.12);
+  overflow: hidden;
+}
+
+.ims-branch-menu button {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  min-height: 38px;
+  padding: 0 12px;
+  border: 0;
+  border-bottom: 1px solid #f1f5f9;
+  background: transparent;
+  color: #334155;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+}
+
+.ims-branch-menu button:last-child {
+  border-bottom: 0;
+}
+
+.ims-branch-menu button:hover {
+  background: #f8fafc;
+}
+
+.ims-branch-menu button.is-selected {
+  background: #f5f3ff;
+  color: #6d28d9;
+  box-shadow: inset 0 0 0 1px #ddd6fe;
+}
+
+.ims-branch-menu button.is-selected::after {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: #7c3aed;
 }
 
 .ims-status-pills {
@@ -3191,13 +3304,28 @@ body.demo-open {
   border: 1px solid transparent;
   border-radius: 8px;
   background: transparent;
-  color: #64748b;
   font: inherit;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 700;
   white-space: nowrap;
   cursor: pointer;
   transition: background 0.12s ease, border-color 0.12s ease, color 0.12s ease;
+}
+
+.ims-status-pills button.pill-all {
+  color: #475569;
+}
+
+.ims-status-pills button.pill-active {
+  color: #0284c7;
+}
+
+.ims-status-pills button.pill-ready {
+  color: #059669;
+}
+
+.ims-status-pills button.pill-booked {
+  color: #ea580c;
 }
 
 .ims-status-pills button:hover {
@@ -3229,12 +3357,6 @@ body.demo-open {
   color: #c2410c;
 }
 
-.ims-status-pills button.pill-sold.active {
-  border-color: #3b82f6;
-  background: #eff6ff;
-  color: #1d4ed8;
-}
-
 .ims-adv-toggle,
 .ims-reset-btn {
   display: inline-flex;
@@ -3247,10 +3369,10 @@ body.demo-open {
   background: #fff;
   color: #475569;
   font: inherit;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 700;
   cursor: pointer;
-  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03);
   white-space: nowrap;
 }
 
@@ -3301,12 +3423,12 @@ body.demo-open {
   display: inline-flex;
   align-items: center;
   min-height: 24px;
-  padding: 0 8px;
+  padding: 2px 8px;
   border: 1px solid #a7f3d0;
   border-radius: 6px;
   background: #ecfdf5;
   color: #065f46;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 800;
 }
 
@@ -3363,7 +3485,7 @@ body.demo-open {
 }
 
 .ims-adv-panel {
-  padding: 12px 14px;
+  padding: 14px 16px 16px;
   border: 1px solid #e2e8f0;
   border-radius: 12px;
   background: #f8fafc;
@@ -3373,10 +3495,13 @@ body.demo-open {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 12px;
+  margin-bottom: 14px;
 }
 
 .ims-adv-header b {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   color: #64748b;
   font-size: 11px;
   font-weight: 800;
@@ -3389,8 +3514,8 @@ body.demo-open {
   background: transparent;
   color: #64748b;
   font: inherit;
-  font-size: 11px;
-  font-weight: 700;
+  font-size: 12px;
+  font-weight: 600;
   cursor: pointer;
 }
 
@@ -3401,62 +3526,87 @@ body.demo-open {
 .ims-adv-grid {
   display: grid;
   grid-template-columns: repeat(6, minmax(0, 1fr));
-  gap: 10px 12px;
+  gap: 12px 14px;
 }
 
 .ims-adv-grid label {
   display: grid;
-  gap: 4px;
+  gap: 5px;
   min-width: 0;
 }
 
 .ims-adv-grid span {
   color: #94a3b8;
-  font-size: 10px;
-  font-weight: 700;
+  font-size: 11px;
+  font-weight: 600;
 }
 
 .ims-adv-grid input,
 .ims-adv-grid select {
-  min-height: 32px;
+  min-height: 34px;
   width: 100%;
-  padding: 0 8px;
+  padding: 0 10px;
   border: 1px solid #e2e8f0;
-  border-radius: 6px;
+  border-radius: 8px;
   background: #fff;
   color: #334155;
   font: inherit;
-  font-size: 11px;
+  font-size: 12px;
 }
 
 .ims-units-table-wrap {
   min-height: 280px;
-  max-height: calc(100vh - 280px);
+  max-height: calc(100vh - 250px);
   overflow: auto;
+  background: #fff;
+}
+
+.ims-units-table {
+  width: 100%;
+  table-layout: fixed;
 }
 
 .ims-units-table th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
   background: #f1f5f9;
-  font-size: 10px;
-  letter-spacing: 0.05em;
+  color: #64748b;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
   padding: 10px 12px;
+  border-bottom: 1px solid #e2e8f0;
+  text-align: left;
+  box-shadow: 0 1px 0 #e2e8f0;
 }
 
-.ims-units-table th.th-unit,
-.ims-units-table th.th-plate,
+.ims-units-table th.th-unit {
+  width: 22%;
+  text-align: center;
+}
+
+.ims-units-table th.th-plate {
+  width: 10%;
+  text-align: center;
+}
+
 .ims-units-table th.th-status {
+  width: 10%;
   text-align: center;
 }
 
 .ims-units-table td {
-  padding: 12px;
+  padding: 14px 12px;
   vertical-align: top;
-  font-size: 12px;
-  border-top: 1px solid #eef2f7;
+  font-size: 13px;
+  border-top: 1px solid #f1f5f9;
+  color: #334155;
 }
 
 .ims-units-table tbody tr:hover {
-  background: #f8fafc;
+  background: #fafbfc;
 }
 
 .ims-unit-title-cell {
@@ -3464,14 +3614,14 @@ body.demo-open {
   flex-direction: column;
   gap: 4px;
   min-width: 0;
-  padding: 2px 4px;
+  padding: 0 2px;
 }
 
 .ims-unit-title-cell b {
   display: -webkit-box;
   overflow: hidden;
   color: #312e81;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 700;
   letter-spacing: 0.01em;
   line-height: 1.25;
@@ -3492,7 +3642,7 @@ body.demo-open {
 
 .ims-unit-title-cell em {
   display: block;
-  margin-top: 2px;
+  margin-top: 4px;
   color: #7c3aed;
   font-size: 10px;
   font-style: normal;
@@ -3503,13 +3653,17 @@ body.demo-open {
 
 .ims-units-table .demo-plate {
   display: inline-block;
-  font-size: 12px;
-  letter-spacing: 0.1em;
+  color: #334155;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
   text-align: center;
 }
 
 .ims-units-table .demo-cell-stack b {
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 600;
   color: #334155;
 }
@@ -3524,9 +3678,25 @@ body.demo-open {
   font-size: 11px;
 }
 
+.ims-odo-line {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: #475569;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.ims-odo-line svg {
+  color: #cbd5e1;
+  flex-shrink: 0;
+}
+
 .ims-units-table .demo-aging {
+  display: block;
+  margin-top: 2px;
   font-weight: 700;
-  font-size: 12px;
+  font-size: 13px;
 }
 
 .ims-units-table .demo-aging.ok {
@@ -3556,14 +3726,14 @@ body.demo-open {
   align-items: center;
   gap: 4px;
   color: #334155;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 600;
 }
 
-.ims-branch-cell b::before {
-  content: "📍";
-  font-size: 10px;
-  opacity: 0.7;
+.ims-branch-cell b .ims-pin {
+  color: #818cf8;
+  font-size: 11px;
+  line-height: 1;
 }
 
 .ims-branch-cell span {
@@ -3571,11 +3741,22 @@ body.demo-open {
   font-size: 11px;
 }
 
+.ims-branch-cell .ims-source {
+  color: #94a3b8;
+  font-size: 10px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 180px;
+}
+
 .ims-units-table .demo-status {
   min-height: 22px;
-  padding: 2px 8px;
-  font-size: 10px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 11px;
   font-weight: 700;
+  letter-spacing: 0.02em;
 }
 
 .ims-units-table .demo-status.ready {
@@ -3617,6 +3798,11 @@ body.demo-open {
 
 .ims-sort-hidden {
   display: none !important;
+}
+
+/* Units view: tighter workspace padding to mirror app card */
+.demo-workspace:has(.ims-units-view.is-active) {
+  padding-top: 12px;
 }
 
 .demo-toolbar {
@@ -6719,8 +6905,9 @@ body.demo-open {
     padding: 11px;
   }
 
-  .ims-units-heading-actions {
-    width: 100%;
+  .ims-units-topbar {
+    flex-wrap: wrap;
+    gap: 8px;
   }
 
   .ims-adv-grid {
@@ -6733,6 +6920,15 @@ body.demo-open {
 
   .ims-units-search {
     flex: 1 1 100%;
+  }
+
+  .ims-branch-popover {
+    flex: 1 1 auto;
+  }
+
+  .ims-branch-btn {
+    width: 100%;
+    justify-content: space-between;
   }
 
   .demo-search {
