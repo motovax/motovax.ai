@@ -904,55 +904,205 @@
       </div>
 
       <div class="demo-detail-backdrop" data-demo-detail-backdrop hidden></div>
-      <aside class="demo-detail-panel" aria-labelledby="demoDetailTitle" aria-hidden="true">
-        <div class="demo-detail-header">
-          <div>
-            <span>DETAIL UNIT</span>
-            <h3 id="demoDetailTitle" data-detail-name>Detail unit</h3>
-          </div>
-          <button type="button" data-close-demo-detail aria-label="Tutup detail unit">×</button>
+      <aside class="demo-detail-panel ims-unit-detail" aria-labelledby="demoDetailTitle" aria-hidden="true">
+        <!-- Breadcrumb bar (Mobix style) -->
+        <div class="ims-ud-breadcrumb-bar">
+          <nav class="ims-ud-breadcrumb" aria-label="Breadcrumb detail">
+            <span>Operasional</span>
+            <span class="ims-bc-sep" aria-hidden="true">›</span>
+            <button type="button" data-close-demo-detail class="ims-ud-bc-link">Manajemen Unit</button>
+            <span class="ims-bc-sep" aria-hidden="true">›</span>
+            <strong id="demoDetailTitle" data-detail-plate>Unit</strong>
+          </nav>
+          <button type="button" class="ims-ud-back" data-close-demo-detail aria-label="Kembali ke Manajemen Unit">←</button>
         </div>
-        <div class="demo-detail-content">
-          <div class="demo-detail-car" aria-hidden="true">
-            <img data-detail-photo alt="" hidden />
-            <span data-detail-brand>MVX</span>
+
+        <!-- Dark header: plate | meta | status -->
+        <div class="ims-ud-header">
+          <div class="ims-ud-header-left">
+            <span class="ims-ud-plate" data-detail-plate-header>—</span>
+            <span class="ims-ud-meta">
+              <span data-detail-name>—</span>
+              <span aria-hidden="true">|</span>
+              <span data-detail-year>—</span>
+              <span aria-hidden="true">|</span>
+              <span data-detail-color>—</span>
+            </span>
+            <a class="ims-ud-mocil" href="https://mocil.id" target="_blank" rel="noreferrer">Mocil.id</a>
           </div>
-          <div class="demo-detail-status-row">
-            <span data-detail-status></span>
-            <span data-detail-plate></span>
-          </div>
-          <div class="demo-detail-price">
-            <small>Harga Jual (OTR)</small>
-            <b data-detail-price></b>
-            <span data-detail-credit></span>
-          </div>
-          <dl class="demo-detail-specs">
-            <div><dt>Tahun</dt><dd data-detail-year></dd></div>
-            <div><dt>Transmisi</dt><dd data-detail-transmission></dd></div>
-            <div><dt>Warna</dt><dd data-detail-color></dd></div>
-            <div><dt>Odometer</dt><dd data-detail-odometer></dd></div>
-            <div><dt>Tipe Bodi</dt><dd data-detail-body></dd></div>
-            <div><dt>Bahan Bakar</dt><dd data-detail-fuel></dd></div>
-            <div><dt>Mesin</dt><dd data-detail-engine></dd></div>
-            <div><dt>Kapasitas</dt><dd data-detail-seats></dd></div>
-            <div><dt>Cabang</dt><dd data-detail-branch></dd></div>
-            <div><dt>Posisi Unit</dt><dd data-detail-position></dd></div>
-            <div><dt>Aging Stok</dt><dd data-detail-aging></dd></div>
-            <div><dt>Sumber Unit</dt><dd data-detail-source></dd></div>
-          </dl>
-          <div class="demo-detail-features-block">
-            <span>FITUR UNIT</span>
-            <ul data-detail-features></ul>
-          </div>
-          <div class="demo-detail-insight">
-            <span>INSIGHT INVENTORY</span>
-            <p data-detail-insight></p>
+          <div class="ims-ud-header-right">
+            <button type="button" class="ims-ud-ghost-btn" data-detail-edit disabled title="Simulasi di demo">Edit Unit</button>
+            <button type="button" class="ims-ud-ghost-btn" data-detail-export-toggle aria-haspopup="true" aria-expanded="false">
+              Export <span aria-hidden="true">▾</span>
+            </button>
+            <span class="ims-ud-status" data-detail-status>UNIT READY</span>
           </div>
         </div>
-        <div class="demo-detail-footer">
-          <button class="demo-secondary-action" type="button" data-close-demo-detail>Kembali</button>
-          <button class="demo-primary-action" type="button" data-demo-book-unit>Booking unit ini</button>
-          <p data-demo-booking-copy>Minat booking tersimpan di tenant demo; status unit asli tidak diubah.</p>
+
+        <!-- Tabs -->
+        <div class="ims-ud-tabs" role="tablist" aria-label="Bag detail unit">
+          <button type="button" role="tab" class="active" data-ims-ud-tab="detail" aria-selected="true">Detail</button>
+          <button type="button" role="tab" data-ims-ud-tab="gambar" aria-selected="false">Gambar</button>
+          <button type="button" role="tab" data-ims-ud-tab="video" aria-selected="false">Video</button>
+          <button type="button" role="tab" data-ims-ud-tab="dokumen" aria-selected="false">Dokumen</button>
+          <button type="button" role="tab" data-ims-ud-tab="histori" aria-selected="false">Histori</button>
+        </div>
+
+        <div class="demo-detail-content ims-ud-content">
+          <!-- TAB: Detail -->
+          <div class="ims-ud-tab-panel is-active" data-ims-ud-panel="detail">
+            <!-- Identitas + Dokumen grid -->
+            <div class="ims-ud-grid-2">
+              <section class="ims-ud-section">
+                <header class="ims-ud-section-head">Identitas Unit</header>
+                <table class="ims-ud-table">
+                  <tbody>
+                    <tr><th>Merk / Tipe</th><td data-detail-merk-tipe class="upper">—</td></tr>
+                    <tr><th>Tahun / Kategori / Warna</th><td data-detail-year-cat-color class="upper">—</td></tr>
+                    <tr><th>Transmisi</th><td data-detail-transmission class="strong upper">—</td></tr>
+                    <tr><th>Km</th><td data-detail-odometer class="mono">—</td></tr>
+                    <tr><th>No Rangka</th><td data-detail-chassis class="mono">—</td></tr>
+                    <tr><th>No Mesin</th><td data-detail-engine-no class="mono">—</td></tr>
+                  </tbody>
+                </table>
+              </section>
+              <section class="ims-ud-section">
+                <header class="ims-ud-section-head">Dokumen &amp; Governance</header>
+                <table class="ims-ud-table">
+                  <tbody>
+                    <tr><th>Tgl STNK</th><td data-detail-stnk class="mono">—</td></tr>
+                    <tr><th>Nama BPKB</th><td data-detail-bpkb class="strong upper">—</td></tr>
+                    <tr><th>Notes Doc</th><td data-detail-notes class="muted">—</td></tr>
+                    <tr><th>Posisi Unit</th><td data-detail-position class="upper">—</td></tr>
+                    <tr><th>Cabang</th><td data-detail-branch class="strong upper">—</td></tr>
+                    <tr><th>Appraiser</th><td data-detail-appraiser class="upper muted">—</td></tr>
+                  </tbody>
+                </table>
+              </section>
+            </div>
+
+            <!-- Info Pembelian -->
+            <section class="ims-ud-section">
+              <header class="ims-ud-section-head ims-ud-section-head-split">
+                <span>Info Pembelian</span>
+                <em data-detail-buy-aging class="ims-ud-buy-aging">Harga Beli: — · Aging: —</em>
+              </header>
+              <table class="ims-ud-table ims-ud-table-wide">
+                <tbody>
+                  <tr><th>Source</th><td data-detail-source class="upper muted italic">—</td></tr>
+                  <tr><th>Tgl. Beli</th><td data-detail-purchase-date class="mono">—</td></tr>
+                  <tr><th>Handover</th><td data-detail-handover class="mono">—</td></tr>
+                  <tr>
+                    <th>Stock Unit</th>
+                    <td>
+                      <span data-detail-stock-count class="strong">1</span>
+                      <span class="ims-ud-stock-badge" data-detail-stock-label>IN STOCK</span>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </section>
+
+            <!-- Estimasi Rekondisi -->
+            <section class="ims-ud-section">
+              <header class="ims-ud-section-head ims-ud-section-head-dark">
+                <span>Estimasi Rekondisi</span>
+                <em data-detail-recon-total>TOTAL EST. REKON: —</em>
+              </header>
+              <table class="ims-ud-table ims-ud-table-recon">
+                <thead>
+                  <tr>
+                    <th class="col-jenis">Jenis</th>
+                    <th>Keterangan</th>
+                    <th class="col-est">Estimasi (IDR)</th>
+                  </tr>
+                </thead>
+                <tbody data-detail-recon-body>
+                  <tr>
+                    <td><span class="ims-ud-est-badge">EST</span></td>
+                    <td class="muted italic">Komisi / Fee (Commission)</td>
+                    <td class="mono right" data-detail-recon-commission>Rp 500.000</td>
+                  </tr>
+                </tbody>
+              </table>
+            </section>
+
+            <!-- Data Penjualan + Profitability -->
+            <div class="ims-ud-grid-2 ims-ud-sales-grid">
+              <section class="ims-ud-section">
+                <header class="ims-ud-section-head ims-ud-section-head-green">Data Penjualan</header>
+                <table class="ims-ud-table ims-ud-table-sales">
+                  <tbody>
+                    <tr><th>Sales</th><td data-detail-sales>—</td></tr>
+                    <tr><th>Source of Purchase</th><td data-detail-source-purchase class="upper">—</td></tr>
+                    <tr><th>Source Jual</th><td data-detail-source-sell>—</td></tr>
+                    <tr><th>Metode Pembayaran</th><td data-detail-payment>—</td></tr>
+                    <tr><th>Harga Jual (Deal)</th><td data-detail-deal-price class="price">—</td></tr>
+                  </tbody>
+                </table>
+              </section>
+              <section class="ims-ud-section">
+                <header class="ims-ud-section-head ims-ud-section-head-green">Profitability Settlement (Estimasi)</header>
+                <table class="ims-ud-table ims-ud-table-profit">
+                  <tbody>
+                    <tr><th>Gross Revenue</th><td data-detail-gross class="mono right">—</td></tr>
+                    <tr><th>Harga Beli</th><td data-detail-buy-profit class="mono right buy-red">—</td></tr>
+                    <tr><th>Est. Total Rekon</th><td data-detail-recon-profit class="mono right">—</td></tr>
+                    <tr><th>Aktual Rekon</th><td data-detail-recon-actual class="mono right">—</td></tr>
+                    <tr><th>TNS Include VAT</th><td data-detail-tns class="mono right">—</td></tr>
+                    <tr><th>GP (Gross Profit)</th><td data-detail-gp class="mono right gp">—</td></tr>
+                    <tr class="ims-ud-gp-row"><th>GP Gross</th><td data-detail-gp-gross class="mono right">—</td></tr>
+                  </tbody>
+                </table>
+              </section>
+            </div>
+
+            <footer class="ims-ud-footmeta">
+              <span>UNIT_ID: <em data-detail-id>—</em></span>
+              <span>PLATE: <em data-detail-plate-foot>—</em></span>
+              <span>DATA_SOURCE: <em data-detail-doc-source>—</em></span>
+              <span>MOTOVAX_DIGITAL_INVENTORY_SYSTEM</span>
+            </footer>
+          </div>
+
+          <!-- TAB: Gambar -->
+          <div class="ims-ud-tab-panel" data-ims-ud-panel="gambar" hidden>
+            <div class="ims-ud-media-empty">
+              <div class="ims-ud-photo-hero" data-detail-photo-wrap hidden>
+                <img data-detail-photo alt="" />
+              </div>
+              <p data-detail-photo-empty>Belum ada foto unit di demo ini. Di Mobix, tab Gambar menampilkan galeri foto unit dari tenant.</p>
+              <span class="ims-ud-photo-count" data-detail-photo-count>0 foto</span>
+            </div>
+          </div>
+
+          <!-- TAB: Video -->
+          <div class="ims-ud-tab-panel" data-ims-ud-panel="video" hidden>
+            <div class="ims-ud-media-empty">
+              <p>Belum ada video unit. Di Mobix, tab ini menampilkan video unit yang diunggah ke tenant.</p>
+            </div>
+          </div>
+
+          <!-- TAB: Dokumen -->
+          <div class="ims-ud-tab-panel" data-ims-ud-panel="dokumen" hidden>
+            <div class="ims-ud-media-empty">
+              <p>Dokumen legal (STNK / BPKB) dikelola di tenant Mobix. Demo menampilkan ringkasan field di tab Detail.</p>
+              <ul class="ims-ud-doc-list">
+                <li><span>STNK</span><b data-detail-stnk-doc>—</b></li>
+                <li><span>BPKB</span><b data-detail-bpkb-doc>—</b></li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- TAB: Histori -->
+          <div class="ims-ud-tab-panel" data-ims-ud-panel="histori" hidden>
+            <div class="ims-ud-media-empty">
+              <p>Riwayat event unit (import, status, foto) tersedia di production Motovax App.</p>
+              <ul class="ims-ud-history" data-detail-history>
+                <li>Unit masuk stok demo</li>
+              </ul>
+            </div>
+          </div>
         </div>
       </aside>
 

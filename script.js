@@ -573,7 +573,7 @@ class InventoryProductDemo {
       {
         view: "units",
         title: "Manajemen Unit",
-        body: "UI selaras Motovax App: cari plat/brand, filter Stok Aktif/Ready/Booked, Filter Lanjutan, lalu buka detail unit. Coba booking unit Ready (tersimpan di tenant demo).",
+        body: "UI selaras Motovax App: cari plat/brand, filter Stok Aktif/Ready/Booked, Filter Lanjutan, lalu buka detail unit — layout detail mirip halaman Mobix (tanpa tombol booking).",
       },
       {
         view: "per-cabang",
@@ -1021,7 +1021,16 @@ class InventoryProductDemo {
     }
     this.detailBackdrop?.addEventListener("click", () => this.closeDetail());
 
-    this.bookingButton?.addEventListener("click", () => this.bookSelectedUnit());
+    // Detail tabs (Detail / Gambar / Video / Dokumen / Histori) — no booking CTA
+    for (const button of this.root.querySelectorAll("[data-ims-ud-tab]")) {
+      button.addEventListener("click", () => {
+        this.setUnitDetailTab(button.dataset.imsUdTab || "detail");
+      });
+    }
+    this.root.querySelector("[data-detail-export-toggle]")?.addEventListener("click", () => {
+      this.exportSelectedUnitDetail();
+    });
+
     this.root.querySelector("[data-demo-reset]")?.addEventListener("click", () => this.reset());
     for (const button of this.root.querySelectorAll("[data-demo-clear-filter]")) {
       button.addEventListener("click", () => {
@@ -2704,117 +2713,252 @@ class InventoryProductDemo {
     if (!unit) return;
     this.selectedId = unit.id;
     this.closeGuide();
+    this.setUnitDetailTab("detail");
     this.populateDetail(unit);
     this.detailBackdrop.hidden = false;
     this.detailPanel.classList.add("is-open");
     this.detailPanel.setAttribute("aria-hidden", "false");
-    this.detailPanel.querySelector("[data-close-demo-detail]").focus();
+    this.detailPanel.querySelector("[data-close-demo-detail]")?.focus();
+  }
+
+  setUnitDetailTab(tab) {
+    const next = ["detail", "gambar", "video", "dokumen", "histori"].includes(tab) ? tab : "detail";
+    for (const button of this.root.querySelectorAll("[data-ims-ud-tab]")) {
+      const active = button.dataset.imsUdTab === next;
+      button.classList.toggle("active", active);
+      button.setAttribute("aria-selected", active ? "true" : "false");
+    }
+    for (const panel of this.root.querySelectorAll("[data-ims-ud-panel]")) {
+      const active = panel.dataset.imsUdPanel === next;
+      panel.hidden = !active;
+      panel.classList.toggle("is-active", active);
+    }
+  }
+
+  /** Deterministic demo extras when tenant field missing (keeps layout Mobix-complete). */
+  demoDetailExtras(unit) {
+    const seed = `${unit.id || unit.plate || "unit"}`;
+    let hash = 0;
+    for (let i = 0; i < seed.length; i += 1) hash = (hash * 31 + seed.charCodeAt(i)) >>> 0;
+    const chassis = unit.chassis || unit.chassis_number || `MHR${String(hash).slice(0, 11).padStart(11, "0")}`;
+    const engineNo = unit.engineNumber || unit.engine_number || `L${String(hash).slice(-9).padStart(9, "0")}`;
+    const bpkb = unit.bpkbName || unit.bpkb_name || "PEMILIK UNIT DEMO";
+    const stnk = unit.stnkExpiry || unit.stnk_expiry || unit.stnk || "2026-12-31";
+    const appraiser = unit.appraiser || "APPRAISER DEMO";
+    const purchaseDate = unit.purchaseDate || unit.purchase_date || "";
+    const reconCommission = unit.reconCommission || 500000;
+    const buy = Number(unit.buyingPrice || 0);
+    const sell = Number(unit.cashPrice || unit.creditPrice || 0);
+    const reconTotal = reconCommission;
+    const tns = buy > 0 ? Math.round(buy * 1.0182) : 0;
+    const gp = sell > 0 && buy > 0 ? sell - buy - reconTotal : 0;
+    const gpPct = sell > 0 && gp ? ((gp / sell) * 100).toFixed(1) : "0.0";
+    return {
+      chassis,
+      engineNo,
+      bpkb,
+      stnk,
+      appraiser,
+      purchaseDate,
+      reconCommission,
+      reconTotal,
+      tns,
+      gp,
+      gpPct,
+      buy,
+      sell,
+    };
+  }
+
+  setText(selector, value) {
+    const el = this.root.querySelector(selector);
+    if (el) el.textContent = value == null || value === "" ? "—" : String(value);
   }
 
   populateDetail(unit) {
-    this.root.querySelector("[data-detail-name]").textContent = `${unit.brand} ${unit.type}`;
-    this.root.querySelector("[data-detail-brand]").textContent = this.initials(unit.brand);
-    const statusElement = this.root.querySelector("[data-detail-status]");
-    statusElement.className = `demo-status ${this.statusClass(unit.status)}`;
-    statusElement.textContent = this.statusLabel(unit.status);
-    this.root.querySelector("[data-detail-plate]").textContent = unit.plate;
-    this.root.querySelector("[data-detail-price]").textContent = this.formatPrice(unit.cashPrice);
-    this.root.querySelector("[data-detail-credit]").textContent =
-      `Harga kredit ${this.formatPrice(unit.creditPrice)}`;
-    this.root.querySelector("[data-detail-year]").textContent = String(unit.year);
-    this.root.querySelector("[data-detail-transmission]").textContent = unit.transmission;
-    this.root.querySelector("[data-detail-color]").textContent = unit.color;
-    this.root.querySelector("[data-detail-odometer]").textContent =
-      `${unit.odometer.toLocaleString("id-ID")} KM`;
-    this.root.querySelector("[data-detail-branch]").textContent = this.titleCase(unit.branch);
-    this.root.querySelector("[data-detail-position]").textContent = unit.position;
-    this.root.querySelector("[data-detail-aging]").textContent = `${unit.aging} hari`;
-    this.root.querySelector("[data-detail-source]").textContent = unit.source;
+    const x = this.demoDetailExtras(unit);
+    const plate = unit.plate || "N/A";
+    const name = `${unit.brand || "-"} ${unit.type || ""}`.trim();
+    const bodyType = unit.bodyType || unit.category || "—";
+    const source = unit.source || "Inventory demo";
+    const isSold = unit.status === "SOLD";
+    const inStock = unit.status === "UNIT READY" || unit.status === "BOOKED";
 
-    const carVisual = this.root.querySelector(".demo-detail-car");
+    // Header / breadcrumb
+    this.setText("[data-detail-plate]", plate);
+    this.setText("[data-detail-plate-header]", plate);
+    this.setText("[data-detail-plate-foot]", plate);
+    this.setText("[data-detail-name]", name);
+    this.setText("[data-detail-year]", unit.year || "—");
+    this.setText("[data-detail-color]", unit.color || "—");
+
+    const statusEl = this.root.querySelector("[data-detail-status]");
+    if (statusEl) {
+      statusEl.className = "ims-ud-status";
+      if (unit.status === "BOOKED") statusEl.classList.add("is-booked");
+      if (unit.status === "SOLD") statusEl.classList.add("is-sold");
+      statusEl.textContent = this.statusLabel(unit.status);
+    }
+
+    // Identitas
+    this.setText("[data-detail-merk-tipe]", name);
+    this.setText(
+      "[data-detail-year-cat-color]",
+      `${unit.year || "—"} | ${bodyType} | ${unit.color || "—"}`,
+    );
+    this.setText("[data-detail-transmission]", unit.transmission || "—");
+    this.setText(
+      "[data-detail-odometer]",
+      `${(unit.odometer || 0).toLocaleString("id-ID")} KM`,
+    );
+    this.setText("[data-detail-chassis]", x.chassis);
+    this.setText("[data-detail-engine-no]", x.engineNo);
+
+    // Dokumen & governance
+    this.setText("[data-detail-stnk]", x.stnk);
+    this.setText("[data-detail-bpkb]", x.bpkb);
+    this.setText("[data-detail-notes]", unit.notes || "—");
+    this.setText("[data-detail-position]", unit.position || "—");
+    this.setText("[data-detail-branch]", unit.branch || "—");
+    this.setText("[data-detail-appraiser]", x.appraiser);
+
+    // Info pembelian
+    const buyLabel = x.buy > 0 ? this.formatFullPrice(x.buy) : "—";
+    this.setText(
+      "[data-detail-buy-aging]",
+      `Harga Beli: ${buyLabel} · Aging: ${unit.aging ?? 0} hari`,
+    );
+    this.setText("[data-detail-source]", source);
+    this.setText(
+      "[data-detail-purchase-date]",
+      x.purchaseDate || "—",
+    );
+    this.setText("[data-detail-handover]", unit.handoverDate || unit.handover_date || "—");
+    this.setText("[data-detail-stock-count]", inStock ? "1" : "0");
+    const stockLabel = this.root.querySelector("[data-detail-stock-label]");
+    if (stockLabel) {
+      stockLabel.textContent = isSold ? "SOLD" : unit.status === "BOOKED" ? "BOOKED" : "IN STOCK";
+      stockLabel.classList.toggle("is-out", isSold);
+    }
+
+    // Rekon
+    this.setText(
+      "[data-detail-recon-total]",
+      `TOTAL EST. REKON: ${this.formatFullPrice(x.reconTotal)}`,
+    );
+    this.setText("[data-detail-recon-commission]", this.formatFullPrice(x.reconCommission));
+
+    // Penjualan
+    this.setText("[data-detail-sales]", isSold ? "SALES DEMO" : "—");
+    this.setText("[data-detail-source-purchase]", source);
+    this.setText("[data-detail-source-sell]", isSold ? "SHOWROOM" : "—");
+    this.setText("[data-detail-payment]", isSold ? "CASH / CREDIT" : "—");
+    this.setText(
+      "[data-detail-deal-price]",
+      x.sell > 0 ? this.formatFullPrice(x.sell) : "—",
+    );
+
+    // Profitability
+    this.setText("[data-detail-gross]", x.sell > 0 ? this.formatFullPrice(x.sell) : "—");
+    this.setText(
+      "[data-detail-buy-profit]",
+      x.buy > 0 ? `− ${this.formatFullPrice(x.buy)}` : "—",
+    );
+    this.setText(
+      "[data-detail-recon-profit]",
+      x.reconTotal > 0 ? `− ${this.formatFullPrice(x.reconTotal)}` : "— —",
+    );
+    this.setText(
+      "[data-detail-recon-actual]",
+      x.reconTotal > 0 ? `− ${this.formatFullPrice(x.reconTotal)}` : "—",
+    );
+    this.setText("[data-detail-tns]", x.tns > 0 ? this.formatFullPrice(x.tns) : "—");
+    this.setText(
+      "[data-detail-gp]",
+      x.gp
+        ? `${this.formatFullPrice(x.gp)} (${x.gpPct}%)`
+        : "—",
+    );
+    this.setText(
+      "[data-detail-gp-gross]",
+      x.gp ? this.formatFullPrice(Math.round(x.gp * 1.08)) : "—",
+    );
+
+    // Footer meta
+    this.setText("[data-detail-id]", unit.id || "—");
+    this.setText(
+      "[data-detail-doc-source]",
+      source ? `DOCUMENT: ${source}` : "DEMO SEED",
+    );
+
+    // Gambar tab
+    const photoWrap = this.root.querySelector("[data-detail-photo-wrap]");
     const carPhoto = this.root.querySelector("[data-detail-photo]");
-    if (carVisual && carPhoto) {
+    const photoEmpty = this.root.querySelector("[data-detail-photo-empty]");
+    if (carPhoto && photoWrap) {
       if (unit.photoUrl) {
         carPhoto.src = unit.photoUrl;
-        carPhoto.hidden = false;
-        carPhoto.alt = `${unit.brand} ${unit.type}`;
-        carVisual.classList.add("has-photo");
+        carPhoto.alt = name;
+        photoWrap.hidden = false;
+        if (photoEmpty) photoEmpty.hidden = true;
       } else {
         carPhoto.removeAttribute("src");
-        carPhoto.hidden = true;
-        carVisual.classList.remove("has-photo");
+        photoWrap.hidden = true;
+        if (photoEmpty) photoEmpty.hidden = false;
       }
     }
+    this.setText("[data-detail-photo-count]", `${unit.photos || 0} foto`);
+    this.setText("[data-detail-stnk-doc]", x.stnk);
+    this.setText("[data-detail-bpkb-doc]", x.bpkb);
 
-    const bodyEl = this.root.querySelector("[data-detail-body]");
-    const fuelEl = this.root.querySelector("[data-detail-fuel]");
-    const engineEl = this.root.querySelector("[data-detail-engine]");
-    const seatsEl = this.root.querySelector("[data-detail-seats]");
-    if (bodyEl) bodyEl.textContent = unit.bodyType || "—";
-    if (fuelEl) fuelEl.textContent = unit.fuel || "—";
-    if (engineEl) engineEl.textContent = unit.engine || "—";
-    if (seatsEl) seatsEl.textContent = unit.seats ? `${unit.seats} penumpang` : "—";
-
-    const featuresEl = this.root.querySelector("[data-detail-features]");
-    if (featuresEl) {
-      const list = Array.isArray(unit.features) && unit.features.length ? unit.features : [];
-      featuresEl.innerHTML = list.length
-        ? list.map((f) => `<li>${f}</li>`).join("")
-        : "<li>Fitur unit akan dilengkapi dari master data tenant.</li>";
+    const history = this.root.querySelector("[data-detail-history]");
+    if (history) {
+      history.innerHTML = [
+        `<li>Unit ${this.escapeHtml(plate)} masuk stok · status ${this.escapeHtml(this.statusLabel(unit.status))}</li>`,
+        `<li>Cabang ${this.escapeHtml(unit.branch || "-")} · posisi ${this.escapeHtml(unit.position || "-")}</li>`,
+        unit.photos
+          ? `<li>${unit.photos} foto tercatat di galeri tenant demo</li>`
+          : `<li>Belum ada upload foto di demo</li>`,
+      ].join("");
     }
+  }
 
-    this.root.querySelector("[data-detail-insight]").textContent =
-      unit.aging >= 60
-        ? "Aging unit melewati 60 hari. Pertimbangkan penyesuaian harga atau promosi untuk mempercepat perputaran stok."
-        : "Aging unit masih sehat. Harga jual berada dalam rentang yang kompetitif untuk cabang ini.";
-
-    this.bookingButton.disabled = unit.status !== "UNIT READY";
-    this.bookingButton.textContent =
-      unit.status === "SOLD"
-        ? "Unit sudah terjual"
-        : unit.status === "BOOKED"
-          ? "Unit sudah di-booking"
-          : "Booking unit ini";
-    this.bookingCopy.textContent = unit.bookedBy
-      ? `${unit.bookedBy} tercatat booking ${unit.brand} ${unit.type} ${unit.year} di tenant demo.`
-      : unit.status === "BOOKED"
-        ? "Unit ini sudah berstatus Booked di tenant demo."
-        : "Minat booking tersimpan di tenant demo; status unit asli tidak diubah.";
+  exportSelectedUnitDetail() {
+    const unit = this.units.find((item) => item.id === this.selectedId);
+    if (!unit) {
+      this.toast.querySelector("b").textContent = "Unit tidak dipilih";
+      this.toast.querySelector("p").textContent = "Buka detail unit dulu sebelum export.";
+      this.toast.hidden = false;
+      return;
+    }
+    const headers = ["Plate No", "Brand", "Type", "Year", "Color", "Status", "Aging (hr)", "Branch", "Harga Beli", "Harga Jual Cash"];
+    const escapeCsv = (value) => `"${String(value ?? "").replace(/"/g, '""')}"`;
+    const row = [
+      unit.plate,
+      unit.brand,
+      unit.type,
+      unit.year,
+      unit.color,
+      unit.status,
+      unit.aging,
+      unit.branch,
+      unit.buyingPrice ?? "",
+      unit.cashPrice ?? "",
+    ];
+    const csv = [headers, row].map((r) => r.map(escapeCsv).join(",")).join("\n");
+    const blob = new Blob([`\uFEFF${csv}`], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement("a");
+    anchor.href = url;
+    anchor.download = `unit-${String(unit.plate || unit.id || "export").replace(/\s+/g, "-")}.csv`;
+    anchor.click();
+    URL.revokeObjectURL(url);
   }
 
   closeDetail() {
     this.detailPanel.classList.remove("is-open");
     this.detailPanel.setAttribute("aria-hidden", "true");
     this.detailBackdrop.hidden = true;
-  }
-
-  async bookSelectedUnit() {
-    const unit = this.units.find((item) => item.id === this.selectedId);
-    if (!unit || unit.status !== "UNIT READY") return;
-    this.bookingButton.disabled = true;
-    this.bookingButton.textContent = "Menyimpan ke tenant demo…";
-    try {
-      const booking = await publicDemoData.submit("inventory_interest", {
-        unit_id: unit.id,
-        unit_interest: `${unit.brand} ${unit.type} ${unit.year}`,
-      });
-      const customerName = String(booking.customer_name || "").trim();
-      if (!customerName) throw new Error("Identitas pengunjung demo belum tersedia.");
-      unit.status = "BOOKED";
-      unit.bookedBy = customerName;
-      this.populateDetail(unit);
-      this.render();
-      this.toast.querySelector("b").textContent = `${customerName} sudah booking`;
-      this.toast.querySelector("p").textContent =
-        `${unit.brand} ${unit.type} ${unit.year} tercatat di tenant demo MotoVax App.`;
-      this.toast.hidden = false;
-    } catch (error) {
-      this.bookingButton.disabled = false;
-      this.bookingButton.textContent = "Booking unit ini";
-      this.toast.querySelector("b").textContent = "Belum berhasil disimpan";
-      this.toast.querySelector("p").textContent = error.message;
-      this.toast.hidden = false;
-    }
   }
 
   statusClass(status) {
