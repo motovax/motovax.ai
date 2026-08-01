@@ -857,22 +857,35 @@
                 <div>
                   <span class="demo-breadcrumb">Operasional / AI Falcon</span>
                   <h2>AI Falcon</h2>
-                  <p>Mock WhatsApp seperti di Mobix: tutorial <b>semua fitur Falcon</b> sebagai <b>Sales Agent</b> (tanpa laporan), lalu <b>Management Agent</b> (laporan, import, edit, analytics).</p>
+                  <p>Mock WhatsApp seperti di Mobix: jalankan <b>panduan demo</b> (template), lalu <b>uji chat real</b> — Falcon AI menjawab dari stok Motovax (bukan skrip).</p>
                 </div>
-                <button class="demo-primary-action" type="button" data-demo-guide>
-                  <span aria-hidden="true">▶</span> Panduan demo
-                </button>
+                <div class="falcon-heading-actions">
+                  <button class="demo-secondary-action" type="button" data-demo-guide>
+                    <span aria-hidden="true">▶</span> Panduan demo
+                  </button>
+                  <button class="demo-primary-action" type="button" data-falcon-start-live>
+                    <span aria-hidden="true">⚡</span> Uji chat real
+                  </button>
+                </div>
               </div>
 
               <div class="falcon-demo-layout">
                 <div class="falcon-role-panel">
                   <div class="falcon-role-badge" data-falcon-role-badge>
-                    <span>ROLE AKTIF</span>
+                    <span data-falcon-mode-label>MODE DEMO</span>
                     <b data-falcon-role-label>Sales Agent</b>
                     <p data-falcon-role-hint>Checklist = semua fitur Falcon untuk role ini. Sales tidak bisa laporan aging/GP — Management bisa semua.</p>
                   </div>
+                  <div class="falcon-live-cta" data-falcon-live-cta>
+                    <b>Siap coba Falcon sungguhan?</b>
+                    <p>Pilih role, lalu chat di mock iPhone. Jawaban dari AI Falcon + knowledge inventory Motovax — bukan template.</p>
+                    <button type="button" class="demo-primary-action" data-falcon-start-live>Mulai uji chat real</button>
+                  </div>
                   <ol class="falcon-tutorial-list" data-falcon-tutorial-list></ol>
                   <div class="falcon-quick-prompts" data-falcon-quick-prompts></div>
+                  <button type="button" class="falcon-exit-live" data-falcon-exit-live hidden>
+                    Kembali ke mode panduan (template)
+                  </button>
                 </div>
 
                 <div class="iphone-frame" aria-label="Mock WhatsApp AI Falcon">
@@ -894,6 +907,24 @@
                       <button type="button" class="wa-attach" data-falcon-attach title="Kirim foto (simulasi)" aria-label="Kirim foto simulasi">📎</button>
                       <input type="text" data-falcon-input placeholder="Ketik pesan ke Falcon…" aria-label="Pesan ke Falcon" />
                       <button type="button" class="wa-send" data-falcon-send aria-label="Kirim">➤</button>
+                    </div>
+
+                    <!-- Gate: pilih role sebelum chat real -->
+                    <div class="falcon-role-gate" data-falcon-role-gate hidden>
+                      <div class="falcon-role-gate-card">
+                        <span>UJI CHAT REAL</span>
+                        <b>Anda mau chat sebagai siapa?</b>
+                        <p>Falcon akan menjawab dengan capability role yang dipilih, memakai data stok Motovax (live AI, bukan template demo).</p>
+                        <button type="button" data-falcon-pick-role="sales">
+                          <strong>Sales Agent</strong>
+                          <small>Cek stok, simulasi kredit, rekomendasi unit</small>
+                        </button>
+                        <button type="button" data-falcon-pick-role="management">
+                          <strong>Management Agent</strong>
+                          <small>Laporan stok, aging, insight inventory</small>
+                        </button>
+                        <button type="button" class="falcon-gate-cancel" data-falcon-cancel-live>Batal</button>
+                      </div>
                     </div>
                   </div>
                 </div>
