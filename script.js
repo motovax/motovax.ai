@@ -1066,7 +1066,7 @@ class InventoryProductDemo {
       if (this.falconMode === "live") {
         this.showToast(
           "Mode chat real",
-          "Unggah foto lewat WhatsApp produksi. Di sini ketik pertanyaan ke Falcon.",
+          "Lihat foto: ketik “mau lihat foto unit …”. Unggah/update foto stok tidak tersedia di uji chat real.",
         );
         return;
       }
@@ -1931,16 +1931,16 @@ class InventoryProductDemo {
     const salesLive = [
       "Ada unit Serena ready berapa?",
       "Rekomendasi MPV di bawah 350 juta",
+      "Mau lihat foto Xenia",
       "Simulasi kredit Xpander DP 20% 48 bulan",
       "Unit ready cabang mana saja?",
-      "Bandingkan Innova vs Serena",
     ];
     const managementLive = [
       "Ringkas stok ready vs booked",
       "Unit aging di atas 90 hari",
+      "Tampilkan foto unit aging",
       "Cabang mana stoknya paling banyak?",
       "Rekomendasi unit yang perlu dipromosikan",
-      "Tren tipe unit yang sering ready",
     ];
     const list =
       this.falconMode === "live"
@@ -2051,6 +2051,25 @@ class InventoryProductDemo {
     }, options.fromGuide ? 280 : 420);
   }
 
+  normalizeFalconLivePhotos(raw) {
+    if (!Array.isArray(raw)) return [];
+    return raw
+      .map((item, index) => {
+        if (!item) return null;
+        if (typeof item === "string") {
+          return { url: item, slot: index };
+        }
+        const url = item.url || item.URL || item.photoUrl || "";
+        if (!url) return null;
+        return {
+          url,
+          slot: typeof item.index === "number" ? item.index : index,
+          label: item.label || item.Label || "",
+        };
+      })
+      .filter(Boolean);
+  }
+
   async sendFalconLiveMessage(text) {
     if (this.falconLiveBusy) return;
     const content = String(text || "").trim();
@@ -2087,9 +2106,11 @@ class InventoryProductDemo {
         return;
       }
       const reply = String(body.reply || body.Reply || "").trim();
+      const photos = this.normalizeFalconLivePhotos(body.photos || body.Photos || []);
       this.pushFalconBot(
         reply ||
           "Falcon tidak mengembalikan teks. Coba tanyakan ulang dengan detail unit/cabang.",
+        photos.length ? { photos } : {},
       );
       this.renderFalconMessages();
     } catch (error) {
