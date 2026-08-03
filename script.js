@@ -739,7 +739,7 @@ if (contactForm instanceof HTMLFormElement) {
     if (event.key === "Escape" && trigger.getAttribute("aria-expanded") === "true") close({ restoreFocus: true });
   });
   window.addEventListener("resize", () => {
-    if (window.innerWidth > 900 && trigger.getAttribute("aria-expanded") === "true") close();
+    if (window.innerWidth > 1024 && trigger.getAttribute("aria-expanded") === "true") close();
   });
 })();
 

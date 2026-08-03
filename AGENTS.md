@@ -28,6 +28,12 @@ Jika workspace punya clone `motovax-app`, utamakan:
 - Komunikasi agent ke manusia organisasi: **bahasa Indonesia** (kecuali user minta lain).
 - Copy UI landing boleh campuran EN/ID sesuai branding yang sudah ada; jangan mengubah tone masif tanpa diminta.
 
+## Responsivitas UI
+
+- Setiap perubahan, terutama perubahan UI, wajib disesuaikan dan diverifikasi pada mode **mobile**, **tablet**, dan **normal/desktop**.
+- Jangan menganggap tampilan desktop otomatis aman di layar yang lebih kecil. Periksa minimal navigasi, grid, tipografi, media, tombol/CTA, formulir, tabel, modal/demo interaktif, serta potensi horizontal overflow pada tiap mode.
+- Gunakan breakpoint dan pola responsif yang konsisten dengan `styles.css`; pertahankan target sentuh yang layak dan pastikan konten utama tidak terpotong atau saling bertumpuk.
+
 ## Git & deploy
 
 - Commit sebagai identitas member (jangan invent author agent).

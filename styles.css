@@ -856,6 +856,25 @@ body.solusi-menu-open {
 }
 
 @media (max-width: 1024px) {
+  /* Tablet memakai navigasi ringkas agar logo, menu, dan CTA tidak bertumpuk. */
+  .header-inner {
+    grid-template-columns: 1fr auto auto;
+    gap: 14px;
+  }
+
+  .nav {
+    display: none;
+  }
+
+  .mobile-nav-trigger {
+    display: grid;
+  }
+
+  .mobile-nav-panel,
+  .mobile-nav-backdrop {
+    display: block;
+  }
+
   .produk-mega-tabs-inner {
     gap: 24px;
     padding: 0 16px;
@@ -2176,6 +2195,16 @@ body.solusi-menu-open {
 
   .feature-page-cta-inner {
     align-items: flex-start;
+  }
+
+  .feature-hero-actions,
+  .feature-page-cta-inner > .btn {
+    width: 100%;
+  }
+
+  .feature-hero-actions .btn {
+    flex: 1 1 100%;
+    width: 100%;
   }
 }
 
@@ -11249,6 +11278,10 @@ body.demo-open {
 
   .header-cta {
     display: none;
+  }
+
+  .mobile-solutions-grid {
+    grid-template-columns: 1fr;
   }
 
   .hero h1 {
