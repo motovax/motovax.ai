@@ -90,33 +90,6 @@ window.MOTOVAX_FEATURES = {
     related: ["aplikasi-omnichannel", "ctwa", "aplikasi-crm"],
   },
 
-  "integrasi-tokopedia": {
-    slug: "integrasi-tokopedia",
-    title: "Tokopedia Chat",
-    heroTitle: "Sentralisasi chat e-commerce ke operasional dealer",
-    heroDesc:
-      "Motovax memusatkan komunikasi omnichannel untuk operasional penjualan. Integrasi chat marketplace diposisikan sebagai perluasan channel di atas fondasi Call Center & CRM yang sudah live di motovax-app.",
-    status: "Partial",
-    module: "M3 · Omnichannel (perluasan channel)",
-    flag: "whatsapp_ai",
-    demo: "omni",
-    demoHash: "omniDemo",
-    category: "Aplikasi Omnichannel",
-    breadcrumbs: ["Produk", "Fitur", "Tokopedia Chat"],
-    capabilities: [
-      { title: "Fondasi omnichannel", desc: "Arsitektur inbox multi-channel siap menampung channel tambahan per tenant." },
-      { title: "CRM lanjutan", desc: "Lead dari marketplace dapat masuk pipeline Customer & deal yang sama." },
-      { title: "AI handoff", desc: "Pola AI → manusia → MR dipakai ulang untuk channel baru." },
-    ],
-    howItWorks: [
-      { title: "Channel policy", desc: "Tenant mengatur channel aktif di integrasi." },
-      { title: "Inbox terpadu", desc: "Chat masuk ke faneling yang sama dengan WA/IG." },
-      { title: "Closing di CRM", desc: "Deal dan follow-up dilanjutkan di Autopilot CRM." },
-    ],
-    benefits: ["Kurangi silo chat marketplace", "SOP satu untuk semua channel", "Data lead tetap di Motovax"],
-    related: ["aplikasi-omnichannel", "aplikasi-crm", "manajemen-deal"],
-  },
-
   "embedded-live-chat": {
     slug: "embedded-live-chat",
     title: "Embedded Live Chat",
