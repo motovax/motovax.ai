@@ -37,7 +37,7 @@
   const relatedItems = uniqueBySlug((data.related || []).map((id) => catalog[id]).filter(Boolean));
   const faqs = buildFaqs(data, profile, availability, capabilities, workflow, relatedItems);
 
-  const crumbs = (data.breadcrumbs || ["Produk", "Fitur", data.title])
+  const crumbs = (data.breadcrumbs || ["Produk", "Kapabilitas", data.title])
     .map((item, index, items) => {
       if (index === items.length - 1) return `<span>${escapeHtml(item)}</span>`;
       if (item === "Produk") return `<a href="../modul.html">${escapeHtml(item)}</a>`;
@@ -57,7 +57,7 @@
     "Automasi Operasional & Workflow": "crm",
     "Manajemen Campaign": "social",
     "Call Center": "omni",
-    "Solusi Bisnis": "dashboard",
+    "Suite Motovax": "dashboard",
   };
   const demoHashes = {
     inventory: "inventoryDemo",

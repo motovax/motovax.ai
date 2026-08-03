@@ -780,8 +780,8 @@ window.MOTOVAX_FEATURES = {
     module: "M5 + M2 + M3",
     demo: "social",
     demoHash: "socialDemo",
-    category: "Solusi Bisnis",
-    breadcrumbs: ["Produk", "Solusi Bisnis", "Motovax Broadcast"],
+    category: "Suite Motovax",
+    breadcrumbs: ["Produk", "Suite Motovax", "Motovax Broadcast"],
     capabilities: [
       { title: "Outbound scale", desc: "Jangkau banyak prospek tanpa proses manual murni." },
       { title: "Konten stok", desc: "Pesan menempel unit nyata." },
@@ -806,8 +806,8 @@ window.MOTOVAX_FEATURES = {
     module: "M1 + M2 + M4 + M6",
     demo: "crm",
     demoHash: "crmDemo",
-    category: "Solusi Bisnis",
-    breadcrumbs: ["Produk", "Solusi Bisnis", "Motovax Sales Suite"],
+    category: "Suite Motovax",
+    breadcrumbs: ["Produk", "Suite Motovax", "Motovax Sales Suite"],
     capabilities: [
       { title: "Stok akurat", desc: "IMS multi-cabang sebagai fondasi penawaran." },
       { title: "AI sales", desc: "Falcon bantu kualifikasi & data." },
@@ -833,8 +833,8 @@ window.MOTOVAX_FEATURES = {
     module: "M2 + M3",
     demo: "omni",
     demoHash: "omniDemo",
-    category: "Solusi Bisnis",
-    breadcrumbs: ["Produk", "Solusi Bisnis", "Motovax Service Suite"],
+    category: "Suite Motovax",
+    breadcrumbs: ["Produk", "Suite Motovax", "Motovax Service Suite"],
     capabilities: [
       { title: "Omnichannel CS", desc: "Semua chat di satu tempat." },
       { title: "AI 24/7", desc: "Baseload dijawab otomatis." },
@@ -857,8 +857,8 @@ window.MOTOVAX_FEATURES = {
       "Inventory + AI WhatsApp + Omnichannel + CRM + Social + Dashboard + Platform multi-tenant. Motovax 360 adalah cara memandang seluruh modul produksi sebagai satu sistem.",
     status: "Live · suite",
     module: "M1–M8",
-    category: "Solusi Bisnis",
-    breadcrumbs: ["Produk", "Solusi Bisnis", "Motovax 360"],
+    category: "Suite Motovax",
+    breadcrumbs: ["Produk", "Suite Motovax", "Motovax 360"],
     capabilities: [
       { title: "Satu data", desc: "Unit, lead, chat, campaign saling terkait." },
       { title: "Satu journey", desc: "Dari awareness sampai aftersales light." },
