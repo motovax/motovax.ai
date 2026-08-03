@@ -23,9 +23,12 @@ for (const link of document.querySelectorAll("[data-wa]")) {
   if (!menus.length) return;
 
   const path = location.pathname.replace(/\/+$/, "") || "/";
-  const onIndex = !path.endsWith("modul.html");
-  const home = onIndex ? "#" : "./index.html#";
-  const modul = "./modul.html";
+  const inFiturDir = path.includes("/fitur/") || /\/fitur$/.test(path);
+  const rootPrefix = inFiturDir ? "../" : "./";
+  const fiturPrefix = inFiturDir ? "./" : "./fitur/";
+  const home = inFiturDir ? "../index.html#" : path.endsWith("modul.html") ? "./index.html#" : "#";
+  const modul = `${rootPrefix}modul.html`;
+  const f = (slug) => `${fiturPrefix}${slug}.html`;
 
   const icon = (paths, viewBox = "0 0 24 24") =>
     `<svg viewBox="${viewBox}" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${paths}</svg>`;
@@ -70,102 +73,102 @@ for (const link of document.querySelectorAll("[data-wa]")) {
           id: "omni",
           label: "Aplikasi Omnichannel",
           paneTitle: "Aplikasi Omnichannel",
-          moreHref: `${modul}`,
+          moreHref: `${fiturPrefix}index.html`,
           moreLabel: "Lihat semua fitur",
           features: [
-            { title: "Omnichannel", desc: "Satu platform untuk kelola chat dari berbagai saluran", icon: "chat", href: `${home}solusi`, demo: "omni" },
-            { title: "Instagram API", desc: "Respons DM otomatis untuk tingkatkan penjualan", icon: "ig", href: `${home}solusi`, demo: "omni" },
-            { title: "Tokopedia Chat", desc: "Kelola chat akun Tokopedia Seller lebih mudah", icon: "shop", href: `${home}solusi`, demo: "omni" },
-            { title: "Embedded Live Chat", desc: "Integrasi layanan live chat 24/7 untuk aplikasi Anda", icon: "live", href: `${home}solusi`, demo: "omni" },
-            { title: "Ticket Creation Integration", desc: "Sederhanakan proses resolusi masalah pelanggan", icon: "ticket", href: `${home}solusi`, demo: "omni" },
+            { title: "Omnichannel", desc: "Satu platform untuk kelola chat dari berbagai saluran", icon: "chat", href: f("aplikasi-omnichannel") },
+            { title: "Instagram API", desc: "Respons DM otomatis untuk tingkatkan penjualan", icon: "ig", href: f("instagram-api") },
+            { title: "Tokopedia Chat", desc: "Kelola chat akun Tokopedia Seller lebih mudah", icon: "shop", href: f("integrasi-tokopedia") },
+            { title: "Embedded Live Chat", desc: "Integrasi layanan live chat 24/7 untuk aplikasi Anda", icon: "live", href: f("embedded-live-chat") },
+            { title: "Ticket Creation Integration", desc: "Sederhanakan proses resolusi masalah pelanggan", icon: "ticket", href: f("ticket-creation-integration") },
           ],
         },
         {
           id: "crm",
           label: "Aplikasi CRM",
           paneTitle: "Aplikasi CRM",
-          moreHref: `${modul}`,
+          moreHref: `${fiturPrefix}index.html`,
           moreLabel: "Lihat semua fitur",
           features: [
-            { title: "Aplikasi CRM", desc: "Automasi proses penjualan & layanan pelanggan", icon: "crm", href: `${home}solusi`, demo: "crm" },
-            { title: "Manajemen Deal", desc: "Kelola deal secara end-to-end lebih ciamik", icon: "deal", href: `${home}solusi`, demo: "crm" },
-            { title: "Manajemen Kontak", desc: "Kelola kontak pelanggan lebih mulus", icon: "contact", href: `${home}solusi`, demo: "crm" },
-            { title: "Manajemen Goal", desc: "Mudah kelola goal dan target yang terkustomisasi", icon: "goal", href: `${home}solusi`, demo: "crm" },
-            { title: "Sales GPS Tracking", desc: "Pelacakan lokasi tim sales lapangan real-time", icon: "gps", href: `${home}solusi`, demo: "crm" },
-            { title: "Custom CRM Report", desc: "Buat laporan dari data CRM sesuai kebutuhan", icon: "report", href: `${home}solusi`, demo: "dashboard" },
+            { title: "Aplikasi CRM", desc: "Automasi proses penjualan & layanan pelanggan", icon: "crm", href: f("aplikasi-crm") },
+            { title: "Manajemen Deal", desc: "Kelola deal secara end-to-end lebih ciamik", icon: "deal", href: f("manajemen-deal") },
+            { title: "Manajemen Kontak", desc: "Kelola kontak pelanggan lebih mulus", icon: "contact", href: f("manajemen-kontak") },
+            { title: "Manajemen Goal", desc: "Mudah kelola goal dan target yang terkustomisasi", icon: "goal", href: f("manajemen-goal") },
+            { title: "Sales GPS Tracking", desc: "Pelacakan lokasi tim sales lapangan real-time", icon: "gps", href: f("sales-gps-tracking") },
+            { title: "Custom CRM Report", desc: "Buat laporan dari data CRM sesuai kebutuhan", icon: "report", href: f("personalisasi-report-sales") },
           ],
         },
         {
           id: "wa",
           label: "WhatsApp API",
           paneTitle: "WhatsApp API",
-          moreHref: `${modul}`,
+          moreHref: `${fiturPrefix}index.html`,
           moreLabel: "Lihat semua fitur",
           features: [
-            { title: "WhatsApp API", desc: "Optimalkan interaksi dengan WhatsApp Business API", icon: "wa", href: `${modul}#m2-agentic` },
-            { title: "WhatsApp Centang Biru", desc: "Tingkatkan kredibilitas dengan verifikasi WhatsApp", icon: "verify", href: `${modul}#m2-agentic` },
-            { title: "WhatsApp Blast", desc: "Jangkau ribuan pelanggan secara otomatis", icon: "blast", href: `${home}solusi`, demo: "social" },
-            { title: "Click-to-WhatsApp Ads", desc: "Tingkatkan penjualan di WhatsApp lebih mudah", icon: "ads", href: `${home}solusi`, demo: "social" },
-            { title: "WhatsApp Call", desc: "Layanan panggilan untuk komunikasi lebih lancar", icon: "call", href: `${home}solusi`, demo: "omni" },
-            { title: "WhatsApp Bulk", desc: "Kirim pesan ke banyak kontak secara bersamaan", icon: "bulk", href: `${home}solusi`, demo: "social" },
-            { title: "WhatsApp Flows", desc: "Buat formulir terintegrasi untuk pelayanan lebih tepat", icon: "flow", href: `${modul}#m2-agentic` },
+            { title: "WhatsApp API", desc: "Optimalkan interaksi dengan WhatsApp Business API", icon: "wa", href: f("whatsapp-business-api") },
+            { title: "WhatsApp Centang Biru", desc: "Tingkatkan kredibilitas dengan verifikasi WhatsApp", icon: "verify", href: f("centang-biru-whatsapp") },
+            { title: "WhatsApp Blast", desc: "Jangkau ribuan pelanggan secara otomatis", icon: "blast", href: f("wa-blast") },
+            { title: "Click-to-WhatsApp Ads", desc: "Tingkatkan penjualan di WhatsApp lebih mudah", icon: "ads", href: f("ctwa") },
+            { title: "WhatsApp Call", desc: "Layanan panggilan untuk komunikasi lebih lancar", icon: "call", href: f("whatsapp-business-calling") },
+            { title: "WhatsApp Bulk", desc: "Kirim pesan ke banyak kontak secara bersamaan", icon: "bulk", href: f("whatsapp-bulk") },
+            { title: "WhatsApp Flows", desc: "Buat formulir terintegrasi untuk pelayanan lebih tepat", icon: "flow", href: f("whatsapp-flows") },
           ],
         },
         {
           id: "cs",
           label: "Customer Support & Ticketing",
           paneTitle: "Customer Support & Ticketing",
-          moreHref: `${modul}`,
+          moreHref: `${fiturPrefix}index.html`,
           moreLabel: "Lihat semua fitur",
           features: [
-            { title: "Aplikasi Customer Service", desc: "Platform terintegrasi untuk layanan pelanggan efisien", icon: "cs", href: `${home}solusi`, demo: "omni" },
-            { title: "Manajemen Tiket", desc: "Tangani keluhan pelanggan lebih cepat & akurat", icon: "ticket", href: `${home}solusi`, demo: "omni" },
-            { title: "Manajemen SLA", desc: "Optimalkan resolusi masalah pelanggan & kinerja agen", icon: "sla", href: `${home}solusi`, demo: "omni" },
-            { title: "Agent Scorecard", desc: "Pantau & evaluasi kualitas layanan pelanggan lebih mudah", icon: "score", href: `${home}solusi`, demo: "dashboard" },
+            { title: "Aplikasi Customer Service", desc: "Platform terintegrasi untuk layanan pelanggan efisien", icon: "cs", href: f("aplikasi-customer-service") },
+            { title: "Manajemen Tiket", desc: "Tangani keluhan pelanggan lebih cepat & akurat", icon: "ticket", href: f("sistem-manajemen-tiket") },
+            { title: "Manajemen SLA", desc: "Optimalkan resolusi masalah pelanggan & kinerja agen", icon: "sla", href: f("manajemen-sla") },
+            { title: "Agent Scorecard", desc: "Pantau & evaluasi kualitas layanan pelanggan lebih mudah", icon: "score", href: f("agent-scorecard") },
           ],
         },
         {
           id: "ai",
           label: "AI & Chatbot",
           paneTitle: "AI & Chatbot",
-          moreHref: `${modul}`,
+          moreHref: `${fiturPrefix}index.html`,
           moreLabel: "Lihat semua fitur",
           features: [
-            { title: "Chatbot & Conversational AI", desc: "Respons pelanggan lebih cepat dengan chatbot 24/7", icon: "bot", href: `${modul}#m2-agentic` },
-            { title: "Airene", desc: "Maksimalkan kinerja agen CS dengan dukungan Airene", icon: "agent", href: `${home}solusi`, demo: "omni" },
-            { title: "Agentic AI", desc: "Agen AI cerdas untuk proses bisnis lebih optimal", icon: "ai", href: `${modul}#m2-agentic`, badge: "New" },
+            { title: "Chatbot & Conversational AI", desc: "Respons pelanggan lebih cepat dengan chatbot 24/7", icon: "bot", href: f("chatbot") },
+            { title: "Airene", desc: "Maksimalkan kinerja agen CS dengan dukungan Airene", icon: "agent", href: f("integrasi-airene") },
+            { title: "Agentic AI", desc: "Agen AI cerdas untuk proses bisnis lebih optimal", icon: "ai", href: f("agentic-ai"), badge: "New" },
           ],
         },
         {
           id: "workflow",
           label: "Automasi Operasional & Workflow",
           paneTitle: "Automasi Operasional & Workflow",
-          moreHref: `${modul}`,
+          moreHref: `${fiturPrefix}index.html`,
           moreLabel: "Lihat semua fitur",
           features: [
-            { title: "Knowledge Base", desc: "Pusat informasi untuk layanan pelanggan efisien", icon: "kb", href: `${modul}#m2-agentic` },
-            { title: "Workflow", desc: "Otomatisasi alur kerja lintas tim dan sistem", icon: "workflow", href: `${home}solusi`, demo: "crm" },
+            { title: "Knowledge Base", desc: "Pusat informasi untuk layanan pelanggan efisien", icon: "kb", href: f("knowledge-base") },
+            { title: "Workflow", desc: "Otomatisasi alur kerja lintas tim dan sistem", icon: "workflow", href: f("automasi-workflow") },
           ],
         },
         {
           id: "campaign",
           label: "Manajemen Campaign",
           paneTitle: "Manajemen Campaign",
-          moreHref: `${modul}`,
+          moreHref: `${fiturPrefix}index.html`,
           moreLabel: "Lihat semua fitur",
           features: [
-            { title: "WhatsApp Broadcast", desc: "Jangkau ribuan pelanggan secara otomatis", icon: "blast", href: `${home}solusi`, demo: "social" },
-            { title: "WhatsApp Bulk", desc: "Kirim pesan ke banyak kontak secara bersamaan", icon: "bulk", href: `${home}solusi`, demo: "social" },
+            { title: "WhatsApp Broadcast", desc: "Jangkau ribuan pelanggan secara otomatis", icon: "blast", href: f("aplikasi-broadcast-whatsapp") },
+            { title: "WhatsApp Bulk", desc: "Kirim pesan ke banyak kontak secara bersamaan", icon: "bulk", href: f("whatsapp-bulk") },
           ],
         },
         {
           id: "callcenter",
           label: "Call Center",
           paneTitle: "Call Center",
-          moreHref: `${modul}`,
+          moreHref: `${fiturPrefix}index.html`,
           moreLabel: "Lihat semua fitur",
           features: [
-            { title: "Call Center", desc: "Pusat layanan panggilan fleksibel berbasis cloud", icon: "call", href: `${home}solusi`, demo: "omni" },
+            { title: "Call Center", desc: "Pusat layanan panggilan fleksibel berbasis cloud", icon: "call", href: f("aplikasi-call-center") },
           ],
         },
       ],
@@ -178,40 +181,40 @@ for (const link of document.querySelectorAll("[data-wa]")) {
           id: "broadcast",
           label: "Motovax Broadcast",
           paneTitle: "Motovax Broadcast",
-          moreHref: `${modul}`,
+          moreHref: `${fiturPrefix}index.html`,
           moreLabel: "Lihat semua fitur",
           features: [
-            { title: "Motovax Broadcast", desc: "Jangkau ribuan pelanggan tanpa proses manual", icon: "blast", href: `${home}solusi`, demo: "social" },
+            { title: "Motovax Broadcast", desc: "Jangkau ribuan pelanggan tanpa proses manual", icon: "blast", href: f("motovax-broadcast") },
           ],
         },
         {
           id: "sales-suite",
           label: "Motovax Sales Suite",
           paneTitle: "Motovax Sales Suite",
-          moreHref: `${modul}`,
+          moreHref: `${fiturPrefix}index.html`,
           moreLabel: "Lihat semua fitur",
           features: [
-            { title: "Motovax Sales Suite", desc: "Optimalkan penjualan dengan solusi komprehensif", icon: "suite", href: `${home}solusi`, demo: "crm" },
+            { title: "Motovax Sales Suite", desc: "Optimalkan penjualan dengan solusi komprehensif", icon: "suite", href: f("motovax-sales-suite") },
           ],
         },
         {
           id: "service-suite",
           label: "Motovax Service Suite",
           paneTitle: "Motovax Service Suite",
-          moreHref: `${modul}`,
+          moreHref: `${fiturPrefix}index.html`,
           moreLabel: "Lihat semua fitur",
           features: [
-            { title: "Motovax Service Suite", desc: "Respons pelanggan lebih cepat dengan layanan optimal", icon: "cs", href: `${home}solusi`, demo: "omni" },
+            { title: "Motovax Service Suite", desc: "Respons pelanggan lebih cepat dengan layanan optimal", icon: "cs", href: f("motovax-service-suite") },
           ],
         },
         {
           id: "suite-360",
           label: "Motovax 360",
           paneTitle: "Motovax 360",
-          moreHref: `${modul}`,
+          moreHref: `${fiturPrefix}index.html`,
           moreLabel: "Lihat semua fitur",
           features: [
-            { title: "Motovax 360", desc: "Manajemen pelanggan terintegrasi untuk proses efisien", icon: "suite", href: `${modul}` },
+            { title: "Motovax 360", desc: "Manajemen pelanggan terintegrasi untuk proses efisien", icon: "suite", href: f("motovax-360") },
           ],
         },
       ],
@@ -220,19 +223,6 @@ for (const link of document.querySelectorAll("[data-wa]")) {
 
   const allPanes = groups.flatMap((g) => g.items);
   const firstPaneId = allPanes[0]?.id || "omni";
-
-  const demoAttr = (demo) => {
-    if (!demo || !onIndex) return "";
-    const map = {
-      omni: "data-open-omni-demo",
-      crm: "data-open-crm-demo",
-      social: "data-open-social-demo",
-      dashboard: "data-open-dashboard-demo",
-      insight: "data-open-insight-demo",
-      inventory: "data-open-inventory-demo",
-    };
-    return map[demo] || "";
-  };
 
   function renderMenuHtml() {
     const firstGroupId = groups[0]?.id || "fitur";
@@ -287,20 +277,16 @@ for (const link of document.querySelectorAll("[data-wa]")) {
     const panes = allPanes
       .map((item) => {
         const features = item.features
-          .map((f) => {
-            const demo = demoAttr(f.demo);
-            const tag = demo ? "button" : "a";
-            const href = demo ? "" : ` href="${f.href}"`;
-            const type = demo ? ' type="button"' : "";
-            const badge = f.badge ? ` <span class="badge-new">${f.badge}</span>` : "";
+          .map((feat) => {
+            const badge = feat.badge ? ` <span class="badge-new">${feat.badge}</span>` : "";
             return `
-              <${tag}${type}${href} class="produk-mega-item" ${demo} data-produk-close>
-                <span class="produk-mega-icon">${I[f.icon] || I.chat}</span>
+              <a href="${feat.href}" class="produk-mega-item" data-produk-close>
+                <span class="produk-mega-icon">${I[feat.icon] || I.chat}</span>
                 <span class="produk-mega-meta">
-                  <span class="produk-mega-item-title">${f.title}${badge}</span>
-                  <span class="produk-mega-item-desc">${f.desc}</span>
+                  <span class="produk-mega-item-title">${feat.title}${badge}</span>
+                  <span class="produk-mega-item-desc">${feat.desc}</span>
                 </span>
-              </${tag}>`;
+              </a>`;
           })
           .join("");
 
