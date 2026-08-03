@@ -151,6 +151,303 @@ class PublicDemoDataBridge {
 
 const publicDemoData = new PublicDemoDataBridge();
 
+/**
+ * Product-tour guide bersama (gaya IMS):
+ * spotlight cutout + tooltip biru menempel target + Kembali/Berikutnya/Selesai.
+ * Dipakai semua demo solusi agar flow & style seragam.
+ */
+class DemoProductTour {
+  /**
+   * @param {HTMLElement} root
+   * @param {{
+   *   ns: string,
+   *   anchorAttr?: string,
+   *   getSteps: () => Array<{title:string, body:string, anchor?:string, view?:string, label?:string, enter?:Function}>,
+   *   onSwitchView?: (view: string) => void,
+   *   getStepLabel?: (step: object, index: number, total: number) => string,
+   * }} opts
+   */
+  constructor(root, opts) {
+    this.root = root;
+    this.ns = opts.ns;
+    this.anchorAttr = opts.anchorAttr || `data-${opts.ns}-anchor`;
+    this.getSteps = opts.getSteps;
+    this.onSwitchView = opts.onSwitchView || null;
+    this.getStepLabel = opts.getStepLabel || null;
+    this.stepIndex = 0;
+    this._highlightEl = null;
+
+    this.guide = root.querySelector(`[data-${opts.ns}-guide-popover]`);
+    this.spotlight = root.querySelector(`[data-${opts.ns}-guide-spotlight]`);
+    this.stepLabelEl = this.guide?.querySelector(`[data-${opts.ns}-guide-step-label]`);
+    this.titleEl = this.guide?.querySelector(`[data-${opts.ns}-guide-title]`);
+    this.bodyEl = this.guide?.querySelector(`[data-${opts.ns}-guide-body]`);
+    this.prevBtn = this.guide?.querySelector(`[data-${opts.ns}-guide-prev]`);
+    this.nextBtn = this.guide?.querySelector(`[data-${opts.ns}-guide-next]`);
+    this.finishBtn = this.guide?.querySelector(`[data-${opts.ns}-guide-finish]`);
+    this.closeBtn = this.guide?.querySelector(`[data-close-${opts.ns}-guide]`);
+
+    this._onReposition = () => {
+      if (!this.guide || this.guide.hidden) return;
+      this.syncSpotlightRect();
+      this.positionGuide();
+    };
+
+    this.bindControls();
+  }
+
+  get isOpen() {
+    return Boolean(this.guide && !this.guide.hidden);
+  }
+
+  bindControls() {
+    if (!this.guide) return;
+    for (const btn of this.root.querySelectorAll(`[data-${this.ns}-guide]`)) {
+      btn.addEventListener("click", () => this.open(0));
+    }
+    this.closeBtn?.addEventListener("click", () => this.close());
+    this.nextBtn?.addEventListener("click", () => this.next());
+    this.prevBtn?.addEventListener("click", () => this.prev());
+    this.finishBtn?.addEventListener("click", () => this.close());
+
+    window.addEventListener("resize", this._onReposition);
+    const scrollParents = this.root.querySelectorAll(
+      ".demo-workspace, .demo-sidebar, .cc-shell, .cc-queue, .cc-chat, .cc-context, .dashboard-workspace, .insight-workspace",
+    );
+    for (const el of scrollParents) {
+      el.addEventListener("scroll", this._onReposition, { passive: true });
+    }
+  }
+
+  open(startIndex = 0) {
+    if (!this.guide) return;
+    const steps = this.getSteps() || [];
+    if (!steps.length) return;
+    this.stepIndex = Math.max(0, Math.min(startIndex, steps.length - 1));
+    this.guide.hidden = false;
+    this.renderStep();
+    const focusBtn =
+      this.guide.querySelector(`[data-${this.ns}-guide-next]:not([hidden])`) ||
+      this.guide.querySelector(`[data-${this.ns}-guide-finish]:not([hidden])`);
+    focusBtn?.focus();
+  }
+
+  close() {
+    if (!this.guide) return;
+    this.guide.hidden = true;
+    this.clearHighlight();
+    this.clearGuidePosition();
+  }
+
+  next() {
+    const steps = this.getSteps() || [];
+    if (this.stepIndex >= steps.length - 1) {
+      this.close();
+      return;
+    }
+    this.stepIndex += 1;
+    this.renderStep();
+  }
+
+  prev() {
+    if (this.stepIndex <= 0) return;
+    this.stepIndex -= 1;
+    this.renderStep();
+  }
+
+  clearGuidePosition() {
+    if (!this.guide) return;
+    this.guide.classList.remove("is-anchored", "is-falcon-anchor");
+    this.guide.style.top = "";
+    this.guide.style.left = "";
+    this.guide.style.right = "";
+    this.guide.style.bottom = "";
+    this.guide.style.maxWidth = "";
+  }
+
+  highlightAnchor(name) {
+    this.clearHighlight(false);
+    if (!name) {
+      this.syncSpotlightRect(null);
+      return;
+    }
+    const candidates = [...this.root.querySelectorAll(`[${this.anchorAttr}="${name}"]`)];
+    const el =
+      candidates.find((node) => {
+        const r = node.getBoundingClientRect();
+        const style = window.getComputedStyle(node);
+        return r.width > 1 && r.height > 1 && style.display !== "none" && style.visibility !== "hidden";
+      }) || candidates[0];
+    if (!el) {
+      this.syncSpotlightRect(null);
+      return;
+    }
+    this._highlightEl = el;
+    el.classList.add("demo-guide-highlight", "ims-guide-highlight");
+    try {
+      el.scrollIntoView({ block: "nearest", behavior: "smooth", inline: "nearest" });
+    } catch {
+      /* ignore */
+    }
+    this.syncSpotlightRect(el);
+  }
+
+  clearHighlight(hideSpotlight = true) {
+    for (const el of this.root.querySelectorAll(".demo-guide-highlight, .ims-guide-highlight, .crm-guide-highlight, .social-guide-highlight, .omni-guide-highlight")) {
+      el.classList.remove(
+        "demo-guide-highlight",
+        "ims-guide-highlight",
+        "crm-guide-highlight",
+        "social-guide-highlight",
+        "omni-guide-highlight",
+      );
+    }
+    this._highlightEl = null;
+    if (hideSpotlight) this.syncSpotlightRect(null);
+  }
+
+  syncSpotlightRect(el = this._highlightEl) {
+    const spot = this.spotlight;
+    if (!spot) return;
+    if (!el || !this.guide || this.guide.hidden) {
+      spot.hidden = true;
+      spot.style.top = "";
+      spot.style.left = "";
+      spot.style.width = "";
+      spot.style.height = "";
+      return;
+    }
+    const r = el.getBoundingClientRect();
+    if (r.width < 2 && r.height < 2) {
+      spot.hidden = true;
+      return;
+    }
+    const pad = 8;
+    const top = Math.max(4, r.top - pad);
+    const left = Math.max(4, r.left - pad);
+    const width = Math.min(window.innerWidth - left - 4, r.width + pad * 2);
+    const height = Math.min(window.innerHeight - top - 4, r.height + pad * 2);
+    spot.hidden = false;
+    spot.style.top = `${Math.round(top)}px`;
+    spot.style.left = `${Math.round(left)}px`;
+    spot.style.width = `${Math.round(width)}px`;
+    spot.style.height = `${Math.round(height)}px`;
+  }
+
+  positionGuide() {
+    if (!this.guide || this.guide.hidden) return;
+
+    const place = () => {
+      if (!this.guide || this.guide.hidden) return;
+      const target =
+        this._highlightEl && this._highlightEl.getBoundingClientRect().width > 0
+          ? this._highlightEl
+          : null;
+
+      this.guide.classList.add("is-anchored");
+
+      const gw = Math.min(320, window.innerWidth - 24);
+      const gh = this.guide.offsetHeight || 200;
+      const gap = 14;
+      const margin = 12;
+      const minTop = 64;
+
+      if (!target) {
+        this.guide.style.top = "92px";
+        this.guide.style.right = "24px";
+        this.guide.style.left = "auto";
+        this.guide.style.bottom = "auto";
+        this.guide.style.maxWidth = `${gw}px`;
+        return;
+      }
+
+      const rect = target.getBoundingClientRect();
+      let left = rect.right + gap;
+      let top = rect.top;
+
+      if (left + gw > window.innerWidth - margin) {
+        left = rect.left - gw - gap;
+      }
+      if (left < margin) {
+        left = Math.max(margin, Math.min(rect.left, window.innerWidth - gw - margin));
+        top = rect.bottom + gap;
+        if (top + gh > window.innerHeight - margin) {
+          top = Math.max(minTop, rect.top - gh - gap);
+        }
+      } else {
+        top = Math.max(minTop, Math.min(top, window.innerHeight - gh - margin));
+      }
+
+      left = Math.max(margin, Math.min(left, window.innerWidth - gw - margin));
+      top = Math.max(minTop, Math.min(top, window.innerHeight - gh - margin));
+
+      this.guide.style.top = `${Math.round(top)}px`;
+      this.guide.style.left = `${Math.round(left)}px`;
+      this.guide.style.right = "auto";
+      this.guide.style.bottom = "auto";
+      this.guide.style.maxWidth = `${gw}px`;
+    };
+
+    requestAnimationFrame(() => {
+      requestAnimationFrame(place);
+      window.setTimeout(place, 80);
+      window.setTimeout(() => {
+        this.syncSpotlightRect();
+        place();
+      }, 200);
+    });
+  }
+
+  renderStep() {
+    if (!this.guide) return;
+    const steps = this.getSteps() || [];
+    const step = steps[this.stepIndex] || steps[0];
+    if (!step) {
+      this.close();
+      return;
+    }
+    const total = steps.length;
+    const index = this.stepIndex + 1;
+
+    if (this.stepLabelEl) {
+      if (this.getStepLabel) {
+        this.stepLabelEl.textContent = this.getStepLabel(step, index, total);
+      } else {
+        const viewLabel = (step.label || step.view || "Panduan").toString().toUpperCase();
+        this.stepLabelEl.textContent =
+          total > 1 ? `${viewLabel} · LANGKAH ${index} DARI ${total}` : viewLabel;
+      }
+    }
+    if (this.titleEl) this.titleEl.textContent = step.title;
+    if (this.bodyEl) this.bodyEl.textContent = step.body;
+
+    const isLast = this.stepIndex >= total - 1;
+    const isFirst = this.stepIndex <= 0;
+    if (this.prevBtn) this.prevBtn.hidden = isFirst;
+    if (this.nextBtn) {
+      this.nextBtn.hidden = isLast;
+      this.nextBtn.textContent = "Berikutnya";
+    }
+    if (this.finishBtn) this.finishBtn.hidden = !isLast;
+
+    if (step.view && typeof this.onSwitchView === "function") {
+      this.onSwitchView(step.view);
+    }
+    if (typeof step.enter === "function") step.enter();
+
+    const applyHighlight = () => {
+      if (step.anchor) this.highlightAnchor(step.anchor);
+      else this.clearHighlight();
+      this.positionGuide();
+    };
+    requestAnimationFrame(() => {
+      applyHighlight();
+      window.setTimeout(applyHighlight, 100);
+    });
+  }
+}
+
+
 const inventoryDemoSeed = [
   {
     id: "unit-001",
@@ -3861,6 +4158,25 @@ class AutopilotCRMDemo {
     this.prepareButton = root.querySelector("[data-crm-prepare-followup]");
     this.closedList = root.querySelector("[data-crm-closed-list]");
 
+    this.tour = new DemoProductTour(root, {
+      ns: "crm",
+      anchorAttr: "data-crm-anchor",
+      getSteps: () => this.guideSteps(),
+      onSwitchView: (view) => this.switchView(view),
+      getStepLabel: (step, index, total) => {
+        const labels = {
+          pipeline: "Pipeline",
+          customer: "Customer",
+          "auto-follow": "Auto Follow",
+          panduan: "Panduan",
+        };
+        const viewLabel = labels[step.view] || step.label || "Autopilot CRM";
+        return total > 1
+          ? `${String(viewLabel).toUpperCase()} · LANGKAH ${index} DARI ${total}`
+          : String(viewLabel).toUpperCase();
+      },
+    });
+
     this.bind();
     this.switchView("pipeline");
     this.render();
@@ -3881,83 +4197,84 @@ class AutopilotCRMDemo {
     return [
       {
         view: "pipeline",
+        anchor: "sidebar",
+        label: "Autopilot CRM",
         title: "Menu Autopilot CRM",
-        body: "Sidebar selaras Motovax: Customer, Pipeline, Auto Follow Customer, dan Panduan. Campaign diganti Auto Follow Customer.",
-        enter: () => this.highlightAnchor("sidebar"),
+        body: "Sidebar selaras Motovax: Customer, Pipeline, Auto Follow Customer, dan Panduan. Area sorot = navigasi aktif — pola sama dengan panduan Inventory.",
       },
       {
         view: "pipeline",
-        title: "Pipeline & filter",
+        anchor: "kpi-grid",
+        label: "Pipeline",
+        title: "Pipeline & KPI",
         body: "Lihat nilai pipeline, forecast, dan KPI. Filter Semua / Omnichannel / Excel Import seperti di produk.",
         enter: () => {
           this.source = "all";
           this.render();
-          this.highlightAnchor("kpi-grid");
         },
       },
       {
         view: "pipeline",
+        anchor: "board",
+        label: "Pipeline",
         title: "Lead prioritas Nadia",
-        body: "Buka kartu Nadia Demo bertanda “Coba ini” — Warm, stale ≥7 hari, siap follow-up AI.",
+        body: "Kartu Nadia Demo bertanda “Coba ini” — Warm, stale ≥7 hari, siap follow-up AI. Klik kartu setelah panduan untuk eksplor bebas.",
         enter: () => {
           this.closeDetail();
           this.source = "all";
           this.mobileStage = "warm";
           this.render();
-          this.highlightAnchor("board");
           requestAnimationFrame(() => {
             const card = this.root.querySelector('[data-lead-id="lead-nadia"]');
             card?.scrollIntoView({ block: "nearest", behavior: "smooth" });
-            card?.focus();
           });
         },
       },
       {
         view: "pipeline",
+        anchor: "unit-card",
+        label: "Detail Lead",
         title: "Unit = stok Motovax",
         body: "Detail lead menampilkan unit dari katalog inventory: plate, cabang, status, harga, dan fitur.",
-        enter: () => {
-          this.openDetail("lead-nadia", { keepGuide: true });
-          this.highlightAnchor("unit-card");
-        },
+        enter: () => this.openDetail("lead-nadia", { keepGuide: true }),
       },
       {
         view: "pipeline",
+        anchor: "ai-summary",
+        label: "Detail Lead",
         title: "AI Co-Pilot",
         body: "Baca ringkasan AI dan rekomendasi berikutnya — input untuk follow-up otomatis.",
-        enter: () => {
-          this.openDetail("lead-nadia", { keepGuide: true });
-          this.highlightAnchor("ai-summary");
-        },
+        enter: () => this.openDetail("lead-nadia", { keepGuide: true }),
       },
       {
         view: "pipeline",
+        anchor: "followup",
+        label: "Follow-up AI",
         title: "Simulasi follow-up AI",
         body: "Siapkan pesan WhatsApp buatan AI, lalu Kirim simulasi. Stage naik, skor naik — pesan tidak dikirim ke customer.",
         enter: () => {
           this.openDetail("lead-nadia", { keepGuide: true });
           this.prepareFollowup();
-          this.highlightAnchor("followup");
         },
       },
       {
         view: "auto-follow",
+        anchor: "auto-follow",
+        label: "Auto Follow",
         title: "Auto Follow Customer",
         body: "Program follow-up terjadwal (nurture, warm ≥7h, hot push). Ganti menu Campaign di Motovax.",
-        enter: () => {
-          this.closeDetail();
-          this.highlightAnchor("auto-follow");
-        },
+        enter: () => this.closeDetail(),
       },
       {
         view: "pipeline",
+        anchor: "board",
+        label: "Pipeline",
         title: "Dampak di pipeline",
-        body: "Setelah follow-up, lead pindah kolom dan forecast berubah. Siap ditutup sales. Selesai — silakan eksplor bebas.",
+        body: "Setelah follow-up, lead pindah kolom dan forecast berubah. Selesai — silakan eksplor bebas seperti di demo Inventory.",
         enter: () => {
           this.closeDetail();
           this.mobileStage = this.leads.find((l) => l.id === "lead-nadia")?.stage || "hot";
           this.render();
-          this.highlightAnchor("board");
         },
       },
     ];
@@ -4019,13 +4336,7 @@ class AutopilotCRMDemo {
     this.root.querySelector("[data-crm-send-followup]")?.addEventListener("click", () => this.sendFollowup());
     this.root.querySelector("[data-crm-reset]")?.addEventListener("click", () => this.reset());
 
-    for (const button of this.root.querySelectorAll("[data-crm-guide]")) {
-      button.addEventListener("click", () => this.openGuide(0));
-    }
-    this.root.querySelector("[data-close-crm-guide]")?.addEventListener("click", () => this.closeGuide());
-    this.root.querySelector("[data-crm-guide-next]")?.addEventListener("click", () => this.nextGuideStep());
-    this.root.querySelector("[data-crm-guide-prev]")?.addEventListener("click", () => this.prevGuideStep());
-    this.root.querySelector("[data-crm-guide-finish]")?.addEventListener("click", () => this.closeGuide());
+    // Panduan: DemoProductTour (bindControls di constructor)
 
     this.root.querySelector("[data-close-crm-toast]")?.addEventListener("click", () => {
       this.toast.hidden = true;
@@ -4045,7 +4356,7 @@ class AutopilotCRMDemo {
       if (event.key !== "Escape" || !this.root.classList.contains("is-open")) return;
       if (!this.toast.hidden) {
         this.toast.hidden = true;
-      } else if (this.guide && !this.guide.hidden) {
+      } else if (this.tour?.isOpen) {
         this.closeGuide();
       } else if (this.detailPanel.classList.contains("is-open")) {
         this.closeDetail();
@@ -4096,77 +4407,11 @@ class AutopilotCRMDemo {
   }
 
   openGuide(startIndex = 0) {
-    if (!this.guide) return;
-    this.guideStepIndex = Math.max(0, startIndex);
-    this.guide.hidden = false;
-    this.renderGuideStep();
-    const focusBtn =
-      this.guide.querySelector("[data-crm-guide-next]:not([hidden])") ||
-      this.guide.querySelector("[data-crm-guide-finish]:not([hidden])");
-    focusBtn?.focus();
+    this.tour?.open(startIndex);
   }
 
   closeGuide() {
-    if (!this.guide) return;
-    this.guide.hidden = true;
-    this.clearHighlight();
-  }
-
-  highlightAnchor(name) {
-    this.clearHighlight();
-    const el = this.root.querySelector(`[data-crm-anchor="${name}"]`);
-    if (el) {
-      el.classList.add("crm-guide-highlight");
-      el.scrollIntoView({ block: "nearest", behavior: "smooth" });
-    }
-  }
-
-  clearHighlight() {
-    for (const el of this.root.querySelectorAll(".crm-guide-highlight")) {
-      el.classList.remove("crm-guide-highlight");
-    }
-  }
-
-  renderGuideStep() {
-    if (!this.guide) return;
-    const steps = this.guideSteps();
-    const step = steps[this.guideStepIndex] || steps[0];
-    const total = steps.length;
-    const index = this.guideStepIndex + 1;
-
-    this.guide.querySelector("[data-crm-guide-step-label]").textContent =
-      `LANGKAH ${index} DARI ${total}`;
-    this.guide.querySelector("[data-crm-guide-title]").textContent = step.title;
-    this.guide.querySelector("[data-crm-guide-body]").textContent = step.body;
-
-    const prev = this.guide.querySelector("[data-crm-guide-prev]");
-    const next = this.guide.querySelector("[data-crm-guide-next]");
-    const finish = this.guide.querySelector("[data-crm-guide-finish]");
-    const isLast = this.guideStepIndex >= total - 1;
-    const isFirst = this.guideStepIndex <= 0;
-
-    if (prev) prev.hidden = isFirst;
-    if (next) next.hidden = isLast;
-    if (finish) finish.hidden = !isLast;
-
-    if (step.view) this.switchView(step.view);
-    if (typeof step.enter === "function") step.enter();
-  }
-
-  nextGuideStep() {
-    const steps = this.guideSteps();
-    if (this.guideStepIndex >= steps.length - 1) {
-      this.closeGuide();
-      return;
-    }
-    this.guideStepIndex += 1;
-    this.renderGuideStep();
-  }
-
-  prevGuideStep() {
-    if (this.guideStepIndex <= 0) return;
-    this.guideStepIndex -= 1;
-    this.renderGuideStep();
+    this.tour?.close();
   }
 
   reset() {
@@ -4946,6 +5191,7 @@ class OmnichannelAIDemo {
     this.lastFocusedElement = null;
     this.tutorialStep = 0;
     this.tutorialActive = false;
+    this.hasOpenedGuide = false;
     this.agentName = "Agent Demo";
 
     this.contactList = root.querySelector("[data-omni-contact-list]");
@@ -4973,8 +5219,130 @@ class OmnichannelAIDemo {
     };
     this.trace = { ...this.defaultTrace, assertions: [...this.defaultTrace.assertions] };
 
+    this.tour = new DemoProductTour(root, {
+      ns: "omni",
+      anchorAttr: "data-omni-anchor",
+      getSteps: () => this.guideSteps(),
+      getStepLabel: (step, index, total) => {
+        const viewLabel = step.label || "Call Center";
+        return total > 1
+          ? `${String(viewLabel).toUpperCase()} · LANGKAH ${index} DARI ${total}`
+          : String(viewLabel).toUpperCase();
+      },
+    });
+
     this.bind();
     this.render();
+  }
+
+  guideSteps() {
+    return [
+      {
+        anchor: "queue",
+        label: "Call Center",
+        title: "Selamat datang — 2 role omnichannel",
+        body: "Demo meniru Call Center produksi (3 kolom). Dua role: Call Center (inbox) dan MR (sales). AI menangani dulu, lalu takeover & handoff. Spotlight sorot area aktif — sama seperti panduan Inventory.",
+        enter: () => {
+          this.fanel = "ai";
+          this.activeContactId = "omni-nadia";
+          this.ctxTab = "detail";
+          this.render();
+        },
+      },
+      {
+        anchor: "fanel",
+        label: "Faneling",
+        title: "Role Call Center: faneling & bucket",
+        body: "Tab Saya Handle · AI · Semua meniru produksi. Group: Ditangani AI, Menunggu Agent, MR Belum/Sudah Balas. Lead Nadia ada di bucket AI.",
+        enter: () => {
+          this.fanel = "ai";
+          this.activeContactId = "omni-nadia";
+          this.render();
+        },
+      },
+      {
+        anchor: "chat",
+        label: "Percakapan",
+        title: "Ambil alih dari AI",
+        body: "Ketik pesan atau takeover memindahkan lead ke Call Center (Saya Handle). Banner status berubah; agent bisa pakai Aksi Cepat.",
+        enter: () => {
+          this.fanel = "ai";
+          this.activeContactId = "omni-nadia";
+          this.takeoverContact("omni-nadia");
+          this.render();
+        },
+      },
+      {
+        anchor: "aksi",
+        label: "Aksi Cepat",
+        title: "Aksi Cepat + Detail / Riwayat",
+        body: "Simulasi Kredit, Cek Inventori, Tanya Falcon — sama produksi. Panel kanan: Detail Lead, Pipeline COLD→BOOK, dan tab Riwayat.",
+        enter: () => {
+          this.fanel = "mine";
+          this.activeContactId = "omni-nadia";
+          this.ctxTab = "riwayat";
+          this.render();
+        },
+      },
+      {
+        anchor: "handoff",
+        label: "Handoff MR",
+        title: "Handoff ke MR",
+        body: "Tombol Handoff menyerahkan lead ke Marketing Representative. Bucket menjadi MR; badge MR BELUM BALAS sampai MR membalas.",
+        enter: () => {
+          this.fanel = "mine";
+          this.activeContactId = "omni-nadia";
+          this.ctxTab = "detail";
+          const c = this.activeContact();
+          if (c && c.bucket !== "mr") {
+            const mr = "Dimas Pratama";
+            c.bucket = "mr";
+            c.mrName = mr;
+            c.handlerName = `MR ${mr.split(" ")[0]}`;
+            c.mrUnanswered = true;
+            c.claimedByOther = false;
+            if (c.pipelineStage === "cold" || c.pipelineStage === "warm") {
+              c.pipelineStage = "hot";
+              c.tag = "hot";
+            }
+            c.notes = "Tutorial: HOT + test drive";
+            c.messages.push({
+              role: "system",
+              content: `Handoff oleh Agent Demo ke MR ${mr} · alasan: tutorial`,
+              time: "baru saja",
+            });
+            c.history.push({ label: `Handoff ke MR ${mr}`, time: "baru saja" });
+            c.preview = `Handoff → MR ${mr.split(" ")[0]}`;
+            this.fanel = "all";
+          }
+          this.render();
+        },
+      },
+      {
+        anchor: "context",
+        label: "Detail Lead",
+        title: "Role MR (preview)",
+        body: "MR punya workspace Percakapan sendiri. Konteks lead terbawa. Di production: sales follow-up & closing. Buka preview UI MR dari kartu Role MR.",
+        enter: () => {
+          this.fanel = "all";
+          this.activeContactId = "omni-nadia";
+          this.ctxTab = "detail";
+          this.render();
+        },
+      },
+      {
+        anchor: "trace",
+        label: "AI Trace",
+        title: "AI Trace + CRM terpisah",
+        body: "Tab AI Trace menampilkan router, tool, grounding, dan guardrail. Pipeline CRM sales ada di demo Autopilot CRM terpisah. Selesai — eksplor bebas.",
+        enter: () => {
+          this.fanel = "all";
+          this.activeContactId = "omni-nadia";
+          this.ctxTab = "trace";
+          this.render();
+        },
+      },
+    ];
   }
 
   cloneSeed() {
@@ -5144,10 +5512,8 @@ class OmnichannelAIDemo {
     });
 
     this.root.querySelector("[data-omni-open-mr-preview]").addEventListener("click", () => this.openMrPreview());
-    this.root.querySelector("[data-omni-tutorial]").addEventListener("click", () => this.startTutorial());
-    this.root.querySelector("[data-omni-tutorial-close]").addEventListener("click", () => this.endTutorial());
-    this.root.querySelector("[data-omni-tutorial-skip]").addEventListener("click", () => this.endTutorial());
-    this.root.querySelector("[data-omni-tutorial-next]").addEventListener("click", () => this.nextTutorial());
+    // Tutorial diganti product-tour IMS-style (data-omni-guide via DemoProductTour)
+    this.root.querySelector("[data-omni-tutorial]")?.addEventListener("click", () => this.openGuide(0));
 
     for (const el of this.root.querySelectorAll("[data-close-modal]")) {
       el.addEventListener("click", () => this.closeModal(el.dataset.closeModal));
@@ -5166,6 +5532,10 @@ class OmnichannelAIDemo {
         this.toast.hidden = true;
         return;
       }
+      if (this.tour?.isOpen) {
+        this.closeGuide();
+        return;
+      }
       const openModal = this.root.querySelector(".cc-modal-backdrop:not([hidden])");
       if (openModal) {
         openModal.hidden = true;
@@ -5182,16 +5552,28 @@ class OmnichannelAIDemo {
     document.body.classList.add("demo-open");
     this.root.querySelector("[data-close-omni-demo]").focus();
     this.render();
+    if (!this.hasOpenedGuide) {
+      this.openGuide(0);
+      this.hasOpenedGuide = true;
+    }
   }
 
   close() {
-    this.endTutorial(true);
+    this.closeGuide();
     this.toast.hidden = true;
     for (const modal of this.root.querySelectorAll(".cc-modal-backdrop")) modal.hidden = true;
     this.root.classList.remove("is-open");
     this.root.setAttribute("aria-hidden", "true");
     document.body.classList.remove("demo-open");
     if (this.lastFocusedElement) this.lastFocusedElement.focus();
+  }
+
+  openGuide(startIndex = 0) {
+    this.tour?.open(startIndex);
+  }
+
+  closeGuide() {
+    this.tour?.close();
   }
 
   reset() {
@@ -5232,10 +5614,11 @@ class OmnichannelAIDemo {
       manual: "[data-omni-manual-modal]",
       simple: "[data-omni-simple-modal]",
       mr: "[data-omni-mr-modal]",
-      tutorial: "[data-omni-tutorial-modal]",
     };
     const sel = map[name];
-    if (sel) this.root.querySelector(sel).hidden = false;
+    if (!sel) return;
+    const el = this.root.querySelector(sel);
+    if (el) el.hidden = false;
   }
 
   closeModal(name) {
@@ -5807,51 +6190,12 @@ class OmnichannelAIDemo {
   }
 
   startTutorial() {
-    this.tutorialActive = true;
-    this.tutorialStep = 0;
-    this.showTutorialStep();
+    this.openGuide(0);
   }
 
   endTutorial(silent) {
-    this.tutorialActive = false;
-    this.root.querySelector("[data-omni-tutorial-modal]").hidden = true;
+    this.closeGuide();
     if (!silent) this.showToast("Tutorial selesai", "Silakan eksplorasi bebas semua aksi Call Center.");
-  }
-
-  nextTutorial() {
-    if (this.tutorialStep >= omniTutorialSteps.length - 1) {
-      this.endTutorial();
-      return;
-    }
-    this.tutorialStep += 1;
-    this.showTutorialStep();
-  }
-
-  showTutorialStep() {
-    const step = omniTutorialSteps[this.tutorialStep];
-    if (step.fanel) this.fanel = step.fanel;
-    if (step.contactId) this.activeContactId = step.contactId;
-    if (step.ctxTab) this.ctxTab = step.ctxTab;
-    if (step.action === "takeover") this.takeoverContact(step.contactId);
-    if (step.action === "handoff") {
-      const c = this.activeContact();
-      if (c.bucket !== "mr") {
-        this.root.querySelector("[data-omni-handoff-mr]").value = "Dimas Pratama";
-        this.root.querySelector("[data-omni-handoff-notes]").value = "Tutorial: HOT + test drive";
-        this.submitHandoff();
-      }
-    }
-    this.render();
-    if (step.action === "mr_preview") this.openMrPreview();
-    this.root.querySelector("[data-omni-tutorial-title]").textContent = `Langkah ${this.tutorialStep + 1}/${omniTutorialSteps.length}: ${step.title}`;
-    this.root.querySelector("[data-omni-tutorial-body]").textContent = step.body;
-    const stepsEl = this.root.querySelector("[data-omni-tutorial-steps]");
-    stepsEl.innerHTML = omniTutorialSteps
-      .map((_, i) => `<span class="${i === this.tutorialStep ? "on" : ""}">${i + 1}</span>`)
-      .join("");
-    this.root.querySelector("[data-omni-tutorial-next]").textContent =
-      this.tutorialStep >= omniTutorialSteps.length - 1 ? "Selesai" : "Lanjut";
-    this.openModal("tutorial");
   }
 
   async runPrompt(message, { asCustomer = true } = {}) {
@@ -6870,6 +7214,19 @@ class OneDashboardDemo {
     this.changeBusinessBtn = root.querySelector("[data-dashboard-change-business]");
     this.businessDescInput = root.querySelector("[data-dashboard-business-desc]");
     this.highlightEditors = root.querySelector("[data-dashboard-highlight-editors]");
+    this.hasOpenedGuide = false;
+
+    this.tour = new DemoProductTour(root, {
+      ns: "dashboard",
+      anchorAttr: "data-dashboard-anchor",
+      getSteps: () => this.guideSteps(),
+      getStepLabel: (step, index, total) => {
+        const viewLabel = step.label || "One Dashboard";
+        return total > 1
+          ? `${String(viewLabel).toUpperCase()} · LANGKAH ${index} DARI ${total}`
+          : String(viewLabel).toUpperCase();
+      },
+    });
 
     this.bind();
     publicDemoData
@@ -6879,6 +7236,47 @@ class OneDashboardDemo {
         if (this.verticalId) this.render();
       })
       .catch(() => {});
+  }
+
+  guideSteps() {
+    return [
+      {
+        anchor: "sidebar",
+        label: "One Dashboard",
+        title: "Command Center eksekutif",
+        body: "Satu dashboard untuk Direktur, Sales Manager, dan Kepala Cabang. Navigasi kiri memilih view — pola panduan sama dengan Inventory Management.",
+      },
+      {
+        anchor: "heading",
+        label: "Filter",
+        title: "Periode & lokasi",
+        body: "Pilih cabang dan periode MTD/QTD/YTD. KPI dan chart langsung menyesuaikan data tenant demo.",
+      },
+      {
+        anchor: "kpi",
+        label: "KPI",
+        title: "KPI utama",
+        body: "Kartu KPI menampilkan revenue, pipeline, conversion, dan metrik prioritas sesuai industri yang dipilih di onboarding.",
+      },
+      {
+        anchor: "revenue",
+        label: "Tren",
+        title: "Tren pendapatan + forecast",
+        body: "Grafik aktual vs forecast membantu melihat momentum bulanan lintas cabang.",
+      },
+      {
+        anchor: "pipeline",
+        label: "Pipeline",
+        title: "Corong konversi",
+        body: "Pipeline sales menunjukkan volume lead di setiap tahap hingga closing.",
+      },
+      {
+        anchor: "customize",
+        label: "Personalisasi",
+        title: "Sesuaikan dashboard",
+        body: "Tombol Sesuaikan membuka panel peran + widget. Selesai — silakan atur layout atau ganti industri lewat Ganti bisnis.",
+      },
+    ];
   }
 
   bind() {
@@ -6979,6 +7377,8 @@ class OneDashboardDemo {
       if (event.key !== "Escape" || !this.root.classList.contains("is-open")) return;
       if (!this.toast.hidden) {
         this.toast.hidden = true;
+      } else if (this.tour?.isOpen) {
+        this.closeGuide();
       } else if (this.customizer.classList.contains("is-open")) {
         this.closeCustomizer();
       } else if (this.onboarding && !this.onboarding.hidden && this.verticalId) {
@@ -7003,19 +7403,29 @@ class OneDashboardDemo {
 
     this.hideOnboarding();
     this.root.querySelector("[data-close-dashboard-demo]").focus();
-    if (!this.hasOpenedCustomizer) {
-      this.openCustomizer();
-      this.hasOpenedCustomizer = true;
+    if (!this.hasOpenedGuide) {
+      this.openGuide(0);
+      this.hasOpenedGuide = true;
     }
   }
 
   close() {
+    this.closeGuide();
     this.closeCustomizer();
     this.toast.hidden = true;
     this.root.classList.remove("is-open");
     this.root.setAttribute("aria-hidden", "true");
     document.body.classList.remove("demo-open");
     if (this.lastFocusedElement) this.lastFocusedElement.focus();
+  }
+
+  openGuide(startIndex = 0) {
+    this.closeCustomizer();
+    this.tour?.open(startIndex);
+  }
+
+  closeGuide() {
+    this.tour?.close();
   }
 
   showOnboarding(keepWorkspace) {
@@ -7073,9 +7483,9 @@ class OneDashboardDemo {
     }
     this.changeBusinessBtn.hidden = false;
 
-    if (!this.hasOpenedCustomizer) {
-      this.openCustomizer();
-      this.hasOpenedCustomizer = true;
+    if (!this.hasOpenedGuide) {
+      this.openGuide(0);
+      this.hasOpenedGuide = true;
     }
   }
 
@@ -7988,6 +8398,24 @@ class SocialGrowthDemo {
     this.campaignSelect = root.querySelector("[data-social-campaign]");
     this.guide = root.querySelector("[data-social-guide-popover]");
 
+    this.tour = new DemoProductTour(root, {
+      ns: "social",
+      anchorAttr: "data-social-anchor",
+      getSteps: () => this.guideSteps(),
+      onSwitchView: (view) => this.switchView(view),
+      getStepLabel: (step, index, total) => {
+        const labels = {
+          studio: "Content Studio",
+          calendar: "Kalender",
+          insight: "Campaign Insight",
+        };
+        const viewLabel = labels[step.view] || step.label || "Social Growth";
+        return total > 1
+          ? `${String(viewLabel).toUpperCase()} · LANGKAH ${index} DARI ${total}`
+          : String(viewLabel).toUpperCase();
+      },
+    });
+
     this.bind();
     this.reset();
     this.loadTenantPosts();
@@ -8033,75 +8461,68 @@ class SocialGrowthDemo {
     return [
       {
         view: "studio",
+        anchor: "vehicles",
+        label: "Content Studio",
         title: "Social Growth Studio",
-        body: "Demo Social Media & Ads Automation: alur Konten → Jadwal → Insight lead. Data mock aman, tidak terkirim ke Meta asli.",
+        body: "Demo Social Media & Ads Automation: alur Konten → Jadwal → Insight. Spotlight + tooltip sama seperti panduan Inventory — area sorot adalah kontrol aktif.",
       },
       {
         view: "studio",
+        anchor: "vehicles",
+        label: "Content Studio",
         title: "Pilih unit dari inventory",
-        body: "Delapan unit ready siap jadi materi iklan. Klik kartu unit untuk mengganti preview, harga, dan caption otomatis.",
+        body: "Unit ready siap jadi materi iklan. Klik kartu unit untuk mengganti preview, harga, dan caption otomatis.",
         enter: () => {
           this.vehicleId = "zenix";
           this.offerInput.value = this.vehicle().offer;
           this.captionInput.value = this.vehicle().caption;
           this.renderStudio();
-          this.highlightAnchor("vehicles");
         },
       },
       {
         view: "studio",
-        title: "Cek fitur mobil di creative",
-        body: "Setiap unit membawa spesifikasi Motovax: bodi, BBM, mesin, kapasitas, dan fitur unggulan yang ikut ke caption & preview.",
-        enter: () => {
-          this.vehicleId = "brv";
-          this.offerInput.value = this.vehicle().offer;
-          this.captionInput.value = this.vehicle().caption;
-          this.renderStudio();
-          this.highlightAnchor("vehicles");
-        },
-      },
-      {
-        view: "studio",
+        anchor: "design",
+        label: "Content Studio",
         title: "Desain & format konten",
         body: "Pilih format Post 1:1, Feed 4:5, atau Story 9:16. Edit headline dan penawaran—preview langsung berubah.",
         enter: () => {
           this.format = "portrait";
           this.renderStudio();
-          this.highlightAnchor("design");
         },
       },
       {
         view: "studio",
+        anchor: "caption",
+        label: "Content Studio",
         title: "Platform & generate caption",
         body: "Aktifkan Instagram/Facebook, lalu Generate Ulang untuk 3 varian caption berbasis unit + penawaran.",
-        enter: () => {
-          this.highlightAnchor("caption");
-          this.root.querySelector("[data-social-generate]")?.focus();
-        },
       },
       {
         view: "studio",
+        anchor: "schedule",
+        label: "Content Studio",
         title: "Jadwalkan ke tenant demo",
         body: "Atur tanggal/waktu lalu Jadwalkan. Posting tersimpan di tenant demo (tidak publish ke akun Meta).",
         enter: () => {
           this.root.querySelector(".social-progress span:last-child")?.classList.add("active");
-          this.highlightAnchor("schedule");
         },
       },
       {
         view: "calendar",
+        anchor: "calendar",
+        label: "Kalender",
         title: "Kalender konten",
         body: "Lihat draft, terjadwal, dan terbit. Setelah schedule, unit masuk sebagai posting planned di kalender.",
-        enter: () => this.highlightAnchor("calendar"),
       },
       {
         view: "insight",
+        anchor: "insight",
+        label: "Campaign Insight",
         title: "Campaign Insight → CRM",
-        body: "Ganti campaign untuk melihat klik, lead, UTM, ranking produk, dan lead terbaru yang masuk pipeline CRM.",
+        body: "Ganti campaign untuk melihat klik, lead, UTM, ranking produk, dan lead terbaru yang masuk pipeline CRM. Selesai — eksplor bebas.",
         enter: () => {
           this.campaignSelect.value = "zenix";
           this.renderInsight();
-          this.highlightAnchor("insight");
         },
       },
     ];
@@ -8120,13 +8541,7 @@ class SocialGrowthDemo {
       this.toast.hidden = true;
     });
 
-    for (const button of this.root.querySelectorAll("[data-social-guide]")) {
-      button.addEventListener("click", () => this.openGuide(0));
-    }
-    this.root.querySelector("[data-close-social-guide]")?.addEventListener("click", () => this.closeGuide());
-    this.root.querySelector("[data-social-guide-next]")?.addEventListener("click", () => this.nextGuideStep());
-    this.root.querySelector("[data-social-guide-prev]")?.addEventListener("click", () => this.prevGuideStep());
-    this.root.querySelector("[data-social-guide-finish]")?.addEventListener("click", () => this.closeGuide());
+    // Panduan: DemoProductTour (bindControls di constructor)
 
     for (const button of this.root.querySelectorAll("[data-social-nav]")) {
       button.addEventListener("click", () => this.switchView(button.dataset.socialNav || "studio"));
@@ -8193,7 +8608,7 @@ class SocialGrowthDemo {
     document.addEventListener("keydown", (event) => {
       if (event.key !== "Escape" || !this.root.classList.contains("is-open")) return;
       if (!this.toast.hidden) this.toast.hidden = true;
-      else if (this.guide && !this.guide.hidden) this.closeGuide();
+      else if (this.tour?.isOpen) this.closeGuide();
       else this.close();
     });
   }
@@ -8221,74 +8636,11 @@ class SocialGrowthDemo {
   }
 
   openGuide(startIndex = 0) {
-    if (!this.guide) return;
-    this.guideStepIndex = Math.max(0, startIndex);
-    this.guide.hidden = false;
-    this.renderGuideStep();
-    const focusBtn =
-      this.guide.querySelector("[data-social-guide-next]:not([hidden])") ||
-      this.guide.querySelector("[data-social-guide-finish]:not([hidden])");
-    focusBtn?.focus();
+    this.tour?.open(startIndex);
   }
 
   closeGuide() {
-    if (!this.guide) return;
-    this.guide.hidden = true;
-    this.clearHighlight();
-  }
-
-  highlightAnchor(name) {
-    this.clearHighlight();
-    const el = this.root.querySelector(`[data-social-anchor="${name}"]`);
-    if (el) el.classList.add("social-guide-highlight");
-  }
-
-  clearHighlight() {
-    for (const el of this.root.querySelectorAll(".social-guide-highlight")) {
-      el.classList.remove("social-guide-highlight");
-    }
-  }
-
-  renderGuideStep() {
-    if (!this.guide) return;
-    const steps = this.guideSteps();
-    const step = steps[this.guideStepIndex] || steps[0];
-    const total = steps.length;
-    const index = this.guideStepIndex + 1;
-
-    this.guide.querySelector("[data-social-guide-step-label]").textContent =
-      `LANGKAH ${index} DARI ${total}`;
-    this.guide.querySelector("[data-social-guide-title]").textContent = step.title;
-    this.guide.querySelector("[data-social-guide-body]").textContent = step.body;
-
-    const prev = this.guide.querySelector("[data-social-guide-prev]");
-    const next = this.guide.querySelector("[data-social-guide-next]");
-    const finish = this.guide.querySelector("[data-social-guide-finish]");
-    const isLast = this.guideStepIndex >= total - 1;
-    const isFirst = this.guideStepIndex <= 0;
-
-    if (prev) prev.hidden = isFirst;
-    if (next) next.hidden = isLast;
-    if (finish) finish.hidden = !isLast;
-
-    if (step.view) this.switchView(step.view);
-    if (typeof step.enter === "function") step.enter();
-  }
-
-  nextGuideStep() {
-    const steps = this.guideSteps();
-    if (this.guideStepIndex >= steps.length - 1) {
-      this.closeGuide();
-      return;
-    }
-    this.guideStepIndex += 1;
-    this.renderGuideStep();
-  }
-
-  prevGuideStep() {
-    if (this.guideStepIndex <= 0) return;
-    this.guideStepIndex -= 1;
-    this.renderGuideStep();
+    this.tour?.close();
   }
 
   reset() {
@@ -8796,10 +9148,64 @@ class ConversionInsightDemo {
     this.heatmap = root.querySelector("[data-insight-heatmap]");
     this.actionList = root.querySelector("[data-insight-action-list]");
     this.runActionButton = root.querySelector("[data-insight-run-action]");
+    this.hasOpenedGuide = false;
+
+    this.tour = new DemoProductTour(root, {
+      ns: "insight",
+      anchorAttr: "data-insight-anchor",
+      getSteps: () => this.guideSteps(),
+      getStepLabel: (step, index, total) => {
+        const viewLabel = step.label || "Conversion Insight";
+        return total > 1
+          ? `${String(viewLabel).toUpperCase()} · LANGKAH ${index} DARI ${total}`
+          : String(viewLabel).toUpperCase();
+      },
+    });
 
     this.bind();
     this.reset();
     this.loadTenantMetrics();
+  }
+
+  guideSteps() {
+    return [
+      {
+        anchor: "sidebar",
+        label: "Conversion Insight",
+        title: "Conversion Intelligence",
+        body: "Modul insight menemukan kebocoran funnel dan peluang closing. Panduan memakai spotlight + tooltip seperti Inventory Management.",
+      },
+      {
+        anchor: "kpi",
+        label: "KPI",
+        title: "KPI konversi",
+        body: "Pantau lead masuk, HOT, response time, dan conversion rate sesuai periode yang dipilih.",
+      },
+      {
+        anchor: "funnel",
+        label: "Funnel",
+        title: "Diagnostik funnel",
+        body: "Corong Lead → Closing menampilkan tahap dengan drop-off terbesar (bottleneck).",
+      },
+      {
+        anchor: "opportunity",
+        label: "Opportunity",
+        title: "Prioritas berdampak tinggi",
+        body: "Kartu opportunity mengestimasi uplift konversi bila rekomendasi dijalankan di tenant demo.",
+      },
+      {
+        anchor: "sources",
+        label: "Sumber",
+        title: "Performa sumber lead",
+        body: "Bandingkan WhatsApp, Instagram, Facebook, dan Website berdasarkan volume dan konversi.",
+      },
+      {
+        anchor: "actions",
+        label: "Next Best Action",
+        title: "Rekomendasi untuk tim",
+        body: "Daftar aksi prioritas. Tombol Jalankan Rekomendasi Demo mencatat aktivitas di tenant demo. Selesai — sesuaikan fokus lewat panel personalisasi.",
+      },
+    ];
   }
 
   async loadTenantMetrics(force = false) {
@@ -8922,6 +9328,7 @@ class ConversionInsightDemo {
     document.addEventListener("keydown", (event) => {
       if (event.key !== "Escape" || !this.root.classList.contains("is-open")) return;
       if (!this.toast.hidden) this.toast.hidden = true;
+      else if (this.tour?.isOpen) this.closeGuide();
       else if (this.customizer.classList.contains("is-open")) this.closeCustomizer();
       else this.close();
     });
@@ -8933,19 +9340,29 @@ class ConversionInsightDemo {
     this.root.setAttribute("aria-hidden", "false");
     document.body.classList.add("demo-open");
     this.root.querySelector("[data-close-insight-demo]").focus();
-    if (!this.hasOpened) {
-      this.openCustomizer();
-      this.hasOpened = true;
+    if (!this.hasOpenedGuide) {
+      this.openGuide(0);
+      this.hasOpenedGuide = true;
     }
   }
 
   close() {
+    this.closeGuide();
     this.closeCustomizer();
     this.toast.hidden = true;
     this.root.classList.remove("is-open");
     this.root.setAttribute("aria-hidden", "true");
     document.body.classList.remove("demo-open");
     if (this.lastFocusedElement) this.lastFocusedElement.focus();
+  }
+
+  openGuide(startIndex = 0) {
+    this.closeCustomizer();
+    this.tour?.open(startIndex);
+  }
+
+  closeGuide() {
+    this.tour?.close();
   }
 
   openCustomizer() {
