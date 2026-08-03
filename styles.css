@@ -137,9 +137,9 @@ a {
   color: var(--blue);
 }
 
-/* —— Menu Produk (mega dropdown ala Qontak) —— */
+/* —— Menu Produk (full-width mega, layout Qontak) —— */
 .nav-item-produk {
-  position: relative;
+  position: static;
   display: flex;
   align-items: center;
 }
@@ -147,23 +147,44 @@ a {
 .nav-produk-trigger {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 4px;
   margin: 0;
-  padding: 0;
+  padding: 7px 0;
   border: 0;
   background: transparent;
   font: inherit;
   font-size: 14px;
-  font-weight: inherit;
-  color: inherit;
+  font-weight: 500;
+  color: #232933;
   cursor: pointer;
+  position: relative;
   transition: color 0.18s ease;
+}
+
+.nav-produk-trigger::after {
+  content: "";
+  display: block;
+  width: 0;
+  height: 2px;
+  background: #2c76ed;
+  border-radius: 4px;
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  transform: translateX(-50%);
+  transition: width 0.2s linear;
+}
+
+.nav-produk-trigger:hover::after,
+.nav-item-produk.is-open .nav-produk-trigger::after,
+.nav-item-produk.is-current .nav-produk-trigger::after {
+  width: 100%;
 }
 
 .nav-produk-trigger:hover,
 .nav-item-produk.is-open .nav-produk-trigger,
 .nav-item-produk.is-current .nav-produk-trigger {
-  color: var(--blue);
+  color: #232933;
 }
 
 .nav-chevron {
@@ -176,102 +197,151 @@ a {
 }
 
 .produk-mega {
-  position: absolute;
-  top: calc(100% + 14px);
+  position: fixed;
   left: 0;
-  z-index: 40;
-  width: min(760px, calc(100vw - 48px));
-  padding-top: 0;
-  filter: drop-shadow(0 22px 48px rgba(15, 35, 75, 0.16));
+  right: 0;
+  top: 78px;
+  z-index: 60;
+  max-height: calc(100vh - 78px);
+  overflow: auto;
+  background: #fff;
+  box-shadow:
+    0 4px 6px -2px rgba(0, 0, 0, 0.05),
+    0 10px 15px -3px rgba(0, 0, 0, 0.1);
 }
 
 .produk-mega[hidden] {
+  display: none !important;
+}
+
+.produk-mega-layout {
+  display: flex;
+  align-items: stretch;
+  min-height: 420px;
+  max-width: 1248px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.produk-mega-sidebar {
+  flex: 0 0 272px;
+  width: 272px;
+  background: #f1f5f9;
+  padding: 28px 0 32px;
+  border-right: 1px solid #e2e8f0;
+}
+
+.produk-mega-group + .produk-mega-group {
+  margin-top: 22px;
+}
+
+.produk-mega-group-title {
+  padding: 0 24px 10px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #626b79;
+}
+
+.produk-mega-nav-btn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  margin: 0;
+  padding: 10px 24px;
+  border: 0;
+  border-left: 3px solid transparent;
+  background: transparent;
+  text-align: left;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.35;
+  color: #232933;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+.produk-mega-nav-btn:hover {
+  background: rgba(44, 118, 237, 0.06);
+}
+
+.produk-mega-nav-btn.is-active {
+  background: #fff;
+  border-left-color: #2c76ed;
+  color: #2c76ed;
+  font-weight: 600;
+}
+
+.produk-mega-nav-btn .chev {
+  flex-shrink: 0;
+  opacity: 0.55;
+}
+
+.produk-mega-nav-btn.is-active .chev {
+  opacity: 1;
+  color: #2c76ed;
+}
+
+.produk-mega-content {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: 28px 32px 28px 28px;
+  background: #fff;
+}
+
+.produk-mega-pane {
   display: none;
 }
 
-.produk-mega-inner {
-  background: #fff;
-  border: 1px solid #e2ebf6;
-  border-radius: 18px;
-  overflow: hidden;
-}
-
-.produk-mega-head {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 16px;
-  padding: 18px 20px 14px;
-  border-bottom: 1px solid #eef3f9;
-  background: linear-gradient(180deg, #f8fbff 0%, #fff 100%);
-}
-
-.produk-mega-kicker {
+.produk-mega-pane.is-active {
   display: block;
-  margin-bottom: 4px;
-  font-size: 11px;
-  font-weight: 800;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--blue);
 }
 
-.produk-mega-head strong {
-  display: block;
-  font-size: 15px;
-  letter-spacing: -0.02em;
-  color: #0f172a;
-}
-
-.produk-mega-all {
-  flex-shrink: 0;
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  margin-top: 2px;
-  font-size: 13px;
+.produk-mega-pane-title {
+  margin: 0 0 18px;
+  font-size: 18px;
   font-weight: 700;
-  color: var(--blue);
-  white-space: nowrap;
+  letter-spacing: -0.02em;
+  color: #081833;
+  line-height: 1.3;
 }
 
-.produk-mega-all:hover {
-  text-decoration: underline;
-}
-
-.produk-mega-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 4px;
-  padding: 10px;
+.produk-mega-items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 16px;
 }
 
 .produk-mega-item {
   display: flex;
   align-items: flex-start;
   gap: 12px;
-  width: 100%;
+  width: calc(33.333% - 11px);
+  min-width: 200px;
+  max-width: 100%;
   margin: 0;
-  padding: 12px 12px;
+  padding: 12px 10px;
   border: 0;
-  border-radius: 12px;
+  border-radius: 10px;
   background: transparent;
   text-align: left;
+  text-decoration: none;
   font: inherit;
   color: inherit;
   cursor: pointer;
-  transition: background 0.15s ease, box-shadow 0.15s ease;
-}
-
-a.produk-mega-item {
-  text-decoration: none;
+  transition: background 0.15s ease;
+  box-sizing: border-box;
 }
 
 .produk-mega-item:hover,
 .produk-mega-item:focus-visible {
   background: #f4f8ff;
   outline: none;
-  box-shadow: inset 0 0 0 1px #dbeafe;
+  text-decoration: none;
 }
 
 .produk-mega-icon {
@@ -281,86 +351,126 @@ a.produk-mega-item {
   border-radius: 10px;
   display: grid;
   place-items: center;
-  font-size: 11px;
-  font-weight: 900;
-  letter-spacing: -0.02em;
-  color: #fff;
-  background: var(--c, var(--blue));
-  box-shadow: 0 6px 14px color-mix(in srgb, var(--c, var(--blue)) 28%, transparent);
+  background: var(--icon-bg, #eaf2ff);
+  color: var(--icon-fg, #2c76ed);
 }
 
-.produk-mega-copy {
-  display: grid;
-  gap: 3px;
+.produk-mega-icon svg {
+  width: 22px;
+  height: 22px;
+  display: block;
+}
+
+.produk-mega-meta {
   min-width: 0;
+  display: grid;
+  gap: 2px;
 }
 
-.produk-mega-copy b {
-  font-size: 13.5px;
+.produk-mega-item-title {
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.35;
+  color: #081833;
+}
+
+.produk-mega-item-title .badge-new {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 1px 6px;
+  border-radius: 999px;
+  font-size: 10px;
   font-weight: 700;
-  letter-spacing: -0.01em;
-  color: #0f172a;
-  line-height: 1.25;
+  letter-spacing: 0.02em;
+  color: #fff;
+  background: #ef4444;
+  vertical-align: middle;
 }
 
-.produk-mega-copy small {
-  font-size: 12px;
+.produk-mega-item-desc {
+  font-size: 12.5px;
   line-height: 1.45;
-  color: #64748b;
+  color: #626b79;
 }
 
-.produk-mega-foot {
-  display: flex;
+.produk-mega-more {
+  display: inline-flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 14px;
-  padding: 14px 18px;
-  border-top: 1px solid #eef3f9;
-  background: #f8fafc;
+  gap: 6px;
+  margin-top: 22px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #2c76ed;
+  text-decoration: none;
 }
 
-.produk-mega-foot p {
-  margin: 0;
-  font-size: 13px;
-  color: #475569;
+.produk-mega-more:hover {
+  text-decoration: underline;
 }
 
-.produk-mega-cta {
-  min-height: 40px;
-  padding: 0 16px;
-  font-size: 13px;
-  white-space: nowrap;
+.produk-mega-more svg {
+  width: 16px;
+  height: 16px;
 }
 
 .site-header:has(.nav-item-produk.is-open) {
-  z-index: 50;
+  z-index: 70;
 }
 
-@media (max-width: 1180px) {
-  .produk-mega {
-    width: min(640px, calc(100vw - 36px));
-  }
-
-  .produk-mega-copy small {
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-  }
+body.produk-menu-open {
+  overflow: hidden;
 }
 
-@media (max-width: 720px) {
-  .produk-mega-grid {
-    grid-template-columns: 1fr;
-  }
+.produk-mega-scrim {
+  position: fixed;
+  inset: 0;
+  top: 78px;
+  z-index: 55;
+  background: rgba(15, 23, 42, 0.28);
+}
 
-  .produk-mega-foot {
+.produk-mega-scrim[hidden] {
+  display: none !important;
+}
+
+@media (max-width: 1024px) {
+  .produk-mega-layout {
     flex-direction: column;
-    align-items: stretch;
   }
 
-  .produk-mega-cta {
+  .produk-mega-sidebar {
+    flex: none;
     width: 100%;
+    padding: 16px 0 8px;
+    border-right: 0;
+    border-bottom: 1px solid #e2e8f0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0;
+  }
+
+  .produk-mega-group {
+    flex: 1 1 100%;
+  }
+
+  .produk-mega-nav-btn {
+    padding: 10px 16px;
+  }
+
+  .produk-mega-content {
+    padding: 18px 16px 24px;
+  }
+
+  .produk-mega-item {
+    width: 100%;
+    min-width: 0;
+  }
+}
+
+@media (max-width: 900px) {
+  .produk-mega,
+  .produk-mega-scrim {
+    top: 64px;
   }
 }
 
