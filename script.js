@@ -1753,12 +1753,9 @@ class InventoryProductDemo {
         },
         {
           view: "falcon",
-          anchor: "falcon-live",
-          title: "Uji chat real",
-          body: "Selesai template. Di panel kiri pilih mode “Chat real” (area sorot) — Falcon AI menjawab dengan stok Motovax. Ganti agent Sales/Management kapan saja di rail kiri.",
-          enter: () => {
-            // Highlight mode toggle; user klik sendiri “Chat real”
-          },
+          anchor: "falcon-chat",
+          title: "Langsung chat real",
+          body: "Selesai panduan. Ketik pesan, tekan kirim, atau pilih “Coba langsung” — demo otomatis beralih ke Falcon AI real dengan stok Motovax. Ganti agent kapan saja di rail kiri.",
         },
       ],
     };
@@ -2071,14 +2068,11 @@ class InventoryProductDemo {
 
     this.root.querySelector("[data-falcon-send]")?.addEventListener("click", () => this.handleFalconSend());
     this.root.querySelector("[data-falcon-attach]")?.addEventListener("click", () => {
-      if (this.falconMode === "live") {
-        this.showToast(
-          "Mode chat real",
-          "Lihat foto: ketik “mau lihat foto unit …”. Unggah/update foto stok tidak tersedia di uji chat real.",
-        );
-        return;
-      }
-      this.simulateFalconPhotoUpload();
+      if (this.falconMode !== "live") this.startFalconLiveMode(this.falconRole);
+      this.showToast(
+        "Chat real aktif",
+        "Untuk melihat foto, ketik “mau lihat foto unit …”. Unggah/update foto stok tidak tersedia di uji chat real.",
+      );
     });
     this.falconInput?.addEventListener("keydown", (event) => {
       if (event.key === "Enter") {
@@ -2098,9 +2092,6 @@ class InventoryProductDemo {
     this.root.querySelector("[data-falcon-cancel-live]")?.addEventListener("click", () =>
       this.cancelFalconLivePick(),
     );
-    this.root.querySelector("[data-falcon-exit-live]")?.addEventListener("click", () =>
-      this.exitFalconLiveMode(),
-    );
     this.falconRoleGate?.addEventListener("click", (event) => {
       const pick = event.target.closest("[data-falcon-pick-role]");
       if (!pick) return;
@@ -2118,18 +2109,6 @@ class InventoryProductDemo {
         this.startFalconLiveMode(role);
       } else {
         this.setFalconRole(role, { greet: true, reset: true });
-      }
-    });
-
-    // Left rail: mode demo template vs chat real
-    this.root.querySelector(".falcon-mode-toggle")?.addEventListener("click", (event) => {
-      const btn = event.target.closest("[data-falcon-set-mode]");
-      if (!btn) return;
-      const mode = btn.dataset.falconSetMode || "tutorial";
-      if (mode === "live") {
-        if (this.falconMode !== "live") this.startFalconLiveMode(this.falconRole);
-      } else if (this.falconMode === "live" || this.falconMode === "picking") {
-        this.exitFalconLiveMode();
       }
     });
 
@@ -3014,12 +2993,12 @@ class InventoryProductDemo {
         );
       } else if (next === "sales") {
         this.pushFalconBot(
-          "Halo! Saya Falcon untuk Sales Agent.\n\nSaya bisa bantu: cek stok/unit, foto, simulasi kredit, lokasi showroom, catat lead, handoff admin, generate konten, dan performa sales Anda.\n\nCoba chip “Coba cepat” di kiri, atau ketik “tampilkan semua fitur sales”.\n\nSiap coba AI sungguhan? Pilih mode Chat real di panel kiri.",
+          "Halo! Saya Falcon untuk Sales Agent.\n\nSaya bisa bantu: cek stok/unit, foto, simulasi kredit, lokasi showroom, catat lead, handoff admin, generate konten, dan performa sales Anda.\n\nPilih “Coba langsung” di kiri atau ketik pesan sendiri. Pesan Anda otomatis dijawab Falcon AI real.",
         );
       } else {
         this.pushFalconSystem("Mode berganti ke Management Agent.");
         this.pushFalconBot(
-          "Halo! Saya Falcon untuk Management Agent.\n\nSaya bisa semua fitur Sales + laporan stok/cabang/aging, GP/margin, import Excel, edit unit, dokumen, analisis inventory, dan analytics tren.\n\nCoba “laporan stok per cabang” atau “tampilkan semua fitur management”.\n\nMode Chat real di kiri = jawaban AI + data Motovax.",
+          "Halo! Saya Falcon untuk Management Agent.\n\nSaya bisa semua fitur Sales + laporan stok/cabang/aging, GP/margin, import Excel, edit unit, dokumen, analisis inventory, dan analytics tren.\n\nPilih “Coba langsung” di kiri atau ketik pesan sendiri. Pesan Anda otomatis dijawab Falcon AI real.",
         );
       }
     }
@@ -3041,7 +3020,7 @@ class InventoryProductDemo {
       this.falconRoleLabel.textContent = isSales ? "Sales Agent" : "Management Agent";
     }
     if (this.falconModeLabel) {
-      this.falconModeLabel.textContent = isLive ? "MODE LIVE · FALCON AI" : "MODE DEMO";
+      this.falconModeLabel.textContent = isLive ? "MODE LIVE · FALCON AI" : "PANDUAN TEMPLATE";
     }
     if (this.falconStatus) {
       if (isLive) {
@@ -3075,8 +3054,8 @@ class InventoryProductDemo {
           : `Chat real: Falcon AI sebagai Management Agent + knowledge inventory. Sisa kuota sesi: ${rem} pesan.`;
       } else {
         this.falconRoleHint.textContent = isSales
-          ? "Mode demo (template). Ganti ke “Chat real” di atas untuk Falcon AI sungguhan."
-          : "Mode demo Management (template). Ganti ke “Chat real” untuk jawaban AI live.";
+          ? "Panduan Sales aktif. Ketik atau pilih prompt untuk langsung memakai Falcon AI real."
+          : "Panduan Management aktif. Ketik atau pilih prompt untuk langsung memakai Falcon AI real.";
       }
     }
     const badge = this.root.querySelector("[data-falcon-role-badge]");
@@ -3089,15 +3068,7 @@ class InventoryProductDemo {
       card.classList.toggle("is-selected", active);
       card.setAttribute("aria-selected", active ? "true" : "false");
     }
-    // Sync mode toggle
-    for (const btn of this.root.querySelectorAll("[data-falcon-set-mode]")) {
-      const mode = btn.dataset.falconSetMode || "tutorial";
-      const active = isLive ? mode === "live" : mode === "tutorial";
-      btn.classList.toggle("is-active", active);
-    }
-
     if (this.falconLiveCta) this.falconLiveCta.hidden = true;
-    if (this.falconExitLive) this.falconExitLive.hidden = !isLive;
     if (this.falconTutorialList) {
       this.falconTutorialList.hidden = isLive;
     }
@@ -3174,32 +3145,6 @@ class InventoryProductDemo {
 
   renderFalconQuickPrompts() {
     if (!this.falconQuickPrompts) return;
-    const story = this.falconStoryLabel();
-    const salesTutorial = [
-      `Halo, mau tanya ${story} dong, masih ready?`,
-      "Boleh minta fotonya?",
-      `Simulasi kredit ${story} DP 20% tenor 48 bulan`,
-      "Lokasi showroom",
-      `Catat lead Budi 08123456789 minat ${story}`,
-      "Hubungkan customer ke admin",
-      `Buat caption promo ${story}`,
-      "Performa sales saya",
-      "Tampilkan semua fitur sales",
-      "Laporan aging stok",
-      "Ganti ke Management Agent",
-    ];
-    const managementTutorial = [
-      "Laporan stok per cabang",
-      "Laporan aging unit",
-      "Gross profit / margin unit",
-      "Import inventory lewat WA",
-      "Ubah status unit jadi Booked",
-      "Upload dokumen unit",
-      "Analisis inventory dan rekomendasi stok",
-      "Tren penjualan bulan ini",
-      "Tampilkan semua fitur management",
-      "Kembali ke Sales Agent",
-    ];
     const salesLive = [
       "Ada unit Serena ready berapa?",
       "Rekomendasi MPV di bawah 350 juta",
@@ -3214,14 +3159,7 @@ class InventoryProductDemo {
       "Cabang mana stoknya paling banyak?",
       "Rekomendasi unit yang perlu dipromosikan",
     ];
-    const list =
-      this.falconMode === "live"
-        ? this.falconRole === "sales"
-          ? salesLive
-          : managementLive
-        : this.falconRole === "sales"
-          ? salesTutorial
-          : managementTutorial;
+    const list = this.falconRole === "sales" ? salesLive : managementLive;
     this.falconQuickPrompts.innerHTML = list
       .map(
         (text) =>
@@ -3300,8 +3238,9 @@ class InventoryProductDemo {
     const content = String(text || "").trim();
     if (!content) return;
 
-    // Live mode uses real Falcon API (skip during guided template steps).
-    if (this.falconMode === "live" && !options.fromGuide) {
+    // Interaksi user selalu memakai Falcon real; template hanya untuk langkah panduan otomatis.
+    if (!options.fromGuide) {
+      if (this.falconMode !== "live") this.startFalconLiveMode(this.falconRole);
       this.sendFalconLiveMessage(content);
       return;
     }
