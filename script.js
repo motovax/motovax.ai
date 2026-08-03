@@ -13,6 +13,31 @@ for (const link of document.querySelectorAll("[data-wa]")) {
   }
 }
 
+const contactForm = document.querySelector("[data-contact-form]");
+if (contactForm instanceof HTMLFormElement) {
+  contactForm.addEventListener("submit", (event) => {
+    event.preventDefault();
+    if (!contactForm.reportValidity()) return;
+
+    const data = new FormData(contactForm);
+    const value = (name) => String(data.get(name) || "").trim();
+    const message = [
+      "Halo MOTOVAX, saya ingin berkonsultasi.",
+      "",
+      `Nama: ${value("name")}`,
+      `Perusahaan/dealer: ${value("company")}`,
+      `Email: ${value("email")}`,
+      `Nomor WhatsApp: ${value("phone")}`,
+      `Kebutuhan: ${value("need")}`,
+      value("message") ? `Detail: ${value("message")}` : "",
+    ]
+      .filter(Boolean)
+      .join("\n");
+
+    window.open(`https://wa.me/6281999197186?text=${encodeURIComponent(message)}`, "_blank", "noopener,noreferrer");
+  });
+}
+
 /**
  * Mega menu Produk — katalog kapabilitas dan suite Motovax.
  * Link diarahkan ke halaman detail fitur terkait.
@@ -23,9 +48,10 @@ for (const link of document.querySelectorAll("[data-wa]")) {
 
   const path = location.pathname.replace(/\/+$/, "") || "/";
   const inNestedDir = path.includes("/fitur/") || path.includes("/solusi/") || /\/(fitur|solusi)$/.test(path);
+  const isStandaloneRoot = path.endsWith("modul.html") || path.endsWith("hubungi-kami.html");
   const rootPrefix = inNestedDir ? "../" : "./";
   const fiturPrefix = inNestedDir ? "../fitur/" : "./fitur/";
-  const home = inNestedDir ? "../index.html#" : path.endsWith("modul.html") ? "./index.html#" : "#";
+  const home = inNestedDir ? "../index.html#" : isStandaloneRoot ? "./index.html#" : "#";
   const modul = `${rootPrefix}modul.html`;
   const f = (slug) => `${fiturPrefix}${slug}.html`;
 
@@ -496,18 +522,18 @@ for (const link of document.querySelectorAll("[data-wa]")) {
       id: "industri",
       title: "Industri",
       items: [
-        { title: "Pendidikan", desc: "Kelola manajemen sekolah", icon: "education", slug: "pendidikan", href: `${solusiPrefix}pendidikan.html` },
-        { title: "Keuangan", desc: "Kelola nasabah dengan mudah", icon: "finance", slug: "keuangan", href: `${solusiPrefix}keuangan.html` },
-        { title: "Kesehatan", desc: "Atur manajemen klinik/rumah sakit", icon: "health", slug: "kesehatan", href: `${solusiPrefix}kesehatan.html` },
-        { title: "Tour & Travel", desc: "Mudahkan kelola agen travel", icon: "travel", slug: "tour-travel", href: `${solusiPrefix}tour-travel.html` },
-        { title: "Perhotelan", desc: "Percepat reservasi pelanggan", icon: "hotel", slug: "perhotelan", href: `${solusiPrefix}perhotelan.html` },
-        { title: "Logistik", desc: "Konsolidasi laporan pengiriman", icon: "logistics", slug: "logistik", href: `${solusiPrefix}logistik.html` },
-        { title: "FMCG", desc: "Sederhanakan proses penjualan", icon: "fmcg", slug: "fmcg", href: `${solusiPrefix}fmcg.html` },
-        { title: "Ritel", desc: "Kelola pencatatan inventaris", icon: "retail", slug: "ritel", href: `${solusiPrefix}ritel.html` },
-        { title: "Teknologi Informasi", desc: "Sinkronisasi data pelanggan", icon: "tech", slug: "teknologi-informasi", href: `${solusiPrefix}teknologi-informasi.html` },
-        { title: "Outsourcing", desc: "Kelola interaksi pelanggan", icon: "outsourcing", slug: "outsourcing", href: `${solusiPrefix}outsourcing.html` },
-        { title: "Otomotif", desc: "Optimalkan penjualan dealer", icon: "automotive", slug: "otomotif", href: `${solusiPrefix}otomotif.html` },
-        { title: "Property", desc: "Kelola prospek dan penjualan properti", icon: "property", slug: "property", href: `${solusiPrefix}property.html` },
+        { title: "Pendidikan", desc: "Fondasi inquiry dan admission", icon: "education", slug: "pendidikan", status: "adapt", statusLabel: "Adaptif", href: `${solusiPrefix}pendidikan.html` },
+        { title: "Keuangan", desc: "Fondasi engagement nasabah", icon: "finance", slug: "keuangan", status: "adapt", statusLabel: "Adaptif", href: `${solusiPrefix}keuangan.html` },
+        { title: "Kesehatan", desc: "Fondasi layanan dan inquiry pasien", icon: "health", slug: "kesehatan", status: "adapt", statusLabel: "Adaptif", href: `${solusiPrefix}kesehatan.html` },
+        { title: "Tour & Travel", desc: "Fondasi inquiry dan booking", icon: "travel", slug: "tour-travel", status: "adapt", statusLabel: "Adaptif", href: `${solusiPrefix}tour-travel.html` },
+        { title: "Perhotelan", desc: "Fondasi reservasi dan layanan tamu", icon: "hotel", slug: "perhotelan", status: "adapt", statusLabel: "Adaptif", href: `${solusiPrefix}perhotelan.html` },
+        { title: "Logistik", desc: "Fondasi customer service pengiriman", icon: "logistics", slug: "logistik", status: "adapt", statusLabel: "Adaptif", href: `${solusiPrefix}logistik.html` },
+        { title: "FMCG", desc: "Fondasi engagement channel partner", icon: "fmcg", slug: "fmcg", status: "adapt", statusLabel: "Adaptif", href: `${solusiPrefix}fmcg.html` },
+        { title: "Ritel", desc: "Fondasi conversational sales", icon: "retail", slug: "ritel", status: "adapt", statusLabel: "Adaptif", href: `${solusiPrefix}ritel.html` },
+        { title: "Teknologi Informasi", desc: "Fondasi B2B sales dan support", icon: "tech", slug: "teknologi-informasi", status: "adapt", statusLabel: "Adaptif", href: `${solusiPrefix}teknologi-informasi.html` },
+        { title: "Outsourcing", desc: "Fondasi operasi layanan multi-klien", icon: "outsourcing", slug: "outsourcing", status: "adapt", statusLabel: "Adaptif", href: `${solusiPrefix}outsourcing.html` },
+        { title: "Otomotif", desc: "Stok hingga closing terintegrasi", icon: "automotive", slug: "otomotif", status: "live", statusLabel: "Live", href: `${solusiPrefix}otomotif.html` },
+        { title: "Property", desc: "Fondasi lead hingga site visit", icon: "property", slug: "property", status: "adapt", statusLabel: "Adaptif", href: `${solusiPrefix}property.html` },
       ],
     },
     {
@@ -529,7 +555,10 @@ for (const link of document.querySelectorAll("[data-wa]")) {
       <a class="solusi-mega-item${isCurrent ? " is-current" : ""}" href="${item.href}"${isCurrent ? ' aria-current="page"' : ""} data-solusi-close>
         <span class="solusi-mega-icon">${icons[item.icon]}</span>
         <span class="solusi-mega-meta">
-          <strong>${item.title}</strong>
+          <span class="solusi-mega-title-row">
+            <strong>${item.title}</strong>
+            ${item.statusLabel ? `<span class="solusi-mega-status ${item.status}">${item.statusLabel}</span>` : ""}
+          </span>
           <small>${item.desc}</small>
         </span>
         <svg class="solusi-mega-arrow" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -667,6 +696,50 @@ for (const link of document.querySelectorAll("[data-wa]")) {
   });
   document.addEventListener("motovax:nav-menu-open", (event) => {
     if (event.detail?.source !== "solusi") closeAll();
+  });
+})();
+
+/** Navigasi mobile beranda — menjaga Produk, Solusi, Cara Kerja, dan Keunggulan tetap dapat diakses. */
+(function initMobileNavigation() {
+  const trigger = document.querySelector("[data-mobile-nav-trigger]");
+  const panel = document.querySelector("[data-mobile-nav-panel]");
+  const backdrop = document.querySelector("[data-mobile-nav-backdrop]");
+  if (!(trigger instanceof HTMLButtonElement) || !(panel instanceof HTMLElement) || !(backdrop instanceof HTMLElement)) return;
+
+  const close = ({ restoreFocus = false } = {}) => {
+    panel.hidden = true;
+    backdrop.hidden = true;
+    trigger.setAttribute("aria-expanded", "false");
+    trigger.setAttribute("aria-label", "Buka menu navigasi");
+    trigger.classList.remove("is-open");
+    document.body.classList.remove("mobile-menu-open");
+    if (restoreFocus) trigger.focus();
+  };
+
+  const open = () => {
+    panel.hidden = false;
+    backdrop.hidden = false;
+    trigger.setAttribute("aria-expanded", "true");
+    trigger.setAttribute("aria-label", "Tutup menu navigasi");
+    trigger.classList.add("is-open");
+    document.body.classList.add("mobile-menu-open");
+    panel.querySelector("a, summary")?.focus();
+  };
+
+  trigger.addEventListener("click", () => {
+    if (trigger.getAttribute("aria-expanded") === "true") close();
+    else open();
+  });
+  backdrop.addEventListener("click", () => close({ restoreFocus: true }));
+  panel.addEventListener("click", (event) => {
+    const target = event.target;
+    if (target instanceof Element && target.closest("[data-mobile-nav-close]")) close();
+  });
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && trigger.getAttribute("aria-expanded") === "true") close({ restoreFocus: true });
+  });
+  window.addEventListener("resize", () => {
+    if (window.innerWidth > 900 && trigger.getAttribute("aria-expanded") === "true") close();
   });
 })();
 
