@@ -13,10 +13,319 @@ for (const link of document.querySelectorAll("[data-wa]")) {
   }
 }
 
-/** Mega menu Produk (klik = buka detail fitur, ala qontak.com) */
+/**
+ * Mega menu Produk — layout, copy, dan interaksi selaras qontak.com/Produk
+ * (sidebar kategori + pane detail). Teks menu mengikuti Qontak; suite
+ * berbrand diganti Motovax. Link diarahkan ke demo / modul Motovax.
+ */
 (function initProdukMegaMenu() {
   const menus = document.querySelectorAll("[data-produk-menu]");
   if (!menus.length) return;
+
+  const path = location.pathname.replace(/\/+$/, "") || "/";
+  const inFiturDir = path.includes("/fitur/") || /\/fitur$/.test(path);
+  const rootPrefix = inFiturDir ? "../" : "./";
+  const fiturPrefix = inFiturDir ? "./" : "./fitur/";
+  const home = inFiturDir ? "../index.html#" : path.endsWith("modul.html") ? "./index.html#" : "#";
+  const modul = `${rootPrefix}modul.html`;
+  const f = (slug) => `${fiturPrefix}${slug}.html`;
+
+  const icon = (paths, viewBox = "0 0 24 24") =>
+    `<svg viewBox="${viewBox}" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${paths}</svg>`;
+
+  const I = {
+    chat: icon('<path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"/>'),
+    ig: icon('<rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/>'),
+    shop: icon('<path d="M4 7h16l-1.2 12.2A2 2 0 0 1 16.8 21H7.2a2 2 0 0 1-2-1.8L4 7z"/><path d="M8 7V5a4 4 0 0 1 8 0v2"/>'),
+    live: icon('<path d="M8 10h.01M12 10h.01M16 10h.01"/><path d="M21 12a9 9 0 1 1-9-9"/><path d="M21 3v6h-6"/>'),
+    ticket: icon('<path d="M4 9V7a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v2a2 2 0 0 0 0 4v2a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-2a2 2 0 0 0 0-4z"/>'),
+    crm: icon('<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>'),
+    deal: icon('<path d="M12 3v18M8 7h7a3 3 0 0 1 0 6H9a3 3 0 0 0 0 6h8"/>'),
+    contact: icon('<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>'),
+    goal: icon('<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1" fill="currentColor"/>'),
+    gps: icon('<path d="M12 21s-7-4.5-7-10a7 7 0 1 1 14 0c0 5.5-7 10-7 10z"/><circle cx="12" cy="11" r="2.5"/>'),
+    report: icon('<path d="M4 19V9m8 10V5m8 14v-7M2 19h20"/>'),
+    wa: icon('<path d="M20.5 11.5a8.5 8.5 0 0 1-12.7 7.4L4 20l1.2-3.6A8.5 8.5 0 1 1 20.5 11.5z"/><path d="M9.2 9.6c.2-.5.4-.5.7-.5h.5c.2 0 .4 0 .5.4l.7 1.7c.1.2 0 .4-.1.6l-.4.5c-.1.1-.2.3 0 .5.3.4 1 1.1 2 1.7 1 .6 1.4.5 1.7.4l.6-.3c.2-.1.4 0 .5.1l1.1 1.3c.1.2.2.4 0 .6-.3.4-1.2.9-1.8.9-.5 0-1.3 0-2.6-.6-1.6-.7-2.8-2.2-3.2-2.7-.4-.5-1.1-1.5-1.1-2.5 0-1 .5-1.5.7-1.7z"/>'),
+    verify: icon('<path d="M12 3 4.5 6.5v5.2c0 4.5 3.1 7.8 7.5 9.3 4.4-1.5 7.5-4.8 7.5-9.3V6.5L12 3z"/><path d="m9 12 2 2 4-4"/>'),
+    blast: icon('<path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4 20-7z"/>'),
+    ads: icon('<path d="M4 12v8a1 1 0 0 0 1 1h3v-9z"/><path d="M12 5v16h3a1 1 0 0 0 1-1V9z"/><path d="M20 9v11a1 1 0 0 0 1 1h0"/>'),
+    call: icon('<path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6 19.8 19.8 0 0 1-3.1-8.7A2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.6a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.5-1.2a2 2 0 0 1 2.1-.4c.8.3 1.7.6 2.6.7a2 2 0 0 1 1.7 2z"/>'),
+    bulk: icon('<path d="M17 8h4v12H7v-4"/><path d="M3 4h14v12H3z"/>'),
+    flow: icon('<rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="8.5" y="14" width="7" height="7" rx="1.5"/><path d="M10 6.5h4M12 10v4"/>'),
+    cs: icon('<path d="M12 2a7 7 0 0 0-7 7v3a3 3 0 0 0 3 3h1V9a5 5 0 0 1 10 0v6h-1a3 3 0 0 0-2.8 2"/><path d="M12 19a2 2 0 0 0 2 2h1"/>'),
+    sla: icon('<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>'),
+    score: icon('<path d="M12 17.3 6.2 20.5l1.1-6.5L2.5 9.5l6.6-1L12 2.5l2.9 6 6.6 1-4.8 4.5 1.1 6.5z"/>'),
+    bot: icon('<rect x="5" y="8" width="14" height="11" rx="3"/><path d="M9 13h.01M15 13h.01M9 17h6M12 8V5"/><path d="M8 5h8"/>'),
+    agent: icon('<path d="M12 3 4 7v5c0 5 3.5 8.5 8 10 4.5-1.5 8-5 8-10V7l-8-4z"/><path d="M9.5 12.5 11 14l3.5-3.5"/>'),
+    ai: icon('<path d="m12 3 1.4 4.1L18 8.5l-4.6 1.4L12 14l-1.4-4.1L6 8.5l4.6-1.4L12 3z"/><path d="m19 13 .8 2.2L22 16l-2.2.8L19 19l-.8-2.2L16 16l2.2-.8L19 13z"/>'),
+    kb: icon('<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>'),
+    workflow: icon('<circle cx="6" cy="6" r="2.5"/><circle cx="18" cy="6" r="2.5"/><circle cx="12" cy="18" r="2.5"/><path d="M8.5 6h7M6 8.5v4.2A3 3 0 0 0 9 15.7h0M18 8.5v4.2A3 3 0 0 1 15 15.7h0M9 15.7h6"/>'),
+    suite: icon('<rect x="3" y="3" width="8" height="8" rx="1.5"/><rect x="13" y="3" width="8" height="8" rx="1.5"/><rect x="3" y="13" width="8" height="8" rx="1.5"/><rect x="13" y="13" width="8" height="8" rx="1.5"/>'),
+  };
+
+  /** Copy & struktur menu = qontak.com Produk; link → Motovax */
+  const groups = [
+    {
+      id: "fitur",
+      title: "Fitur",
+      items: [
+        {
+          id: "omni",
+          label: "Aplikasi Omnichannel",
+          paneTitle: "Aplikasi Omnichannel",
+          moreHref: `${fiturPrefix}index.html`,
+          moreLabel: "Lihat semua fitur",
+          features: [
+            { title: "Omnichannel", desc: "Satu platform untuk kelola chat dari berbagai saluran", icon: "chat", href: f("aplikasi-omnichannel") },
+            { title: "Instagram API", desc: "Respons DM otomatis untuk tingkatkan penjualan", icon: "ig", href: f("instagram-api") },
+            { title: "Tokopedia Chat", desc: "Kelola chat akun Tokopedia Seller lebih mudah", icon: "shop", href: f("integrasi-tokopedia") },
+            { title: "Embedded Live Chat", desc: "Integrasi layanan live chat 24/7 untuk aplikasi Anda", icon: "live", href: f("embedded-live-chat") },
+            { title: "Ticket Creation Integration", desc: "Sederhanakan proses resolusi masalah pelanggan", icon: "ticket", href: f("ticket-creation-integration") },
+          ],
+        },
+        {
+          id: "crm",
+          label: "Aplikasi CRM",
+          paneTitle: "Aplikasi CRM",
+          moreHref: `${fiturPrefix}index.html`,
+          moreLabel: "Lihat semua fitur",
+          features: [
+            { title: "Aplikasi CRM", desc: "Automasi proses penjualan & layanan pelanggan", icon: "crm", href: f("aplikasi-crm") },
+            { title: "Manajemen Deal", desc: "Kelola deal secara end-to-end lebih ciamik", icon: "deal", href: f("manajemen-deal") },
+            { title: "Manajemen Kontak", desc: "Kelola kontak pelanggan lebih mulus", icon: "contact", href: f("manajemen-kontak") },
+            { title: "Manajemen Goal", desc: "Mudah kelola goal dan target yang terkustomisasi", icon: "goal", href: f("manajemen-goal") },
+            { title: "Sales GPS Tracking", desc: "Pelacakan lokasi tim sales lapangan real-time", icon: "gps", href: f("sales-gps-tracking") },
+            { title: "Custom CRM Report", desc: "Buat laporan dari data CRM sesuai kebutuhan", icon: "report", href: f("personalisasi-report-sales") },
+          ],
+        },
+        {
+          id: "wa",
+          label: "WhatsApp API",
+          paneTitle: "WhatsApp API",
+          moreHref: `${fiturPrefix}index.html`,
+          moreLabel: "Lihat semua fitur",
+          features: [
+            { title: "WhatsApp API", desc: "Optimalkan interaksi dengan WhatsApp Business API", icon: "wa", href: f("whatsapp-business-api") },
+            { title: "WhatsApp Centang Biru", desc: "Tingkatkan kredibilitas dengan verifikasi WhatsApp", icon: "verify", href: f("centang-biru-whatsapp") },
+            { title: "WhatsApp Blast", desc: "Jangkau ribuan pelanggan secara otomatis", icon: "blast", href: f("wa-blast") },
+            { title: "Click-to-WhatsApp Ads", desc: "Tingkatkan penjualan di WhatsApp lebih mudah", icon: "ads", href: f("ctwa") },
+            { title: "WhatsApp Call", desc: "Layanan panggilan untuk komunikasi lebih lancar", icon: "call", href: f("whatsapp-business-calling") },
+            { title: "WhatsApp Bulk", desc: "Kirim pesan ke banyak kontak secara bersamaan", icon: "bulk", href: f("whatsapp-bulk") },
+            { title: "WhatsApp Flows", desc: "Buat formulir terintegrasi untuk pelayanan lebih tepat", icon: "flow", href: f("whatsapp-flows") },
+          ],
+        },
+        {
+          id: "cs",
+          label: "Customer Support & Ticketing",
+          paneTitle: "Customer Support & Ticketing",
+          moreHref: `${fiturPrefix}index.html`,
+          moreLabel: "Lihat semua fitur",
+          features: [
+            { title: "Aplikasi Customer Service", desc: "Platform terintegrasi untuk layanan pelanggan efisien", icon: "cs", href: f("aplikasi-customer-service") },
+            { title: "Manajemen Tiket", desc: "Tangani keluhan pelanggan lebih cepat & akurat", icon: "ticket", href: f("sistem-manajemen-tiket") },
+            { title: "Manajemen SLA", desc: "Optimalkan resolusi masalah pelanggan & kinerja agen", icon: "sla", href: f("manajemen-sla") },
+            { title: "Agent Scorecard", desc: "Pantau & evaluasi kualitas layanan pelanggan lebih mudah", icon: "score", href: f("agent-scorecard") },
+          ],
+        },
+        {
+          id: "ai",
+          label: "AI & Chatbot",
+          paneTitle: "AI & Chatbot",
+          moreHref: `${fiturPrefix}index.html`,
+          moreLabel: "Lihat semua fitur",
+          features: [
+            { title: "Chatbot & Conversational AI", desc: "Respons pelanggan lebih cepat dengan chatbot 24/7", icon: "bot", href: f("chatbot") },
+            { title: "Airene", desc: "Maksimalkan kinerja agen CS dengan dukungan Airene", icon: "agent", href: f("integrasi-airene") },
+            { title: "Agentic AI", desc: "Agen AI cerdas untuk proses bisnis lebih optimal", icon: "ai", href: f("agentic-ai"), badge: "New" },
+          ],
+        },
+        {
+          id: "workflow",
+          label: "Automasi Operasional & Workflow",
+          paneTitle: "Automasi Operasional & Workflow",
+          moreHref: `${fiturPrefix}index.html`,
+          moreLabel: "Lihat semua fitur",
+          features: [
+            { title: "Knowledge Base", desc: "Pusat informasi untuk layanan pelanggan efisien", icon: "kb", href: f("knowledge-base") },
+            { title: "Workflow", desc: "Otomatisasi alur kerja lintas tim dan sistem", icon: "workflow", href: f("automasi-workflow") },
+          ],
+        },
+        {
+          id: "campaign",
+          label: "Manajemen Campaign",
+          paneTitle: "Manajemen Campaign",
+          moreHref: `${fiturPrefix}index.html`,
+          moreLabel: "Lihat semua fitur",
+          features: [
+            { title: "WhatsApp Broadcast", desc: "Jangkau ribuan pelanggan secara otomatis", icon: "blast", href: f("aplikasi-broadcast-whatsapp") },
+            { title: "WhatsApp Bulk", desc: "Kirim pesan ke banyak kontak secara bersamaan", icon: "bulk", href: f("whatsapp-bulk") },
+          ],
+        },
+        {
+          id: "callcenter",
+          label: "Call Center",
+          paneTitle: "Call Center",
+          moreHref: `${fiturPrefix}index.html`,
+          moreLabel: "Lihat semua fitur",
+          features: [
+            { title: "Call Center", desc: "Pusat layanan panggilan fleksibel berbasis cloud", icon: "call", href: f("aplikasi-call-center") },
+          ],
+        },
+      ],
+    },
+    {
+      id: "solusi",
+      title: "Solusi Bisnis",
+      items: [
+        {
+          id: "broadcast",
+          label: "Motovax Broadcast",
+          paneTitle: "Motovax Broadcast",
+          moreHref: `${fiturPrefix}index.html`,
+          moreLabel: "Lihat semua fitur",
+          features: [
+            { title: "Motovax Broadcast", desc: "Jangkau ribuan pelanggan tanpa proses manual", icon: "blast", href: f("motovax-broadcast") },
+          ],
+        },
+        {
+          id: "sales-suite",
+          label: "Motovax Sales Suite",
+          paneTitle: "Motovax Sales Suite",
+          moreHref: `${fiturPrefix}index.html`,
+          moreLabel: "Lihat semua fitur",
+          features: [
+            { title: "Motovax Sales Suite", desc: "Optimalkan penjualan dengan solusi komprehensif", icon: "suite", href: f("motovax-sales-suite") },
+          ],
+        },
+        {
+          id: "service-suite",
+          label: "Motovax Service Suite",
+          paneTitle: "Motovax Service Suite",
+          moreHref: `${fiturPrefix}index.html`,
+          moreLabel: "Lihat semua fitur",
+          features: [
+            { title: "Motovax Service Suite", desc: "Respons pelanggan lebih cepat dengan layanan optimal", icon: "cs", href: f("motovax-service-suite") },
+          ],
+        },
+        {
+          id: "suite-360",
+          label: "Motovax 360",
+          paneTitle: "Motovax 360",
+          moreHref: `${fiturPrefix}index.html`,
+          moreLabel: "Lihat semua fitur",
+          features: [
+            { title: "Motovax 360", desc: "Manajemen pelanggan terintegrasi untuk proses efisien", icon: "suite", href: f("motovax-360") },
+          ],
+        },
+      ],
+    },
+  ];
+
+  const allPanes = groups.flatMap((g) => g.items);
+  const firstPaneId = allPanes[0]?.id || "omni";
+
+  function renderMenuHtml() {
+    const firstGroupId = groups[0]?.id || "fitur";
+
+    const tabs = `
+      <div class="produk-mega-tabs" role="tablist" aria-label="Fitur dan Solusi Bisnis">
+        <div class="produk-mega-tabs-inner">
+          ${groups
+            .map(
+              (group) => `
+            <button
+              type="button"
+              class="produk-mega-tab${group.id === firstGroupId ? " is-active" : ""}"
+              role="tab"
+              id="produk-tab-${group.id}"
+              aria-selected="${group.id === firstGroupId ? "true" : "false"}"
+              aria-controls="produk-group-${group.id}"
+              data-produk-tab="${group.id}"
+            >${group.title}</button>`
+            )
+            .join("")}
+        </div>
+      </div>`;
+
+    const sidebar = groups
+      .map((group) => {
+        const isActiveGroup = group.id === firstGroupId;
+        const activePaneId = isActiveGroup ? firstPaneId : group.items[0]?.id;
+        return `
+        <div
+          class="produk-mega-group${isActiveGroup ? " is-active" : ""}"
+          id="produk-group-${group.id}"
+          role="tabpanel"
+          aria-labelledby="produk-tab-${group.id}"
+          data-produk-group="${group.id}"
+          ${isActiveGroup ? "" : "hidden"}
+        >
+          <div class="produk-mega-group-title">${group.title}</div>
+          ${group.items
+            .map(
+              (item) => `
+            <button type="button" class="produk-mega-nav-btn${item.id === activePaneId && isActiveGroup ? " is-active" : ""}" data-produk-pane="${item.id}" data-produk-pane-group="${group.id}" aria-selected="${item.id === activePaneId && isActiveGroup ? "true" : "false"}">
+              <span>${item.label}</span>
+              <svg class="chev" width="16" height="16" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M8.334 5 13.334 10l-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>`
+            )
+            .join("")}
+        </div>`;
+      })
+      .join("");
+
+    const panes = allPanes
+      .map((item) => {
+        const features = item.features
+          .map((feat) => {
+            const badge = feat.badge ? ` <span class="badge-new">${feat.badge}</span>` : "";
+            return `
+              <a href="${feat.href}" class="produk-mega-item" data-produk-close>
+                <span class="produk-mega-icon">${I[feat.icon] || I.chat}</span>
+                <span class="produk-mega-meta">
+                  <span class="produk-mega-item-title">${feat.title}${badge}</span>
+                  <span class="produk-mega-item-desc">${feat.desc}</span>
+                </span>
+              </a>`;
+          })
+          .join("");
+
+        return `
+          <div class="produk-mega-pane${item.id === firstPaneId ? " is-active" : ""}" data-produk-pane-panel="${item.id}" ${item.id === firstPaneId ? "" : "hidden"}>
+            <h3 class="produk-mega-pane-title">${item.paneTitle}</h3>
+            <div class="produk-mega-items">${features}</div>
+            <a class="produk-mega-more" href="${item.moreHref}" data-produk-close>
+              ${item.moreLabel}
+              <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </a>
+          </div>`;
+      })
+      .join("");
+
+    return `
+      ${tabs}
+      <div class="produk-mega-layout">
+        <aside class="produk-mega-sidebar" aria-label="Kategori produk">${sidebar}</aside>
+        <div class="produk-mega-content">${panes}</div>
+      </div>`;
+  }
+
+  let scrim = document.querySelector("[data-produk-scrim]");
+  if (!scrim) {
+    scrim = document.createElement("div");
+    scrim.className = "produk-mega-scrim";
+    scrim.hidden = true;
+    scrim.setAttribute("data-produk-scrim", "");
+    document.body.appendChild(scrim);
+  }
+
+  for (const menu of menus) {
+    const panel = menu.querySelector("[data-produk-mount], [data-produk-panel]");
+    if (panel && !panel.dataset.built) {
+      panel.innerHTML = renderMenuHtml();
+      panel.dataset.built = "1";
+    }
+  }
 
   const closeAll = (except = null) => {
     for (const menu of menus) {
@@ -27,6 +336,10 @@ for (const link of document.querySelectorAll("[data-wa]")) {
       if (trigger) trigger.setAttribute("aria-expanded", "false");
       if (panel) panel.hidden = true;
     }
+    if (!except) {
+      scrim.hidden = true;
+      document.body.classList.remove("produk-menu-open");
+    }
   };
 
   const openMenu = (menu) => {
@@ -36,6 +349,8 @@ for (const link of document.querySelectorAll("[data-wa]")) {
     const panel = menu.querySelector("[data-produk-panel]");
     if (trigger) trigger.setAttribute("aria-expanded", "true");
     if (panel) panel.hidden = false;
+    scrim.hidden = false;
+    document.body.classList.add("produk-menu-open");
   };
 
   const closeMenu = (menu) => {
@@ -44,6 +359,45 @@ for (const link of document.querySelectorAll("[data-wa]")) {
     const panel = menu.querySelector("[data-produk-panel]");
     if (trigger) trigger.setAttribute("aria-expanded", "false");
     if (panel) panel.hidden = true;
+    scrim.hidden = true;
+    document.body.classList.remove("produk-menu-open");
+  };
+
+  const setActivePane = (menu, paneId) => {
+    for (const btn of menu.querySelectorAll("[data-produk-pane]")) {
+      const on = btn.getAttribute("data-produk-pane") === paneId;
+      btn.classList.toggle("is-active", on);
+      btn.setAttribute("aria-selected", on ? "true" : "false");
+    }
+    for (const pane of menu.querySelectorAll("[data-produk-pane-panel]")) {
+      const on = pane.getAttribute("data-produk-pane-panel") === paneId;
+      pane.classList.toggle("is-active", on);
+      pane.hidden = !on;
+    }
+  };
+
+  const setActiveTab = (menu, groupId) => {
+    const group = groups.find((g) => g.id === groupId) || groups[0];
+    if (!group) return;
+
+    for (const tab of menu.querySelectorAll("[data-produk-tab]")) {
+      const on = tab.getAttribute("data-produk-tab") === group.id;
+      tab.classList.toggle("is-active", on);
+      tab.setAttribute("aria-selected", on ? "true" : "false");
+    }
+
+    for (const panel of menu.querySelectorAll("[data-produk-group]")) {
+      const on = panel.getAttribute("data-produk-group") === group.id;
+      panel.classList.toggle("is-active", on);
+      panel.hidden = !on;
+    }
+
+    const activeInGroup = menu.querySelector(
+      `[data-produk-group="${group.id}"] [data-produk-pane].is-active`
+    );
+    const paneId =
+      activeInGroup?.getAttribute("data-produk-pane") || group.items[0]?.id || firstPaneId;
+    setActivePane(menu, paneId);
   };
 
   for (const menu of menus) {
@@ -57,18 +411,41 @@ for (const link of document.querySelectorAll("[data-wa]")) {
       else openMenu(menu);
     });
 
-    for (const closer of menu.querySelectorAll("[data-produk-close]")) {
-      closer.addEventListener("click", () => {
-        // Delay close slightly so demo open handlers run first on buttons
+    menu.addEventListener("click", (event) => {
+      const target = event.target;
+      if (!(target instanceof Element)) return;
+
+      const tabBtn = target.closest("[data-produk-tab]");
+      if (tabBtn && menu.contains(tabBtn)) {
+        event.preventDefault();
+        event.stopPropagation();
+        setActiveTab(menu, tabBtn.getAttribute("data-produk-tab") || groups[0]?.id);
+        return;
+      }
+
+      const paneBtn = target.closest("[data-produk-pane]");
+      if (paneBtn && menu.contains(paneBtn)) {
+        event.preventDefault();
+        event.stopPropagation();
+        setActivePane(menu, paneBtn.getAttribute("data-produk-pane") || firstPaneId);
+        return;
+      }
+
+      const closer = target.closest("[data-produk-close]");
+      if (closer && menu.contains(closer)) {
+        // biarkan handler demo berjalan dulu
         requestAnimationFrame(() => closeMenu(menu));
-      });
-    }
+      }
+    });
   }
+
+  scrim.addEventListener("click", () => closeAll());
 
   document.addEventListener("click", (event) => {
     const target = event.target;
     if (!(target instanceof Element)) return;
     if (target.closest("[data-produk-menu]")) return;
+    if (target.closest("[data-produk-scrim]")) return;
     closeAll();
   });
 
