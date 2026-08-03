@@ -500,6 +500,15 @@ class InventoryProductDemo {
     /** tutorial = template demo; live = real Falcon API + Motovax knowledge */
     this.falconMode = "tutorial"; // tutorial | live | picking
     this.falconLiveBusy = false;
+    /** Rate-limit snapshot from /falcon-chat (session 30 / day 800 on backend). */
+    this.falconLiveQuota = {
+      sessionUsed: 0,
+      sessionLimit: 30,
+      sessionRemaining: 30,
+      dayUsed: 0,
+      dayLimit: 800,
+      dayRemaining: 800,
+    };
     this.advOpen = false;
     this.branchMenuOpen = false;
     this.advFilters = {
@@ -1688,6 +1697,14 @@ class InventoryProductDemo {
     this.falconFocus = null;
     this.falconMode = "tutorial";
     this.falconLiveBusy = false;
+    this.falconLiveQuota = {
+      sessionUsed: 0,
+      sessionLimit: 30,
+      sessionRemaining: 30,
+      dayUsed: 0,
+      dayLimit: 800,
+      dayRemaining: 800,
+    };
     this.setFalconRole("sales", { greet: true, reset: true });
     this.setView("units");
     this.setUploadTab("inventory");
@@ -1698,6 +1715,14 @@ class InventoryProductDemo {
     this.falconFocus = null;
     this.falconMode = "tutorial";
     this.falconLiveBusy = false;
+    this.falconLiveQuota = {
+      sessionUsed: 0,
+      sessionLimit: 30,
+      sessionRemaining: 30,
+      dayUsed: 0,
+      dayLimit: 800,
+      dayRemaining: 800,
+    };
     this.setFalconRole("sales", { greet: true, reset: true });
   }
 
@@ -1724,6 +1749,15 @@ class InventoryProductDemo {
     if (next === "management") this.falconSalesDone = true;
     this.falconMessages = [];
     this.falconFocus = null;
+    // Soft reset of client quota display; server remains source of truth per session_id.
+    this.falconLiveQuota = {
+      sessionUsed: 0,
+      sessionLimit: 30,
+      sessionRemaining: 30,
+      dayUsed: 0,
+      dayLimit: 800,
+      dayRemaining: 800,
+    };
     if (this.falconRoleGate) this.falconRoleGate.hidden = true;
     this.closeGuide();
 
@@ -1732,9 +1766,9 @@ class InventoryProductDemo {
     this.renderFalconQuickPrompts();
 
     const label = next === "sales" ? "Sales Agent" : "Management Agent";
-    this.pushFalconSystem(`Mode live · ${label} · knowledge Motovax`);
+    this.pushFalconSystem(`Mode live · ${label} · knowledge Motovax · max 30 chat/sesi`);
     this.pushFalconBot(
-      `Halo! Saya Falcon (live) untuk ${label}.\n\nTanya apa saja tentang stok, unit, atau insight inventory — saya jawab dengan data Motovax, bukan skrip demo.\n\nContoh: “Ada Serena ready berapa unit?” atau “Rekomendasi MPV di bawah 350 juta”.`,
+      `Halo! Saya Falcon (live) untuk ${label}.\n\nTanya apa saja tentang stok, unit, atau insight inventory — saya jawab dengan data Motovax, bukan skrip demo.\n\nContoh: “Ada Serena ready berapa unit?” atau “Rekomendasi MPV di bawah 350 juta”.\n\nBatas uji: 30 pesan per sesi browser / 800 per hari (seluruh pengunjung demo).`,
     );
     this.renderFalconMessages();
     this.falconInput?.focus();
@@ -1745,6 +1779,25 @@ class InventoryProductDemo {
     this.falconLiveBusy = false;
     if (this.falconRoleGate) this.falconRoleGate.hidden = true;
     this.setFalconRole(this.falconRole, { greet: true, reset: true });
+  }
+
+  applyFalconLiveQuota(body = {}) {
+    const q = this.falconLiveQuota || {};
+    const num = (v, fallback) => {
+      const n = Number(v);
+      return Number.isFinite(n) ? n : fallback;
+    };
+    this.falconLiveQuota = {
+      sessionUsed: num(body.session_used ?? body.SessionUsed, q.sessionUsed ?? 0),
+      sessionLimit: num(body.session_limit ?? body.SessionLimit, q.sessionLimit ?? 30),
+      sessionRemaining: num(
+        body.session_remaining ?? body.SessionRemaining,
+        q.sessionRemaining ?? 30,
+      ),
+      dayUsed: num(body.day_used ?? body.DayUsed, q.dayUsed ?? 0),
+      dayLimit: num(body.day_limit ?? body.DayLimit, q.dayLimit ?? 800),
+      dayRemaining: num(body.day_remaining ?? body.DayRemaining, q.dayRemaining ?? 800),
+    };
   }
 
   setFalconRole(role, options = {}) {
@@ -1805,15 +1858,35 @@ class InventoryProductDemo {
       this.falconModeLabel.textContent = isLive ? "MODE LIVE · FALCON AI" : "MODE DEMO";
     }
     if (this.falconStatus) {
-      this.falconStatus.textContent = isLive
-        ? "live · knowledge Motovax"
-        : "online · Falcon AI";
+      if (isLive) {
+        const q = this.falconLiveQuota || {};
+        const used = Number(q.sessionUsed) || 0;
+        const limit = Number(q.sessionLimit) || 30;
+        const rem = Number.isFinite(Number(q.sessionRemaining))
+          ? Number(q.sessionRemaining)
+          : Math.max(0, limit - used);
+        this.falconStatus.textContent =
+          rem <= 0
+            ? `live · batas sesi ${used}/${limit}`
+            : `live · sisa ${rem}/${limit} chat`;
+        this.falconStatus.title =
+          rem <= 0
+            ? "Batas chat live sesi ini tercapai. Reset demo atau coba lagi besok."
+            : `Kuota chat live: ${used} terpakai dari ${limit} per sesi (hari ini bersama pengunjung lain: ${Number(q.dayUsed) || 0}/${Number(q.dayLimit) || 800}).`;
+      } else {
+        this.falconStatus.textContent = "online · Falcon AI";
+        this.falconStatus.title = "";
+      }
     }
     if (this.falconRoleHint) {
       if (isLive) {
+        const q = this.falconLiveQuota || {};
+        const rem = Number.isFinite(Number(q.sessionRemaining))
+          ? Number(q.sessionRemaining)
+          : 30;
         this.falconRoleHint.textContent = isSales
-          ? "Chat real: Falcon AI menjawab sebagai Sales Agent dengan stok Motovax (bukan template)."
-          : "Chat real: Falcon AI menjawab sebagai Management Agent dengan knowledge inventory Motovax.";
+          ? `Chat real: Falcon AI menjawab sebagai Sales Agent dengan stok Motovax (bukan template). Sisa kuota sesi: ${rem} pesan.`
+          : `Chat real: Falcon AI menjawab sebagai Management Agent dengan knowledge inventory Motovax. Sisa kuota sesi: ${rem} pesan.`;
       } else {
         this.falconRoleHint.textContent = isSales
           ? "Mode panduan (template). Setelah selesai, klik “Uji chat real” untuk Falcon sungguhan."
@@ -2075,6 +2148,17 @@ class InventoryProductDemo {
     const content = String(text || "").trim();
     if (!content) return;
 
+    const q = this.falconLiveQuota || {};
+    if (Number(q.sessionRemaining) === 0) {
+      this.pushFalconUser(content);
+      this.pushFalconBot(
+        `⚠️ Batas chat live sesi ini tercapai (${q.sessionUsed || 0}/${q.sessionLimit || 30}). Klik “Reset demo” atau coba lagi besok.`,
+      );
+      this.renderFalconMessages();
+      this.renderFalconChrome();
+      return;
+    }
+
     this.falconLiveBusy = true;
     this.renderFalconChrome();
     this.pushFalconUser(content);
@@ -2095,16 +2179,34 @@ class InventoryProductDemo {
       // Drop typing placeholder
       this.falconMessages = this.falconMessages.filter((m) => !m.typing);
       if (!response.ok) {
+        if (response.status === 429 || body.code === "resource_exhausted") {
+          // Optimistically mark session as exhausted for UI (server is source of truth).
+          this.falconLiveQuota = {
+            ...this.falconLiveQuota,
+            sessionRemaining: 0,
+            sessionUsed:
+              Number(this.falconLiveQuota?.sessionLimit) ||
+              Number(this.falconLiveQuota?.sessionUsed) ||
+              30,
+          };
+        } else if (
+          body.session_used != null ||
+          body.session_remaining != null ||
+          body.SessionUsed != null
+        ) {
+          this.applyFalconLiveQuota(body);
+        }
         const msg =
           body.message ||
           body.Message ||
           (response.status === 429
-            ? "Batas chat live tercapai. Coba lagi nanti."
+            ? "Batas chat live tercapai. Coba lagi nanti atau reset demo."
             : "Falcon live belum dapat merespons. Coba lagi sebentar.");
         this.pushFalconBot(`⚠️ ${msg}`);
         this.renderFalconMessages();
         return;
       }
+      this.applyFalconLiveQuota(body);
       const reply = String(body.reply || body.Reply || "").trim();
       const photos = this.normalizeFalconLivePhotos(body.photos || body.Photos || []);
       this.pushFalconBot(
