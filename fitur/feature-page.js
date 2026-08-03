@@ -29,6 +29,22 @@
     return;
   }
 
+  const profile = profileFor(data);
+  const availability = availabilityFor(data.status);
+  const capabilities = data.capabilities || [];
+  const benefits = data.benefits || [];
+  const workflow = data.howItWorks || [];
+  const relatedItems = uniqueBySlug((data.related || []).map((id) => catalog[id]).filter(Boolean));
+  const faqs = buildFaqs(data, profile, availability, capabilities, workflow, relatedItems);
+
+  const crumbs = (data.breadcrumbs || ["Produk", "Fitur", data.title])
+    .map((item, index, items) => {
+      if (index === items.length - 1) return `<span>${escapeHtml(item)}</span>`;
+      if (item === "Produk") return `<a href="../modul.html">${escapeHtml(item)}</a>`;
+      return `<span>${escapeHtml(item)}</span>`;
+    })
+    .join(' <span class="crumb-sep">/</span> ');
+
   // Satu demo dipakai bersama oleh beberapa halaman detail dalam kelompok yang
   // sama. Nilai eksplisit di katalog tetap menang (mis. Goal -> Dashboard),
   // sedangkan fallback memastikan setiap halaman detail punya CTA simulasi.
@@ -53,63 +69,11 @@
   };
   const sharedDemo = data.demo || demoByCategory[data.category] || "dashboard";
   const sharedDemoHash = data.demoHash || demoHashes[sharedDemo] || "solusi";
-  const demoParams = new URLSearchParams({
-    demo: sharedDemo,
-    from: data.slug || slug,
-  });
+  const demoParams = new URLSearchParams({ demo: sharedDemo, from: data.slug || slug });
   const demoHref = `../index.html?${demoParams.toString()}#${sharedDemoHash}`;
   const isRelatedSimulation = /partial|roadmap/i.test(data.status || "");
   const demoLabel = isRelatedSimulation ? "Lihat Simulasi Terkait" : "Coba Demo Interaktif";
-  const demoCta = `<a class="btn btn-secondary" href="${escapeHtml(demoHref)}">${demoLabel} <span>-></span></a>`;
-
-  const related = (data.related || [])
-    .map((id) => window.MOTOVAX_FEATURES[id])
-    .filter(Boolean)
-    .map(
-      (f) => `
-      <a class="feature-related-card" href="./${f.slug}.html">
-        <strong>${escapeHtml(f.title)}</strong>
-        <span>${escapeHtml(f.heroTitle)}</span>
-      </a>`
-    )
-    .join("");
-
-  const caps = (data.capabilities || [])
-    .map(
-      (c) => `
-      <article class="feature-cap-card">
-        <h3>${escapeHtml(c.title)}</h3>
-        <p>${escapeHtml(c.desc)}</p>
-      </article>`
-    )
-    .join("");
-
-  const steps = (data.howItWorks || [])
-    .map(
-      (s, i) => `
-      <li class="feature-step">
-        <span class="feature-step-num">${i + 1}</span>
-        <div>
-          <strong>${escapeHtml(s.title)}</strong>
-          <p>${escapeHtml(s.desc)}</p>
-        </div>
-      </li>`
-    )
-    .join("");
-
-  const benefits = (data.benefits || []).map((b) => `<li>${escapeHtml(b)}</li>`).join("");
-
-  const crumbs = (data.breadcrumbs || ["Produk", "Fitur", data.title])
-    .map((item, index, items) => {
-      if (index === items.length - 1) return `<span>${escapeHtml(item)}</span>`;
-      if (item === "Produk") return `<a href="../modul.html">${escapeHtml(item)}</a>`;
-      return `<span>${escapeHtml(item)}</span>`;
-    })
-    .join(' <span class="crumb-sep">/</span> ');
-
-  const demoCta = data.demo
-    ? `<a class="btn btn-secondary feature-hero-demo" href="../index.html#${escapeHtml(data.demoHash || "solusi")}">Lihat demo produk <span>-></span></a>`
-    : `<a class="btn btn-secondary feature-hero-demo" href="#kemampuan">Lihat kemampuan <span>-></span></a>`;
+  const demoCta = `<a class="btn btn-secondary feature-hero-demo" href="${escapeHtml(demoHref)}">${demoLabel} <span>-></span></a>`;
 
   const heroBenefits = benefits
     .slice(0, 4)
