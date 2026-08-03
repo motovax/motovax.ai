@@ -453,26 +453,6 @@ a {
   color: #626b79;
 }
 
-.produk-mega-more {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  margin-top: 22px;
-  font-size: 14px;
-  font-weight: 600;
-  color: #2c76ed;
-  text-decoration: none;
-}
-
-.produk-mega-more:hover {
-  text-decoration: underline;
-}
-
-.produk-mega-more svg {
-  width: 16px;
-  height: 16px;
-}
-
 .site-header:has(.nav-item-produk.is-open) {
   z-index: 70;
 }

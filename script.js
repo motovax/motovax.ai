@@ -73,8 +73,6 @@ for (const link of document.querySelectorAll("[data-wa]")) {
           id: "omni",
           label: "Aplikasi Omnichannel",
           paneTitle: "Aplikasi Omnichannel",
-          moreHref: `${fiturPrefix}index.html`,
-          moreLabel: "Lihat semua fitur",
           features: [
             { title: "Omnichannel", desc: "Satu platform untuk kelola chat dari berbagai saluran", icon: "chat", href: f("aplikasi-omnichannel") },
             { title: "Instagram API", desc: "Respons DM otomatis untuk tingkatkan penjualan", icon: "ig", href: f("instagram-api") },
@@ -86,8 +84,6 @@ for (const link of document.querySelectorAll("[data-wa]")) {
           id: "crm",
           label: "Aplikasi CRM",
           paneTitle: "Aplikasi CRM",
-          moreHref: `${fiturPrefix}index.html`,
-          moreLabel: "Lihat semua fitur",
           features: [
             { title: "Aplikasi CRM", desc: "Automasi proses penjualan & layanan pelanggan", icon: "crm", href: f("aplikasi-crm") },
             { title: "Manajemen Deal", desc: "Kelola deal secara end-to-end lebih ciamik", icon: "deal", href: f("manajemen-deal") },
@@ -101,8 +97,6 @@ for (const link of document.querySelectorAll("[data-wa]")) {
           id: "wa",
           label: "WhatsApp API",
           paneTitle: "WhatsApp API",
-          moreHref: `${fiturPrefix}index.html`,
-          moreLabel: "Lihat semua fitur",
           features: [
             { title: "WhatsApp API", desc: "Optimalkan interaksi dengan WhatsApp Business API", icon: "wa", href: f("whatsapp-business-api") },
             { title: "WhatsApp Centang Biru", desc: "Tingkatkan kredibilitas dengan verifikasi WhatsApp", icon: "verify", href: f("centang-biru-whatsapp") },
@@ -117,8 +111,6 @@ for (const link of document.querySelectorAll("[data-wa]")) {
           id: "cs",
           label: "Customer Support & Ticketing",
           paneTitle: "Customer Support & Ticketing",
-          moreHref: `${fiturPrefix}index.html`,
-          moreLabel: "Lihat semua fitur",
           features: [
             { title: "Aplikasi Customer Service", desc: "Platform terintegrasi untuk layanan pelanggan efisien", icon: "cs", href: f("aplikasi-customer-service") },
             { title: "Manajemen Tiket", desc: "Tangani keluhan pelanggan lebih cepat & akurat", icon: "ticket", href: f("sistem-manajemen-tiket") },
@@ -130,8 +122,6 @@ for (const link of document.querySelectorAll("[data-wa]")) {
           id: "ai",
           label: "AI & Chatbot",
           paneTitle: "AI & Chatbot",
-          moreHref: `${fiturPrefix}index.html`,
-          moreLabel: "Lihat semua fitur",
           features: [
             { title: "Chatbot & Conversational AI", desc: "Respons pelanggan lebih cepat dengan chatbot 24/7", icon: "bot", href: f("chatbot") },
             { title: "Airene", desc: "Maksimalkan kinerja agen CS dengan dukungan Airene", icon: "agent", href: f("integrasi-airene") },
@@ -142,8 +132,6 @@ for (const link of document.querySelectorAll("[data-wa]")) {
           id: "workflow",
           label: "Automasi Operasional & Workflow",
           paneTitle: "Automasi Operasional & Workflow",
-          moreHref: `${fiturPrefix}index.html`,
-          moreLabel: "Lihat semua fitur",
           features: [
             { title: "Knowledge Base", desc: "Pusat informasi untuk layanan pelanggan efisien", icon: "kb", href: f("knowledge-base") },
             { title: "Workflow", desc: "Otomatisasi alur kerja lintas tim dan sistem", icon: "workflow", href: f("automasi-workflow") },
@@ -153,8 +141,6 @@ for (const link of document.querySelectorAll("[data-wa]")) {
           id: "campaign",
           label: "Manajemen Campaign",
           paneTitle: "Manajemen Campaign",
-          moreHref: `${fiturPrefix}index.html`,
-          moreLabel: "Lihat semua fitur",
           features: [
             { title: "WhatsApp Broadcast", desc: "Jangkau ribuan pelanggan secara otomatis", icon: "blast", href: f("aplikasi-broadcast-whatsapp") },
             { title: "WhatsApp Bulk", desc: "Kirim pesan ke banyak kontak secara bersamaan", icon: "bulk", href: f("whatsapp-bulk") },
@@ -164,8 +150,6 @@ for (const link of document.querySelectorAll("[data-wa]")) {
           id: "callcenter",
           label: "Call Center",
           paneTitle: "Call Center",
-          moreHref: `${fiturPrefix}index.html`,
-          moreLabel: "Lihat semua fitur",
           features: [
             { title: "Call Center", desc: "Pusat layanan panggilan fleksibel berbasis cloud", icon: "call", href: f("aplikasi-call-center") },
           ],
@@ -180,8 +164,6 @@ for (const link of document.querySelectorAll("[data-wa]")) {
           id: "broadcast",
           label: "Motovax Broadcast",
           paneTitle: "Motovax Broadcast",
-          moreHref: `${fiturPrefix}index.html`,
-          moreLabel: "Lihat semua fitur",
           features: [
             { title: "Motovax Broadcast", desc: "Jangkau ribuan pelanggan tanpa proses manual", icon: "blast", href: f("motovax-broadcast") },
           ],
@@ -190,8 +172,6 @@ for (const link of document.querySelectorAll("[data-wa]")) {
           id: "sales-suite",
           label: "Motovax Sales Suite",
           paneTitle: "Motovax Sales Suite",
-          moreHref: `${fiturPrefix}index.html`,
-          moreLabel: "Lihat semua fitur",
           features: [
             { title: "Motovax Sales Suite", desc: "Optimalkan penjualan dengan solusi komprehensif", icon: "suite", href: f("motovax-sales-suite") },
           ],
@@ -200,8 +180,6 @@ for (const link of document.querySelectorAll("[data-wa]")) {
           id: "service-suite",
           label: "Motovax Service Suite",
           paneTitle: "Motovax Service Suite",
-          moreHref: `${fiturPrefix}index.html`,
-          moreLabel: "Lihat semua fitur",
           features: [
             { title: "Motovax Service Suite", desc: "Respons pelanggan lebih cepat dengan layanan optimal", icon: "cs", href: f("motovax-service-suite") },
           ],
@@ -210,8 +188,6 @@ for (const link of document.querySelectorAll("[data-wa]")) {
           id: "suite-360",
           label: "Motovax 360",
           paneTitle: "Motovax 360",
-          moreHref: `${fiturPrefix}index.html`,
-          moreLabel: "Lihat semua fitur",
           features: [
             { title: "Motovax 360", desc: "Manajemen pelanggan terintegrasi untuk proses efisien", icon: "suite", href: f("motovax-360") },
           ],
@@ -293,10 +269,6 @@ for (const link of document.querySelectorAll("[data-wa]")) {
           <div class="produk-mega-pane${item.id === firstPaneId ? " is-active" : ""}" data-produk-pane-panel="${item.id}" ${item.id === firstPaneId ? "" : "hidden"}>
             <h3 class="produk-mega-pane-title">${item.paneTitle}</h3>
             <div class="produk-mega-items">${features}</div>
-            <a class="produk-mega-more" href="${item.moreHref}" data-produk-close>
-              ${item.moreLabel}
-              <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            </a>
           </div>`;
       })
       .join("");
