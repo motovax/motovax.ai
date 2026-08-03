@@ -2008,6 +2008,29 @@ body.demo-open {
   display: block;
 }
 
+/*
+ * Hover affordance: browser default for <button> is cursor:default (arrow).
+ * Force pointer on clickable controls inside product demos (IMS + CRM/omni/dll
+ * yang memakai class inventory-demo).
+ */
+.inventory-demo button:not(:disabled),
+.inventory-demo [role="button"]:not([aria-disabled="true"]),
+.inventory-demo a[href],
+.inventory-demo summary,
+.inventory-demo select,
+.inventory-demo [data-unit-id],
+.inventory-demo .ims-upload-drop,
+.inventory-demo .demo-stat,
+.inventory-demo .demo-mobile-card {
+  cursor: pointer;
+}
+
+.inventory-demo button:disabled,
+.inventory-demo [disabled],
+.inventory-demo [aria-disabled="true"] {
+  cursor: not-allowed;
+}
+
 .demo-app {
   position: relative;
   display: flex;
@@ -2207,6 +2230,7 @@ body.demo-open {
   font-size: 11px;
   font-weight: 700;
   text-align: left;
+  cursor: pointer;
 }
 
 .demo-nav-icon {
@@ -3161,6 +3185,7 @@ body.demo-open {
   border-radius: 16px;
   background: linear-gradient(160deg, #f8fafc, #eef2ff 120%);
   text-align: center;
+  cursor: pointer;
 }
 
 .ims-upload-icon {
@@ -4011,6 +4036,10 @@ body.demo-open {
   color: #334155;
 }
 
+.ims-units-table tbody tr {
+  cursor: pointer;
+}
+
 .ims-units-table tbody tr:hover {
   background: #fafbfc;
 }
@@ -4186,6 +4215,7 @@ body.demo-open {
   background: #fff;
   box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
   padding: 12px;
+  cursor: pointer;
 }
 
 .ims-units-mobile .demo-mobile-card h3 {
@@ -4542,6 +4572,7 @@ body.demo-open {
   font: inherit;
   font-size: 10px;
   font-weight: 800;
+  cursor: pointer;
 }
 
 .demo-detail-backdrop {
