@@ -2529,23 +2529,66 @@ body.demo-open {
 .demo-guide-actions [data-social-guide-next],
 .demo-guide-actions [data-social-guide-finish],
 .demo-guide-actions [data-crm-guide-next],
-.demo-guide-actions [data-crm-guide-finish] {
+.demo-guide-actions [data-crm-guide-finish],
+.demo-guide-actions [data-omni-guide-next],
+.demo-guide-actions [data-omni-guide-finish],
+.demo-guide-actions [data-dashboard-guide-next],
+.demo-guide-actions [data-dashboard-guide-finish],
+.demo-guide-actions [data-insight-guide-next],
+.demo-guide-actions [data-insight-guide-finish],
+.demo-guide-actions .demo-guide-next,
+.demo-guide-actions .demo-guide-finish {
   background: #4338ca;
   color: #fff;
 }
 
 /* Pastikan tombol action di tooltip biru tidak tertimpa aturan di atas */
 .demo-guide-popover.demo-guide-tooltip .demo-guide-actions [data-demo-guide-next],
-.demo-guide-popover.demo-guide-tooltip .demo-guide-actions [data-demo-guide-finish] {
+.demo-guide-popover.demo-guide-tooltip .demo-guide-actions [data-demo-guide-finish],
+.demo-guide-popover.demo-guide-tooltip .demo-guide-actions [data-crm-guide-next],
+.demo-guide-popover.demo-guide-tooltip .demo-guide-actions [data-crm-guide-finish],
+.demo-guide-popover.demo-guide-tooltip .demo-guide-actions [data-social-guide-next],
+.demo-guide-popover.demo-guide-tooltip .demo-guide-actions [data-social-guide-finish],
+.demo-guide-popover.demo-guide-tooltip .demo-guide-actions [data-omni-guide-next],
+.demo-guide-popover.demo-guide-tooltip .demo-guide-actions [data-omni-guide-finish],
+.demo-guide-popover.demo-guide-tooltip .demo-guide-actions [data-dashboard-guide-next],
+.demo-guide-popover.demo-guide-tooltip .demo-guide-actions [data-dashboard-guide-finish],
+.demo-guide-popover.demo-guide-tooltip .demo-guide-actions [data-insight-guide-next],
+.demo-guide-popover.demo-guide-tooltip .demo-guide-actions [data-insight-guide-finish],
+.demo-guide-popover.demo-guide-tooltip .demo-guide-actions .demo-guide-next,
+.demo-guide-popover.demo-guide-tooltip .demo-guide-actions .demo-guide-finish {
   background: #fff;
   color: #1d4ed8;
 }
 
 .demo-guide-actions [data-demo-guide-prev],
 .demo-guide-actions [data-social-guide-prev],
-.demo-guide-actions [data-crm-guide-prev] {
+.demo-guide-actions [data-crm-guide-prev],
+.demo-guide-actions [data-omni-guide-prev],
+.demo-guide-actions [data-dashboard-guide-prev],
+.demo-guide-actions [data-insight-guide-prev],
+.demo-guide-actions .demo-guide-prev {
   background: #e2e8f0;
   color: #334155;
+}
+
+.demo-guide-popover.demo-guide-tooltip .demo-guide-actions [data-crm-guide-prev],
+.demo-guide-popover.demo-guide-tooltip .demo-guide-actions [data-social-guide-prev],
+.demo-guide-popover.demo-guide-tooltip .demo-guide-actions [data-omni-guide-prev],
+.demo-guide-popover.demo-guide-tooltip .demo-guide-actions [data-dashboard-guide-prev],
+.demo-guide-popover.demo-guide-tooltip .demo-guide-actions [data-insight-guide-prev],
+.demo-guide-popover.demo-guide-tooltip .demo-guide-actions .demo-guide-prev {
+  background: rgba(255, 255, 255, 0.18);
+  color: #fff;
+}
+
+/* Shared highlight ring for all solution demos (IMS product-tour style) */
+.demo-guide-highlight {
+  border-radius: 10px;
+  outline: 2px solid transparent;
+  transition: outline 0.15s ease, box-shadow 0.15s ease;
+  position: relative;
+  z-index: 50;
 }
 
 /*
@@ -5866,23 +5909,36 @@ body.demo-open {
   color: rgba(255, 255, 255, 0.92);
 }
 
-.demo-guide-popover.demo-guide-tooltip > button[data-close-demo-guide] {
+.demo-guide-popover.demo-guide-tooltip > button[data-close-demo-guide],
+.demo-guide-popover.demo-guide-tooltip > button[data-close-crm-guide],
+.demo-guide-popover.demo-guide-tooltip > button[data-close-social-guide],
+.demo-guide-popover.demo-guide-tooltip > button[data-close-omni-guide],
+.demo-guide-popover.demo-guide-tooltip > button[data-close-dashboard-guide],
+.demo-guide-popover.demo-guide-tooltip > button[data-close-insight-guide] {
   color: #fff;
   background: rgba(255, 255, 255, 0.16);
 }
 
-.demo-guide-popover.demo-guide-tooltip > button[data-close-demo-guide]:hover {
+.demo-guide-popover.demo-guide-tooltip > button[data-close-demo-guide]:hover,
+.demo-guide-popover.demo-guide-tooltip > button[data-close-crm-guide]:hover,
+.demo-guide-popover.demo-guide-tooltip > button[data-close-social-guide]:hover,
+.demo-guide-popover.demo-guide-tooltip > button[data-close-omni-guide]:hover,
+.demo-guide-popover.demo-guide-tooltip > button[data-close-dashboard-guide]:hover,
+.demo-guide-popover.demo-guide-tooltip > button[data-close-insight-guide]:hover {
   background: rgba(255, 255, 255, 0.28);
 }
 
 .demo-guide-popover.demo-guide-tooltip .demo-guide-actions [data-demo-guide-next],
-.demo-guide-popover.demo-guide-tooltip .demo-guide-actions [data-demo-guide-finish] {
+.demo-guide-popover.demo-guide-tooltip .demo-guide-actions [data-demo-guide-finish],
+.demo-guide-popover.demo-guide-tooltip .demo-guide-actions .demo-guide-next,
+.demo-guide-popover.demo-guide-tooltip .demo-guide-actions .demo-guide-finish {
   background: #fff;
   color: #1d4ed8;
   box-shadow: 0 2px 8px rgba(15, 23, 42, 0.12);
 }
 
-.demo-guide-popover.demo-guide-tooltip .demo-guide-actions [data-demo-guide-prev] {
+.demo-guide-popover.demo-guide-tooltip .demo-guide-actions [data-demo-guide-prev],
+.demo-guide-popover.demo-guide-tooltip .demo-guide-actions .demo-guide-prev {
   background: rgba(255, 255, 255, 0.18);
   color: #fff;
 }
@@ -6761,10 +6817,12 @@ body.demo-open {
   z-index: 50;
 }
 
-.crm-guide-highlight {
-  outline: 2px solid #2563eb;
-  outline-offset: 4px;
+.crm-guide-highlight,
+.social-guide-highlight,
+.omni-guide-highlight {
+  /* Alias — highlight utama lewat .demo-guide-highlight + spotlight */
   border-radius: 10px;
+  outline: 2px solid transparent;
   transition: outline 0.15s ease;
 }
 
@@ -10201,16 +10259,12 @@ body.demo-open {
   gap: 8px;
 }
 
-.social-guide-highlight {
-  outline: 2px solid #2563eb;
-  outline-offset: 4px;
-  border-radius: 12px;
-  box-shadow: 0 0 0 6px rgba(37, 99, 235, 0.12);
-  transition: outline 0.15s ease, box-shadow 0.15s ease;
-}
-
-.social-guide-popover {
-  z-index: 50;
+.social-guide-popover,
+.crm-guide-popover,
+.omni-guide-popover,
+.dashboard-guide-popover,
+.insight-guide-popover {
+  z-index: 51;
 }
 
 .social-heading-status span,
