@@ -10352,3 +10352,32 @@ const asciiIndonesiaMount = document.getElementById("asciiIndonesiaBg");
 if (asciiIndonesiaMount) {
   new AsciiIndonesiaBackground(asciiIndonesiaMount);
 }
+
+/**
+ * Deep-link demo dari halaman detail fitur.
+ * Contoh: index.html?demo=omni&from=instagram-api#omniDemo akan membuka modal omnichannel
+ * yang sama seperti tombol pada kartu Solusi, termasuk tutorial pertamanya.
+ * Hash lama (#omniDemo, #crmDemo, dst.) tetap didukung.
+ */
+(function openRequestedSharedDemo() {
+  const demos = {
+    inventory: { hash: "inventoryDemo", selector: "[data-open-inventory-demo]" },
+    omni: { hash: "omniDemo", selector: "[data-open-omni-demo]" },
+    crm: { hash: "crmDemo", selector: "[data-open-crm-demo]" },
+    social: { hash: "socialDemo", selector: "[data-open-social-demo]" },
+    dashboard: { hash: "dashboardDemo", selector: "[data-open-dashboard-demo]" },
+    insight: { hash: "insightDemo", selector: "[data-open-insight-demo]" },
+  };
+  const params = new URLSearchParams(window.location.search);
+  const requestedByQuery = params.get("demo");
+  const requestedByHash = Object.entries(demos).find(
+    ([, config]) => window.location.hash === `#${config.hash}`,
+  )?.[0];
+  const requestedDemo = demos[requestedByQuery] ? requestedByQuery : requestedByHash;
+  if (!requestedDemo) return;
+
+  const opener = document.querySelector(demos[requestedDemo].selector);
+  if (!(opener instanceof HTMLElement)) return;
+
+  window.requestAnimationFrame(() => opener.click());
+})();

@@ -45,9 +45,35 @@
     })
     .join(' <span class="crumb-sep">/</span> ');
 
-  const demoCta = data.demo
-    ? `<a class="btn btn-secondary feature-hero-demo" href="../index.html#${escapeHtml(data.demoHash || "solusi")}">Lihat demo produk <span>-></span></a>`
-    : `<a class="btn btn-secondary feature-hero-demo" href="#kemampuan">Lihat kemampuan <span>-></span></a>`;
+  // Satu demo dipakai bersama oleh beberapa halaman detail dalam kelompok yang
+  // sama. Nilai eksplisit di katalog tetap menang (mis. Goal -> Dashboard),
+  // sedangkan fallback memastikan setiap halaman detail punya CTA simulasi.
+  const demoByCategory = {
+    "Aplikasi Omnichannel": "omni",
+    "Aplikasi CRM": "crm",
+    "WhatsApp API": "omni",
+    "Customer Support & Ticketing": "omni",
+    "AI & Chatbot": "omni",
+    "Automasi Operasional & Workflow": "crm",
+    "Manajemen Campaign": "social",
+    "Call Center": "omni",
+    "Solusi Bisnis": "dashboard",
+  };
+  const demoHashes = {
+    inventory: "inventoryDemo",
+    omni: "omniDemo",
+    crm: "crmDemo",
+    social: "socialDemo",
+    dashboard: "dashboardDemo",
+    insight: "insightDemo",
+  };
+  const sharedDemo = data.demo || demoByCategory[data.category] || "dashboard";
+  const sharedDemoHash = data.demoHash || demoHashes[sharedDemo] || "solusi";
+  const demoParams = new URLSearchParams({ demo: sharedDemo, from: data.slug || slug });
+  const demoHref = `../index.html?${demoParams.toString()}#${sharedDemoHash}`;
+  const isRelatedSimulation = /partial|roadmap/i.test(data.status || "");
+  const demoLabel = isRelatedSimulation ? "Lihat Simulasi Terkait" : "Coba Demo Interaktif";
+  const demoCta = `<a class="btn btn-secondary feature-hero-demo" href="${escapeHtml(demoHref)}">${demoLabel} <span>-></span></a>`;
 
   const heroBenefits = benefits
     .slice(0, 4)
