@@ -400,6 +400,34 @@
   }
 
   function renderProductVisual(feature, productProfile, caps, flow) {
+    const preview = previewFor(feature);
+    if (preview) {
+      return `
+        <figure class="feature-product-visual feature-product-preview family-${productProfile.family}" aria-label="Pratinjau antarmuka ${escapeHtml(feature.title)}">
+          <div class="feature-preview-window">
+            <div class="feature-preview-topbar" aria-hidden="true">
+              <span class="feature-preview-dots"><i></i><i></i><i></i></span>
+              <strong>${escapeHtml(preview.label)}</strong>
+              <span class="feature-preview-status"><i></i> Data demo</span>
+            </div>
+            <div class="feature-preview-image-shell">
+              <img
+                src="../assets/feature-previews/${escapeHtml(preview.file)}"
+                width="1440"
+                height="900"
+                alt="${escapeHtml(preview.alt)}"
+                loading="eager"
+                decoding="async"
+                fetchpriority="high"
+              >
+            </div>
+            <figcaption>Tampilan aplikasi Motovax dengan data yang telah dianonimkan.</figcaption>
+          </div>
+          <span class="feature-visual-orbit one"></span>
+          <span class="feature-visual-orbit two"></span>
+        </figure>`;
+    }
+
     const rows = caps.slice(0, 3);
     const activities = flow.slice(0, 3);
     return `
@@ -438,6 +466,33 @@
         <span class="feature-visual-orbit one"></span>
         <span class="feature-visual-orbit two"></span>
       </div>`;
+  }
+
+  function previewFor(feature) {
+    const id = String(feature.slug || "");
+    const title = String(feature.title || "fitur Motovax");
+    const preview = (file, label) => ({
+      file,
+      label,
+      alt: `Tampilan aplikasi Motovax untuk ${title} dengan data demo`,
+    });
+
+    if (/broadcast|blast|bulk|ctwa/.test(id)) {
+      return preview("social-generator.webp", "Social Media Generator");
+    }
+    if (/instagram-api|whatsapp-business-api|centang-biru|whatsapp-business-calling|whatsapp-flows|ticket-creation-integration/.test(id)) {
+      return preview("channel-integrations.webp", "Integrasi Channel");
+    }
+    if (/goal|report|scorecard|motovax-360/.test(id)) {
+      return preview("sales-analytics.webp", "Analytics & Performance");
+    }
+    if (/aplikasi-crm|manajemen-deal|manajemen-kontak|sales-gps|agentic-ai|chatbot|integrasi-airene|knowledge-base|automasi-workflow|motovax-sales-suite/.test(id)) {
+      return preview("ai-agents.webp", "CRM & AI Agent");
+    }
+    if (/aplikasi-call-center|manajemen-sla|sistem-manajemen-tiket|motovax-service-suite/.test(id)) {
+      return preview("service-performance.webp", "Service Performance");
+    }
+    return preview("omnichannel-inbox.webp", "Omnichannel Inbox");
   }
 
   function renderShowcaseVisual(feature, productProfile, capability, index) {
