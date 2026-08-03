@@ -65,9 +65,8 @@
 .industry-visual-modules i { width: 25px; height: 25px; display: grid; place-items: center; flex: 0 0 auto; border-radius: 7px; color: #bfe9ff; background: rgba(18,103,245,.34); font-size: 7px; font-style: normal; font-weight: 900; }
 
 .industry-foundation { border-bottom: 1px solid #e5edf8; background: #f8fbff; }
-.industry-foundation .container { min-height: 100px; display: flex; align-items: center; justify-content: space-between; gap: 28px; }
-.industry-foundation .container > span { max-width: 170px; color: #718198; font-size: 9px; font-weight: 900; line-height: 1.55; letter-spacing: .08em; }
-.industry-foundation .container > div { display: flex; align-items: center; justify-content: flex-end; flex-wrap: wrap; gap: 9px; }
+.industry-foundation .container { min-height: 100px; display: flex; align-items: center; justify-content: center; gap: 28px; }
+.industry-foundation .container > div { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 9px; }
 .industry-foundation b { padding: 8px 11px; border: 1px solid #dce8f7; border-radius: 8px; color: #53647c; background: #fff; font-size: 10px; box-shadow: 0 4px 12px rgba(24,58,110,.04); }
 
 .industry-section { padding: 96px 0; }
@@ -173,7 +172,6 @@
   .industry-hero-grid { grid-template-columns: 1fr; gap: 46px; margin-top: 38px; }
   .industry-hero-copy, .industry-hero-visual { max-width: 720px; width: 100%; }
   .industry-foundation .container { align-items: flex-start; flex-direction: column; padding-top: 22px; padding-bottom: 22px; }
-  .industry-foundation .container > span { max-width: none; }
   .industry-foundation .container > div { justify-content: flex-start; }
   .industry-section { padding: 76px 0; }
   .industry-challenge-grid, .industry-related-grid { grid-template-columns: 1fr; }

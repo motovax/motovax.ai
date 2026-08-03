@@ -135,7 +135,6 @@
 
       <section class="industry-foundation" aria-label="Fondasi produk Motovax">
         <div class="container">
-          <span>BERDASARKAN CAPABILITY MOTOVAX-APP SAAT INI</span>
           <div>
             <b>AI Omnichannel</b>
             <b>Agentic AI</b>
