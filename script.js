@@ -551,10 +551,11 @@ class InventoryProductDemo {
     this.selectedId = null;
     this.dataError = "";
     this.lastFocusedElement = null;
-    this.hasOpenedGuide = false;
     this.activeView = "units";
     this.activeUploadTab = "inventory";
     this.guideStepIndex = 0;
+    this.guideView = "units";
+    this._guideAutoShowing = false;
     this.falconRole = "sales"; // sales | management
     this.falconMessages = [];
     this.falconSalesDone = false;
@@ -615,6 +616,8 @@ class InventoryProductDemo {
     this.detailPanel = root.querySelector(".demo-detail-panel");
     this.detailBackdrop = root.querySelector("[data-demo-detail-backdrop]");
     this.guide = root.querySelector("[data-demo-guide-popover]");
+    this.guideSpotlight = root.querySelector("[data-demo-guide-spotlight]");
+    this._highlightEl = null;
     this.toast = root.querySelector("[data-demo-toast]");
     this.bookingButton = root.querySelector("[data-demo-book-unit]");
     this.bookingCopy = root.querySelector("[data-demo-booking-copy]");
@@ -643,198 +646,160 @@ class InventoryProductDemo {
     this.loadTenantData();
   }
 
-  guideSteps() {
+  /**
+   * Panduan pendek per menu sidebar + spotlight (highlight area seperti product tour).
+   * Tiap tab punya langkah sendiri; `anchor` menunjuk elemen data-ims-anchor.
+   * Auto-aktif setiap kali user buka menu sidebar (bukan sekali-saja).
+   */
+  guideSteps(view = this.guideView || this.activeView) {
     const story = this.falconStoryLabel();
-    return [
-      {
-        view: "units",
-        title: "Tiga modul SMI seperti Mobix",
-        body: "Sidebar Sistem Manajemen Inventaris berisi Manajemen Unit, Unit per Cabang, dan Upload Data — sama dengan Mobix. Klik Lanjut untuk mencoba satu per satu.",
-      },
-      {
-        view: "units",
-        title: "Manajemen Unit",
-        body: "UI selaras Motovax App: cari plat/brand, filter Stok Aktif/Ready/Booked, Filter Lanjutan, lalu buka detail unit — layout detail mirip halaman Mobix (tanpa tombol booking).",
-      },
-      {
-        view: "per-cabang",
-        title: "Unit per Cabang",
-        body: "Lihat ringkasan stok Ready, Booked, dan foto per cabang. Klik kartu cabang untuk kembali ke Manajemen Unit dengan filter cabang itu.",
-      },
-      {
-        view: "uploads",
-        title: "Upload Data",
-        body: "Tab Import Inventory, Foto, Handover, dan MRP — alur yang sama dengan Mobix. Di demo, unggah bersifat simulasi.",
-      },
-      {
-        view: "falcon",
-        title: "Masuk AI Falcon",
-        body: "Mock WhatsApp. Mode Sales Agent — Falcon demo semua fitur sales Motovax (tanpa laporan management).",
-        enter: () => this.setFalconRole("sales", { greet: true }),
-      },
-      {
-        view: "falcon",
-        title: "Sales: cek stok unit",
-        body: `Tanya satu unit (unit_query). Contoh: “Halo, mau tanya ${story} dong, masih ready?”.`,
-        enter: () => {
-          this.setFalconRole("sales");
-          this.sendFalconUserMessage(
-            `Halo, mau tanya ${story} dong, masih ready?`,
-            { fromGuide: true },
-          );
+    const byView = {
+      units: [
+        {
+          view: "units",
+          anchor: "nav-units",
+          title: "Menu Manajemen Unit",
+          body: "Anda di menu stok unit (sama seperti Motovax App). Area sorot = item sidebar aktif. Berikutnya: cara mencari unit.",
         },
-      },
-      {
-        view: "falcon",
-        title: "Sales: minta foto unit",
-        body: `Lanjut unit yang sama — “Boleh minta fotonya?” (2–3 foto real unit).`,
-        enter: () =>
-          this.sendFalconUserMessage("Boleh minta fotonya?", {
-            fromGuide: true,
-          }),
-      },
-      {
-        view: "falcon",
-        title: "Sales: upload foto stok",
-        body: "📎 update galeri unit yang sama: +2 foto berbeda → total 5.",
-        enter: () => this.simulateFalconPhotoUpload({ fromGuide: true }),
-      },
-      {
-        view: "falcon",
-        title: "Sales: simulasi kredit",
-        body: `finance_simulation — “Simulasi kredit ${story} DP 20% tenor 48 bulan”.`,
-        enter: () =>
-          this.sendFalconUserMessage(
-            `Simulasi kredit ${story} DP 20% tenor 48 bulan`,
-            { fromGuide: true },
-          ),
-      },
-      {
-        view: "falcon",
-        title: "Sales: lokasi showroom",
-        body: "location_map — “Lokasi showroom” / map cabang.",
-        enter: () => this.sendFalconUserMessage("Lokasi showroom", { fromGuide: true }),
-      },
-      {
-        view: "falcon",
-        title: "Sales: catat lead",
-        body: "lead_own — catat lead minat unit yang sama (Serena).",
-        enter: () =>
-          this.sendFalconUserMessage(
-            `Catat lead Budi 08123456789 minat ${this.falconStoryLabel()}`,
-            { fromGuide: true },
-          ),
-      },
-      {
-        view: "falcon",
-        title: "Sales: handoff ke admin",
-        body: "handoff — “Hubungkan customer ke admin”.",
-        enter: () =>
-          this.sendFalconUserMessage("Hubungkan customer ke admin", { fromGuide: true }),
-      },
-      {
-        view: "falcon",
-        title: "Sales: generate konten",
-        body: "image_generation — “Buat caption promo unit”.",
-        enter: () =>
-          this.sendFalconUserMessage("Buat caption promo unit", { fromGuide: true }),
-      },
-      {
-        view: "falcon",
-        title: "Sales: performa sendiri",
-        body: "analytics:sales_performance (terbatas) — “Performa sales saya”. Bukan laporan management.",
-        enter: () =>
-          this.sendFalconUserMessage("Performa sales saya", { fromGuide: true }),
-      },
-      {
-        view: "falcon",
-        title: "Sales: ringkasan semua fitur",
-        body: "Falcon merangkum seluruh capability Sales Agent (bukan sekadar cek mode).",
-        enter: () =>
-          this.sendFalconUserMessage("Tampilkan semua fitur sales", { fromGuide: true }),
-      },
-      {
-        view: "falcon",
-        title: "Berganti ke Management Agent",
-        body: "Tutorial Sales selesai. Ganti ke Management — laporan, aging, GP, import, edit unit, dokumen, analytics.",
-        enter: () => this.setFalconRole("management", { greet: true, fromGuide: true }),
-      },
-      {
-        view: "falcon",
-        title: "Management: stok per cabang",
-        body: "Laporan stok agregat per cabang (mock demo).",
-        enter: () =>
-          this.sendFalconUserMessage("Laporan stok per cabang", { fromGuide: true }),
-      },
-      {
-        view: "falcon",
-        title: "Management: aging unit",
-        body: "Inventory analysis — “Laporan aging unit”.",
-        enter: () =>
-          this.sendFalconUserMessage("Laporan aging unit", { fromGuide: true }),
-      },
-      {
-        view: "falcon",
-        title: "Management: GP / margin",
-        body: "Insight GP & margin internal (hanya Management).",
-        enter: () =>
-          this.sendFalconUserMessage("Gross profit margin unit", { fromGuide: true }),
-      },
-      {
-        view: "falcon",
-        title: "Management: import Excel",
-        body: "excel_import — “Import inventory lewat WA”.",
-        enter: () =>
-          this.sendFalconUserMessage("Import inventory lewat WA", { fromGuide: true }),
-      },
-      {
-        view: "falcon",
-        title: "Management: edit unit",
-        body: "unit_edit — “Ubah status unit jadi Booked”.",
-        enter: () =>
-          this.sendFalconUserMessage("Ubah status unit jadi Booked", { fromGuide: true }),
-      },
-      {
-        view: "falcon",
-        title: "Management: dokumen",
-        body: "document_upload / review — “Upload dokumen unit”.",
-        enter: () =>
-          this.sendFalconUserMessage("Upload dokumen unit", { fromGuide: true }),
-      },
-      {
-        view: "falcon",
-        title: "Management: analisis stok",
-        body: "Rekomendasi inventory & perputaran stok.",
-        enter: () =>
-          this.sendFalconUserMessage("Analisis inventory dan rekomendasi stok", {
-            fromGuide: true,
-          }),
-      },
-      {
-        view: "falcon",
-        title: "Management: tren penjualan",
-        body: "analytics — “Tren penjualan bulan ini”.",
-        enter: () =>
-          this.sendFalconUserMessage("Tren penjualan bulan ini", { fromGuide: true }),
-      },
-      {
-        view: "falcon",
-        title: "Management: ringkasan fitur",
-        body: "Semua capability Management Agent dalam satu ringkasan demo.",
-        enter: () =>
-          this.sendFalconUserMessage("Tampilkan semua fitur management", {
-            fromGuide: true,
-          }),
-      },
-      {
-        view: "falcon",
-        title: "Panduan selesai — uji chat real",
-        body: "Tutorial template selesai. Klik “Uji chat real”, pilih Sales Agent atau Management Agent, lalu chat di mock iPhone — jawaban Falcon AI + stok Motovax (bukan skrip).",
-        enter: () => {
-          this.openFalconLiveRoleGate();
+        {
+          view: "units",
+          anchor: "units-search",
+          title: "Cari unit",
+          body: "Ketik plat, brand, tipe, atau tahun di kolom pencarian. Contoh: “Avanza” atau plat “B 1234”. Hasil tabel langsung menyusut.",
         },
-      },
-    ];
+        {
+          view: "units",
+          anchor: "units-filters",
+          title: "Filter cabang & status",
+          body: "Cabang, pill Ready/Booked, dan Filter Lanjutan menyaring stok. Export di kanan atas untuk unduh Excel/PDF (simulasi).",
+        },
+        {
+          view: "units",
+          anchor: "units-table",
+          title: "Tabel stok & detail",
+          body: "Klik satu baris unit untuk membuka detail (harga, odo, foto, dokumen) — layout mirip halaman Mobix. Lalu coba menu sidebar lain.",
+        },
+        {
+          view: "units",
+          anchor: "nav",
+          title: "Menu lain di sidebar",
+          body: "Unit per Cabang, Upload Data, dan AI Falcon masing-masing punya panduan sendiri. Klik menu kiri — panduan langsung aktif tanpa perlu tekan tombol dulu.",
+        },
+      ],
+      "per-cabang": [
+        {
+          view: "per-cabang",
+          anchor: "nav-per-cabang",
+          title: "Menu Unit per Cabang",
+          body: "Menu ini merangkum stok Ready, Booked, dan kelengkapan foto per cabang — setara modul cabang di Mobix.",
+        },
+        {
+          view: "per-cabang",
+          anchor: "branch-totals",
+          title: "Total agregat",
+          body: "Baris total di atas menampilkan ringkasan semua cabang (jumlah unit, Ready, Booked). Angka ikut data tenant demo.",
+        },
+        {
+          view: "per-cabang",
+          anchor: "branch-grid",
+          title: "Kartu cabang",
+          body: "Klik satu kartu cabang → kembali ke Manajemen Unit dengan filter cabang itu otomatis aktif. Tidak perlu set filter manual.",
+        },
+      ],
+      uploads: [
+        {
+          view: "uploads",
+          anchor: "nav-uploads",
+          title: "Menu Upload Data",
+          body: "Satu tempat untuk impor inventory, foto unit, handover sales, dan MRP — alur yang sama dengan Mobix.",
+        },
+        {
+          view: "uploads",
+          anchor: "upload-tabs",
+          title: "Empat jenis upload",
+          body: "Pilih tab: Import Inventory (Excel stok), Upload Foto, Handover Sales (unit terjual), atau Upload MRP (harga OTR massal).",
+        },
+        {
+          view: "uploads",
+          anchor: "upload-drop",
+          title: "Simulasi unggah",
+          body: "Di demo, tombol unggah hanya simulasi (file tidak dikirim). Di tenant asli, file divalidasi lalu masuk ke inventory Anda.",
+        },
+      ],
+      falcon: [
+        {
+          view: "falcon",
+          anchor: "nav-falcon",
+          title: "Menu AI Falcon",
+          body: "Chat WhatsApp mock untuk Sales & Management Agent. Panduan template dulu, lalu boleh uji chat real ke Falcon AI + stok Motovax.",
+          enter: () => this.setFalconRole("sales", { greet: true }),
+        },
+        {
+          view: "falcon",
+          anchor: "falcon-badge",
+          title: "Sales Agent (template)",
+          body: "Badge role menunjukkan mode demo. Sales: cek stok, foto, kredit, lead — tanpa laporan management (aging/GP).",
+          enter: () => this.setFalconRole("sales", { greet: true }),
+        },
+        {
+          view: "falcon",
+          anchor: "falcon-phone",
+          title: "Sales: cek stok unit",
+          body: `Pesan dikirim otomatis di mock iPhone: “Halo, mau tanya ${story} dong, masih ready?” — lihat balasan template di chat.`,
+          enter: () => {
+            this.setFalconRole("sales");
+            this.sendFalconUserMessage(
+              `Halo, mau tanya ${story} dong, masih ready?`,
+              { fromGuide: true },
+            );
+          },
+        },
+        {
+          view: "falcon",
+          anchor: "falcon-phone",
+          title: "Sales: minta foto unit",
+          body: "Lanjut unit yang sama — “Boleh minta fotonya?” Foto real unit muncul di bubble chat (jika tenant punya foto).",
+          enter: () =>
+            this.sendFalconUserMessage("Boleh minta fotonya?", { fromGuide: true }),
+        },
+        {
+          view: "falcon",
+          anchor: "falcon-phone",
+          title: "Sales: simulasi kredit",
+          body: `Finance demo: “Simulasi kredit ${story} DP 20% tenor 48 bulan”. Angka ilustratif untuk presentasi ke customer.`,
+          enter: () =>
+            this.sendFalconUserMessage(
+              `Simulasi kredit ${story} DP 20% tenor 48 bulan`,
+              { fromGuide: true },
+            ),
+        },
+        {
+          view: "falcon",
+          anchor: "falcon-badge",
+          title: "Ganti ke Management Agent",
+          body: "Management membuka laporan stok, aging, GP, import, dan analytics — fitur yang tidak tersedia di Sales.",
+          enter: () => this.setFalconRole("management", { greet: true, fromGuide: true }),
+        },
+        {
+          view: "falcon",
+          anchor: "falcon-phone",
+          title: "Management: laporan stok",
+          body: "Contoh di chat: “Laporan stok per cabang”. Coba juga “Laporan aging unit” setelah panduan selesai.",
+          enter: () =>
+            this.sendFalconUserMessage("Laporan stok per cabang", { fromGuide: true }),
+        },
+        {
+          view: "falcon",
+          anchor: "falcon-live",
+          title: "Uji chat real",
+          body: "Selesai template. Di panel kiri pilih mode “Chat real” (area sorot) — Falcon AI menjawab dengan stok Motovax. Ganti agent Sales/Management kapan saja di rail kiri.",
+          enter: () => {
+            // Highlight mode toggle; user klik sendiri “Chat real”
+          },
+        },
+      ],
+    };
+    return byView[view] || byView.units;
   }
 
   sampleUnitNames() {
@@ -933,7 +898,7 @@ class InventoryProductDemo {
 
     for (const button of this.root.querySelectorAll("[data-ims-nav]")) {
       button.addEventListener("click", () => {
-        this.setView(button.dataset.imsNav || "units");
+        this.setView(button.dataset.imsNav || "units", { fromNav: true });
       });
     }
 
@@ -1094,7 +1059,7 @@ class InventoryProductDemo {
       if (status === "ALL") status = this.defaultStatus;
       this.setBranch(branch);
       this.status = status;
-      this.setView("units");
+      this.setView("units", { skipGuide: true });
       this.render();
     };
     this.branchTotals?.addEventListener("click", handleBranchFilterClick);
@@ -1124,7 +1089,7 @@ class InventoryProductDemo {
     }
 
     for (const button of this.root.querySelectorAll("[data-demo-guide]")) {
-      button.addEventListener("click", () => this.openGuide(0));
+      button.addEventListener("click", () => this.openGuide(0, this.activeView));
     }
     this.root.querySelector("[data-close-demo-guide]").addEventListener("click", () => this.closeGuide());
     this.root.querySelector("[data-demo-guide-next]")?.addEventListener("click", () => this.nextGuideStep());
@@ -1172,11 +1137,42 @@ class InventoryProductDemo {
       this.startFalconLiveMode(pick.dataset.falconPickRole || "sales");
     });
 
+    // Left rail: pilih agent (Sales / Management)
+    this.root.querySelector(".falcon-picker-list")?.addEventListener("click", (event) => {
+      const card = event.target.closest("[data-falcon-set-role]");
+      if (!card) return;
+      const role = card.dataset.falconSetRole || "sales";
+      if (this.falconMode === "live") {
+        this.setFalconRole(role, { greet: true, reset: true });
+      } else if (this.falconMode === "picking") {
+        this.startFalconLiveMode(role);
+      } else {
+        this.setFalconRole(role, { greet: true, reset: true });
+      }
+    });
+
+    // Left rail: mode demo template vs chat real
+    this.root.querySelector(".falcon-mode-toggle")?.addEventListener("click", (event) => {
+      const btn = event.target.closest("[data-falcon-set-mode]");
+      if (!btn) return;
+      const mode = btn.dataset.falconSetMode || "tutorial";
+      if (mode === "live") {
+        if (this.falconMode !== "live") this.startFalconLiveMode(this.falconRole);
+      } else if (this.falconMode === "live" || this.falconMode === "picking") {
+        this.exitFalconLiveMode();
+      }
+    });
+
     this._onGuideReposition = () => {
-      if (!this.guide.hidden) this.positionGuide();
+      if (!this.guide || this.guide.hidden) return;
+      this.syncSpotlightRect();
+      this.positionGuide();
     };
     window.addEventListener("resize", this._onGuideReposition);
     this.root.querySelector(".demo-workspace")?.addEventListener("scroll", this._onGuideReposition, {
+      passive: true,
+    });
+    this.root.querySelector(".demo-sidebar")?.addEventListener("scroll", this._onGuideReposition, {
       passive: true,
     });
 
@@ -1194,8 +1190,9 @@ class InventoryProductDemo {
     });
   }
 
-  setView(view) {
+  setView(view, options = {}) {
     const next = ["units", "per-cabang", "uploads", "falcon"].includes(view) ? view : "units";
+    const prev = this.activeView;
     this.activeView = next;
 
     for (const button of this.root.querySelectorAll("[data-ims-nav]")) {
@@ -1226,7 +1223,7 @@ class InventoryProductDemo {
       },
       falcon: {
         title: "Chat AI Falcon",
-        body: "Tutorial semua fitur Falcon: Sales Agent (tanpa report) dulu, lalu Management Agent (laporan, import, edit, analytics).",
+        body: "Pilih agent di kiri, coba chat di iPhone tengah. Mode demo = template; Chat real = AI + stok Motovax.",
       },
     };
     const tip = tips[next] || tips.units;
@@ -1241,6 +1238,41 @@ class InventoryProductDemo {
       this.renderFalconTutorial();
       this.renderFalconQuickPrompts();
     }
+
+    // Tutup panduan tab lama saat pindah menu (kecuali langkah panduan sendiri yang set view).
+    if (
+      prev !== next &&
+      !options.fromGuide &&
+      this.guide &&
+      !this.guide.hidden &&
+      this.guideView !== next
+    ) {
+      this.closeGuide();
+    }
+
+    // Auto-panduan setiap kali user buka menu sidebar (atau open demo) — tidak perlu tombol Panduan dulu.
+    if (!options.fromGuide && !options.skipGuide) {
+      this.maybeShowViewGuide(next);
+    }
+  }
+
+  /**
+   * Tampilkan panduan demo untuk tab sidebar yang dibuka.
+   * Selalu aktif saat menu dibuka (tiap Unit / Cabang / Upload / Falcon punya tour sendiri).
+   */
+  maybeShowViewGuide(view) {
+    if (!this.root?.classList.contains("is-open")) return;
+    if (this._guideAutoShowing) return;
+    const key = ["units", "per-cabang", "uploads", "falcon"].includes(view) ? view : "units";
+
+    this._guideAutoShowing = true;
+    // Biarkan layout tab settle dulu (kartu cabang / panel upload ter-render).
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        this.openGuide(0, key);
+        this._guideAutoShowing = false;
+      });
+    });
   }
 
   setUploadTab(tab) {
@@ -1264,10 +1296,8 @@ class InventoryProductDemo {
     this.root.setAttribute("aria-hidden", "false");
     document.body.classList.add("demo-open");
     this.root.querySelector("[data-close-inventory-demo]").focus();
-    if (!this.hasOpenedGuide) {
-      this.openGuide();
-      this.hasOpenedGuide = true;
-    }
+    // Panduan hanya untuk tab aktif (default: Manajemen Unit), bukan tour lintas semua menu.
+    this.maybeShowViewGuide(this.activeView || "units");
     this.loadTenantData(true);
   }
 
@@ -1281,24 +1311,32 @@ class InventoryProductDemo {
     if (this.lastFocusedElement) this.lastFocusedElement.focus();
   }
 
-  openGuide(startIndex = 0) {
+  openGuide(startIndex = 0, view = this.activeView) {
+    const key = ["units", "per-cabang", "uploads", "falcon"].includes(view)
+      ? view
+      : this.activeView || "units";
+    this.guideView = key;
     this.guideStepIndex = Math.max(0, startIndex);
-    this.guide.hidden = false;
+    if (this.activeView !== key) {
+      this.setView(key, { fromGuide: true });
+    }
+    if (this.guide) this.guide.hidden = false;
     this.renderGuideStep();
     const focusBtn =
-      this.guide.querySelector("[data-demo-guide-next]:not([hidden])") ||
-      this.guide.querySelector("[data-demo-guide-finish]:not([hidden])");
+      this.guide?.querySelector("[data-demo-guide-next]:not([hidden])") ||
+      this.guide?.querySelector("[data-demo-guide-finish]:not([hidden])");
     focusBtn?.focus();
   }
 
   closeGuide() {
-    this.guide.hidden = true;
+    if (this.guide) this.guide.hidden = true;
+    this.clearHighlight();
     this.clearGuidePosition();
   }
 
   clearGuidePosition() {
     if (!this.guide) return;
-    this.guide.classList.remove("is-falcon-anchor");
+    this.guide.classList.remove("is-falcon-anchor", "is-anchored");
     this.guide.style.top = "";
     this.guide.style.left = "";
     this.guide.style.right = "";
@@ -1307,64 +1345,136 @@ class InventoryProductDemo {
   }
 
   /**
-   * Posisikan popover panduan agar tidak menutupi mockup iPhone di view AI Falcon.
-   * Langkah non-Falcon tetap di kanan atas (CSS default).
+   * Sorot elemen data-ims-anchor + gambar spotlight cutout (dim area lain).
+   * Pola product tour: highlight menu/kontrol yang sedang dijelaskan.
+   */
+  highlightAnchor(name) {
+    this.clearHighlight(false);
+    if (!name) {
+      this.syncSpotlightRect(null);
+      return;
+    }
+    // Prefer elemen yang terlihat (sidebar desktop vs mobile-nav)
+    const candidates = [...this.root.querySelectorAll(`[data-ims-anchor="${name}"]`)];
+    const el =
+      candidates.find((node) => {
+        const r = node.getBoundingClientRect();
+        const style = window.getComputedStyle(node);
+        return r.width > 1 && r.height > 1 && style.display !== "none" && style.visibility !== "hidden";
+      }) || candidates[0];
+    if (!el) {
+      this.syncSpotlightRect(null);
+      return;
+    }
+    this._highlightEl = el;
+    el.classList.add("ims-guide-highlight");
+    try {
+      el.scrollIntoView({ block: "nearest", behavior: "smooth", inline: "nearest" });
+    } catch {
+      /* ignore */
+    }
+    this.syncSpotlightRect(el);
+  }
+
+  clearHighlight(hideSpotlight = true) {
+    for (const el of this.root.querySelectorAll(".ims-guide-highlight")) {
+      el.classList.remove("ims-guide-highlight");
+    }
+    this._highlightEl = null;
+    if (hideSpotlight) this.syncSpotlightRect(null);
+  }
+
+  /**
+   * Hole spotlight fixed di atas target — box-shadow besar = dim overlay.
+   * Tidak terpengaruh overflow:hidden di .demo-app.
+   */
+  syncSpotlightRect(el = this._highlightEl) {
+    const spot = this.guideSpotlight;
+    if (!spot) return;
+    if (!el || !this.guide || this.guide.hidden) {
+      spot.hidden = true;
+      spot.style.top = "";
+      spot.style.left = "";
+      spot.style.width = "";
+      spot.style.height = "";
+      return;
+    }
+    const r = el.getBoundingClientRect();
+    if (r.width < 2 && r.height < 2) {
+      spot.hidden = true;
+      return;
+    }
+    const pad = 8;
+    const top = Math.max(4, r.top - pad);
+    const left = Math.max(4, r.left - pad);
+    const width = Math.min(window.innerWidth - left - 4, r.width + pad * 2);
+    const height = Math.min(window.innerHeight - top - 4, r.height + pad * 2);
+    spot.hidden = false;
+    spot.style.top = `${Math.round(top)}px`;
+    spot.style.left = `${Math.round(left)}px`;
+    spot.style.width = `${Math.round(width)}px`;
+    spot.style.height = `${Math.round(height)}px`;
+  }
+
+  /**
+   * Posisikan tooltip di samping area yang disorot (mirip callout product tour).
    */
   positionGuide() {
     if (!this.guide || this.guide.hidden) return;
 
-    const steps = this.guideSteps();
-    const step = steps[this.guideStepIndex] || steps[0];
-    const isFalcon = step?.view === "falcon";
-
-    if (!isFalcon) {
-      this.clearGuidePosition();
-      return;
-    }
-
-    this.guide.classList.add("is-falcon-anchor");
-
-    const rectIsVisible = (el) => {
-      const r = el.getBoundingClientRect();
-      return r.width > 0 && r.height > 0;
-    };
-
     const place = () => {
       if (!this.guide || this.guide.hidden) return;
-      const phone = this.root.querySelector(".iphone-frame");
-      if (!phone || !rectIsVisible(phone)) {
-        // Fallback: kiri area workspace, jauh dari mockup iPhone
+
+      const target =
+        this._highlightEl && this._highlightEl.getBoundingClientRect().width > 0
+          ? this._highlightEl
+          : this.root.querySelector(".iphone-frame");
+
+      this.guide.classList.add("is-anchored");
+      this.guide.classList.toggle(
+        "is-falcon-anchor",
+        (this.guideView || this.activeView) === "falcon",
+      );
+
+      const gw = Math.min(320, window.innerWidth - 24);
+      const gh = this.guide.offsetHeight || 200;
+      const gap = 14;
+      const margin = 12;
+      const minTop = 64;
+
+      if (!target) {
         this.guide.style.top = "92px";
-        this.guide.style.right = "auto";
-        this.guide.style.left = "16px";
+        this.guide.style.right = "24px";
+        this.guide.style.left = "auto";
         this.guide.style.bottom = "auto";
+        this.guide.style.maxWidth = `${gw}px`;
         return;
       }
 
-      const rect = phone.getBoundingClientRect();
-      const gw = Math.min(330, window.innerWidth - 32);
-      const gh = this.guide.offsetHeight || 200;
-      const gap = 16;
-      const minTop = 76;
-
-      let left = rect.left - gw - gap;
+      const rect = target.getBoundingClientRect();
+      let left = rect.right + gap;
       let top = rect.top;
 
-      if (left >= 12) {
-        // Cukup ruang di kiri iPhone — letakkan di samping (kolom role panel)
-        top = Math.max(minTop, Math.min(top, window.innerHeight - gh - 16));
-      } else {
-        // Layout sempit / stacked: di atas iPhone, atau di bawah jika tidak muat
-        left = Math.max(12, Math.min(rect.left, window.innerWidth - gw - 12));
-        top = rect.top - gh - gap;
-        if (top < minTop) {
-          top = Math.min(rect.bottom + gap, window.innerHeight - gh - 16);
-          left = Math.max(
-            12,
-            Math.min(rect.left + (rect.width - gw) / 2, window.innerWidth - gw - 12),
-          );
-        }
+      // Prefer kanan target; jika tidak muat, kiri; lalu atas/bawah.
+      if (left + gw > window.innerWidth - margin) {
+        left = rect.left - gw - gap;
       }
+      if (left < margin) {
+        left = Math.max(
+          margin,
+          Math.min(rect.left, window.innerWidth - gw - margin),
+        );
+        top = rect.bottom + gap;
+        if (top + gh > window.innerHeight - margin) {
+          top = Math.max(minTop, rect.top - gh - gap);
+        }
+      } else {
+        top = Math.max(minTop, Math.min(top, window.innerHeight - gh - margin));
+      }
+
+      // Clamp final
+      left = Math.max(margin, Math.min(left, window.innerWidth - gw - margin));
+      top = Math.max(minTop, Math.min(top, window.innerHeight - gh - margin));
 
       this.guide.style.top = `${Math.round(top)}px`;
       this.guide.style.left = `${Math.round(left)}px`;
@@ -1373,22 +1483,36 @@ class InventoryProductDemo {
       this.guide.style.maxWidth = `${gw}px`;
     };
 
-    // Tunggu layout view Falcon + bubble chat selesai
     requestAnimationFrame(() => {
       requestAnimationFrame(place);
-      // enter() bisa menambah bubble; reposisi sekali lagi setelah layout stabil
       window.setTimeout(place, 80);
+      window.setTimeout(() => {
+        this.syncSpotlightRect();
+        place();
+      }, 200);
     });
   }
 
   renderGuideStep() {
-    const steps = this.guideSteps();
+    const steps = this.guideSteps(this.guideView || this.activeView);
     const step = steps[this.guideStepIndex] || steps[0];
+    if (!step) {
+      this.closeGuide();
+      return;
+    }
     const total = steps.length;
     const index = this.guideStepIndex + 1;
+    const viewLabel = {
+      units: "Manajemen Unit",
+      "per-cabang": "Unit per Cabang",
+      uploads: "Upload Data",
+      falcon: "AI Falcon",
+    }[this.guideView || step.view] || "Panduan";
 
     this.guide.querySelector("[data-demo-guide-step-label]").textContent =
-      `LANGKAH ${index} DARI ${total}`;
+      total > 1
+        ? `${viewLabel.toUpperCase()} · LANGKAH ${index} DARI ${total}`
+        : viewLabel.toUpperCase();
     this.guide.querySelector("[data-demo-guide-title]").textContent = step.title;
     this.guide.querySelector("[data-demo-guide-body]").textContent = step.body;
 
@@ -1399,16 +1523,31 @@ class InventoryProductDemo {
     const isFirst = this.guideStepIndex <= 0;
 
     if (prev) prev.hidden = isFirst;
-    if (next) next.hidden = isLast;
+    if (next) {
+      next.hidden = isLast;
+      next.textContent = "Berikutnya";
+    }
     if (finish) finish.hidden = !isLast;
 
-    if (step.view) this.setView(step.view);
+    if (step.view && step.view !== this.activeView) {
+      this.setView(step.view, { fromGuide: true });
+    }
     if (typeof step.enter === "function") step.enter();
-    this.positionGuide();
+
+    // Highlight setelah view settle (enter bisa ganti role / bubble)
+    const applyHighlight = () => {
+      if (step.anchor) this.highlightAnchor(step.anchor);
+      else this.clearHighlight();
+      this.positionGuide();
+    };
+    requestAnimationFrame(() => {
+      applyHighlight();
+      window.setTimeout(applyHighlight, 100);
+    });
   }
 
   nextGuideStep() {
-    const steps = this.guideSteps();
+    const steps = this.guideSteps(this.guideView || this.activeView);
     if (this.guideStepIndex >= steps.length - 1) {
       this.closeGuide();
       return;
@@ -1770,7 +1909,7 @@ class InventoryProductDemo {
       dayRemaining: 800,
     };
     this.setFalconRole("sales", { greet: true, reset: true });
-    this.setView("units");
+    this.setView("units", { skipGuide: true });
     this.setUploadTab("inventory");
     this.loadTenantData(true);
   }
@@ -1791,10 +1930,9 @@ class InventoryProductDemo {
   }
 
   openFalconLiveRoleGate() {
-    this.setView("falcon");
-    this.falconMode = "picking";
-    if (this.falconRoleGate) this.falconRoleGate.hidden = false;
-    this.renderFalconChrome();
+    // Role sudah dipilih di rail kiri — langsung chat real (gate overlay jadi cadangan).
+    this.setView("falcon", { skipGuide: true });
+    this.startFalconLiveMode(this.falconRole || "sales");
   }
 
   cancelFalconLivePick() {
@@ -1892,12 +2030,12 @@ class InventoryProductDemo {
         );
       } else if (next === "sales") {
         this.pushFalconBot(
-          "Halo! Saya Falcon untuk Sales Agent.\n\nSaya bisa bantu: cek stok/unit, foto, simulasi kredit, lokasi showroom, catat lead, handoff admin, generate konten, dan performa sales Anda.\n\nCoba chip di kiri, atau ketik “tampilkan semua fitur sales” untuk ringkasan + cara coba tiap fitur.\n\nSelesai panduan? Klik “Uji chat real” untuk Falcon sungguhan.",
+          "Halo! Saya Falcon untuk Sales Agent.\n\nSaya bisa bantu: cek stok/unit, foto, simulasi kredit, lokasi showroom, catat lead, handoff admin, generate konten, dan performa sales Anda.\n\nCoba chip “Coba cepat” di kiri, atau ketik “tampilkan semua fitur sales”.\n\nSiap coba AI sungguhan? Pilih mode Chat real di panel kiri.",
         );
       } else {
         this.pushFalconSystem("Mode berganti ke Management Agent.");
         this.pushFalconBot(
-          "Halo! Saya Falcon untuk Management Agent.\n\nSaya bisa semua fitur Sales + laporan stok/cabang/aging, GP/margin, import Excel, edit unit, dokumen, analisis inventory, dan analytics tren.\n\nCoba “laporan stok per cabang” atau “tampilkan semua fitur management”.\n\nAtau “Uji chat real” untuk jawaban AI + data Motovax.",
+          "Halo! Saya Falcon untuk Management Agent.\n\nSaya bisa semua fitur Sales + laporan stok/cabang/aging, GP/margin, import Excel, edit unit, dokumen, analisis inventory, dan analytics tren.\n\nCoba “laporan stok per cabang” atau “tampilkan semua fitur management”.\n\nMode Chat real di kiri = jawaban AI + data Motovax.",
         );
       }
     }
@@ -1949,19 +2087,32 @@ class InventoryProductDemo {
           ? Number(q.sessionRemaining)
           : 30;
         this.falconRoleHint.textContent = isSales
-          ? `Chat real: Falcon AI menjawab sebagai Sales Agent dengan stok Motovax (bukan template). Sisa kuota sesi: ${rem} pesan.`
-          : `Chat real: Falcon AI menjawab sebagai Management Agent dengan knowledge inventory Motovax. Sisa kuota sesi: ${rem} pesan.`;
+          ? `Chat real: Falcon AI menjawab sebagai Sales Agent dengan stok Motovax. Sisa kuota sesi: ${rem} pesan.`
+          : `Chat real: Falcon AI sebagai Management Agent + knowledge inventory. Sisa kuota sesi: ${rem} pesan.`;
       } else {
         this.falconRoleHint.textContent = isSales
-          ? "Mode panduan (template). Setelah selesai, klik “Uji chat real” untuk Falcon sungguhan."
-          : "Mode panduan Management (template). Klik “Uji chat real” untuk jawaban AI live.";
+          ? "Mode demo (template). Ganti ke “Chat real” di atas untuk Falcon AI sungguhan."
+          : "Mode demo Management (template). Ganti ke “Chat real” untuk jawaban AI live.";
       }
     }
     const badge = this.root.querySelector("[data-falcon-role-badge]");
     badge?.classList.toggle("is-management", !isSales);
     badge?.classList.toggle("is-live", isLive);
 
-    if (this.falconLiveCta) this.falconLiveCta.hidden = isLive;
+    // Sync left-rail role cards
+    for (const card of this.root.querySelectorAll("[data-falcon-set-role]")) {
+      const active = (card.dataset.falconSetRole || "sales") === this.falconRole;
+      card.classList.toggle("is-selected", active);
+      card.setAttribute("aria-selected", active ? "true" : "false");
+    }
+    // Sync mode toggle
+    for (const btn of this.root.querySelectorAll("[data-falcon-set-mode]")) {
+      const mode = btn.dataset.falconSetMode || "tutorial";
+      const active = isLive ? mode === "live" : mode === "tutorial";
+      btn.classList.toggle("is-active", active);
+    }
+
+    if (this.falconLiveCta) this.falconLiveCta.hidden = true;
     if (this.falconExitLive) this.falconExitLive.hidden = !isLive;
     if (this.falconTutorialList) {
       this.falconTutorialList.hidden = isLive;
