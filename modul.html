@@ -3,10 +3,10 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Modul & Fitur MOTOVAX — Agentic AI ERP</title>
+    <title>Produk & Fitur MOTOVAX — Agentic AI ERP</title>
     <meta
       name="description"
-      content="Breakdown modul Motovax: inventory, agentic AI, call center omnichannel, CRM autopilot, social ads, dashboard, platform — plus roadmap ERP yang bisa dibangun."
+      content="Produk Motovax: inventory, agentic AI, call center omnichannel, CRM autopilot, social ads, dashboard, platform — plus roadmap ERP yang bisa dibangun."
     />
     <meta name="theme-color" content="#1267f5" />
     <link rel="icon" href="./favicon.ico" sizes="any" />
@@ -97,6 +97,11 @@
         flex-direction: column;
         gap: 12px;
         min-height: 100%;
+        scroll-margin-top: 100px;
+      }
+      .module-card:target {
+        border-color: #93c5fd;
+        box-shadow: 0 0 0 3px rgba(18, 103, 245, 0.15), var(--shadow-soft);
       }
       .module-card header {
         display: flex;
@@ -300,8 +305,96 @@
           <img class="brand-logo" src="./icons/logo-motovax.png" width="160" height="55" alt="MOTOVAX" />
         </a>
         <nav class="nav" aria-label="Navigasi utama">
+          <div class="nav-item nav-item-produk is-current" data-produk-menu>
+            <button
+              type="button"
+              class="nav-produk-trigger"
+              aria-expanded="false"
+              aria-haspopup="true"
+              aria-controls="produk-mega-menu"
+              aria-current="page"
+              data-produk-trigger
+            >
+              Produk
+              <svg class="nav-chevron" width="12" height="12" viewBox="0 0 12 12" aria-hidden="true">
+                <path d="M2.5 4.5 6 8l3.5-3.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </button>
+            <div class="produk-mega" id="produk-mega-menu" role="region" aria-label="Menu produk dan fitur" hidden data-produk-panel>
+              <div class="produk-mega-inner">
+                <div class="produk-mega-head">
+                  <div>
+                    <span class="produk-mega-kicker">Produk &amp; Fitur</span>
+                    <strong>Platform AI sales untuk dealer</strong>
+                  </div>
+                  <a class="produk-mega-all" href="./modul.html">Lihat semua produk <span aria-hidden="true">→</span></a>
+                </div>
+                <div class="produk-mega-grid">
+                  <a class="produk-mega-item" href="#m1-inventory" data-produk-close>
+                    <span class="produk-mega-icon" style="--c:#1267f5">IM</span>
+                    <span class="produk-mega-copy">
+                      <b>Inventory Management</b>
+                      <small>Stok multi-cabang real-time, import Excel, foto unit</small>
+                    </span>
+                  </a>
+                  <a class="produk-mega-item" href="#m3-omni" data-produk-close>
+                    <span class="produk-mega-icon" style="--c:#0ea5e9">AI</span>
+                    <span class="produk-mega-copy">
+                      <b>AI Omnichannel &amp; Call Center</b>
+                      <small>WA + IG + FB satu inbox, AI 24/7, handoff manusia</small>
+                    </span>
+                  </a>
+                  <a class="produk-mega-item" href="#m4-crm" data-produk-close>
+                    <span class="produk-mega-icon" style="--c:#8b5cf6">CRM</span>
+                    <span class="produk-mega-copy">
+                      <b>Autopilot CRM</b>
+                      <small>Pipeline, follow-up otomatis, rekomendasi closing</small>
+                    </span>
+                  </a>
+                  <a class="produk-mega-item" href="#m5-social" data-produk-close>
+                    <span class="produk-mega-icon" style="--c:#ec4899">AD</span>
+                    <span class="produk-mega-copy">
+                      <b>Social Media &amp; Ads</b>
+                      <small>Konten dari stok, jadwal posting, campaign insight</small>
+                    </span>
+                  </a>
+                  <a class="produk-mega-item" href="#m6-dashboard" data-produk-close>
+                    <span class="produk-mega-icon" style="--c:#10b981">DB</span>
+                    <span class="produk-mega-copy">
+                      <b>One Dashboard</b>
+                      <small>KPI, cabang, channel — satu command center</small>
+                    </span>
+                  </a>
+                  <a class="produk-mega-item" href="#m7-insight" data-produk-close>
+                    <span class="produk-mega-icon" style="--c:#f59e0b">IN</span>
+                    <span class="produk-mega-copy">
+                      <b>Data Insight &amp; Conversion</b>
+                      <small>Funnel, sumber lead, next best action</small>
+                    </span>
+                  </a>
+                  <a class="produk-mega-item" href="#m2-agentic" data-produk-close>
+                    <span class="produk-mega-icon" style="--c:#6366f1">WA</span>
+                    <span class="produk-mega-copy">
+                      <b>Agentic AI WhatsApp</b>
+                      <small>Falcon &amp; Jasmine: tool stok, kredit, handoff</small>
+                    </span>
+                  </a>
+                  <a class="produk-mega-item" href="#m8-platform" data-produk-close>
+                    <span class="produk-mega-icon" style="--c:#334155">PL</span>
+                    <span class="produk-mega-copy">
+                      <b>Platform &amp; Integrasi</b>
+                      <small>Multi-tenant, RBAC, API, pairing channel</small>
+                    </span>
+                  </a>
+                </div>
+                <div class="produk-mega-foot">
+                  <p>Coba demo interaktif di landing page</p>
+                  <a class="btn btn-primary produk-mega-cta" href="./index.html#solusi">Buka demo fitur <span>-></span></a>
+                </div>
+              </div>
+            </div>
+          </div>
           <a href="./index.html#solusi">Solusi</a>
-          <a href="./modul.html" aria-current="page">Modul</a>
           <a href="./index.html#fitur">Fitur</a>
           <a href="./index.html#cara-kerja">Cara Kerja</a>
           <a href="./index.html#kontak">Kontak</a>
@@ -336,7 +429,7 @@
         </div>
 
         <div class="module-grid">
-          <article class="module-card">
+          <article class="module-card" id="m1-inventory">
             <header>
               <div class="code">M1</div>
               <span class="badge live">Live</span>
@@ -352,7 +445,7 @@
             <footer>Demo: <a href="./index.html#inventoryDemo">Sistem Manajemen Inventaris</a></footer>
           </article>
 
-          <article class="module-card">
+          <article class="module-card" id="m2-agentic">
             <header>
               <div class="code">M2</div>
               <span class="badge live">Live</span>
@@ -368,7 +461,7 @@
             <footer>Settings: Integrasi WhatsApp · Meta · Instagram</footer>
           </article>
 
-          <article class="module-card">
+          <article class="module-card" id="m3-omni">
             <header>
               <div class="code">M3</div>
               <span class="badge live">Live</span>
@@ -384,7 +477,7 @@
             <footer>Demo: <a href="./index.html#omniDemo">Call Center</a></footer>
           </article>
 
-          <article class="module-card">
+          <article class="module-card" id="m4-crm">
             <header>
               <div class="code">M4</div>
               <span class="badge partial">Live · flag</span>
@@ -400,7 +493,7 @@
             <footer>Demo: <a href="./index.html#crmDemo">Autopilot CRM</a></footer>
           </article>
 
-          <article class="module-card">
+          <article class="module-card" id="m5-social">
             <header>
               <div class="code">M5</div>
               <span class="badge partial">Live · flag</span>
@@ -416,7 +509,7 @@
             <footer>Demo: <a href="./index.html#socialDemo">Social Growth Studio</a></footer>
           </article>
 
-          <article class="module-card">
+          <article class="module-card" id="m6-dashboard">
             <header>
               <div class="code">M6</div>
               <span class="badge live">Live</span>
@@ -432,7 +525,7 @@
             <footer>Demo: <a href="./index.html#dashboardDemo">One Dashboard</a></footer>
           </article>
 
-          <article class="module-card">
+          <article class="module-card" id="m7-insight">
             <header>
               <div class="code">M7</div>
               <span class="badge partial">Partial</span>
@@ -448,7 +541,7 @@
             <footer>Demo: <a href="./index.html#insightDemo">Data Insight</a></footer>
           </article>
 
-          <article class="module-card">
+          <article class="module-card" id="m8-platform">
             <header>
               <div class="code">M8</div>
               <span class="badge live">Live</span>
@@ -555,8 +648,8 @@
         </div>
         <div>
           <h3>Produk</h3>
+          <a href="./modul.html">Semua produk</a>
           <a href="./index.html#solusi">Solusi</a>
-          <a href="./modul.html">Modul</a>
           <a href="./index.html#fitur">Fitur</a>
         </div>
         <div>
