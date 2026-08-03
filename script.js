@@ -792,9 +792,9 @@ class InventoryProductDemo {
           view: "falcon",
           anchor: "falcon-live",
           title: "Uji chat real",
-          body: "Selesai template. Klik “Uji chat real” / tombol di area sorot, pilih Sales atau Management di iPhone — jawaban AI Falcon + stok live Motovax (bukan skrip).",
+          body: "Selesai template. Di panel kiri pilih mode “Chat real” (area sorot) — Falcon AI menjawab dengan stok Motovax. Ganti agent Sales/Management kapan saja di rail kiri.",
           enter: () => {
-            this.openFalconLiveRoleGate();
+            // Highlight mode toggle; user klik sendiri “Chat real”
           },
         },
       ],
@@ -1137,6 +1137,32 @@ class InventoryProductDemo {
       this.startFalconLiveMode(pick.dataset.falconPickRole || "sales");
     });
 
+    // Left rail: pilih agent (Sales / Management)
+    this.root.querySelector(".falcon-picker-list")?.addEventListener("click", (event) => {
+      const card = event.target.closest("[data-falcon-set-role]");
+      if (!card) return;
+      const role = card.dataset.falconSetRole || "sales";
+      if (this.falconMode === "live") {
+        this.setFalconRole(role, { greet: true, reset: true });
+      } else if (this.falconMode === "picking") {
+        this.startFalconLiveMode(role);
+      } else {
+        this.setFalconRole(role, { greet: true, reset: true });
+      }
+    });
+
+    // Left rail: mode demo template vs chat real
+    this.root.querySelector(".falcon-mode-toggle")?.addEventListener("click", (event) => {
+      const btn = event.target.closest("[data-falcon-set-mode]");
+      if (!btn) return;
+      const mode = btn.dataset.falconSetMode || "tutorial";
+      if (mode === "live") {
+        if (this.falconMode !== "live") this.startFalconLiveMode(this.falconRole);
+      } else if (this.falconMode === "live" || this.falconMode === "picking") {
+        this.exitFalconLiveMode();
+      }
+    });
+
     this._onGuideReposition = () => {
       if (!this.guide || this.guide.hidden) return;
       this.syncSpotlightRect();
@@ -1197,7 +1223,7 @@ class InventoryProductDemo {
       },
       falcon: {
         title: "Chat AI Falcon",
-        body: "Panduan Falcon aktif otomatis saat buka menu ini. Sales Agent dulu, lalu Management — atau buka ulang lewat tombol Panduan.",
+        body: "Pilih agent di kiri, coba chat di iPhone tengah. Mode demo = template; Chat real = AI + stok Motovax.",
       },
     };
     const tip = tips[next] || tips.units;
@@ -1904,10 +1930,9 @@ class InventoryProductDemo {
   }
 
   openFalconLiveRoleGate() {
+    // Role sudah dipilih di rail kiri — langsung chat real (gate overlay jadi cadangan).
     this.setView("falcon", { skipGuide: true });
-    this.falconMode = "picking";
-    if (this.falconRoleGate) this.falconRoleGate.hidden = false;
-    this.renderFalconChrome();
+    this.startFalconLiveMode(this.falconRole || "sales");
   }
 
   cancelFalconLivePick() {
@@ -2005,12 +2030,12 @@ class InventoryProductDemo {
         );
       } else if (next === "sales") {
         this.pushFalconBot(
-          "Halo! Saya Falcon untuk Sales Agent.\n\nSaya bisa bantu: cek stok/unit, foto, simulasi kredit, lokasi showroom, catat lead, handoff admin, generate konten, dan performa sales Anda.\n\nCoba chip di kiri, atau ketik “tampilkan semua fitur sales” untuk ringkasan + cara coba tiap fitur.\n\nSelesai panduan? Klik “Uji chat real” untuk Falcon sungguhan.",
+          "Halo! Saya Falcon untuk Sales Agent.\n\nSaya bisa bantu: cek stok/unit, foto, simulasi kredit, lokasi showroom, catat lead, handoff admin, generate konten, dan performa sales Anda.\n\nCoba chip “Coba cepat” di kiri, atau ketik “tampilkan semua fitur sales”.\n\nSiap coba AI sungguhan? Pilih mode Chat real di panel kiri.",
         );
       } else {
         this.pushFalconSystem("Mode berganti ke Management Agent.");
         this.pushFalconBot(
-          "Halo! Saya Falcon untuk Management Agent.\n\nSaya bisa semua fitur Sales + laporan stok/cabang/aging, GP/margin, import Excel, edit unit, dokumen, analisis inventory, dan analytics tren.\n\nCoba “laporan stok per cabang” atau “tampilkan semua fitur management”.\n\nAtau “Uji chat real” untuk jawaban AI + data Motovax.",
+          "Halo! Saya Falcon untuk Management Agent.\n\nSaya bisa semua fitur Sales + laporan stok/cabang/aging, GP/margin, import Excel, edit unit, dokumen, analisis inventory, dan analytics tren.\n\nCoba “laporan stok per cabang” atau “tampilkan semua fitur management”.\n\nMode Chat real di kiri = jawaban AI + data Motovax.",
         );
       }
     }
@@ -2062,19 +2087,32 @@ class InventoryProductDemo {
           ? Number(q.sessionRemaining)
           : 30;
         this.falconRoleHint.textContent = isSales
-          ? `Chat real: Falcon AI menjawab sebagai Sales Agent dengan stok Motovax (bukan template). Sisa kuota sesi: ${rem} pesan.`
-          : `Chat real: Falcon AI menjawab sebagai Management Agent dengan knowledge inventory Motovax. Sisa kuota sesi: ${rem} pesan.`;
+          ? `Chat real: Falcon AI menjawab sebagai Sales Agent dengan stok Motovax. Sisa kuota sesi: ${rem} pesan.`
+          : `Chat real: Falcon AI sebagai Management Agent + knowledge inventory. Sisa kuota sesi: ${rem} pesan.`;
       } else {
         this.falconRoleHint.textContent = isSales
-          ? "Mode panduan (template). Setelah selesai, klik “Uji chat real” untuk Falcon sungguhan."
-          : "Mode panduan Management (template). Klik “Uji chat real” untuk jawaban AI live.";
+          ? "Mode demo (template). Ganti ke “Chat real” di atas untuk Falcon AI sungguhan."
+          : "Mode demo Management (template). Ganti ke “Chat real” untuk jawaban AI live.";
       }
     }
     const badge = this.root.querySelector("[data-falcon-role-badge]");
     badge?.classList.toggle("is-management", !isSales);
     badge?.classList.toggle("is-live", isLive);
 
-    if (this.falconLiveCta) this.falconLiveCta.hidden = isLive;
+    // Sync left-rail role cards
+    for (const card of this.root.querySelectorAll("[data-falcon-set-role]")) {
+      const active = (card.dataset.falconSetRole || "sales") === this.falconRole;
+      card.classList.toggle("is-selected", active);
+      card.setAttribute("aria-selected", active ? "true" : "false");
+    }
+    // Sync mode toggle
+    for (const btn of this.root.querySelectorAll("[data-falcon-set-mode]")) {
+      const mode = btn.dataset.falconSetMode || "tutorial";
+      const active = isLive ? mode === "live" : mode === "tutorial";
+      btn.classList.toggle("is-active", active);
+    }
+
+    if (this.falconLiveCta) this.falconLiveCta.hidden = true;
     if (this.falconExitLive) this.falconExitLive.hidden = !isLive;
     if (this.falconTutorialList) {
       this.falconTutorialList.hidden = isLive;
