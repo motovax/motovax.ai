@@ -6341,7 +6341,9 @@ class OmnichannelAIDemo {
           <span class="cc-bucket-icon" aria-hidden="true">${this.bucketIcon(icon)}</span>
           <span class="cc-bucket-title">${title}</span>
           <span class="cc-bucket-count">${items.length}</span>
-          <span class="cc-bucket-chevron" aria-hidden="true">${collapsed ? "›" : "⌄"}</span>
+          <span class="cc-bucket-chevron${collapsed ? "" : " is-open"}" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
+          </span>
         </button>
         <button type="button" class="cc-bucket-select" data-omni-select-group="${key}" aria-label="Pilih chat di bucket ${title}" title="Select bucket">
           ${this.bucketIcon("list")}

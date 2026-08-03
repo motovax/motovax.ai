@@ -14565,11 +14565,23 @@ body.demo-open {
 }
 .cc-bucket-chevron {
   width: 17px;
+  height: 17px;
+  display: inline-grid;
   flex: 0 0 17px;
-  font-size: 18px;
-  line-height: 1;
-  text-align: center;
+  place-items: center;
   opacity: 0.72;
+}
+.cc-bucket-chevron svg {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2.4;
+}
+.cc-bucket-chevron.is-open svg {
+  transform: rotate(90deg);
 }
 .cc-bucket-select {
   width: 28px;
