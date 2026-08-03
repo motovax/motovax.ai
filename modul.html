@@ -1,0 +1,568 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Modul & Fitur MOTOVAX — Agentic AI ERP</title>
+    <meta
+      name="description"
+      content="Breakdown modul Motovax: inventory, agentic AI, call center omnichannel, CRM autopilot, social ads, dashboard, platform — plus roadmap ERP yang bisa dibangun."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./styles.css" />
+    <style>
+      .modules-page {
+        padding: 110px 0 72px;
+        background:
+          radial-gradient(ellipse 80% 40% at 10% 0%, rgba(25, 103, 242, 0.08), transparent 55%),
+          #f7fafc;
+      }
+      .modules-hero {
+        max-width: 820px;
+        margin-bottom: 40px;
+      }
+      .modules-hero .eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 14px;
+      }
+      .modules-hero h1 {
+        margin: 0 0 14px;
+        font-size: clamp(32px, 4vw, 48px);
+        letter-spacing: -0.04em;
+        line-height: 1.1;
+      }
+      .modules-hero h1 span {
+        color: var(--blue);
+      }
+      .modules-hero p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 16px;
+        line-height: 1.7;
+        max-width: 640px;
+      }
+      .status-legend {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin: 28px 0 8px;
+      }
+      .status-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 12px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 700;
+        border: 1px solid #dbe7f5;
+        background: #fff;
+        color: #334155;
+      }
+      .status-pill i {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        display: inline-block;
+      }
+      .status-pill.live i { background: #10b981; }
+      .status-pill.partial i { background: #f59e0b; }
+      .status-pill.roadmap i { background: #6366f1; }
+      .module-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 18px;
+        margin-top: 28px;
+      }
+      .module-card {
+        background: #fff;
+        border: 1px solid #dfebf7;
+        border-radius: 16px;
+        padding: 22px;
+        box-shadow: var(--shadow-soft);
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        min-height: 100%;
+      }
+      .module-card header {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 12px;
+      }
+      .module-card .code {
+        width: 42px;
+        height: 42px;
+        border-radius: 10px;
+        display: grid;
+        place-items: center;
+        font-weight: 900;
+        font-size: 12px;
+        color: #fff;
+        background: linear-gradient(135deg, var(--blue), #0a54d2);
+        flex-shrink: 0;
+      }
+      .module-card h2 {
+        margin: 0;
+        font-size: 18px;
+        letter-spacing: -0.02em;
+      }
+      .module-card .badge {
+        font-size: 11px;
+        font-weight: 800;
+        padding: 4px 10px;
+        border-radius: 999px;
+        white-space: nowrap;
+      }
+      .badge.live {
+        background: #ecfdf5;
+        color: #047857;
+        border: 1px solid #a7f3d0;
+      }
+      .badge.partial {
+        background: #fffbeb;
+        color: #b45309;
+        border: 1px solid #fde68a;
+      }
+      .badge.roadmap {
+        background: #eef2ff;
+        color: #4338ca;
+        border: 1px solid #c7d2fe;
+      }
+      .module-card > p {
+        margin: 0;
+        color: #536175;
+        font-size: 13px;
+        line-height: 1.65;
+      }
+      .module-card ul {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+        display: grid;
+        gap: 6px;
+      }
+      .module-card li {
+        position: relative;
+        padding-left: 16px;
+        font-size: 13px;
+        color: #334155;
+        line-height: 1.45;
+      }
+      .module-card li::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 7px;
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: var(--blue);
+      }
+      .module-card footer {
+        margin-top: auto;
+        padding-top: 10px;
+        border-top: 1px dashed #e2e8f0;
+        font-size: 12px;
+        color: #64748b;
+      }
+      .module-card footer a {
+        color: var(--blue);
+        font-weight: 700;
+        text-decoration: none;
+      }
+      .module-card footer a:hover {
+        text-decoration: underline;
+      }
+      .roadmap-section {
+        margin-top: 56px;
+      }
+      .roadmap-section .section-head {
+        margin-bottom: 22px;
+      }
+      .roadmap-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 16px;
+      }
+      .roadmap-card {
+        background: #0b1220;
+        color: #e2e8f0;
+        border-radius: 16px;
+        padding: 22px;
+        border: 1px solid #1e293b;
+      }
+      .roadmap-card h3 {
+        margin: 0 0 6px;
+        font-size: 15px;
+        color: #93c5fd;
+      }
+      .roadmap-card strong {
+        display: block;
+        margin-bottom: 12px;
+        font-size: 18px;
+        letter-spacing: -0.02em;
+        color: #fff;
+      }
+      .roadmap-card ul {
+        margin: 0;
+        padding-left: 18px;
+        display: grid;
+        gap: 6px;
+        font-size: 13px;
+        line-height: 1.5;
+        color: #cbd5e1;
+      }
+      .pitch-banner {
+        margin-top: 48px;
+        padding: 28px 32px;
+        border-radius: 18px;
+        background: linear-gradient(135deg, #1967f2, #0a54d2);
+        color: #fff;
+        display: grid;
+        grid-template-columns: 1.4fr auto;
+        gap: 20px;
+        align-items: center;
+      }
+      .pitch-banner h2 {
+        margin: 0 0 8px;
+        font-size: 24px;
+        letter-spacing: -0.03em;
+      }
+      .pitch-banner p {
+        margin: 0;
+        opacity: 0.92;
+        font-size: 14px;
+        line-height: 1.65;
+        max-width: 560px;
+      }
+      .pitch-banner .btn {
+        white-space: nowrap;
+      }
+      .matrix-wrap {
+        margin-top: 48px;
+        overflow-x: auto;
+        border-radius: 16px;
+        border: 1px solid #dfebf7;
+        background: #fff;
+        box-shadow: var(--shadow-soft);
+      }
+      .matrix-wrap table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13px;
+      }
+      .matrix-wrap th,
+      .matrix-wrap td {
+        padding: 12px 16px;
+        text-align: left;
+        border-bottom: 1px solid #eef2f7;
+      }
+      .matrix-wrap th {
+        background: #f8fafc;
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        color: #64748b;
+      }
+      .matrix-wrap tr:last-child td {
+        border-bottom: 0;
+      }
+      @media (max-width: 900px) {
+        .module-grid,
+        .roadmap-grid {
+          grid-template-columns: 1fr;
+        }
+        .pitch-banner {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container header-inner">
+        <a class="brand" href="./index.html#top" aria-label="MOTOVAX home">
+          <span>MOTO</span><strong>VAX</strong>
+        </a>
+        <nav class="nav" aria-label="Navigasi utama">
+          <a href="./index.html#solusi">Solusi</a>
+          <a href="./modul.html" aria-current="page">Modul</a>
+          <a href="./index.html#fitur">Fitur</a>
+          <a href="./index.html#cara-kerja">Cara Kerja</a>
+          <a href="./index.html#kontak">Kontak</a>
+        </nav>
+        <a class="btn btn-primary header-cta" href="./index.html#kontak">Jadwalkan Demo <span>-></span></a>
+      </div>
+    </header>
+
+    <main class="modules-page">
+      <div class="container">
+        <div class="modules-hero">
+          <div class="eyebrow">
+            <span class="icon-dot">AI</span>
+            Agentic AI ERP · Breakdown Produk
+          </div>
+          <h1>
+            Satu platform.<br />
+            Banyak modul.<br />
+            <span>Agen AI di setiap alur bisnis.</span>
+          </h1>
+          <p>
+            Motovax mengintegrasikan operasional dealer (dan ke depan industri lain) dengan
+            agen AI yang punya tool nyata — stok, inbox, CRM, konten, insight — bukan chatbot
+            generik. Di bawah: modul yang sudah live di produksi, yang partial, dan yang bisa
+            kita bangun.
+          </p>
+          <div class="status-legend" aria-label="Legenda status">
+            <span class="status-pill live"><i></i> Live di produksi</span>
+            <span class="status-pill partial"><i></i> Partial / flag</span>
+            <span class="status-pill roadmap"><i></i> Roadmap bisa dibangun</span>
+          </div>
+        </div>
+
+        <div class="module-grid">
+          <article class="module-card">
+            <header>
+              <div class="code">M1</div>
+              <span class="badge live">Live</span>
+            </header>
+            <h2>Inventory Management System</h2>
+            <p>Stok multi-cabang real-time: unit, foto, import Excel, status ready/booked/sold.</p>
+            <ul>
+              <li>Daftar & detail unit, filter cabang</li>
+              <li>Upload / import Excel + validasi</li>
+              <li>Foto unit & worker perawatan media</li>
+              <li>Query & laporan stok lewat AI WhatsApp</li>
+            </ul>
+            <footer>Demo: <a href="./index.html#inventoryDemo">Sistem Manajemen Inventaris</a></footer>
+          </article>
+
+          <article class="module-card">
+            <header>
+              <div class="code">M2</div>
+              <span class="badge live">Live</span>
+            </header>
+            <h2>Agentic AI (WhatsApp)</h2>
+            <p>Agen Falcon / Jasmine dengan tool native: stok, foto, kredit, handoff, konten.</p>
+            <ul>
+              <li>Bukan keyword bot — LLM + tool schema</li>
+              <li>Simulasi kredit, TNS/GP, trade-in</li>
+              <li>Handoff ke admin, call center, MR</li>
+              <li>Caption & posting promo, stock alert</li>
+            </ul>
+            <footer>Settings: Integrasi WhatsApp · Meta · Instagram</footer>
+          </article>
+
+          <article class="module-card">
+            <header>
+              <div class="code">M3</div>
+              <span class="badge live">Live</span>
+            </header>
+            <h2>AI Omnichannel & Call Center</h2>
+            <p>Inbox WA + Messenger + Instagram: AI 24/7, takeover manusia, handoff MR.</p>
+            <ul>
+              <li>Faneling AI / agent / MR + tag lead</li>
+              <li>Realtime SSE (tanpa polling)</li>
+              <li>Aksi cepat: inventori & simulasi</li>
+              <li>Performa omnichannel / CRM</li>
+            </ul>
+            <footer>Demo: <a href="./index.html#omniDemo">Call Center</a></footer>
+          </article>
+
+          <article class="module-card">
+            <header>
+              <div class="code">M4</div>
+              <span class="badge partial">Live · flag</span>
+            </header>
+            <h2>Autopilot CRM</h2>
+            <p>Pipeline, customer, MR, follow-up otomatis, guideline, dan agent workspace.</p>
+            <ul>
+              <li>Customer & pipeline Cold→Deal</li>
+              <li>Program follow-up / campaign</li>
+              <li>Dashboard MR & salespeople</li>
+              <li>Workspace percakapan MR + monitor PIC</li>
+            </ul>
+            <footer>Demo: <a href="./index.html#crmDemo">Autopilot CRM</a></footer>
+          </article>
+
+          <article class="module-card">
+            <header>
+              <div class="code">M5</div>
+              <span class="badge partial">Live · flag</span>
+            </header>
+            <h2>Social Media & Ads Automation</h2>
+            <p>Dari stok live ke creative, jadwal posting, campaign insight, publish Meta Business.</p>
+            <ul>
+              <li>Generator template + caption AI</li>
+              <li>Kalender posting & schedule</li>
+              <li>Ads campaign + lead template WA</li>
+              <li>Publish FB/IG via Meta Business</li>
+            </ul>
+            <footer>Demo: <a href="./index.html#socialDemo">Social Growth Studio</a></footer>
+          </article>
+
+          <article class="module-card">
+            <header>
+              <div class="code">M6</div>
+              <span class="badge live">Live</span>
+            </header>
+            <h2>One Dashboard & Analytics</h2>
+            <p>Command center per role: unit, revenue, GP, funnel, cabang, top agent.</p>
+            <ul>
+              <li>Dashboard management & sales</li>
+              <li>Sales Trend (finansial unit)</li>
+              <li>Sales insight salesperson</li>
+              <li>Multi-vertical ready di demo landing</li>
+            </ul>
+            <footer>Demo: <a href="./index.html#dashboardDemo">One Dashboard</a></footer>
+          </article>
+
+          <article class="module-card">
+            <header>
+              <div class="code">M7</div>
+              <span class="badge partial">Partial</span>
+            </header>
+            <h2>Data Insight & Conversion</h2>
+            <p>Funnel & channel performance; attribution LTV multi-touch masih roadmap.</p>
+            <ul>
+              <li>Lead → booking → sold</li>
+              <li>Breakdown channel WA/FB/IG/web</li>
+              <li>Email report terjadwal</li>
+              <li>Roadmap: multi-touch & BI builder</li>
+            </ul>
+            <footer>Demo: <a href="./index.html#insightDemo">Data Insight</a></footer>
+          </article>
+
+          <article class="module-card">
+            <header>
+              <div class="code">M8</div>
+              <span class="badge live">Live</span>
+            </header>
+            <h2>Platform · IAM · Integrasi</h2>
+            <p>Multi-tenant SaaS: role, config cabang, pairing channel, developer API.</p>
+            <ul>
+              <li>Users, roles, permission policy</li>
+              <li>Tenant config (branding, finance, AI)</li>
+              <li>WhatsApp / Meta / IG pairing</li>
+              <li>Developer API per tenant</li>
+            </ul>
+            <footer>Fondasi ERP multi-tenant untuk semua modul</footer>
+          </article>
+        </div>
+
+        <section class="roadmap-section" aria-labelledby="roadmap-title">
+          <div class="section-head">
+            <span>ROADMAP</span>
+            <h2 id="roadmap-title">Yang bisa kita bangun sebagai Agentic AI ERP</h2>
+            <p>Perluasan di atas fondasi yang sudah hidup — bukan rewrite dari nol.</p>
+          </div>
+          <div class="roadmap-grid">
+            <article class="roadmap-card">
+              <h3>P0 · 3–6 bulan</h3>
+              <strong>Perkuat otomotif</strong>
+              <ul>
+                <li>Document AI (SPK, invoice, PJB)</li>
+                <li>Atribusi iklan → deal</li>
+                <li>Voice / call notes AI</li>
+                <li>Stock intelligence & pricing</li>
+                <li>Mini katalog self-serve</li>
+              </ul>
+            </article>
+            <article class="roadmap-card">
+              <h3>P1 · 6–12 bulan</h3>
+              <strong>ERP lintas fungsi</strong>
+              <ul>
+                <li>Finance ops (AR/AP, cashflow)</li>
+                <li>Aftersales / service booking</li>
+                <li>HR lite: target & komisi</li>
+                <li>Procurement unit masuk</li>
+                <li>Workflow builder event-driven</li>
+              </ul>
+            </article>
+            <article class="roadmap-card">
+              <h3>P2–P3 · 12+ bulan</h3>
+              <strong>Multi-industri & GTM</strong>
+              <ul>
+                <li>Pack properti, ritel, jasa</li>
+                <li>Self-serve onboarding bisnis</li>
+                <li>Billing / credit usage AI</li>
+                <li>Connector leasing & insurance</li>
+                <li>White-label partner</li>
+              </ul>
+            </article>
+          </div>
+        </section>
+
+        <div class="matrix-wrap" role="region" aria-label="Matriks status modul">
+          <table>
+            <thead>
+              <tr>
+                <th>Modul</th>
+                <th>Status</th>
+                <th>Catatan</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>Inventory / Unit</td><td><span class="badge live">Live</span></td><td>Core dealer</td></tr>
+              <tr><td>WhatsApp Agentic AI</td><td><span class="badge live">Live</span></td><td>Tool-rich Falcon/Jasmine</td></tr>
+              <tr><td>Call Center Omnichannel</td><td><span class="badge live">Live</span></td><td>WA + FB + IG, SSE</td></tr>
+              <tr><td>Autopilot CRM</td><td><span class="badge partial">Flag</span></td><td>crm_autopilot</td></tr>
+              <tr><td>Social + Ads + Meta publish</td><td><span class="badge partial">Flag</span></td><td>social_media_automation</td></tr>
+              <tr><td>Analytics / Dashboard</td><td><span class="badge live">Live</span></td><td>Trend & role home</td></tr>
+              <tr><td>Platform multi-tenant + RBAC</td><td><span class="badge live">Live</span></td><td>TenantConfig JSON</td></tr>
+              <tr><td>Finance simulation</td><td><span class="badge partial">Partial</span></td><td>Kredit + TNS/GP</td></tr>
+              <tr><td>Full accounting / aftersales / HR</td><td><span class="badge roadmap">Roadmap</span></td><td>Agentic ERP expansion</td></tr>
+              <tr><td>Multi-industry packs</td><td><span class="badge roadmap">Roadmap</span></td><td>Demo dashboard sudah explore</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="pitch-banner">
+          <div>
+            <h2>Siap integrasikan bisnis Anda dengan AI?</h2>
+            <p>
+              Satu data. Banyak modul. Agen AI yang bekerja di WhatsApp, inbox, CRM, dan
+              dashboard — untuk dealer hari ini, untuk ERP industri Anda besok.
+            </p>
+          </div>
+          <a class="btn btn-light" href="#" data-wa>Hubungi Tim Motovax <span>-></span></a>
+        </div>
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="container footer-grid">
+        <div>
+          <a class="brand footer-brand" href="./index.html#top"><span>MOTO</span><strong>VAX</strong></a>
+          <p>Agentic AI ERP — integrasikan operasional bisnis dengan agen AI.</p>
+        </div>
+        <div>
+          <h3>Produk</h3>
+          <a href="./index.html#solusi">Solusi</a>
+          <a href="./modul.html">Modul</a>
+          <a href="./index.html#fitur">Fitur</a>
+        </div>
+        <div>
+          <h3>Dokumen</h3>
+          <a href="./docs/product/modul-fitur-breakdown.md">Breakdown lengkap (MD)</a>
+        </div>
+        <div>
+          <h3>Hubungi Kami</h3>
+          <p>hello@motovax.ai</p>
+        </div>
+      </div>
+      <div class="copyright">&copy; <span data-year></span> MOTOVAX. All rights reserved.</div>
+    </footer>
+
+    <script src="./script.js"></script>
+  </body>
+</html>

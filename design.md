@@ -33,8 +33,22 @@ Pola visual utama:
 
 ## Catatan Implementasi
 
-- Semua halaman berada di `landing-static/` dan bisa dijalankan sebagai static HTML.
+- Semua halaman berada di root repo dan bisa dijalankan sebagai static HTML.
 - Visual dashboard, chart, donut, funnel, dan car mock dibuat dengan HTML/CSS agar tidak bergantung pada asset eksternal.
 - CTA WhatsApp dikonfigurasi di `script.js`.
 - Layout sudah diberi breakpoint untuk desktop, tablet, dan mobile.
 - Halaman ini adalah prototype static. Versi produksi berikutnya bisa memakai screenshot produk asli, asset mobil resmi, dan data performa tervalidasi.
+
+## Breakdown Modul (Agentic AI ERP)
+
+- Halaman publik: `modul.html` — kartu modul live / partial + roadmap P0–P3.
+- Dokumen lengkap: `docs/product/modul-fitur-breakdown.md` (mirror sumber di `motovax-app/docs/product/`).
+- Navigasi landing menautkan **Modul** ke `modul.html`.
+- Enam kartu solusi di `#solusi` dipetakan ke demo shell:
+  - IMS → `#inventoryDemo`
+  - Omnichannel → `#omniDemo`
+  - Social → `#socialDemo`
+  - CRM → `#crmDemo`
+  - Dashboard → `#dashboardDemo`
+  - Insight → `#insightDemo`
+
