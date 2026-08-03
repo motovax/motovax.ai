@@ -109,7 +109,6 @@
           <a class="btn btn-primary" href="../index.html#kontak">Jadwalkan Demo <span>-></span></a>
           ${demoCta}
         </div>
-        <p class="feature-source-note">Konten diselaraskan dengan kemampuan produksi di <strong>motovax.app</strong> (motovax-app).</p>
       </div>
     </section>
 
