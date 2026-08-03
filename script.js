@@ -78,7 +78,6 @@ for (const link of document.querySelectorAll("[data-wa]")) {
           features: [
             { title: "Omnichannel", desc: "Satu platform untuk kelola chat dari berbagai saluran", icon: "chat", href: f("aplikasi-omnichannel") },
             { title: "Instagram API", desc: "Respons DM otomatis untuk tingkatkan penjualan", icon: "ig", href: f("instagram-api") },
-            { title: "Tokopedia Chat", desc: "Kelola chat akun Tokopedia Seller lebih mudah", icon: "shop", href: f("integrasi-tokopedia") },
             { title: "Embedded Live Chat", desc: "Integrasi layanan live chat 24/7 untuk aplikasi Anda", icon: "live", href: f("embedded-live-chat") },
             { title: "Ticket Creation Integration", desc: "Sederhanakan proses resolusi masalah pelanggan", icon: "ticket", href: f("ticket-creation-integration") },
           ],

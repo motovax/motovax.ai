@@ -134,7 +134,7 @@ fs.writeFileSync(
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Semua Fitur — MOTOVAX</title>
-  <meta name="description" content="Katalog fitur Motovax diselaraskan dengan motovax.app" />
+  <meta name="description" content="Jelajahi katalog fitur Motovax untuk sales, customer service, CRM, omnichannel, dan automasi bisnis." />
   <link rel="stylesheet" href="../styles.css" />
   <link rel="icon" href="../favicon.ico" />
 </head>
@@ -148,7 +148,7 @@ fs.writeFileSync(
   <main class="feature-page-section">
     <div class="container">
       <h1>Semua fitur Motovax</h1>
-      <p class="feature-hero-desc">Referensi konten dari produksi motovax.app. Pilih fitur untuk detail.</p>
+      <p class="feature-hero-desc">Pilih fitur untuk melihat detail kemampuan dan manfaatnya.</p>
       <ul class="feature-index-list">${listItems}</ul>
     </div>
   </main>

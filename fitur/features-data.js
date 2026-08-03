@@ -9,7 +9,7 @@ window.MOTOVAX_FEATURES = {
     title: "Aplikasi Omnichannel",
     heroTitle: "Satu inbox omnichannel untuk semua channel chat pelanggan",
     heroDesc:
-      "Satukan WhatsApp, Instagram DM, Facebook Messenger, dan channel lain dalam Call Center Motovax. Faneling AI / agent / MR, realtime SSE, handoff, dan aksi cepat inventori serta simulasi kredit — sesuai produksi di motovax.app.",
+      "Satukan WhatsApp, Instagram DM, Facebook Messenger, dan channel lain dalam Call Center Motovax. Faneling AI / agent / MR, realtime SSE, handoff, dan aksi cepat inventori serta simulasi kredit untuk mempercepat layanan pelanggan.",
     status: "Live",
     module: "M3 · AI Omnichannel & Call Center",
     flag: "whatsapp_ai",
@@ -75,7 +75,7 @@ window.MOTOVAX_FEATURES = {
       { title: "DM di inbox terpusat", desc: "Percakapan Instagram masuk ke workspace Call Center multi-channel." },
       { title: "Konteks inventori", desc: "AI/agent dapat merujuk unit ready stock saat menjawab inquiry dari IG." },
       { title: "Handoff ke sales", desc: "Lead dari IG dapat di-handoff ke MR atau pipeline CRM." },
-      { title: "Pairing Meta", desc: "Konfigurasi integrasi channel lewat settings tenant di motovax.app." },
+      { title: "Pairing Meta", desc: "Konfigurasi integrasi channel lewat pengaturan tenant Motovax." },
     ],
     howItWorks: [
       { title: "Pairing channel", desc: "Hubungkan akun Meta / Instagram di integrasi tenant." },
@@ -88,33 +88,6 @@ window.MOTOVAX_FEATURES = {
       "Atribusi lead channel lebih jelas di analytics",
     ],
     related: ["aplikasi-omnichannel", "ctwa", "aplikasi-crm"],
-  },
-
-  "integrasi-tokopedia": {
-    slug: "integrasi-tokopedia",
-    title: "Tokopedia Chat",
-    heroTitle: "Sentralisasi chat e-commerce ke operasional dealer",
-    heroDesc:
-      "Motovax memusatkan komunikasi omnichannel untuk operasional penjualan. Integrasi chat marketplace diposisikan sebagai perluasan channel di atas fondasi Call Center & CRM yang sudah live di motovax-app.",
-    status: "Partial",
-    module: "M3 · Omnichannel (perluasan channel)",
-    flag: "whatsapp_ai",
-    demo: "omni",
-    demoHash: "omniDemo",
-    category: "Aplikasi Omnichannel",
-    breadcrumbs: ["Produk", "Fitur", "Tokopedia Chat"],
-    capabilities: [
-      { title: "Fondasi omnichannel", desc: "Arsitektur inbox multi-channel siap menampung channel tambahan per tenant." },
-      { title: "CRM lanjutan", desc: "Lead dari marketplace dapat masuk pipeline Customer & deal yang sama." },
-      { title: "AI handoff", desc: "Pola AI → manusia → MR dipakai ulang untuk channel baru." },
-    ],
-    howItWorks: [
-      { title: "Channel policy", desc: "Tenant mengatur channel aktif di integrasi." },
-      { title: "Inbox terpadu", desc: "Chat masuk ke faneling yang sama dengan WA/IG." },
-      { title: "Closing di CRM", desc: "Deal dan follow-up dilanjutkan di Autopilot CRM." },
-    ],
-    benefits: ["Kurangi silo chat marketplace", "SOP satu untuk semua channel", "Data lead tetap di Motovax"],
-    related: ["aplikasi-omnichannel", "aplikasi-crm", "manajemen-deal"],
   },
 
   "embedded-live-chat": {
@@ -174,7 +147,7 @@ window.MOTOVAX_FEATURES = {
     title: "Aplikasi CRM",
     heroTitle: "Autopilot CRM untuk pipeline sales dealer",
     heroDesc:
-      "Modul CRM Motovax (flag crm_autopilot) mencakup Customer, Pipeline Cold→Deal, program follow-up, guideline, MR, salespeople, agents, dan dashboard sales — sesuai sidebar produksi motovax-app.",
+      "Modul CRM Motovax mencakup Customer, Pipeline Cold→Deal, program follow-up, guideline, MR, salespeople, agents, dan dashboard sales dalam satu workspace.",
     status: "Live · flag",
     module: "M4 · Autopilot CRM",
     flag: "crm_autopilot",
@@ -673,7 +646,7 @@ window.MOTOVAX_FEATURES = {
     title: "Agentic AI",
     heroTitle: "Agen AI yang mengeksekusi pekerjaan bisnis",
     heroDesc:
-      "Falcon (sales/internal) dan Jasmine (customer/CS) di motovax-app menjalankan tool: stok, media, finance, CRM ops, handoff, konten, knowledge, trade-in, MRP. Inilah diferensiasi agentic Motovax.",
+      "Falcon (sales/internal) dan Jasmine (customer/CS) menjalankan tool untuk stok, media, finance, CRM ops, handoff, konten, knowledge, trade-in, dan MRP.",
     status: "Live",
     module: "M2 · Agentic AI",
     flag: "whatsapp_ai",
@@ -776,7 +749,7 @@ window.MOTOVAX_FEATURES = {
     title: "Call Center",
     heroTitle: "Call Center AI omnichannel untuk dealer modern",
     heroDesc:
-      "Modul Call Center di motovax-app: inbox multi-channel, faneling, SSE realtime, aksi inventori & kredit, performa — inti layanan pelanggan Motovax.",
+      "Modul Call Center Motovax menyatukan inbox multi-channel, faneling, SSE realtime, aksi inventori dan kredit, serta pemantauan performa layanan pelanggan.",
     status: "Live",
     module: "M3 · AI Omnichannel & Call Center",
     demo: "omni",
@@ -828,7 +801,7 @@ window.MOTOVAX_FEATURES = {
     title: "Motovax Sales Suite",
     heroTitle: "Solusi komprehensif untuk mempercepat penjualan",
     heroDesc:
-      "Gabungan Inventory, Agentic WhatsApp, Autopilot CRM, dan Dashboard — journey lead sampai closing di motovax.app.",
+      "Gabungan Inventory, Agentic WhatsApp, Autopilot CRM, dan Dashboard dalam satu alur lead hingga closing.",
     status: "Live · suite",
     module: "M1 + M2 + M4 + M6",
     demo: "crm",
