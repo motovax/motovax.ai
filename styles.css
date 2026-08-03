@@ -16751,6 +16751,102 @@ body.demo-open {
   }
 }
 
+/* Semua visual fitur unggulan menggunakan capture antarmuka produk Motovax. */
+.feature-showcase-preview {
+  min-width: 0;
+  margin: 0;
+  padding: clamp(18px, 3vw, 34px);
+}
+
+.feature-showcase-preview-window {
+  overflow: hidden;
+  border: 1px solid rgba(112, 139, 181, 0.3);
+  border-radius: 17px;
+  background: #fff;
+  box-shadow: 0 22px 55px rgba(35, 63, 105, 0.16);
+}
+
+.feature-showcase-preview-topbar {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  min-height: 42px;
+  padding: 0 13px;
+  border-bottom: 1px solid #e7edf5;
+  background: #fbfdff;
+  color: #64748b;
+  font-size: 9px;
+  font-style: normal;
+}
+
+.feature-showcase-preview-topbar > span {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.feature-showcase-preview-topbar > span i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--feature-accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--feature-accent) 13%, transparent);
+}
+
+.feature-showcase-preview-topbar > strong {
+  color: #25364e;
+  font-size: 10px;
+}
+
+.feature-showcase-preview-topbar > em {
+  justify-self: end;
+  color: #718096;
+  font-size: 9px;
+  font-style: normal;
+}
+
+.feature-showcase-preview-image {
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: 16 / 10;
+  background: #f8fafc;
+}
+
+.feature-showcase-preview-image::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  box-shadow: inset 0 0 0 1px rgba(203, 213, 225, 0.28);
+}
+
+.feature-showcase-preview-image img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top left;
+}
+
+.feature-showcase-preview-window figcaption {
+  margin: 0;
+  padding: 10px 13px 11px;
+  border-top: 1px solid #e7edf5;
+  color: #65768d;
+  font-size: 10px;
+  line-height: 1.45;
+}
+
+@media (max-width: 520px) {
+  .feature-showcase-preview-topbar {
+    grid-template-columns: 1fr auto;
+  }
+
+  .feature-showcase-preview-topbar > em {
+    display: none;
+  }
+}
+
 @media (max-width: 1100px) {
   .contact-hero-grid {
     grid-template-columns: minmax(0, 0.84fr) minmax(460px, 1.16fr);

@@ -477,45 +477,66 @@
       alt: `Tampilan aplikasi Motovax untuk ${title} dengan data demo`,
     });
 
+    return previewSetFor(id, preview)[0];
+  }
+
+  function previewSetFor(id, previewFactory) {
+    const previews = {
+      omni: previewFactory("omnichannel-inbox.webp", "Omnichannel Inbox"),
+      service: previewFactory("service-performance.webp", "Service Performance"),
+      integrations: previewFactory("channel-integrations.webp", "Integrasi Channel"),
+      agents: previewFactory("ai-agents.webp", "CRM & AI Agent"),
+      social: previewFactory("social-generator.webp", "Social Media Generator"),
+      analytics: previewFactory("sales-analytics.webp", "Analytics & Performance"),
+    };
+
     if (/broadcast|blast|bulk|ctwa/.test(id)) {
-      return preview("social-generator.webp", "Social Media Generator");
+      return [previews.social, previews.omni, previews.analytics];
     }
     if (/instagram-api|whatsapp-business-api|centang-biru|whatsapp-business-calling|whatsapp-flows|ticket-creation-integration/.test(id)) {
-      return preview("channel-integrations.webp", "Integrasi Channel");
+      return [previews.integrations, previews.omni, previews.social];
     }
     if (/goal|report|scorecard|motovax-360/.test(id)) {
-      return preview("sales-analytics.webp", "Analytics & Performance");
+      return [previews.analytics, previews.agents, previews.service];
     }
     if (/aplikasi-crm|manajemen-deal|manajemen-kontak|sales-gps|agentic-ai|chatbot|integrasi-airene|knowledge-base|automasi-workflow|motovax-sales-suite/.test(id)) {
-      return preview("ai-agents.webp", "CRM & AI Agent");
+      return [previews.agents, previews.analytics, previews.omni];
     }
     if (/aplikasi-call-center|manajemen-sla|sistem-manajemen-tiket|motovax-service-suite/.test(id)) {
-      return preview("service-performance.webp", "Service Performance");
+      return [previews.service, previews.omni, previews.agents];
     }
-    return preview("omnichannel-inbox.webp", "Omnichannel Inbox");
+    return [previews.omni, previews.integrations, previews.service];
   }
 
   function renderShowcaseVisual(feature, productProfile, capability, index) {
+    const title = String(feature.title || "fitur Motovax");
+    const previews = previewSetFor(String(feature.slug || ""), (file, label) => ({
+      file,
+      label,
+      alt: `Tampilan ${label} di aplikasi Motovax untuk ${capability.title} pada ${title} dengan data demo`,
+    }));
+    const preview = previews[index % previews.length];
     return `
-      <div class="feature-showcase-visual family-${productProfile.family}" aria-hidden="true">
-        <div class="feature-mini-window">
-          <div class="feature-mini-top"><span></span><span>${escapeHtml(feature.title)}</span><i>•••</i></div>
-          <div class="feature-mini-body">
-            <aside><b>MV</b><i></i><i class="active"></i><i></i><i></i></aside>
-            <main>
-              <small>${escapeHtml(productProfile.sectionLabel)}</small>
-              <h4>${escapeHtml(capability.title)}</h4>
-              <div class="feature-mini-cards">
-                ${productProfile.facts.map((fact, factIndex) => `<div><span>${escapeHtml(fact)}</span><b>${factIndex === index % 3 ? "ON" : "✓"}</b></div>`).join("")}
-              </div>
-              <div class="feature-mini-chart">
-                ${[42, 68, 54, 86, 73, 94].map((height, barIndex) => `<i style="--bar:${Math.max(24, height - ((index + barIndex) % 3) * 7)}%"></i>`).join("")}
-              </div>
-              <div class="feature-mini-status"><span><i></i> Sistem terhubung</span><b>Realtime</b></div>
-            </main>
+      <figure class="feature-showcase-visual feature-showcase-preview family-${productProfile.family}">
+        <div class="feature-showcase-preview-window">
+          <div class="feature-showcase-preview-topbar">
+            <span><i></i> Screenshot produk</span>
+            <strong>${escapeHtml(preview.label)}</strong>
+            <em>Data demo</em>
           </div>
+          <div class="feature-showcase-preview-image">
+            <img
+              src="../assets/feature-previews/${escapeHtml(preview.file)}"
+              width="1440"
+              height="900"
+              alt="${escapeHtml(preview.alt)}"
+              loading="eager"
+              decoding="async"
+            >
+          </div>
+          <figcaption>${escapeHtml(capability.title)} dalam workspace Motovax</figcaption>
         </div>
-      </div>`;
+      </figure>`;
   }
 
   function buildFaqs(feature, productProfile, available, caps, flow, relatedFeatures) {
