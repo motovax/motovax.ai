@@ -65,7 +65,7 @@ Agen AI dengan tool native (bukan chatbot keyword). Peran tipikal: **Jasmine** (
 | Knowledge | Web search, fetch URL, preferensi reply, notifikasi |
 | Spesial | Trade-in appraise, MRP, draft discount proposal |
 
-**Flag:** `whatsapp_ai`
+**Demo landing:** `#falconDemo` (Falcon) dan `#capabilityDemo` (kontrol channel) · **Flag:** `whatsapp_ai`
 
 ---
 
@@ -119,6 +119,8 @@ Funnel & channel breakdown sudah ada; attribution LTV multi-touch dan BI builder
 
 Multi-tenant · Users/roles · Configuration · Integrations · Email report · Developer API · Control plane (tenants, LLM, workers).
 
+**Demo landing:** `#capabilityDemo` untuk WhatsApp API & Integration serta automasi aktif. Workflow builder visual tetap ditandai **roadmap**.
+
 ---
 
 ### M9–M10 · Finance kalkulator & Trade-in/MRP — **Partial**
@@ -137,6 +139,21 @@ Simulasi kredit, TNS/GP, trade-in, MRP, promotion — belum full accounting ERP.
 | Autopilot CRM | M4 | `#crmDemo` |
 | One Dashboard | M6 | `#dashboardDemo` |
 | Data Insight & Higher Conversion | M6+M7 | `#insightDemo` |
+
+### Routing dropdown Produk
+
+| Kategori dropdown | Demo | Konteks |
+|-------------------|------|---------|
+| Omnichannel | `#omniDemo` | Inbox seluruh channel |
+| Aplikasi CRM | `#crmDemo` | Customer, pipeline, auto-follow |
+| WhatsApp API & Integration | `#capabilityDemo` | Session, role, routing, health channel |
+| Customer Support & Ticketing | `#omniDemo` | Antrian, takeover, resolusi, riwayat |
+| AI & Chatbot | `#falconDemo` | Falcon sebagai demo standalone |
+| Automasi Operasional & Workflow | `#capabilityDemo` | Automasi aktif; builder visual tetap roadmap |
+| Manajemen Campaign | `#socialDemo` | WhatsApp Broadcast, segmentasi, hasil campaign |
+| Call Center | `#omniDemo` | Workspace operator, handoff AI–agent–MR |
+
+Suite memakai demo yang sama dengan konteks terdekat: Broadcast → `#socialDemo`, Sales → `#crmDemo`, Service → `#omniDemo`, dan Motovax 360 → `#dashboardDemo`.
 
 ---
 

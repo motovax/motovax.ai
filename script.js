@@ -98,7 +98,7 @@ if (contactForm instanceof HTMLFormElement) {
           id: "omni",
           label: "Aplikasi Omnichannel",
           paneTitle: "Aplikasi Omnichannel",
-          demo: { id: "omni", hash: "omniDemo", label: "Coba Simulasi" },
+          demo: { id: "omni", hash: "omniDemo", context: "omnichannel", label: "Coba Simulasi" },
           features: [
             { title: "Omnichannel", desc: "Satu platform untuk kelola chat dari berbagai saluran", icon: "chat", href: f("aplikasi-omnichannel") },
             { title: "Instagram API", desc: "Respons DM otomatis untuk tingkatkan penjualan", icon: "ig", href: f("instagram-api") },
@@ -110,7 +110,7 @@ if (contactForm instanceof HTMLFormElement) {
           id: "crm",
           label: "Aplikasi CRM",
           paneTitle: "Aplikasi CRM",
-          demo: { id: "crm", hash: "crmDemo", label: "Coba Simulasi" },
+          demo: { id: "crm", hash: "crmDemo", context: "crm", label: "Coba Simulasi" },
           features: [
             { title: "Aplikasi CRM", desc: "Automasi proses penjualan & layanan pelanggan", icon: "crm", href: f("aplikasi-crm") },
             { title: "Manajemen Deal", desc: "Kelola deal secara end-to-end lebih ciamik", icon: "deal", href: f("manajemen-deal") },
@@ -124,6 +124,7 @@ if (contactForm instanceof HTMLFormElement) {
           id: "wa",
           label: "WhatsApp API",
           paneTitle: "WhatsApp API",
+          demo: { id: "whatsapp", hash: "capabilityDemo", context: "whatsapp", label: "Coba Integrasi" },
           features: [
             { title: "WhatsApp API", desc: "Optimalkan interaksi dengan WhatsApp Business API", icon: "wa", href: f("whatsapp-business-api") },
             { title: "WhatsApp Centang Biru", desc: "Tingkatkan kredibilitas dengan verifikasi WhatsApp", icon: "verify", href: f("centang-biru-whatsapp") },
@@ -138,6 +139,7 @@ if (contactForm instanceof HTMLFormElement) {
           id: "cs",
           label: "Customer Support & Ticketing",
           paneTitle: "Customer Support & Ticketing",
+          demo: { id: "omni", hash: "omniDemo", context: "customer-support", label: "Simulasi Customer Service" },
           features: [
             { title: "Aplikasi Customer Service", desc: "Platform terintegrasi untuk layanan pelanggan efisien", icon: "cs", href: f("aplikasi-customer-service") },
             { title: "Manajemen Tiket", desc: "Tangani keluhan pelanggan lebih cepat & akurat", icon: "ticket", href: f("sistem-manajemen-tiket") },
@@ -149,6 +151,7 @@ if (contactForm instanceof HTMLFormElement) {
           id: "ai",
           label: "AI & Chatbot",
           paneTitle: "AI & Chatbot",
+          demo: { id: "falcon", hash: "falconDemo", context: "agentic-ai", label: "Coba Agentic AI" },
           features: [
             { title: "Chatbot & Conversational AI", desc: "Respons pelanggan lebih cepat dengan chatbot 24/7", icon: "bot", href: f("chatbot") },
             { title: "Airene", desc: "Maksimalkan kinerja agen CS dengan dukungan Airene", icon: "agent", href: f("integrasi-airene") },
@@ -159,6 +162,7 @@ if (contactForm instanceof HTMLFormElement) {
           id: "workflow",
           label: "Automasi Operasional & Workflow",
           paneTitle: "Automasi Operasional & Workflow",
+          demo: { id: "automation", hash: "capabilityDemo", context: "automation", label: "Lihat Automasi Aktif" },
           features: [
             { title: "Knowledge Base", desc: "Pusat informasi untuk layanan pelanggan efisien", icon: "kb", href: f("knowledge-base") },
             { title: "Workflow", desc: "Otomatisasi alur kerja lintas tim dan sistem", icon: "workflow", href: f("automasi-workflow") },
@@ -168,6 +172,7 @@ if (contactForm instanceof HTMLFormElement) {
           id: "campaign",
           label: "Manajemen Campaign",
           paneTitle: "Manajemen Campaign",
+          demo: { id: "social", hash: "socialDemo", context: "broadcast", label: "Coba Campaign" },
           features: [
             { title: "WhatsApp Broadcast", desc: "Jangkau ribuan pelanggan secara otomatis", icon: "blast", href: f("aplikasi-broadcast-whatsapp") },
             { title: "WhatsApp Bulk", desc: "Kirim pesan ke banyak kontak secara bersamaan", icon: "bulk", href: f("whatsapp-bulk") },
@@ -177,8 +182,9 @@ if (contactForm instanceof HTMLFormElement) {
           id: "callcenter",
           label: "Call Center",
           paneTitle: "Call Center",
+          demo: { id: "omni", hash: "omniDemo", context: "call-center", label: "Coba Call Center" },
           features: [
-            { title: "Call Center", desc: "Pusat layanan panggilan fleksibel berbasis cloud", icon: "call", href: f("aplikasi-call-center") },
+            { title: "Call Center", desc: "Workspace layanan omnichannel dengan AI, agent, dan handoff MR", icon: "call", href: f("aplikasi-call-center") },
           ],
         },
       ],
@@ -191,6 +197,7 @@ if (contactForm instanceof HTMLFormElement) {
           id: "broadcast",
           label: "Motovax Broadcast",
           paneTitle: "Motovax Broadcast",
+          demo: { id: "social", hash: "socialDemo", context: "broadcast", label: "Coba Broadcast" },
           features: [
             { title: "Motovax Broadcast", desc: "Jangkau ribuan pelanggan tanpa proses manual", icon: "blast", href: f("motovax-broadcast") },
           ],
@@ -199,6 +206,7 @@ if (contactForm instanceof HTMLFormElement) {
           id: "sales-suite",
           label: "Motovax Sales Suite",
           paneTitle: "Motovax Sales Suite",
+          demo: { id: "crm", hash: "crmDemo", context: "sales-suite", label: "Coba Sales Suite" },
           features: [
             { title: "Motovax Sales Suite", desc: "Optimalkan penjualan dengan solusi komprehensif", icon: "suite", href: f("motovax-sales-suite") },
           ],
@@ -207,6 +215,7 @@ if (contactForm instanceof HTMLFormElement) {
           id: "service-suite",
           label: "Motovax Service Suite",
           paneTitle: "Motovax Service Suite",
+          demo: { id: "omni", hash: "omniDemo", context: "customer-support", label: "Coba Service Suite" },
           features: [
             { title: "Motovax Service Suite", desc: "Respons pelanggan lebih cepat dengan layanan optimal", icon: "cs", href: f("motovax-service-suite") },
           ],
@@ -215,6 +224,7 @@ if (contactForm instanceof HTMLFormElement) {
           id: "suite-360",
           label: "Motovax 360",
           paneTitle: "Motovax 360",
+          demo: { id: "dashboard", hash: "dashboardDemo", context: "motovax-360", label: "Lihat Command Center" },
           features: [
             { title: "Motovax 360", desc: "Manajemen pelanggan terintegrasi untuk proses efisien", icon: "suite", href: f("motovax-360") },
           ],
@@ -279,10 +289,10 @@ if (contactForm instanceof HTMLFormElement) {
     const panes = allPanes
       .map((item) => {
         const demoHref = item.demo
-          ? `${rootPrefix}index.html?demo=${item.demo.id}#${item.demo.hash}`
+          ? `${rootPrefix}index.html?demo=${item.demo.id}&from=${encodeURIComponent(item.demo.context || item.id)}#${item.demo.hash}`
           : "";
         const demoCta = item.demo
-          ? `<a href="${demoHref}" class="produk-mega-demo-button" data-open-${item.demo.id}-demo data-produk-close>
+          ? `<a href="${demoHref}" class="produk-mega-demo-button" data-open-${item.demo.id}-demo data-demo-context="${item.demo.context || item.id}" data-produk-close>
               ${item.demo.label}
               <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </a>`
@@ -1606,6 +1616,13 @@ class InventoryProductDemo {
    */
   guideSteps(view = this.guideView || this.activeView) {
     const story = this.falconStoryLabel();
+    const falconMessageStep = (title, body, message) => ({
+      view: "falcon",
+      anchor: "falcon-phone",
+      title,
+      body,
+      enter: () => this.sendFalconUserMessage(message, { fromGuide: true }),
+    });
     const byView = {
       units: [
         {
@@ -1684,71 +1701,56 @@ class InventoryProductDemo {
           view: "falcon",
           anchor: "nav-falcon",
           title: "Menu AI Falcon",
-          body: "Chat WhatsApp mock untuk Sales & Management Agent. Panduan template dulu, lalu boleh uji chat real ke Falcon AI + stok Motovax.",
-          enter: () => this.setFalconRole("sales", { greet: true }),
-        },
-        {
-          view: "falcon",
-          anchor: "falcon-badge",
-          title: "Sales Agent (template)",
-          body: "Badge role menunjukkan mode demo. Sales: cek stok, foto, kredit, lead — tanpa laporan management (aging/GP).",
-          enter: () => this.setFalconRole("sales", { greet: true }),
-        },
-        {
-          view: "falcon",
-          anchor: "falcon-phone",
-          title: "Sales: cek stok unit",
-          body: `Pesan dikirim otomatis di mock iPhone: “Halo, mau tanya ${story} dong, masih ready?” — lihat balasan template di chat.`,
+          body: "Panduan ini memperagakan seluruh capability Sales Agent, lalu capability tambahan Management Agent. Setiap langkah mengirim contoh pesan dan menampilkan hasilnya di WhatsApp mock.",
           enter: () => {
-            this.setFalconRole("sales");
-            this.sendFalconUserMessage(
-              `Halo, mau tanya ${story} dong, masih ready?`,
-              { fromGuide: true },
-            );
+            this.falconTutorialDone = { sales: {}, management: {} };
+            this.falconSalesDone = false;
+            this.setFalconRole("sales", { greet: true, reset: true, fromGuide: true });
           },
         },
         {
           view: "falcon",
-          anchor: "falcon-phone",
-          title: "Sales: minta foto unit",
-          body: "Lanjut unit yang sama — “Boleh minta fotonya?” Foto real unit muncul di bubble chat (jika tenant punya foto).",
-          enter: () =>
-            this.sendFalconUserMessage("Boleh minta fotonya?", { fromGuide: true }),
+          anchor: "falcon-badge",
+          title: "Sales Agent · 10 capability",
+          body: "Sales fokus pada layanan customer dan pipeline miliknya. Ikuti semua contoh sampai checklist Sales tercentang penuh; laporan internal Management tetap dibatasi.",
         },
+        falconMessageStep("Sales 1/10 · Cek stok & detail", "Falcon mencari unit ready lalu menampilkan nopol, warna, odometer, cabang, posisi, dan harga OTR.", `Halo, mau tanya ${story} dong, masih ready?`),
+        falconMessageStep("Sales 2/10 · Minta foto unit", "Falcon menjaga konteks unit yang sama dan mengirim beberapa foto real unit di bubble chat.", "Boleh minta fotonya?"),
         {
           view: "falcon",
           anchor: "falcon-phone",
-          title: "Sales: simulasi kredit",
-          body: `Finance demo: “Simulasi kredit ${story} DP 20% tenor 48 bulan”. Angka ilustratif untuk presentasi ke customer.`,
-          enter: () =>
-            this.sendFalconUserMessage(
-              `Simulasi kredit ${story} DP 20% tenor 48 bulan`,
-              { fromGuide: true },
-            ),
+          title: "Sales 3/10 · Upload foto stok",
+          body: "Simulasi lampiran menambahkan dua foto ke unit yang sama, menautkan nopol, lalu memperbarui jumlah galeri stok.",
+          enter: () => this.simulateFalconPhotoUpload({ fromGuide: true }),
         },
+        falconMessageStep("Sales 4/10 · Kredit & asuransi", "Falcon menghitung ilustrasi OTR, DP 20%, tenor 48 bulan, angsuran, serta dukungan skema asuransi.", `Simulasi kredit ${story} DP 20% tenor 48 bulan dan asuransi`),
+        falconMessageStep("Sales 5/10 · Lokasi showroom", "Falcon memberikan alamat, token peta, dan konteks jam operasional cabang tenant.", "Lokasi showroom dan map cabang"),
+        falconMessageStep("Sales 6/10 · Catat lead", "Falcon mencatat customer sebagai lead milik sales yang sedang chat, lengkap dengan HP dan unit minat.", `Catat lead Budi 08123456789 minat ${story}`),
+        falconMessageStep("Sales 7/10 · Handoff customer", "Falcon menampilkan PIC yang tersedia dan menyiapkan perpindahan percakapan customer ke admin.", "Hubungkan customer ke admin"),
+        falconMessageStep("Sales 8/10 · Konten promosi", "Falcon membuat draft caption promosi berdasarkan unit tenant; production juga mendukung visual sesuai permission.", `Buat caption promo ${story}`),
+        falconMessageStep("Sales 9/10 · Performa sendiri", "Sales hanya melihat metrik miliknya: lead, follow-up, closing, dan unit yang sering ditanyakan.", "Performa sales saya"),
+        falconMessageStep("Sales 10/10 · Ringkasan capability", "Falcon merangkum seluruh capability Sales beserta contoh perintah. Checklist Sales kini selesai.", "Tampilkan semua fitur sales"),
         {
           view: "falcon",
           anchor: "falcon-badge",
-          title: "Ganti ke Management Agent",
-          body: "Management membuka laporan stok, aging, GP, import, dan analytics — fitur yang tidak tersedia di Sales.",
-          enter: () => this.setFalconRole("management", { greet: true, fromGuide: true }),
+          title: "Management Agent · 9 capability tambahan",
+          body: "Management mewarisi capability Sales dan memperoleh laporan internal, import, edit unit, dokumen, analisis, serta analytics tenant.",
+          enter: () => this.setFalconRole("management", { greet: true, reset: true, fromGuide: true }),
         },
+        falconMessageStep("Management 1/9 · Stok per cabang", "Falcon menyusun total Ready, Booked, Sold, dan total stok per cabang.", "Laporan stok per cabang"),
+        falconMessageStep("Management 2/9 · Aging unit", "Falcon mengurutkan unit dengan aging tertinggi dan memberi rekomendasi tindak lanjut.", "Laporan aging unit"),
+        falconMessageStep("Management 3/9 · GP & margin", "Angka GP/margin internal hanya tampil untuk Management dan diberi konteks risiko unit aging.", "Gross profit dan margin unit"),
+        falconMessageStep("Management 4/9 · Import inventory", "Falcon memperagakan validasi Excel, jumlah baris diproses, unit terbarui, dan warning data.", "Import inventory lewat Excel"),
+        falconMessageStep("Management 5/9 · Edit status unit", "Falcon memvalidasi permission lalu mensimulasikan perubahan status unit menjadi Booked.", "Ubah status unit jadi Booked"),
+        falconMessageStep("Management 6/9 · Dokumen unit", "Falcon memperagakan upload dan review STNK/BPKB yang tertaut ke inventory.", "Upload dan review dokumen STNK BPKB unit"),
+        falconMessageStep("Management 7/9 · Analisis inventory", "Falcon membaca distribusi stok, aging, dan kelengkapan foto lalu memberi rekomendasi operasional.", "Analisis inventory dan rekomendasi stok"),
+        falconMessageStep("Management 8/9 · Analytics penjualan", "Falcon merangkum tren lead, closing, conversion, channel, dan unit terlaris.", "Tren penjualan dan analytics bulan ini"),
+        falconMessageStep("Management 9/9 · Ringkasan capability", "Falcon merangkum seluruh capability Management. Checklist kedua role kini tercentang penuh.", "Tampilkan semua fitur management"),
         {
           view: "falcon",
-          anchor: "falcon-phone",
-          title: "Management: laporan stok",
-          body: "Contoh di chat: “Laporan stok per cabang”. Coba juga “Laporan aging unit” setelah panduan selesai.",
-          enter: () =>
-            this.sendFalconUserMessage("Laporan stok per cabang", { fromGuide: true }),
-        },
-        {
-          view: "falcon",
-          anchor: "falcon-live",
-          title: "Uji chat real",
-          body: "Selesai template. Di panel kiri pilih mode “Chat real” (area sorot) — Falcon AI menjawab dengan stok Motovax. Ganti agent Sales/Management kapan saja di rail kiri.",
-          enter: () => {
-            // Highlight mode toggle; user klik sendiri “Chat real”
-          },
+          anchor: "falcon-chat",
+          title: "Langsung chat real",
+          body: "Selesai panduan. Ketik pesan, tekan kirim, atau pilih “Coba langsung” — demo otomatis beralih ke Falcon AI real dengan stok Motovax. Ganti agent kapan saja di rail kiri.",
         },
       ],
     };
@@ -1842,7 +1844,14 @@ class InventoryProductDemo {
 
   bind() {
     for (const button of document.querySelectorAll("[data-open-inventory-demo]")) {
-      button.addEventListener("click", () => this.open(button));
+      button.addEventListener("click", () => this.open(button, { mode: "inventory" }));
+    }
+
+    for (const button of document.querySelectorAll("[data-open-falcon-demo]")) {
+      button.addEventListener("click", (event) => {
+        if (button instanceof HTMLAnchorElement) event.preventDefault();
+        this.open(button, { mode: "falcon" });
+      });
     }
 
     for (const button of this.root.querySelectorAll("[data-close-inventory-demo]")) {
@@ -2054,14 +2063,11 @@ class InventoryProductDemo {
 
     this.root.querySelector("[data-falcon-send]")?.addEventListener("click", () => this.handleFalconSend());
     this.root.querySelector("[data-falcon-attach]")?.addEventListener("click", () => {
-      if (this.falconMode === "live") {
-        this.showToast(
-          "Mode chat real",
-          "Lihat foto: ketik “mau lihat foto unit …”. Unggah/update foto stok tidak tersedia di uji chat real.",
-        );
-        return;
-      }
-      this.simulateFalconPhotoUpload();
+      if (this.falconMode !== "live") this.startFalconLiveMode(this.falconRole);
+      this.showToast(
+        "Chat real aktif",
+        "Untuk melihat foto, ketik “mau lihat foto unit …”. Unggah/update foto stok tidak tersedia di uji chat real.",
+      );
     });
     this.falconInput?.addEventListener("keydown", (event) => {
       if (event.key === "Enter") {
@@ -2081,9 +2087,6 @@ class InventoryProductDemo {
     this.root.querySelector("[data-falcon-cancel-live]")?.addEventListener("click", () =>
       this.cancelFalconLivePick(),
     );
-    this.root.querySelector("[data-falcon-exit-live]")?.addEventListener("click", () =>
-      this.exitFalconLiveMode(),
-    );
     this.falconRoleGate?.addEventListener("click", (event) => {
       const pick = event.target.closest("[data-falcon-pick-role]");
       if (!pick) return;
@@ -2101,18 +2104,6 @@ class InventoryProductDemo {
         this.startFalconLiveMode(role);
       } else {
         this.setFalconRole(role, { greet: true, reset: true });
-      }
-    });
-
-    // Left rail: mode demo template vs chat real
-    this.root.querySelector(".falcon-mode-toggle")?.addEventListener("click", (event) => {
-      const btn = event.target.closest("[data-falcon-set-mode]");
-      if (!btn) return;
-      const mode = btn.dataset.falconSetMode || "tutorial";
-      if (mode === "live") {
-        if (this.falconMode !== "live") this.startFalconLiveMode(this.falconRole);
-      } else if (this.falconMode === "live" || this.falconMode === "picking") {
-        this.exitFalconLiveMode();
       }
     });
 
@@ -2243,24 +2234,38 @@ class InventoryProductDemo {
     }
   }
 
-  open(trigger) {
+  open(trigger, options = {}) {
     this.lastFocusedElement = trigger;
+    const falconStandalone = options.mode === "falcon";
+    this.root.classList.toggle("is-falcon-standalone", falconStandalone);
+    const title = this.root.querySelector("[data-inventory-demo-title]");
+    const subtitle = this.root.querySelector("[data-inventory-demo-subtitle]");
+    if (title) title.textContent = falconStandalone ? "Agentic AI Falcon" : "Sistem Manajemen Inventaris";
+    if (subtitle) {
+      subtitle.textContent = falconStandalone
+        ? "WhatsApp AI · Sales & Management Agent"
+        : "IMS demo · Selaras menu Mobix";
+    }
+    this.setView(falconStandalone ? "falcon" : "units", { skipGuide: true });
     this.root.classList.add("is-open");
     this.root.setAttribute("aria-hidden", "false");
     document.body.classList.add("demo-open");
     this.root.querySelector("[data-close-inventory-demo]").focus();
     // Panduan hanya untuk tab aktif (default: Manajemen Unit), bukan tour lintas semua menu.
-    this.maybeShowViewGuide(this.activeView || "units");
+    this.maybeShowViewGuide(falconStandalone ? "falcon" : this.activeView || "units");
     this.loadTenantData(true);
   }
 
   close() {
+    const wasFalconStandalone = this.root.classList.contains("is-falcon-standalone");
     this.closeDetail();
     this.closeGuide();
     this.toast.hidden = true;
     this.root.classList.remove("is-open");
+    this.root.classList.remove("is-falcon-standalone");
     this.root.setAttribute("aria-hidden", "true");
     document.body.classList.remove("demo-open");
+    if (wasFalconStandalone) this.setView("units", { skipGuide: true });
     if (this.lastFocusedElement) this.lastFocusedElement.focus();
   }
 
@@ -2983,12 +2988,12 @@ class InventoryProductDemo {
         );
       } else if (next === "sales") {
         this.pushFalconBot(
-          "Halo! Saya Falcon untuk Sales Agent.\n\nSaya bisa bantu: cek stok/unit, foto, simulasi kredit, lokasi showroom, catat lead, handoff admin, generate konten, dan performa sales Anda.\n\nCoba chip “Coba cepat” di kiri, atau ketik “tampilkan semua fitur sales”.\n\nSiap coba AI sungguhan? Pilih mode Chat real di panel kiri.",
+          "Halo! Saya Falcon untuk Sales Agent.\n\nSaya bisa bantu: cek stok/unit, foto, simulasi kredit, lokasi showroom, catat lead, handoff admin, generate konten, dan performa sales Anda.\n\nPilih “Coba langsung” di kiri atau ketik pesan sendiri. Pesan Anda otomatis dijawab Falcon AI real.",
         );
       } else {
         this.pushFalconSystem("Mode berganti ke Management Agent.");
         this.pushFalconBot(
-          "Halo! Saya Falcon untuk Management Agent.\n\nSaya bisa semua fitur Sales + laporan stok/cabang/aging, GP/margin, import Excel, edit unit, dokumen, analisis inventory, dan analytics tren.\n\nCoba “laporan stok per cabang” atau “tampilkan semua fitur management”.\n\nMode Chat real di kiri = jawaban AI + data Motovax.",
+          "Halo! Saya Falcon untuk Management Agent.\n\nSaya bisa semua fitur Sales + laporan stok/cabang/aging, GP/margin, import Excel, edit unit, dokumen, analisis inventory, dan analytics tren.\n\nPilih “Coba langsung” di kiri atau ketik pesan sendiri. Pesan Anda otomatis dijawab Falcon AI real.",
         );
       }
     }
@@ -3010,7 +3015,7 @@ class InventoryProductDemo {
       this.falconRoleLabel.textContent = isSales ? "Sales Agent" : "Management Agent";
     }
     if (this.falconModeLabel) {
-      this.falconModeLabel.textContent = isLive ? "MODE LIVE · FALCON AI" : "MODE DEMO";
+      this.falconModeLabel.textContent = isLive ? "MODE LIVE · FALCON AI" : "PANDUAN TEMPLATE";
     }
     if (this.falconStatus) {
       if (isLive) {
@@ -3044,8 +3049,8 @@ class InventoryProductDemo {
           : `Chat real: Falcon AI sebagai Management Agent + knowledge inventory. Sisa kuota sesi: ${rem} pesan.`;
       } else {
         this.falconRoleHint.textContent = isSales
-          ? "Mode demo (template). Ganti ke “Chat real” di atas untuk Falcon AI sungguhan."
-          : "Mode demo Management (template). Ganti ke “Chat real” untuk jawaban AI live.";
+          ? "Panduan Sales aktif. Ketik atau pilih prompt untuk langsung memakai Falcon AI real."
+          : "Panduan Management aktif. Ketik atau pilih prompt untuk langsung memakai Falcon AI real.";
       }
     }
     const badge = this.root.querySelector("[data-falcon-role-badge]");
@@ -3058,15 +3063,7 @@ class InventoryProductDemo {
       card.classList.toggle("is-selected", active);
       card.setAttribute("aria-selected", active ? "true" : "false");
     }
-    // Sync mode toggle
-    for (const btn of this.root.querySelectorAll("[data-falcon-set-mode]")) {
-      const mode = btn.dataset.falconSetMode || "tutorial";
-      const active = isLive ? mode === "live" : mode === "tutorial";
-      btn.classList.toggle("is-active", active);
-    }
-
     if (this.falconLiveCta) this.falconLiveCta.hidden = true;
-    if (this.falconExitLive) this.falconExitLive.hidden = !isLive;
     if (this.falconTutorialList) {
       this.falconTutorialList.hidden = isLive;
     }
@@ -3133,42 +3130,17 @@ class InventoryProductDemo {
     }
   }
 
-  markFalconTutorial(id) {
-    if (!this.falconTutorialDone[this.falconRole]) {
-      this.falconTutorialDone[this.falconRole] = {};
+  markFalconTutorial(id, role = this.falconRole) {
+    const targetRole = role === "management" ? "management" : "sales";
+    if (!this.falconTutorialDone[targetRole]) {
+      this.falconTutorialDone[targetRole] = {};
     }
-    this.falconTutorialDone[this.falconRole][id] = true;
+    this.falconTutorialDone[targetRole][id] = true;
     this.renderFalconTutorial();
   }
 
   renderFalconQuickPrompts() {
     if (!this.falconQuickPrompts) return;
-    const story = this.falconStoryLabel();
-    const salesTutorial = [
-      `Halo, mau tanya ${story} dong, masih ready?`,
-      "Boleh minta fotonya?",
-      `Simulasi kredit ${story} DP 20% tenor 48 bulan`,
-      "Lokasi showroom",
-      `Catat lead Budi 08123456789 minat ${story}`,
-      "Hubungkan customer ke admin",
-      `Buat caption promo ${story}`,
-      "Performa sales saya",
-      "Tampilkan semua fitur sales",
-      "Laporan aging stok",
-      "Ganti ke Management Agent",
-    ];
-    const managementTutorial = [
-      "Laporan stok per cabang",
-      "Laporan aging unit",
-      "Gross profit / margin unit",
-      "Import inventory lewat WA",
-      "Ubah status unit jadi Booked",
-      "Upload dokumen unit",
-      "Analisis inventory dan rekomendasi stok",
-      "Tren penjualan bulan ini",
-      "Tampilkan semua fitur management",
-      "Kembali ke Sales Agent",
-    ];
     const salesLive = [
       "Ada unit Serena ready berapa?",
       "Rekomendasi MPV di bawah 350 juta",
@@ -3183,14 +3155,7 @@ class InventoryProductDemo {
       "Cabang mana stoknya paling banyak?",
       "Rekomendasi unit yang perlu dipromosikan",
     ];
-    const list =
-      this.falconMode === "live"
-        ? this.falconRole === "sales"
-          ? salesLive
-          : managementLive
-        : this.falconRole === "sales"
-          ? salesTutorial
-          : managementTutorial;
+    const list = this.falconRole === "sales" ? salesLive : managementLive;
     this.falconQuickPrompts.innerHTML = list
       .map(
         (text) =>
@@ -3268,9 +3233,11 @@ class InventoryProductDemo {
   sendFalconUserMessage(text, options = {}) {
     const content = String(text || "").trim();
     if (!content) return;
+    const roleAtSend = this.falconRole;
 
-    // Live mode uses real Falcon API (skip during guided template steps).
-    if (this.falconMode === "live" && !options.fromGuide) {
+    // Interaksi user selalu memakai Falcon real; template hanya untuk langkah panduan otomatis.
+    if (!options.fromGuide) {
+      if (this.falconMode !== "live") this.startFalconLiveMode(this.falconRole);
       this.sendFalconLiveMessage(content);
       return;
     }
@@ -3287,7 +3254,7 @@ class InventoryProductDemo {
         photos: reply.photos,
         reportHtml: reply.reportHtml,
       });
-      if (reply.tutorialId) this.markFalconTutorial(reply.tutorialId);
+      if (reply.tutorialId) this.markFalconTutorial(reply.tutorialId, roleAtSend);
       this.renderFalconMessages();
     }, options.fromGuide ? 280 : 420);
   }
@@ -3494,6 +3461,7 @@ class InventoryProductDemo {
   }
 
   simulateFalconPhotoUpload(options = {}) {
+    const roleAtUpload = this.falconRole;
     const unit = this.pickFocusUnit("");
     if (!unit) {
       this.pushFalconUser("📷 [Foto unit dari galeri]", { photo: true });
@@ -3541,7 +3509,7 @@ class InventoryProductDemo {
           `Kalau mau, bilang saja untuk simulasi kredit atau jadwal survey.`,
         { photos: this.falconFocus.gallery.slice() },
       );
-      this.markFalconTutorial(this.falconRole === "sales" ? "upload" : "import");
+      this.markFalconTutorial(roleAtUpload === "sales" ? "upload" : "import", roleAtUpload);
       this.renderFalconMessages();
     }, options.fromGuide ? 280 : 400);
   }
@@ -4850,7 +4818,7 @@ class AutopilotCRMDemo {
   }
 
   guideSteps() {
-    return [
+    const steps = [
       {
         view: "pipeline",
         anchor: "sidebar",
@@ -5926,6 +5894,8 @@ class OmnichannelAIDemo {
     this.tutorialStep = 0;
     this.tutorialActive = false;
     this.hasOpenedGuide = false;
+    this.entryContext = "call-center";
+    this.lastEntryContext = "";
     this.agentName = "Agent Demo";
 
     this.contactList = root.querySelector("[data-omni-contact-list]");
@@ -5970,12 +5940,29 @@ class OmnichannelAIDemo {
   }
 
   guideSteps() {
-    return [
+    const entryCopy = {
+      omnichannel: {
+        label: "Omnichannel",
+        title: "Satu inbox untuk seluruh channel",
+        body: "WhatsApp, Facebook Messenger, dan Instagram masuk ke workspace yang sama. Filter channel, bucket AI/agent/MR, serta konteks lead tetap tersambung.",
+      },
+      "customer-support": {
+        label: "Customer Support",
+        title: "Dari antrian sampai resolusi",
+        body: "Mode Customer Support menyorot antrian, takeover, eskalasi, riwayat, dan penyelesaian lead. SLA multi-cabang lanjutan tetap ditandai sebagai pengembangan, bukan fitur penuh demo.",
+      },
+      "call-center": {
+        label: "Call Center",
+        title: "Workspace operator omnichannel",
+        body: "Demo meniru Call Center produksi (3 kolom): AI menangani baseload, agent takeover, memakai aksi cepat, lalu handoff ke MR tanpa kehilangan konteks.",
+      },
+    }[this.entryContext] || null;
+    const steps = [
       {
         anchor: "queue",
-        label: "Call Center",
-        title: "Selamat datang — 2 role omnichannel",
-        body: "Demo meniru Call Center produksi (3 kolom). Dua role: Call Center (inbox) dan MR (sales). AI menangani dulu, lalu takeover & handoff. Spotlight sorot area aktif — sama seperti panduan Inventory.",
+        label: entryCopy?.label || "Call Center",
+        title: entryCopy?.title || "Selamat datang — 2 role omnichannel",
+        body: entryCopy?.body || "Demo meniru Call Center produksi (3 kolom). Dua role: Call Center (inbox) dan MR (sales). AI menangani dulu, lalu takeover & handoff.",
         enter: () => {
           this.fanel = "ai";
           this.activeContactId = "omni-nadia";
@@ -6081,6 +6068,32 @@ class OmnichannelAIDemo {
         },
       },
     ];
+
+    if (this.entryContext === "omnichannel") {
+      return [steps[0], steps[1], steps[2], steps[4]];
+    }
+    if (this.entryContext === "customer-support") {
+      const supportSteps = [steps[0], steps[2], steps[3], steps[4], steps[6]];
+      supportSteps[2] = {
+        ...supportSteps[2],
+        label: "Resolusi",
+        title: "Riwayat, status, dan aksi penyelesaian",
+        body: "Panel kanan menyimpan Detail Lead dan Riwayat. Agent dapat memakai simulasi kredit/inventori, eskalasi, close lead, serta membaca jejak handoff sebagai dasar monitoring layanan.",
+      };
+      supportSteps[4] = {
+        ...supportSteps[4],
+        label: "Performa",
+        title: "Performa layanan yang terhubung",
+        body: "Data antrian dan hasil percakapan mengalir ke analytics serta Agent Scorecard. Routing SLA multi-cabang yang lebih lanjut tetap ditandai sebagai roadmap.",
+        enter: () => {
+          this.ctxTab = "riwayat";
+          this.contextOpen = true;
+          this.render();
+        },
+      };
+      return supportSteps;
+    }
+    return steps;
   }
 
   cloneSeed() {
@@ -6304,14 +6317,30 @@ class OmnichannelAIDemo {
 
   open(trigger) {
     this.lastFocusedElement = trigger;
+    const requestedFrom = new URLSearchParams(window.location.search).get("from") || "";
+    const rawContext = trigger?.dataset?.demoContext || requestedFrom;
+    this.entryContext = rawContext === "customer-support" || rawContext === "call-center"
+      ? rawContext
+      : "omnichannel";
+    const title = this.root.querySelector("[data-omni-demo-title]");
+    const subtitle = this.root.querySelector("[data-omni-demo-subtitle]");
+    const copy = {
+      omnichannel: ["AI Omnichannel", "WhatsApp · Facebook · Instagram · satu inbox"],
+      "customer-support": ["Customer Support & Ticketing", "Antrian · eskalasi · riwayat · performa layanan"],
+      "call-center": ["MotoVax Call Center", "Omnichannel · AI · agent · handoff MR"],
+    }[this.entryContext];
+    if (title) title.textContent = copy[0];
+    if (subtitle) subtitle.textContent = `${copy[1]} · DEMO`;
+    this.root.dataset.entryContext = this.entryContext;
     this.root.classList.add("is-open");
     this.root.setAttribute("aria-hidden", "false");
     document.body.classList.add("demo-open");
     this.root.querySelector("[data-close-omni-demo]").focus();
     this.render();
-    if (!this.hasOpenedGuide) {
+    if (!this.hasOpenedGuide || this.lastEntryContext !== this.entryContext) {
       this.openGuide(0);
       this.hasOpenedGuide = true;
+      this.lastEntryContext = this.entryContext;
     }
   }
 
@@ -9209,6 +9238,9 @@ class SocialGrowthDemo {
     this.posts = this.defaultPosts();
     this.guideStepIndex = 0;
     this.hasOpenedGuide = false;
+    this.entryContext = "social";
+    this.lastEntryContext = "";
+    this.broadcastSegment = "hot";
 
     this.vehicleOptions = root.querySelector("[data-social-vehicle-options]");
     this.captionInput = root.querySelector("[data-social-caption]");
@@ -9280,6 +9312,31 @@ class SocialGrowthDemo {
   }
 
   guideSteps() {
+    if (this.entryContext === "broadcast") {
+      return [
+        {
+          view: "broadcast",
+          anchor: "broadcast-segment",
+          label: "Broadcast",
+          title: "Pilih audiens dari CRM",
+          body: "Pilih segmen Lead Hot, Customer Service, atau Stock Match. Angka memakai data mock dan hanya kontak eligible yang masuk antrean.",
+        },
+        {
+          view: "broadcast",
+          anchor: "broadcast-message",
+          label: "Template",
+          title: "Pesan personal berbasis data",
+          body: "Variabel nama, unit minat, cabang, dan PIC mengambil konteks CRM/inventory. Template dan status approval di demo hanya simulasi.",
+        },
+        {
+          view: "broadcast",
+          anchor: "broadcast-result",
+          label: "Hasil",
+          title: "Delivery sampai lead CRM",
+          body: "Jadwalkan broadcast demo untuk melihat queued, delivered, replies, dan lead CRM—tanpa mengirim pesan nyata.",
+        },
+      ];
+    }
     return [
       {
         view: "studio",
@@ -9426,6 +9483,24 @@ class SocialGrowthDemo {
       this.renderCalendar();
     });
     this.campaignSelect.addEventListener("change", () => this.renderInsight());
+    this.root.querySelector("[data-social-view-panel=\"broadcast\"]")?.addEventListener("click", (event) => {
+      const segment = event.target.closest("[data-broadcast-segment]");
+      if (segment) {
+        this.broadcastSegment = segment.dataset.broadcastSegment || "hot";
+        this.renderBroadcast();
+        return;
+      }
+      if (event.target.closest("[data-broadcast-send]")) {
+        const result = this.root.querySelector("[data-broadcast-result]");
+        const date = this.root.querySelector("[data-broadcast-date]")?.value || "";
+        const time = this.root.querySelector("[data-broadcast-time]")?.value || "";
+        const eligible = this.root.querySelector("[data-broadcast-eligible]")?.textContent || "0";
+        if (result) result.hidden = false;
+        const copy = this.root.querySelector("[data-broadcast-result-copy]");
+        if (copy) copy.textContent = `${eligible} pesan dijadwalkan ${this.formatDate(date)} pukul ${time} WIB di tenant demo.`;
+      }
+    });
+    this.root.querySelector("[data-broadcast-message]")?.addEventListener("input", () => this.renderBroadcast());
 
     document.addEventListener("keydown", (event) => {
       if (event.key !== "Escape" || !this.root.classList.contains("is-open")) return;
@@ -9437,14 +9512,20 @@ class SocialGrowthDemo {
 
   open(trigger) {
     this.lastFocusedElement = trigger;
+    const requestedFrom = new URLSearchParams(window.location.search).get("from") || "";
+    const rawContext = trigger?.dataset?.demoContext || requestedFrom;
+    this.entryContext = rawContext === "broadcast" ? "broadcast" : "social";
+    this.root.dataset.entryContext = this.entryContext;
     this.root.classList.add("is-open");
     this.root.setAttribute("aria-hidden", "false");
     document.body.classList.add("demo-open");
     this.root.querySelector("[data-close-social-demo]").focus();
+    this.switchView(this.entryContext === "broadcast" ? "broadcast" : "studio");
     this.loadTenantPosts(true);
-    if (!this.hasOpenedGuide) {
+    if (!this.hasOpenedGuide || this.lastEntryContext !== this.entryContext) {
       this.openGuide(0);
       this.hasOpenedGuide = true;
+      this.lastEntryContext = this.entryContext;
     }
   }
 
@@ -9472,6 +9553,7 @@ class SocialGrowthDemo {
     this.platforms = new Set(["instagram", "facebook"]);
     this.captionVariant = 0;
     this.monthOffset = 0;
+    this.broadcastSegment = "hot";
     this.posts = this.defaultPosts();
     this.headlineInput.value = "Drive Your Dream Today";
     this.offerInput.value = this.vehicle().offer;
@@ -9482,6 +9564,8 @@ class SocialGrowthDemo {
     this.toast.hidden = true;
     this.closeGuide();
     this.root.querySelector(".social-progress span:last-child").classList.remove("active");
+    const broadcastResult = this.root.querySelector("[data-broadcast-result]");
+    if (broadcastResult) broadcastResult.hidden = true;
     this.renderAll();
     this.switchView("studio");
   }
@@ -9522,6 +9606,11 @@ class SocialGrowthDemo {
         title: "Campaign Insight",
         description: "Hubungkan setiap klik campaign dengan lead dan status CRM yang dihasilkan.",
       },
+      broadcast: {
+        breadcrumb: "Campaign / WhatsApp Broadcast",
+        title: "WhatsApp Broadcast Terukur",
+        description: "Pilih segmen, personalisasi pesan, jadwalkan, lalu lihat alurnya sampai reply dan lead CRM.",
+      },
     };
     const heading = headings[view] || headings.studio;
 
@@ -9539,6 +9628,7 @@ class SocialGrowthDemo {
     this.root.querySelector("[data-social-page-title]").textContent = heading.title;
     this.root.querySelector("[data-social-page-description]").textContent = heading.description;
     if (view === "calendar") this.renderCalendar();
+    if (view === "broadcast") this.renderBroadcast();
     if (view === "insight") this.renderInsight();
     this.root.querySelector(".social-workspace").scrollTop = 0;
   }
@@ -9547,7 +9637,33 @@ class SocialGrowthDemo {
     this.renderVehicles();
     this.renderStudio();
     this.renderCalendar();
+    this.renderBroadcast();
     this.renderInsight();
+  }
+
+  renderBroadcast() {
+    const configs = {
+      hot: { target: 186, eligible: 179, optout: 7, name: "Nadia", unit: "Innova Zenix Hybrid", branch: "Pondok Bambu" },
+      service: { target: 94, eligible: 90, optout: 4, name: "Rizky", unit: "jadwal layanan berkala", branch: "Cinere" },
+      stock: { target: 128, eligible: 121, optout: 7, name: "Dewi", unit: "Honda BR-V Prestige", branch: "Cibubur" },
+    };
+    const config = configs[this.broadcastSegment] || configs.hot;
+    for (const button of this.root.querySelectorAll("[data-broadcast-segment]")) {
+      const active = button.dataset.broadcastSegment === this.broadcastSegment;
+      button.classList.toggle("active", active);
+      button.setAttribute("aria-checked", String(active));
+    }
+    const template = this.root.querySelector("[data-broadcast-message]")?.value || "";
+    const preview = template
+      .replaceAll("{{nama}}", config.name)
+      .replaceAll("{{unit_minat}}", config.unit)
+      .replaceAll("{{cabang}}", config.branch)
+      .replaceAll("{{sales_pic}}", "Dimas");
+    const previewEl = this.root.querySelector("[data-broadcast-preview]");
+    if (previewEl) previewEl.textContent = preview;
+    this.root.querySelector("[data-broadcast-target]").textContent = String(config.target);
+    this.root.querySelector("[data-broadcast-eligible]").textContent = String(config.eligible);
+    this.root.querySelector("[data-broadcast-optout]").textContent = String(config.optout);
   }
 
   applyInventoryPhotos(units) {
@@ -9862,6 +9978,279 @@ if (socialDemoMount) {
     socialGrowthDemoInstance?.applyInventoryPhotos(units);
   };
 }
+
+class CapabilityProductDemo {
+  constructor(root) {
+    this.root = root;
+    this.mode = "whatsapp";
+    this.role = "sales";
+    this.aiPaused = false;
+    this.rule = "followup";
+    this.lastFocusedElement = null;
+    this.waLogs = [
+      { time: "10:42", title: "Health check normal", copy: "Falcon · session connected" },
+      { time: "10:39", title: "Meta sync selesai", copy: "Messenger + Instagram aktif" },
+      { time: "10:31", title: "Nomor Call Center diperiksa", copy: "2 nomor · multi-branch" },
+    ];
+    this.automationLogs = [
+      { time: "10:34", title: "Auto-follow CRM", copy: "12 lead stale → task MR" },
+      { time: "09:00", title: "Email report worker", copy: "Rekap harian terkirim" },
+    ];
+    this.bind();
+    this.render();
+  }
+
+  roleConfigs() {
+    return {
+      sales: {
+        title: "Sales · Falcon",
+        avatar: "FA",
+        profile: "Motovax Sales AI",
+        number: "+62 811-2345-001",
+        routing: "Lead sales & inventory",
+        tools: "Stok, foto, kredit, handoff",
+      },
+      "call-center": {
+        title: "Call Center · Jasmine",
+        avatar: "JA",
+        profile: "Motovax Customer AI",
+        number: "2 nomor Call Center",
+        routing: "Inquiry, komplain, handoff MR",
+        tools: "Inbox, kredit, inventori, eskalasi",
+      },
+      meta: {
+        title: "Meta Channels",
+        avatar: "ME",
+        profile: "Messenger + Instagram",
+        number: "Meta Business · Connected",
+        routing: "DM ke inbox omnichannel",
+        tools: "DM, media, atribusi source",
+      },
+    };
+  }
+
+  automationConfigs() {
+    return {
+      followup: {
+        title: "Auto-follow CRM",
+        steps: ["Lead stale terdeteksi", "Cek program & guideline", "Buat reminder / task MR", "Catat aktivitas CRM"],
+        result: "12 lead stale diproses; 9 reminder dan 3 task MR dibuat di tenant demo.",
+      },
+      routing: {
+        title: "Jasmine routing",
+        steps: ["Intent customer dibaca", "Kualifikasi status HOT", "Pilih MR sesuai routing", "Fallback ke Call Center"],
+        result: "Lead HOT diarahkan ke MR Dimas; SLA acknowledgement mulai dihitung.",
+      },
+      report: {
+        title: "Email report worker",
+        steps: ["Jadwal report aktif", "Ambil metrik tenant", "Susun rekap per role", "Kirim & simpan log"],
+        result: "Laporan performa harian disusun dan dicatat sebagai simulasi pengiriman.",
+      },
+      photo: {
+        title: "Photo maintenance",
+        steps: ["Foto unit diunggah", "Validasi identitas unit", "Optimasi media", "Sinkron ke inventory"],
+        result: "8 foto tervalidasi dan disinkronkan ke 2 unit pada tenant demo.",
+      },
+    };
+  }
+
+  bind() {
+    for (const button of document.querySelectorAll("[data-open-whatsapp-demo]")) {
+      button.addEventListener("click", (event) => {
+        if (button instanceof HTMLAnchorElement) event.preventDefault();
+        this.open(button, "whatsapp");
+      });
+    }
+    for (const button of document.querySelectorAll("[data-open-automation-demo]")) {
+      button.addEventListener("click", (event) => {
+        if (button instanceof HTMLAnchorElement) event.preventDefault();
+        this.open(button, "automation");
+      });
+    }
+    this.root.querySelector("[data-close-capability-demo]")?.addEventListener("click", () => this.close());
+    this.root.querySelector("[data-capability-reset]")?.addEventListener("click", () => this.reset());
+    for (const button of this.root.querySelectorAll("[data-capability-nav]")) {
+      button.addEventListener("click", () => this.switchMode(button.dataset.capabilityNav || "whatsapp"));
+    }
+    this.root.addEventListener("click", (event) => {
+      const role = event.target.closest("[data-wa-demo-role]");
+      if (role) {
+        this.role = role.dataset.waDemoRole || "sales";
+        this.renderWhatsApp();
+        return;
+      }
+      const action = event.target.closest("[data-wa-demo-action]");
+      if (action) {
+        this.handleWhatsAppAction(action.dataset.waDemoAction || "test");
+        return;
+      }
+      if (event.target.closest("[data-wa-demo-refresh]")) {
+        this.waLogs.unshift({ time: "baru", title: "Status diperbarui", copy: "Semua session normal" });
+        this.renderWhatsApp();
+        return;
+      }
+      const rule = event.target.closest("[data-automation-rule]");
+      if (rule) {
+        this.rule = rule.dataset.automationRule || "followup";
+        const result = this.root.querySelector("[data-automation-result]");
+        if (result) result.hidden = true;
+        this.renderAutomation();
+        return;
+      }
+      if (event.target.closest("[data-automation-run]")) {
+        this.runAutomation();
+        return;
+      }
+      if (event.target.closest("[data-automation-clear]")) {
+        this.automationLogs = [];
+        this.renderAutomation();
+      }
+    });
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape" && this.root.classList.contains("is-open")) this.close();
+    });
+  }
+
+  open(trigger, mode) {
+    this.lastFocusedElement = trigger;
+    this.switchMode(mode);
+    this.root.classList.add("is-open");
+    this.root.setAttribute("aria-hidden", "false");
+    document.body.classList.add("demo-open");
+    this.root.querySelector("[data-close-capability-demo]")?.focus();
+  }
+
+  close() {
+    this.root.classList.remove("is-open");
+    this.root.setAttribute("aria-hidden", "true");
+    document.body.classList.remove("demo-open");
+    this.lastFocusedElement?.focus();
+  }
+
+  reset() {
+    this.role = "sales";
+    this.aiPaused = false;
+    this.rule = "followup";
+    this.waLogs = [
+      { time: "10:42", title: "Health check normal", copy: "Falcon · session connected" },
+      { time: "10:39", title: "Meta sync selesai", copy: "Messenger + Instagram aktif" },
+    ];
+    this.automationLogs = [{ time: "10:34", title: "Auto-follow CRM", copy: "12 lead stale → task MR" }];
+    const result = this.root.querySelector("[data-automation-result]");
+    if (result) result.hidden = true;
+    this.render();
+  }
+
+  switchMode(mode) {
+    this.mode = mode === "automation" ? "automation" : "whatsapp";
+    const copy = this.mode === "automation"
+      ? {
+          title: "Automasi Operasional",
+          subtitle: "Agent tools · routing · worker · tenant demo",
+          breadcrumb: "Operasional / Automasi Aktif",
+          heading: "Automation Control Center",
+          description: "Pantau automasi yang benar-benar tercermin di produk tanpa menampilkan workflow builder sebagai fitur live.",
+        }
+      : {
+          title: "WhatsApp API & Integration",
+          subtitle: "Channel Control Center · tenant demo",
+          breadcrumb: "Settings / Integrations / WhatsApp",
+          heading: "Channel Control Center",
+          description: "Hubungkan channel per role, pantau status session, dan kendalikan AI tenant dari satu workspace.",
+        };
+    this.root.querySelector("[data-capability-title]").textContent = copy.title;
+    this.root.querySelector("[data-capability-subtitle]").textContent = copy.subtitle;
+    this.root.querySelector("[data-capability-breadcrumb]").textContent = copy.breadcrumb;
+    this.root.querySelector("[data-capability-heading]").textContent = copy.heading;
+    this.root.querySelector("[data-capability-description]").textContent = copy.description;
+    for (const button of this.root.querySelectorAll("[data-capability-nav]")) {
+      const active = button.dataset.capabilityNav === this.mode;
+      button.classList.toggle("active", active);
+      button.setAttribute("aria-current", active ? "page" : "false");
+    }
+    for (const view of this.root.querySelectorAll("[data-capability-view]")) {
+      const active = view.dataset.capabilityView === this.mode;
+      view.hidden = !active;
+      view.classList.toggle("is-active", active);
+    }
+    this.render();
+  }
+
+  handleWhatsAppAction(action) {
+    const config = this.roleConfigs()[this.role];
+    if (action === "toggle") {
+      this.aiPaused = !this.aiPaused;
+      this.waLogs.unshift({
+        time: "baru",
+        title: this.aiPaused ? "AI dipause" : "AI diaktifkan",
+        copy: config.title,
+      });
+    } else if (action === "history") {
+      this.waLogs.unshift({ time: "baru", title: "Riwayat session dibuka", copy: `${config.title} · 24 jam terakhir` });
+    } else {
+      this.waLogs.unshift({ time: "baru", title: "Tes koneksi berhasil", copy: `${config.title} · latency 84 ms` });
+      const sync = this.root.querySelector("[data-wa-demo-sync]");
+      if (sync) sync.textContent = "sekarang";
+    }
+    this.renderWhatsApp();
+  }
+
+  runAutomation() {
+    const config = this.automationConfigs()[this.rule];
+    this.automationLogs.unshift({ time: "baru", title: config.title, copy: config.result });
+    const result = this.root.querySelector("[data-automation-result]");
+    if (result) result.hidden = false;
+    this.root.querySelector("[data-automation-result-copy]").textContent = config.result;
+    this.renderAutomation();
+  }
+
+  render() {
+    this.renderWhatsApp();
+    this.renderAutomation();
+  }
+
+  renderWhatsApp() {
+    const config = this.roleConfigs()[this.role] || this.roleConfigs().sales;
+    for (const button of this.root.querySelectorAll("[data-wa-demo-role]")) {
+      const active = button.dataset.waDemoRole === this.role;
+      button.classList.toggle("active", active);
+      button.setAttribute("aria-selected", String(active));
+    }
+    this.root.querySelector("[data-wa-demo-role-title]").textContent = config.title;
+    this.root.querySelector("[data-wa-demo-role-state]").textContent = this.aiPaused ? "AI dipause" : "AI aktif";
+    this.root.querySelector("[data-wa-demo-avatar]").textContent = config.avatar;
+    this.root.querySelector("[data-wa-demo-profile]").textContent = config.profile;
+    this.root.querySelector("[data-wa-demo-number]").textContent = config.number;
+    this.root.querySelector("[data-wa-demo-routing]").textContent = config.routing;
+    this.root.querySelector("[data-wa-demo-tools]").textContent = config.tools;
+    const toggle = this.root.querySelector('[data-wa-demo-action="toggle"]');
+    if (toggle) toggle.textContent = this.aiPaused ? "Aktifkan AI" : "Pause AI";
+    this.root.querySelector("[data-wa-demo-log]").innerHTML = this.waLogs
+      .slice(0, 6)
+      .map((item) => `<li><time>${item.time}</time><span><b>${item.title}</b><small>${item.copy}</small></span><i></i></li>`)
+      .join("");
+  }
+
+  renderAutomation() {
+    const config = this.automationConfigs()[this.rule] || this.automationConfigs().followup;
+    for (const button of this.root.querySelectorAll("[data-automation-rule]")) {
+      const active = button.dataset.automationRule === this.rule;
+      button.classList.toggle("active", active);
+      button.setAttribute("aria-selected", String(active));
+    }
+    this.root.querySelector("[data-automation-title]").textContent = config.title;
+    this.root.querySelector("[data-automation-flow]").innerHTML = config.steps
+      .map((step, index) => `<div><span>${index + 1}</span><b>${step}</b>${index < config.steps.length - 1 ? "<i>→</i>" : ""}</div>`)
+      .join("");
+    const log = this.root.querySelector("[data-automation-log]");
+    log.innerHTML = this.automationLogs.length
+      ? this.automationLogs.slice(0, 6).map((item) => `<li><time>${item.time}</time><span><b>${item.title}</b><small>${item.copy}</small></span><em>Selesai</em></li>`).join("")
+      : '<li class="empty">Belum ada event demo.</li>';
+  }
+}
+
+const capabilityDemoMount = document.getElementById("capabilityDemo");
+if (capabilityDemoMount) new CapabilityProductDemo(capabilityDemoMount);
 
 const insightDemoSources = [
   {
@@ -10620,6 +11009,9 @@ if (asciiIndonesiaMount) {
     social: { hash: "socialDemo", selector: "[data-open-social-demo]" },
     dashboard: { hash: "dashboardDemo", selector: "[data-open-dashboard-demo]" },
     insight: { hash: "insightDemo", selector: "[data-open-insight-demo]" },
+    falcon: { hash: "falconDemo", selector: "[data-open-falcon-demo]" },
+    whatsapp: { hash: "capabilityDemo", selector: "[data-open-whatsapp-demo]" },
+    automation: { hash: "capabilityDemo", selector: "[data-open-automation-demo]" },
   };
   const params = new URLSearchParams(window.location.search);
   const requestedByQuery = params.get("demo");
@@ -10631,6 +11023,19 @@ if (asciiIndonesiaMount) {
 
   const opener = document.querySelector(demos[requestedDemo].selector);
   if (!(opener instanceof HTMLElement)) return;
+
+  const requestedFrom = params.get("from") || "";
+  let context = requestedFrom;
+  if (requestedDemo === "omni") {
+    context = /customer|service|ticket|sla|scorecard/i.test(requestedFrom)
+      ? "customer-support"
+      : /call-center/i.test(requestedFrom)
+        ? "call-center"
+        : "omnichannel";
+  } else if (requestedDemo === "social") {
+    context = /broadcast|blast|bulk|campaign/i.test(requestedFrom) ? "broadcast" : "social";
+  }
+  if (context) opener.dataset.demoContext = context;
 
   window.requestAnimationFrame(() => opener.click());
 })();

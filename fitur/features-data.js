@@ -313,8 +313,8 @@ window.MOTOVAX_FEATURES = {
     status: "Live",
     module: "M2 · Agentic AI WhatsApp",
     flag: "whatsapp_ai",
-    demo: null,
-    demoHash: null,
+    demo: "whatsapp",
+    demoHash: "capabilityDemo",
     category: "WhatsApp API",
     breadcrumbs: ["Produk", "Fitur", "WhatsApp API"],
     capabilities: [
@@ -599,6 +599,8 @@ window.MOTOVAX_FEATURES = {
     status: "Live",
     module: "M2 · Agentic AI",
     flag: "whatsapp_ai",
+    demo: "falcon",
+    demoHash: "falconDemo",
     category: "AI & Chatbot",
     breadcrumbs: ["Produk", "Fitur", "Chatbot & Conversational AI"],
     capabilities: [
@@ -651,6 +653,8 @@ window.MOTOVAX_FEATURES = {
     module: "M2 · Agentic AI",
     flag: "whatsapp_ai",
     badge: "New",
+    demo: "falcon",
+    demoHash: "falconDemo",
     category: "AI & Chatbot",
     breadcrumbs: ["Produk", "Fitur", "Agentic AI"],
     capabilities: [
@@ -676,6 +680,8 @@ window.MOTOVAX_FEATURES = {
       "Motovax mendukung preferensi reply, guideline CRM, fetch URL/web search pada agent, serta konfigurasi AI tenant. Knowledge base tenant formal ada di roadmap P1 sebagai perluasan.",
     status: "Partial",
     module: "M2 + M4 guideline + roadmap KB",
+    demo: "automation",
+    demoHash: "capabilityDemo",
     category: "Automasi Operasional & Workflow",
     breadcrumbs: ["Produk", "Fitur", "Knowledge Base"],
     capabilities: [
@@ -700,8 +706,8 @@ window.MOTOVAX_FEATURES = {
       "Motovax mengotomasi lewat agent tools, faneling, auto follow CRM, workers (foto, email report), dan integrasi. Workflow builder event-driven ada di roadmap P1.",
     status: "Live · partial builder",
     module: "M2–M5 + platform workers",
-    demo: "crm",
-    demoHash: "crmDemo",
+    demo: "automation",
+    demoHash: "capabilityDemo",
     category: "Automasi Operasional & Workflow",
     breadcrumbs: ["Produk", "Fitur", "Workflow"],
     capabilities: [

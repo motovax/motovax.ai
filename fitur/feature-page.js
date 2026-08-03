@@ -51,10 +51,10 @@
   const demoByCategory = {
     "Aplikasi Omnichannel": "omni",
     "Aplikasi CRM": "crm",
-    "WhatsApp API": "omni",
+    "WhatsApp API": "whatsapp",
     "Customer Support & Ticketing": "omni",
-    "AI & Chatbot": "omni",
-    "Automasi Operasional & Workflow": "crm",
+    "AI & Chatbot": "falcon",
+    "Automasi Operasional & Workflow": "automation",
     "Manajemen Campaign": "social",
     "Call Center": "omni",
     "Suite Motovax": "dashboard",
@@ -66,6 +66,9 @@
     social: "socialDemo",
     dashboard: "dashboardDemo",
     insight: "insightDemo",
+    falcon: "falconDemo",
+    whatsapp: "capabilityDemo",
+    automation: "capabilityDemo",
   };
   const sharedDemo = data.demo || demoByCategory[data.category] || "dashboard";
   const sharedDemoHash = data.demoHash || demoHashes[sharedDemo] || "solusi";
