@@ -361,13 +361,56 @@ a {
   display: block;
 }
 
-.produk-mega-pane-title {
+.produk-mega-pane-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
   margin: 0 0 18px;
+}
+
+.produk-mega-pane-title {
+  margin: 0;
   font-size: 18px;
   font-weight: 700;
   letter-spacing: -0.02em;
   color: #081833;
   line-height: 1.3;
+}
+
+.produk-mega-demo-button {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 38px;
+  padding: 8px 14px;
+  border: 1px solid #2c76ed;
+  border-radius: 9px;
+  background: #2c76ed;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.2;
+  text-decoration: none;
+  box-shadow: 0 6px 16px rgba(44, 118, 237, 0.18);
+  transition: background 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
+}
+
+.produk-mega-demo-button:hover,
+.produk-mega-demo-button:focus-visible {
+  border-color: #1e62ce;
+  background: #1e62ce;
+  color: #fff;
+  text-decoration: none;
+  transform: translateY(-1px);
+  outline: none;
+}
+
+.produk-mega-demo-button svg {
+  width: 16px;
+  height: 16px;
 }
 
 .produk-mega-items {
@@ -673,6 +716,10 @@ body.solusi-menu-open {
   .produk-mega-content {
     padding: 18px 16px 24px;
     overflow: visible;
+  }
+
+  .produk-mega-pane-heading {
+    align-items: flex-start;
   }
 
   .produk-mega-item {

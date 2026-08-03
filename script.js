@@ -72,6 +72,7 @@ for (const link of document.querySelectorAll("[data-wa]")) {
           id: "omni",
           label: "Aplikasi Omnichannel",
           paneTitle: "Aplikasi Omnichannel",
+          demo: { id: "omni", hash: "omniDemo", label: "Coba Simulasi" },
           features: [
             { title: "Omnichannel", desc: "Satu platform untuk kelola chat dari berbagai saluran", icon: "chat", href: f("aplikasi-omnichannel") },
             { title: "Instagram API", desc: "Respons DM otomatis untuk tingkatkan penjualan", icon: "ig", href: f("instagram-api") },
@@ -83,6 +84,7 @@ for (const link of document.querySelectorAll("[data-wa]")) {
           id: "crm",
           label: "Aplikasi CRM",
           paneTitle: "Aplikasi CRM",
+          demo: { id: "crm", hash: "crmDemo", label: "Coba Simulasi" },
           features: [
             { title: "Aplikasi CRM", desc: "Automasi proses penjualan & layanan pelanggan", icon: "crm", href: f("aplikasi-crm") },
             { title: "Manajemen Deal", desc: "Kelola deal secara end-to-end lebih ciamik", icon: "deal", href: f("manajemen-deal") },
@@ -250,6 +252,15 @@ for (const link of document.querySelectorAll("[data-wa]")) {
 
     const panes = allPanes
       .map((item) => {
+        const demoHref = item.demo
+          ? `${rootPrefix}index.html?demo=${item.demo.id}#${item.demo.hash}`
+          : "";
+        const demoCta = item.demo
+          ? `<a href="${demoHref}" class="produk-mega-demo-button" data-open-${item.demo.id}-demo data-produk-close>
+              ${item.demo.label}
+              <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </a>`
+          : "";
         const features = item.features
           .map((feat) => {
             const badge = feat.badge ? ` <span class="badge-new">${feat.badge}</span>` : "";
@@ -266,7 +277,10 @@ for (const link of document.querySelectorAll("[data-wa]")) {
 
         return `
           <div class="produk-mega-pane${item.id === firstPaneId ? " is-active" : ""}" data-produk-pane-panel="${item.id}" ${item.id === firstPaneId ? "" : "hidden"}>
-            <h3 class="produk-mega-pane-title">${item.paneTitle}</h3>
+            <div class="produk-mega-pane-heading">
+              <h3 class="produk-mega-pane-title">${item.paneTitle}</h3>
+              ${demoCta}
+            </div>
             <div class="produk-mega-items">${features}</div>
           </div>`;
       })
@@ -4851,7 +4865,10 @@ class AutopilotCRMDemo {
 
   bind() {
     for (const button of document.querySelectorAll("[data-open-crm-demo]")) {
-      button.addEventListener("click", () => this.open(button));
+      button.addEventListener("click", (event) => {
+        if (button instanceof HTMLAnchorElement) event.preventDefault();
+        this.open(button);
+      });
     }
 
     for (const button of this.root.querySelectorAll("[data-close-crm-demo]")) {
@@ -6003,7 +6020,10 @@ class OmnichannelAIDemo {
 
   bind() {
     for (const button of document.querySelectorAll("[data-open-omni-demo]")) {
-      button.addEventListener("click", () => this.open(button));
+      button.addEventListener("click", (event) => {
+        if (button instanceof HTMLAnchorElement) event.preventDefault();
+        this.open(button);
+      });
     }
     for (const button of this.root.querySelectorAll("[data-close-omni-demo]")) {
       button.addEventListener("click", () => this.close());
