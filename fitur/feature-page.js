@@ -1,6 +1,7 @@
 /**
- * Render halaman detail fitur (layout terinspirasi qontak.com/fitur/*)
- * Data: features-data.js (sumber produk motovax-app)
+ * Halaman detail fitur Motovax.
+ * Struktur marketing mengikuti pola halaman fitur SaaS: hero, outcome, use case,
+ * showcase produk, cara kerja, fitur terkait, FAQ, dan CTA.
  */
 (function () {
   const params = new URLSearchParams(location.search);
@@ -11,7 +12,8 @@
     (pathSlug && pathSlug !== "index" && pathSlug !== "feature-page" ? pathSlug : "") ||
     "aplikasi-omnichannel";
 
-  const data = (window.MOTOVAX_FEATURES && window.MOTOVAX_FEATURES[slug]) || null;
+  const catalog = window.MOTOVAX_FEATURES || {};
+  const data = catalog[slug] || null;
   const root = document.querySelector("[data-feature-root]");
   if (!root) return;
 
@@ -21,132 +23,214 @@
         <div class="container">
           <p class="feature-breadcrumb"><a href="../modul.html">Produk</a> / Fitur</p>
           <h1>Fitur tidak ditemukan</h1>
-          <p class="feature-hero-desc">Slug <code>${escapeHtml(slug)}</code> belum ada di katalog. Lihat <a href="../modul.html">semua produk</a>.</p>
+          <p class="feature-hero-desc">Halaman yang Anda cari belum tersedia. Kembali ke <a href="../modul.html">daftar produk</a>.</p>
         </div>
       </section>`;
     return;
   }
 
-  const demoHref = data.demoHash ? `../index.html#${data.demoHash}` : "../index.html#solusi";
-  const demoAttr = data.demo
-    ? {
-        omni: "data-open-omni-demo",
-        crm: "data-open-crm-demo",
-        social: "data-open-social-demo",
-        dashboard: "data-open-dashboard-demo",
-        insight: "data-open-insight-demo",
-        inventory: "data-open-inventory-demo",
-      }[data.demo]
-    : "";
-
-  // Demo open only works on index; on feature pages link to index with hash / open via navigation
-  const demoCta = data.demo
-    ? `<a class="btn btn-secondary" href="../index.html#${data.demoHash || "solusi"}">Coba demo terkait <span>-></span></a>`
-    : `<a class="btn btn-secondary" href="../modul.html">Lihat semua modul <span>-></span></a>`;
-
-  const related = (data.related || [])
-    .map((id) => window.MOTOVAX_FEATURES[id])
-    .filter(Boolean)
-    .map(
-      (f) => `
-      <a class="feature-related-card" href="./${f.slug}.html">
-        <strong>${escapeHtml(f.title)}</strong>
-        <span>${escapeHtml(f.heroTitle)}</span>
-      </a>`
-    )
-    .join("");
-
-  const caps = (data.capabilities || [])
-    .map(
-      (c) => `
-      <article class="feature-cap-card">
-        <h3>${escapeHtml(c.title)}</h3>
-        <p>${escapeHtml(c.desc)}</p>
-      </article>`
-    )
-    .join("");
-
-  const steps = (data.howItWorks || [])
-    .map(
-      (s, i) => `
-      <li class="feature-step">
-        <span class="feature-step-num">${i + 1}</span>
-        <div>
-          <strong>${escapeHtml(s.title)}</strong>
-          <p>${escapeHtml(s.desc)}</p>
-        </div>
-      </li>`
-    )
-    .join("");
-
-  const benefits = (data.benefits || []).map((b) => `<li>${escapeHtml(b)}</li>`).join("");
+  const profile = profileFor(data);
+  const availability = availabilityFor(data.status);
+  const capabilities = data.capabilities || [];
+  const benefits = data.benefits || [];
+  const workflow = data.howItWorks || [];
+  const relatedItems = uniqueBySlug((data.related || []).map((id) => catalog[id]).filter(Boolean));
+  const faqs = buildFaqs(data, profile, availability, capabilities, workflow, relatedItems);
 
   const crumbs = (data.breadcrumbs || ["Produk", "Fitur", data.title])
-    .map((c, i, arr) => {
-      if (i === arr.length - 1) return `<span>${escapeHtml(c)}</span>`;
-      if (c === "Produk") return `<a href="../modul.html">${escapeHtml(c)}</a>`;
-      return `<span>${escapeHtml(c)}</span>`;
+    .map((item, index, items) => {
+      if (index === items.length - 1) return `<span>${escapeHtml(item)}</span>`;
+      if (item === "Produk") return `<a href="../modul.html">${escapeHtml(item)}</a>`;
+      return `<span>${escapeHtml(item)}</span>`;
     })
     .join(' <span class="crumb-sep">/</span> ');
+
+  const demoCta = data.demo
+    ? `<a class="btn btn-secondary feature-hero-demo" href="../index.html#${escapeHtml(data.demoHash || "solusi")}">Lihat demo produk <span>-></span></a>`
+    : `<a class="btn btn-secondary feature-hero-demo" href="#kemampuan">Lihat kemampuan <span>-></span></a>`;
+
+  const heroBenefits = benefits
+    .slice(0, 4)
+    .map((benefit) => `<li><span aria-hidden="true">✓</span>${escapeHtml(benefit)}</li>`)
+    .join("");
+
+  const outcomeCards = benefits
+    .slice(0, 4)
+    .map(
+      (benefit, index) => `
+        <article class="feature-outcome-card">
+          <span class="feature-outcome-icon" aria-hidden="true">${outcomeIcon(index)}</span>
+          <strong>${escapeHtml(benefit)}</strong>
+        </article>`,
+    )
+    .join("");
+
+  const useCases = profile.roles
+    .map((role, index) => {
+      const primary = capabilities[index % Math.max(capabilities.length, 1)];
+      const secondary = capabilities[(index + profile.roles.length) % Math.max(capabilities.length, 1)];
+      const points = [primary, secondary]
+        .filter(Boolean)
+        .filter((item, itemIndex, items) => items.findIndex((entry) => entry.title === item.title) === itemIndex)
+        .map((item) => `<li><strong>${escapeHtml(item.title)}</strong><span>${escapeHtml(item.desc)}</span></li>`)
+        .join("");
+      return `
+        <article class="feature-use-case-card">
+          <div class="feature-use-case-topline">
+            <span>${String(index + 1).padStart(2, "0")}</span>
+            <em>${escapeHtml(role)}</em>
+          </div>
+          <h3>${escapeHtml(data.title)} untuk ${escapeHtml(role.toLowerCase())}</h3>
+          <ul>${points}</ul>
+        </article>`;
+    })
+    .join("");
+
+  const showcase = capabilities
+    .map((capability, index) => {
+      const step = workflow[index % Math.max(workflow.length, 1)];
+      const benefit = benefits[index % Math.max(benefits.length, 1)];
+      return `
+        <article class="feature-showcase-row${index % 2 ? " reverse" : ""}">
+          <div class="feature-showcase-copy">
+            <span class="feature-showcase-number">FITUR ${String(index + 1).padStart(2, "0")}</span>
+            <h3>${escapeHtml(capability.title)}</h3>
+            <p>${escapeHtml(capability.desc)}</p>
+            <ul>
+              ${step ? `<li>${escapeHtml(step.title)} — ${escapeHtml(step.desc)}</li>` : ""}
+              ${benefit ? `<li>${escapeHtml(benefit)}</li>` : ""}
+            </ul>
+            <a href="../index.html#kontak">Konsultasikan kebutuhan <span>-></span></a>
+          </div>
+          ${renderShowcaseVisual(data, profile, capability, index)}
+        </article>`;
+    })
+    .join("");
+
+  const steps = workflow
+    .map(
+      (step, index) => `
+        <li class="feature-step">
+          <span class="feature-step-num">${index + 1}</span>
+          <div>
+            <strong>${escapeHtml(step.title)}</strong>
+            <p>${escapeHtml(step.desc)}</p>
+          </div>
+        </li>`,
+    )
+    .join("");
+
+  const related = relatedItems
+    .map(
+      (item) => `
+        <a class="feature-related-card" href="./${escapeHtml(item.slug)}.html">
+          <span class="feature-related-arrow" aria-hidden="true">↗</span>
+          <strong>${escapeHtml(item.title)}</strong>
+          <span>${escapeHtml(item.heroTitle)}</span>
+        </a>`,
+    )
+    .join("");
+
+  const faqMarkup = faqs
+    .map(
+      (faq, index) => `
+        <details class="feature-faq-item"${index === 0 ? " open" : ""}>
+          <summary>${escapeHtml(faq.question)}<span aria-hidden="true">+</span></summary>
+          <p>${escapeHtml(faq.answer)}</p>
+        </details>`,
+    )
+    .join("");
 
   document.title = `${data.title} — MOTOVAX`;
   const meta = document.querySelector('meta[name="description"]');
   if (meta) meta.setAttribute("content", data.heroDesc.slice(0, 160));
+  injectFaqSchema(faqs, data);
 
   root.innerHTML = `
     <section class="feature-page-hero">
       <div class="container">
         <p class="feature-breadcrumb">${crumbs}</p>
-        <div class="feature-hero-badges">
-          <span class="feature-badge">${escapeHtml(data.status || "Live")}</span>
-          <span class="feature-badge muted">${escapeHtml(data.module || "")}</span>
-          ${data.flag ? `<span class="feature-badge muted">Flag: ${escapeHtml(data.flag)}</span>` : ""}
-          ${data.badge ? `<span class="feature-badge new">${escapeHtml(data.badge)}</span>` : ""}
-        </div>
-        <h1>${escapeHtml(data.heroTitle)}</h1>
-        <p class="feature-hero-desc">${escapeHtml(data.heroDesc)}</p>
-        <div class="feature-hero-actions">
-          <a class="btn btn-primary" href="../index.html#kontak">Jadwalkan Demo <span>-></span></a>
-          ${demoCta}
-        </div>
-      </div>
-    </section>
-
-    <section class="feature-page-section">
-      <div class="container">
-        <div class="section-head feature-section-head">
-          <span>KEMAMPUAN</span>
-          <h2>Apa yang Anda dapatkan</h2>
-          <p>Detail kemampuan yang tercermin di aplikasi Motovax.</p>
-        </div>
-        <div class="feature-cap-grid">${caps}</div>
-      </div>
-    </section>
-
-    <section class="feature-page-section alt">
-      <div class="container feature-two-col">
-        <div>
-          <div class="section-head feature-section-head">
-            <span>CARA KERJA</span>
-            <h2>Alur di Motovax</h2>
+        <div class="feature-hero-grid">
+          <div class="feature-hero-copy">
+            <div class="feature-hero-badges">
+              <span class="feature-badge">${escapeHtml(profile.eyebrow)}</span>
+              <span class="feature-badge ${availability.tone}">${escapeHtml(availability.label)}</span>
+            </div>
+            <h1>${escapeHtml(data.heroTitle)}</h1>
+            <p class="feature-hero-desc">${escapeHtml(data.heroDesc)}</p>
+            ${heroBenefits ? `<ul class="feature-hero-list">${heroBenefits}</ul>` : ""}
+            <div class="feature-hero-actions">
+              <a class="btn btn-primary" href="../index.html#kontak">Jadwalkan Demo <span>-></span></a>
+              ${demoCta}
+            </div>
           </div>
-          <ol class="feature-steps">${steps}</ol>
+          ${renderProductVisual(data, profile, capabilities, workflow)}
         </div>
-        <div class="feature-benefits-panel">
-          <h3>Manfaat utama</h3>
-          <ul class="feature-benefits">${benefits}</ul>
-          <a class="btn btn-primary" href="../index.html#kontak" style="margin-top:18px">Hubungi tim Motovax</a>
+      </div>
+    </section>
+
+    <section class="feature-proof-strip" aria-label="Manfaat utama">
+      <div class="container feature-outcome-grid">${outcomeCards}</div>
+    </section>
+
+    <section class="feature-page-section feature-intro-section">
+      <div class="container">
+        <div class="feature-section-heading centered">
+          <span>${escapeHtml(profile.sectionLabel)}</span>
+          <h2>${escapeHtml(data.title)} untuk operasional yang lebih cepat dan terhubung</h2>
+          <p>${escapeHtml(profile.intro)}</p>
         </div>
+        <div class="feature-use-case-grid">${useCases}</div>
+      </div>
+    </section>
+
+    <section class="feature-page-section feature-showcase-section" id="kemampuan">
+      <div class="container">
+        <div class="feature-section-heading centered">
+          <span>FITUR UNGGULAN</span>
+          <h2>Kemampuan yang dapat dipakai tim Anda</h2>
+          <p>Setiap bagian di bawah menggambarkan capability Motovax dan alur kerja yang didukungnya.</p>
+        </div>
+        <div class="feature-showcase-list">${showcase}</div>
+      </div>
+    </section>
+
+    <section class="feature-page-section feature-foundation-section">
+      <div class="container">
+        <div class="feature-section-heading centered light">
+          <span>MENGAPA MOTOVAX</span>
+          <h2>Satu platform untuk data, tim, dan agen AI</h2>
+          <p>Fondasi yang sama dipakai lintas modul agar aktivitas pelanggan dan operasional tidak terpecah.</p>
+        </div>
+        <div class="feature-foundation-grid">
+          ${foundationCard("Satu data operasional", "Percakapan, lead, unit, campaign, dan insight saling terhubung sesuai modul yang aktif.", "01")}
+          ${foundationCard("Akses berbasis peran", "Workspace dan aksi mengikuti role serta permission pengguna untuk menjaga kendali operasional.", "02")}
+          ${foundationCard("Multi-tenant & multi-cabang", "Konfigurasi, data, dan integrasi dipisahkan per organisasi sekaligus mendukung operasi lintas cabang.", "03")}
+          ${foundationCard("AI dengan business tools", "Agen AI dapat menjalankan tool bisnis seperti stok, kredit, follow-up, handoff, dan konten.", "04")}
+        </div>
+      </div>
+    </section>
+
+    <section class="feature-page-section feature-process-section">
+      <div class="container feature-process-grid">
+        <div class="feature-section-heading">
+          <span>CARA KERJA</span>
+          <h2>Dari aktivitas masuk hingga tindak lanjut</h2>
+          <p>${escapeHtml(availability.detail)}</p>
+          <a class="btn btn-primary" href="../index.html#kontak">Diskusikan kebutuhan Anda</a>
+        </div>
+        <ol class="feature-steps">${steps}</ol>
       </div>
     </section>
 
     ${
       related
-        ? `<section class="feature-page-section">
+        ? `<section class="feature-page-section feature-related-section">
       <div class="container">
-        <div class="section-head feature-section-head">
-          <span>TERKAIT</span>
-          <h2>Fitur & solusi terkait</h2>
+        <div class="feature-section-heading">
+          <span>TERHUBUNG</span>
+          <h2>Fitur dan solusi terkait</h2>
+          <p>Bangun alur kerja end-to-end dengan capability Motovax lainnya.</p>
         </div>
         <div class="feature-related-grid">${related}</div>
       </div>
@@ -154,21 +238,31 @@
         : ""
     }
 
+    <section class="feature-page-section feature-faq-section">
+      <div class="container feature-faq-layout">
+        <div class="feature-section-heading">
+          <span>FAQ</span>
+          <h2>Pertanyaan tentang ${escapeHtml(data.title)}</h2>
+          <p>Informasi singkat untuk membantu Anda memahami fungsi, ketersediaan, dan keterhubungan fiturnya.</p>
+        </div>
+        <div class="feature-faq-list">${faqMarkup}</div>
+      </div>
+    </section>
+
     <section class="feature-page-cta">
       <div class="container feature-page-cta-inner">
         <div>
-          <h2>Siap coba ${escapeHtml(data.title)} di bisnis Anda?</h2>
-          <p>Jadwalkan demo atau jelajahi modul lengkap Motovax.</p>
+          <span>POWER YOUR OPERATION</span>
+          <h2>Siap melihat ${escapeHtml(data.title)} untuk bisnis Anda?</h2>
+          <p>Jadwalkan sesi bersama tim Motovax untuk melihat alur yang paling relevan.</p>
         </div>
         <div class="feature-hero-actions">
           <a class="btn btn-light" href="#" data-wa>WhatsApp Sales <span>-></span></a>
-          <a class="btn btn-secondary" href="../modul.html" style="background:#fff;color:var(--blue)">Semua produk</a>
+          <a class="btn btn-secondary" href="../index.html#kontak">Jadwalkan Demo</a>
         </div>
       </div>
-    </section>
-  `;
+    </section>`;
 
-  // re-bind data-wa if script already ran
   const whatsappUrl =
     "https://wa.me/6281999197186?text=Halo%20MOTOVAX%2C%20saya%20ingin%20jadwalkan%20demo.";
   for (const link of root.querySelectorAll("[data-wa]")) {
@@ -179,8 +273,242 @@
     }
   }
 
-  function escapeHtml(str) {
-    return String(str || "")
+  function profileFor(feature) {
+    const id = feature.slug || "";
+    const category = String(feature.category || "");
+    const suite = /motovax-(360|sales-suite|service-suite)/.test(id);
+    const campaign = /broadcast|blast|bulk|ctwa/.test(id);
+    const analytics = /goal|report|scorecard/.test(id) || ["dashboard", "insight"].includes(feature.demo);
+    const workflowFamily = /workflow|knowledge|flows/.test(id);
+    const crm = feature.demo === "crm" || /CRM/.test(category) || /deal|kontak|pipeline|sales-gps/.test(id);
+    const social = feature.demo === "social";
+
+    if (suite) {
+      return {
+        family: "suite",
+        eyebrow: "SOLUSI BISNIS MOTOVAX",
+        sectionLabel: "SATU EKOSISTEM",
+        intro: "Satukan modul yang relevan dalam satu journey agar tim bergerak dengan konteks data yang sama.",
+        roles: ["Manajemen", "Tim Sales", "Customer Service"],
+        facts: ["Multi-modul", "Satu data", "Role-based"],
+      };
+    }
+    if (campaign || social) {
+      return {
+        family: "campaign",
+        eyebrow: "MARKETING & CAMPAIGN",
+        sectionLabel: "AKTIVASI PELANGGAN",
+        intro: "Rancang, jalankan, dan pantau komunikasi pelanggan tanpa memutus konteks dari CRM dan operasional.",
+        roles: ["Marketing", "Tim Sales", "Manajemen"],
+        facts: ["Tersegmentasi", "Terjadwal", "Terukur"],
+      };
+    }
+    if (analytics) {
+      return {
+        family: "analytics",
+        eyebrow: "ANALYTICS MOTOVAX",
+        sectionLabel: "INSIGHT OPERASIONAL",
+        intro: "Ubah aktivitas harian menjadi visibilitas yang membantu tim memprioritaskan tindakan berikutnya.",
+        roles: ["Manajemen", "Supervisor", "Tim Sales"],
+        facts: ["Ringkas", "Terfilter", "Actionable"],
+      };
+    }
+    if (workflowFamily) {
+      return {
+        family: "workflow",
+        eyebrow: "AUTOMATION & AI",
+        sectionLabel: "ALUR KERJA TERHUBUNG",
+        intro: "Hubungkan pemicu, pengetahuan, dan tindakan agar pekerjaan berulang dapat ditangani secara konsisten.",
+        roles: ["Operasional", "Customer Service", "Admin"],
+        facts: ["Trigger", "Knowledge", "Action"],
+      };
+    }
+    if (crm) {
+      return {
+        family: "crm",
+        eyebrow: "AUTOPILOT CRM",
+        sectionLabel: "CUSTOMER JOURNEY",
+        intro: "Kelola customer, pipeline, follow-up, dan performa sales dari satu workspace yang terhubung.",
+        roles: ["Tim Sales", "Marketing", "Manajemen"],
+        facts: ["Customer 360°", "Pipeline", "Follow-up"],
+      };
+    }
+    return {
+      family: "omni",
+      eyebrow: "AI OMNICHANNEL",
+      sectionLabel: "INTERAKSI PELANGGAN",
+      intro: "Satukan percakapan, konteks customer, dan aksi operasional agar respons lebih cepat dan tindak lanjut lebih rapi.",
+      roles: ["Customer Service", "Tim Sales", "Marketing"],
+      facts: ["Realtime", "AI + Agent", "Terhubung"],
+    };
+  }
+
+  function availabilityFor(statusValue) {
+    const status = String(statusValue || "Live").toLowerCase();
+    if (status.includes("roadmap")) {
+      return {
+        label: "Dalam pengembangan",
+        tone: "roadmap",
+        detail: "Capability ini berada dalam arah pengembangan Motovax. Cakupan implementasi disesuaikan dengan kebutuhan dan kesiapan integrasi.",
+      };
+    }
+    if (status.includes("partial")) {
+      return {
+        label: "Tersedia terbatas",
+        tone: "partial",
+        detail: "Sebagian capability sudah tersedia. Cakupan aktivasi dapat berbeda menurut modul, konfigurasi tenant, dan integrasi yang digunakan.",
+      };
+    }
+    if (status.includes("suite")) {
+      return {
+        label: "Solusi terintegrasi",
+        tone: "live",
+        detail: "Solusi ini menyatukan beberapa modul Motovax. Aktivasi dan alurnya dapat disesuaikan dengan kebutuhan organisasi.",
+      };
+    }
+    return {
+      label: "Tersedia di Motovax",
+      tone: "live",
+      detail: "Capability utama tersedia dan dapat dikonfigurasi mengikuti role, cabang, channel, serta modul yang digunakan organisasi.",
+    };
+  }
+
+  function renderProductVisual(feature, productProfile, caps, flow) {
+    const rows = caps.slice(0, 3);
+    const activities = flow.slice(0, 3);
+    return `
+      <div class="feature-product-visual family-${productProfile.family}" aria-label="Pratinjau antarmuka ${escapeHtml(feature.title)}">
+        <div class="feature-ui-window">
+          <div class="feature-ui-topbar">
+            <span class="feature-ui-dots"><i></i><i></i><i></i></span>
+            <strong>MOTOVAX</strong>
+            <span class="feature-ui-live"><i></i> Live workspace</span>
+          </div>
+          <div class="feature-ui-shell">
+            <aside class="feature-ui-sidebar" aria-hidden="true">
+              <b>MV</b>
+              <i class="active"></i><i></i><i></i><i></i><i></i>
+            </aside>
+            <div class="feature-ui-main">
+              <div class="feature-ui-heading">
+                <div><small>${escapeHtml(productProfile.eyebrow)}</small><strong>${escapeHtml(feature.title)}</strong></div>
+                <button type="button" tabindex="-1">+ Aksi baru</button>
+              </div>
+              <div class="feature-ui-metrics">
+                ${productProfile.facts.map((fact, index) => `<div><span>${escapeHtml(fact)}</span><strong>${index === 0 ? "Aktif" : index === 1 ? "Realtime" : "Siap"}</strong></div>`).join("")}
+              </div>
+              <div class="feature-ui-content">
+                <div class="feature-ui-list">
+                  ${rows.map((row, index) => `<div class="feature-ui-row"><span class="feature-ui-avatar">${escapeHtml(row.title.slice(0, 1))}</span><div><strong>${escapeHtml(row.title)}</strong><small>${escapeHtml(shorten(row.desc, 54))}</small></div><em>${index === 0 ? "Baru" : "Aktif"}</em></div>`).join("")}
+                </div>
+                <div class="feature-ui-activity">
+                  <strong>Alur kerja</strong>
+                  ${activities.map((item, index) => `<div><i>${index + 1}</i><span>${escapeHtml(item.title)}</span></div>`).join("")}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <span class="feature-visual-orbit one"></span>
+        <span class="feature-visual-orbit two"></span>
+      </div>`;
+  }
+
+  function renderShowcaseVisual(feature, productProfile, capability, index) {
+    return `
+      <div class="feature-showcase-visual family-${productProfile.family}" aria-hidden="true">
+        <div class="feature-mini-window">
+          <div class="feature-mini-top"><span></span><span>${escapeHtml(feature.title)}</span><i>•••</i></div>
+          <div class="feature-mini-body">
+            <aside><b>MV</b><i></i><i class="active"></i><i></i><i></i></aside>
+            <main>
+              <small>${escapeHtml(productProfile.sectionLabel)}</small>
+              <h4>${escapeHtml(capability.title)}</h4>
+              <div class="feature-mini-cards">
+                ${productProfile.facts.map((fact, factIndex) => `<div><span>${escapeHtml(fact)}</span><b>${factIndex === index % 3 ? "ON" : "✓"}</b></div>`).join("")}
+              </div>
+              <div class="feature-mini-chart">
+                ${[42, 68, 54, 86, 73, 94].map((height, barIndex) => `<i style="--bar:${Math.max(24, height - ((index + barIndex) % 3) * 7)}%"></i>`).join("")}
+              </div>
+              <div class="feature-mini-status"><span><i></i> Sistem terhubung</span><b>Realtime</b></div>
+            </main>
+          </div>
+        </div>
+      </div>`;
+  }
+
+  function buildFaqs(feature, productProfile, available, caps, flow, relatedFeatures) {
+    const capNames = caps.map((item) => item.title).join(", ");
+    const flowNames = flow.map((item) => item.title).join(" → ");
+    const relatedNames = relatedFeatures.map((item) => item.title).join(", ");
+    return [
+      { question: `Apa itu ${feature.title}?`, answer: feature.heroDesc },
+      {
+        question: `Apa kemampuan utama ${feature.title}?`,
+        answer: capNames
+          ? `${feature.title} mencakup ${capNames}. Detail aktivasi mengikuti kebutuhan dan konfigurasi organisasi.`
+          : `${feature.title} membantu menyederhanakan proses operasional dalam platform Motovax.`,
+      },
+      {
+        question: `Bagaimana alur kerja ${feature.title}?`,
+        answer: flowNames
+          ? `Alur utamanya adalah ${flowNames}. Tim dapat menyesuaikan penerapannya dengan proses bisnis yang berjalan.`
+          : "Alur kerja disusun dari aktivitas masuk, pemrosesan, hingga tindak lanjut di workspace Motovax.",
+      },
+      { question: `Siapa yang cocok menggunakan ${feature.title}?`, answer: `${feature.title} relevan untuk ${productProfile.roles.join(", ")} sesuai pembagian role dan tanggung jawab di organisasi.` },
+      { question: `Apakah ${feature.title} sudah tersedia?`, answer: `${available.label}. ${available.detail}` },
+      {
+        question: `Fitur apa yang terhubung dengan ${feature.title}?`,
+        answer: relatedNames
+          ? `${feature.title} dapat membentuk alur yang lebih lengkap bersama ${relatedNames}.`
+          : `${feature.title} menggunakan fondasi data, akses berbasis peran, dan integrasi Motovax.`,
+      },
+    ];
+  }
+
+  function injectFaqSchema(faqItems, feature) {
+    const oldSchema = document.querySelector("[data-feature-faq-schema]");
+    if (oldSchema) oldSchema.remove();
+    const schema = document.createElement("script");
+    schema.type = "application/ld+json";
+    schema.dataset.featureFaqSchema = "";
+    schema.textContent = JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      name: feature.title,
+      mainEntity: faqItems.map((item) => ({
+        "@type": "Question",
+        name: item.question,
+        acceptedAnswer: { "@type": "Answer", text: item.answer },
+      })),
+    });
+    document.head.appendChild(schema);
+  }
+
+  function foundationCard(title, description, number) {
+    return `<article><span>${number}</span><h3>${escapeHtml(title)}</h3><p>${escapeHtml(description)}</p></article>`;
+  }
+
+  function uniqueBySlug(items) {
+    const seen = new Set();
+    return items.filter((item) => {
+      if (!item?.slug || seen.has(item.slug)) return false;
+      seen.add(item.slug);
+      return true;
+    });
+  }
+
+  function outcomeIcon(index) {
+    return ["↗", "◎", "✓", "⚡"][index % 4];
+  }
+
+  function shorten(value, max) {
+    const text = String(value || "");
+    return text.length > max ? `${text.slice(0, max - 1).trim()}…` : text;
+  }
+
+  function escapeHtml(value) {
+    return String(value || "")
       .replace(/&/g, "&amp;")
       .replace(/</g, "&lt;")
       .replace(/>/g, "&gt;")
