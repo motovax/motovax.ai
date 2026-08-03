@@ -38,16 +38,6 @@ if (contactForm instanceof HTMLFormElement) {
   });
 }
 
-for (const link of document.querySelectorAll("[data-contact-focus]")) {
-  link.addEventListener("click", () => {
-    window.setTimeout(() => {
-      const fieldName = link.getAttribute("data-contact-focus");
-      const field = contactForm?.elements.namedItem(fieldName || "");
-      if (field instanceof HTMLElement) field.focus({ preventScroll: true });
-    }, 350);
-  });
-}
-
 /**
  * Mega menu Produk — katalog kapabilitas dan suite Motovax.
  * Link diarahkan ke halaman detail fitur terkait.
