@@ -646,22 +646,22 @@
         </header>
 
         <div class="demo-layout">
-          <aside class="demo-sidebar" aria-label="Navigasi demo">
-            <nav>
+          <aside class="demo-sidebar" aria-label="Navigasi demo" data-ims-anchor="sidebar">
+            <nav data-ims-anchor="nav">
               <span class="demo-nav-section">Sistem Manajemen Inventaris</span>
-              <button class="active" type="button" data-ims-nav="units" aria-current="page">
+              <button class="active" type="button" data-ims-nav="units" data-ims-anchor="nav-units" aria-current="page">
                 <svg class="demo-nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5h14v5H5V5Zm0 9h14v5H5v-5ZM8 7.5h.01M8 16.5h.01"/></svg>
                 <span>Manajemen Unit</span>
               </button>
-              <button type="button" data-ims-nav="per-cabang">
+              <button type="button" data-ims-nav="per-cabang" data-ims-anchor="nav-per-cabang">
                 <svg class="demo-nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7-4.5-7-10a7 7 0 1 1 14 0c0 5.5-7 10-7 10Zm0-8a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z"/></svg>
                 <span>Unit per Cabang</span>
               </button>
-              <button type="button" data-ims-nav="uploads">
+              <button type="button" data-ims-nav="uploads" data-ims-anchor="nav-uploads">
                 <svg class="demo-nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V4m0 0 4 4m-4-4-4 4M4 20h16"/></svg>
                 <span>Upload Data</span>
               </button>
-              <button type="button" data-ims-nav="falcon">
+              <button type="button" data-ims-nav="falcon" data-ims-anchor="nav-falcon">
                 <svg class="demo-nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4v8Z"/></svg>
                 <span>AI Falcon</span>
               </button>
@@ -674,11 +674,11 @@
           </aside>
 
           <main class="demo-workspace">
-            <div class="ims-mobile-nav" role="navigation" aria-label="Menu IMS mobile">
-              <button class="active" type="button" data-ims-nav="units">Manajemen Unit</button>
-              <button type="button" data-ims-nav="per-cabang">Unit per Cabang</button>
-              <button type="button" data-ims-nav="uploads">Upload Data</button>
-              <button type="button" data-ims-nav="falcon">AI Falcon</button>
+            <div class="ims-mobile-nav" role="navigation" aria-label="Menu IMS mobile" data-ims-anchor="nav">
+              <button class="active" type="button" data-ims-nav="units" data-ims-anchor="nav-units">Manajemen Unit</button>
+              <button type="button" data-ims-nav="per-cabang" data-ims-anchor="nav-per-cabang">Unit per Cabang</button>
+              <button type="button" data-ims-nav="uploads" data-ims-anchor="nav-uploads">Upload Data</button>
+              <button type="button" data-ims-nav="falcon" data-ims-anchor="nav-falcon">AI Falcon</button>
             </div>
 
             <section class="ims-view is-active ims-units-view" data-ims-view="units">
@@ -727,10 +727,10 @@
                 <option value="price-low">Harga terendah</option>
               </select>
 
-              <section class="demo-inventory-panel ims-units-panel">
-                <div class="ims-units-filters">
+              <section class="demo-inventory-panel ims-units-panel" data-ims-anchor="units-panel">
+                <div class="ims-units-filters" data-ims-anchor="units-filters">
                   <div class="ims-filter-main">
-                    <label class="demo-search ims-units-search">
+                    <label class="demo-search ims-units-search" data-ims-anchor="units-search">
                       <span class="ims-search-ico" aria-hidden="true">
                         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
                       </span>
@@ -742,7 +742,7 @@
                       />
                     </label>
 
-                    <div class="ims-branch-popover" data-ims-branch-popover>
+                    <div class="ims-branch-popover" data-ims-branch-popover data-ims-anchor="units-branch">
                       <button type="button" class="ims-branch-btn" data-ims-branch-trigger aria-haspopup="listbox" aria-expanded="false">
                         <span data-ims-branch-label>Semua Cabang</span>
                         <span aria-hidden="true">▾</span>
@@ -757,14 +757,14 @@
                       </div>
                     </div>
 
-                    <div class="ims-status-pills" role="group" aria-label="Filter status unit">
+                    <div class="ims-status-pills" role="group" aria-label="Filter status unit" data-ims-anchor="units-status">
                       <button class="pill-all" type="button" data-status-filter="ALL">Semua Status</button>
                       <button class="pill-active" type="button" data-status-filter="ACTIVE">Stok Aktif</button>
                       <button class="pill-ready active" type="button" data-status-filter="UNIT READY">Ready</button>
                       <button class="pill-booked" type="button" data-status-filter="BOOKED">Booked</button>
                     </div>
 
-                    <button class="ims-adv-toggle" type="button" data-ims-adv-toggle aria-expanded="false">
+                    <button class="ims-adv-toggle" type="button" data-ims-adv-toggle data-ims-anchor="units-adv" aria-expanded="false">
                       <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 6h16M7 12h10M10 18h4"/></svg>
                       Filter Lanjutan
                       <em class="ims-adv-badge" data-ims-adv-badge hidden>0</em>
@@ -838,7 +838,7 @@
                   </div>
                 </div>
 
-                <div class="demo-table-wrap ims-units-table-wrap">
+                <div class="demo-table-wrap ims-units-table-wrap" data-ims-anchor="units-table">
                   <table class="demo-table ims-units-table">
                     <thead>
                       <tr>
@@ -865,7 +865,7 @@
             </section>
 
             <section class="ims-view" data-ims-view="per-cabang" hidden>
-              <div class="demo-page-heading">
+              <div class="demo-page-heading" data-ims-anchor="branch-heading">
                 <div>
                   <span class="demo-breadcrumb">Operasional / Manajemen Unit / Unit per Cabang</span>
                   <h2>Unit per Cabang</h2>
@@ -873,12 +873,12 @@
                 </div>
               </div>
 
-              <div class="ims-branch-totals" data-ims-branch-totals aria-label="Total stok cabang"></div>
-              <div class="ims-branch-grid" data-ims-branch-grid></div>
+              <div class="ims-branch-totals" data-ims-branch-totals data-ims-anchor="branch-totals" aria-label="Total stok cabang"></div>
+              <div class="ims-branch-grid" data-ims-branch-grid data-ims-anchor="branch-grid"></div>
             </section>
 
             <section class="ims-view" data-ims-view="uploads" hidden>
-              <div class="demo-page-heading">
+              <div class="demo-page-heading" data-ims-anchor="upload-heading">
                 <div>
                   <span class="demo-breadcrumb">Operasional / Manajemen Unit / Upload Data</span>
                   <h2>Upload Data</h2>
@@ -886,14 +886,14 @@
                 </div>
               </div>
 
-              <div class="ims-upload-tabs" role="tablist" aria-label="Jenis upload">
+              <div class="ims-upload-tabs" role="tablist" aria-label="Jenis upload" data-ims-anchor="upload-tabs">
                 <button class="active" type="button" role="tab" aria-selected="true" data-ims-upload-tab="inventory">Import Inventory</button>
                 <button type="button" role="tab" aria-selected="false" data-ims-upload-tab="foto">Upload Foto</button>
                 <button type="button" role="tab" aria-selected="false" data-ims-upload-tab="handover">Handover Sales</button>
                 <button type="button" role="tab" aria-selected="false" data-ims-upload-tab="mrp">Upload MRP</button>
               </div>
 
-              <div class="ims-upload-panel" data-ims-upload-panel="inventory">
+              <div class="ims-upload-panel" data-ims-upload-panel="inventory" data-ims-anchor="upload-drop">
                 <div class="ims-upload-drop">
                   <span class="ims-upload-icon" aria-hidden="true">⇪</span>
                   <b>Unggah file Excel inventory</b>
@@ -968,25 +968,25 @@
               </div>
 
               <div class="falcon-demo-layout">
-                <div class="falcon-role-panel">
-                  <div class="falcon-role-badge" data-falcon-role-badge>
+                <div class="falcon-role-panel" data-ims-anchor="falcon-role">
+                  <div class="falcon-role-badge" data-falcon-role-badge data-ims-anchor="falcon-badge">
                     <span data-falcon-mode-label>MODE DEMO</span>
                     <b data-falcon-role-label>Sales Agent</b>
                     <p data-falcon-role-hint>Checklist = semua fitur Falcon untuk role ini. Sales tidak bisa laporan aging/GP — Management bisa semua.</p>
                   </div>
-                  <div class="falcon-live-cta" data-falcon-live-cta>
+                  <div class="falcon-live-cta" data-falcon-live-cta data-ims-anchor="falcon-live">
                     <b>Siap coba Falcon sungguhan?</b>
                     <p>Pilih role, lalu chat di mock iPhone. Jawaban dari AI Falcon + knowledge inventory Motovax — bukan template.</p>
                     <button type="button" class="demo-primary-action" data-falcon-start-live>Mulai uji chat real</button>
                   </div>
-                  <ol class="falcon-tutorial-list" data-falcon-tutorial-list></ol>
+                  <ol class="falcon-tutorial-list" data-falcon-tutorial-list data-ims-anchor="falcon-checklist"></ol>
                   <div class="falcon-quick-prompts" data-falcon-quick-prompts></div>
                   <button type="button" class="falcon-exit-live" data-falcon-exit-live hidden>
                     Kembali ke mode panduan (template)
                   </button>
                 </div>
 
-                <div class="iphone-frame" aria-label="Mock WhatsApp AI Falcon">
+                <div class="iphone-frame" data-ims-anchor="falcon-phone" aria-label="Mock WhatsApp AI Falcon">
                   <div class="iphone-notch" aria-hidden="true"></div>
                   <div class="iphone-screen">
                     <header class="wa-header">
@@ -1237,14 +1237,16 @@
         </div><!-- /.ims-ud-shell -->
       </aside>
 
-      <div class="demo-guide-popover" data-demo-guide-popover hidden>
+      <!-- Spotlight cutout + tooltip panduan (gaya product tour: highlight area + info) -->
+      <div class="demo-guide-spotlight" data-demo-guide-spotlight hidden aria-hidden="true"></div>
+      <div class="demo-guide-popover demo-guide-tooltip" data-demo-guide-popover hidden>
         <button type="button" data-close-demo-guide aria-label="Tutup panduan">×</button>
         <span data-demo-guide-step-label>MANAJEMEN UNIT · LANGKAH 1 DARI 3</span>
         <h3 data-demo-guide-title>Manajemen Unit</h3>
-        <p data-demo-guide-body>Panduan singkat per menu sidebar. Tiap tab (Unit, Cabang, Upload, Falcon) punya tutorial sendiri dan hanya muncul otomatis saat pertama kali dibuka.</p>
+        <p data-demo-guide-body>Panduan singkat per menu. Area yang disorot adalah kontrol yang sedang dijelaskan — klik Berikutnya untuk lanjut.</p>
         <div class="demo-guide-actions">
           <button type="button" class="demo-secondary-action" data-demo-guide-prev hidden>Kembali</button>
-          <button type="button" data-demo-guide-next>Lanjut</button>
+          <button type="button" data-demo-guide-next>Berikutnya</button>
           <button type="button" data-demo-guide-finish hidden>Selesai</button>
         </div>
       </div>

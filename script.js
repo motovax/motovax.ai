@@ -617,6 +617,8 @@ class InventoryProductDemo {
     this.detailPanel = root.querySelector(".demo-detail-panel");
     this.detailBackdrop = root.querySelector("[data-demo-detail-backdrop]");
     this.guide = root.querySelector("[data-demo-guide-popover]");
+    this.guideSpotlight = root.querySelector("[data-demo-guide-spotlight]");
+    this._highlightEl = null;
     this.toast = root.querySelector("[data-demo-toast]");
     this.bookingButton = root.querySelector("[data-demo-book-unit]");
     this.bookingCopy = root.querySelector("[data-demo-booking-copy]");
@@ -674,8 +676,8 @@ class InventoryProductDemo {
   }
 
   /**
-   * Panduan pendek per menu sidebar.
-   * Tutorial tidak lagi satu rantai panjang lintas tab — tiap tab punya langkah sendiri.
+   * Panduan pendek per menu sidebar + spotlight (highlight area seperti product tour).
+   * Tiap tab punya langkah sendiri; `anchor` menunjuk elemen data-ims-anchor.
    */
   guideSteps(view = this.guideView || this.activeView) {
     const story = this.falconStoryLabel();
@@ -683,55 +685,95 @@ class InventoryProductDemo {
       units: [
         {
           view: "units",
-          title: "Manajemen Unit",
-          body: "Menu ini menampilkan stok unit seperti di Motovax App. Cari plat/brand di kolom pencarian, lalu saring status Ready/Booked.",
+          anchor: "nav-units",
+          title: "Menu Manajemen Unit",
+          body: "Anda di menu stok unit (sama seperti Motovax App). Area sorot = item sidebar aktif. Berikutnya: cara mencari unit.",
         },
         {
           view: "units",
-          title: "Filter & cabang",
-          body: "Gunakan filter cabang, Filter Lanjutan, dan export. Klik baris unit untuk membuka detail (layout mirip halaman Mobix).",
+          anchor: "units-search",
+          title: "Cari unit",
+          body: "Ketik plat, brand, tipe, atau tahun di kolom pencarian. Contoh: “Avanza” atau plat “B 1234”. Hasil tabel langsung menyusut.",
         },
         {
           view: "units",
-          title: "Coba menu lain",
-          body: "Sidebar kiri: Unit per Cabang, Upload Data, dan AI Falcon. Tiap menu punya panduan singkat sendiri saat pertama kali dibuka.",
+          anchor: "units-filters",
+          title: "Filter cabang & status",
+          body: "Cabang, pill Ready/Booked, dan Filter Lanjutan menyaring stok. Export di kanan atas untuk unduh Excel/PDF (simulasi).",
+        },
+        {
+          view: "units",
+          anchor: "units-table",
+          title: "Tabel stok & detail",
+          body: "Klik satu baris unit untuk membuka detail (harga, odo, foto, dokumen) — layout mirip halaman Mobix. Lalu coba menu sidebar lain.",
+        },
+        {
+          view: "units",
+          anchor: "nav",
+          title: "Menu lain di sidebar",
+          body: "Unit per Cabang, Upload Data, dan AI Falcon masing-masing punya panduan singkat saat pertama dibuka. Klik menu kiri untuk beralih.",
         },
       ],
       "per-cabang": [
         {
           view: "per-cabang",
-          title: "Unit per Cabang",
-          body: "Ringkasan stok Ready, Booked, dan kelengkapan foto per cabang — sama dengan modul cabang di Mobix.",
+          anchor: "nav-per-cabang",
+          title: "Menu Unit per Cabang",
+          body: "Menu ini merangkum stok Ready, Booked, dan kelengkapan foto per cabang — setara modul cabang di Mobix.",
         },
         {
           view: "per-cabang",
-          title: "Buka stok cabang",
-          body: "Klik kartu cabang untuk kembali ke Manajemen Unit dengan filter cabang itu otomatis aktif.",
+          anchor: "branch-totals",
+          title: "Total agregat",
+          body: "Baris total di atas menampilkan ringkasan semua cabang (jumlah unit, Ready, Booked). Angka ikut data tenant demo.",
+        },
+        {
+          view: "per-cabang",
+          anchor: "branch-grid",
+          title: "Kartu cabang",
+          body: "Klik satu kartu cabang → kembali ke Manajemen Unit dengan filter cabang itu otomatis aktif. Tidak perlu set filter manual.",
         },
       ],
       uploads: [
         {
           view: "uploads",
-          title: "Upload Data",
-          body: "Empat tab: Import Inventory, Upload Foto, Handover Sales, dan Upload MRP — alur yang sama dengan Mobix.",
+          anchor: "nav-uploads",
+          title: "Menu Upload Data",
+          body: "Satu tempat untuk impor inventory, foto unit, handover sales, dan MRP — alur yang sama dengan Mobix.",
         },
         {
           view: "uploads",
+          anchor: "upload-tabs",
+          title: "Empat jenis upload",
+          body: "Pilih tab: Import Inventory (Excel stok), Upload Foto, Handover Sales (unit terjual), atau Upload MRP (harga OTR massal).",
+        },
+        {
+          view: "uploads",
+          anchor: "upload-drop",
           title: "Simulasi unggah",
-          body: "Di demo, tombol unggah bersifat simulasi (file tidak dikirim ke server). Di tenant asli, file masuk ke inventory Anda.",
+          body: "Di demo, tombol unggah hanya simulasi (file tidak dikirim). Di tenant asli, file divalidasi lalu masuk ke inventory Anda.",
         },
       ],
       falcon: [
         {
           view: "falcon",
-          title: "AI Falcon — Sales Agent",
-          body: "Mock WhatsApp untuk Sales Agent. Falcon demo fitur sales Motovax (cek stok, foto, kredit, lead) tanpa laporan management.",
+          anchor: "nav-falcon",
+          title: "Menu AI Falcon",
+          body: "Chat WhatsApp mock untuk Sales & Management Agent. Panduan template dulu, lalu boleh uji chat real ke Falcon AI + stok Motovax.",
           enter: () => this.setFalconRole("sales", { greet: true }),
         },
         {
           view: "falcon",
+          anchor: "falcon-badge",
+          title: "Sales Agent (template)",
+          body: "Badge role menunjukkan mode demo. Sales: cek stok, foto, kredit, lead — tanpa laporan management (aging/GP).",
+          enter: () => this.setFalconRole("sales", { greet: true }),
+        },
+        {
+          view: "falcon",
+          anchor: "falcon-phone",
           title: "Sales: cek stok unit",
-          body: `Contoh tanya unit: “Halo, mau tanya ${story} dong, masih ready?”`,
+          body: `Pesan dikirim otomatis di mock iPhone: “Halo, mau tanya ${story} dong, masih ready?” — lihat balasan template di chat.`,
           enter: () => {
             this.setFalconRole("sales");
             this.sendFalconUserMessage(
@@ -742,15 +784,17 @@ class InventoryProductDemo {
         },
         {
           view: "falcon",
+          anchor: "falcon-phone",
           title: "Sales: minta foto unit",
-          body: "Lanjut unit yang sama — “Boleh minta fotonya?” (foto real unit di chat).",
+          body: "Lanjut unit yang sama — “Boleh minta fotonya?” Foto real unit muncul di bubble chat (jika tenant punya foto).",
           enter: () =>
             this.sendFalconUserMessage("Boleh minta fotonya?", { fromGuide: true }),
         },
         {
           view: "falcon",
+          anchor: "falcon-phone",
           title: "Sales: simulasi kredit",
-          body: `Coba finance: “Simulasi kredit ${story} DP 20% tenor 48 bulan”.`,
+          body: `Finance demo: “Simulasi kredit ${story} DP 20% tenor 48 bulan”. Angka ilustratif untuk presentasi ke customer.`,
           enter: () =>
             this.sendFalconUserMessage(
               `Simulasi kredit ${story} DP 20% tenor 48 bulan`,
@@ -759,21 +803,24 @@ class InventoryProductDemo {
         },
         {
           view: "falcon",
-          title: "Management Agent",
-          body: "Ganti ke Management untuk laporan stok, aging, GP, import, dan analytics (fitur di luar Sales).",
+          anchor: "falcon-badge",
+          title: "Ganti ke Management Agent",
+          body: "Management membuka laporan stok, aging, GP, import, dan analytics — fitur yang tidak tersedia di Sales.",
           enter: () => this.setFalconRole("management", { greet: true, fromGuide: true }),
         },
         {
           view: "falcon",
+          anchor: "falcon-phone",
           title: "Management: laporan stok",
-          body: "Contoh laporan: “Laporan stok per cabang” atau “Laporan aging unit”.",
+          body: "Contoh di chat: “Laporan stok per cabang”. Coba juga “Laporan aging unit” setelah panduan selesai.",
           enter: () =>
             this.sendFalconUserMessage("Laporan stok per cabang", { fromGuide: true }),
         },
         {
           view: "falcon",
+          anchor: "falcon-live",
           title: "Uji chat real",
-          body: "Selesai template. Klik “Uji chat real”, pilih Sales atau Management, lalu chat di mock iPhone — jawaban Falcon AI + stok Motovax.",
+          body: "Selesai template. Klik “Uji chat real” / tombol di area sorot, pilih Sales atau Management di iPhone — jawaban AI Falcon + stok live Motovax (bukan skrip).",
           enter: () => {
             this.openFalconLiveRoleGate();
           },
@@ -1119,10 +1166,15 @@ class InventoryProductDemo {
     });
 
     this._onGuideReposition = () => {
-      if (!this.guide.hidden) this.positionGuide();
+      if (!this.guide || this.guide.hidden) return;
+      this.syncSpotlightRect();
+      this.positionGuide();
     };
     window.addEventListener("resize", this._onGuideReposition);
     this.root.querySelector(".demo-workspace")?.addEventListener("scroll", this._onGuideReposition, {
+      passive: true,
+    });
+    this.root.querySelector(".demo-sidebar")?.addEventListener("scroll", this._onGuideReposition, {
       passive: true,
     });
 
@@ -1282,12 +1334,13 @@ class InventoryProductDemo {
 
   closeGuide() {
     if (this.guide) this.guide.hidden = true;
+    this.clearHighlight();
     this.clearGuidePosition();
   }
 
   clearGuidePosition() {
     if (!this.guide) return;
-    this.guide.classList.remove("is-falcon-anchor");
+    this.guide.classList.remove("is-falcon-anchor", "is-anchored");
     this.guide.style.top = "";
     this.guide.style.left = "";
     this.guide.style.right = "";
@@ -1296,64 +1349,136 @@ class InventoryProductDemo {
   }
 
   /**
-   * Posisikan popover panduan agar tidak menutupi mockup iPhone di view AI Falcon.
-   * Langkah non-Falcon tetap di kanan atas (CSS default).
+   * Sorot elemen data-ims-anchor + gambar spotlight cutout (dim area lain).
+   * Pola product tour: highlight menu/kontrol yang sedang dijelaskan.
+   */
+  highlightAnchor(name) {
+    this.clearHighlight(false);
+    if (!name) {
+      this.syncSpotlightRect(null);
+      return;
+    }
+    // Prefer elemen yang terlihat (sidebar desktop vs mobile-nav)
+    const candidates = [...this.root.querySelectorAll(`[data-ims-anchor="${name}"]`)];
+    const el =
+      candidates.find((node) => {
+        const r = node.getBoundingClientRect();
+        const style = window.getComputedStyle(node);
+        return r.width > 1 && r.height > 1 && style.display !== "none" && style.visibility !== "hidden";
+      }) || candidates[0];
+    if (!el) {
+      this.syncSpotlightRect(null);
+      return;
+    }
+    this._highlightEl = el;
+    el.classList.add("ims-guide-highlight");
+    try {
+      el.scrollIntoView({ block: "nearest", behavior: "smooth", inline: "nearest" });
+    } catch {
+      /* ignore */
+    }
+    this.syncSpotlightRect(el);
+  }
+
+  clearHighlight(hideSpotlight = true) {
+    for (const el of this.root.querySelectorAll(".ims-guide-highlight")) {
+      el.classList.remove("ims-guide-highlight");
+    }
+    this._highlightEl = null;
+    if (hideSpotlight) this.syncSpotlightRect(null);
+  }
+
+  /**
+   * Hole spotlight fixed di atas target — box-shadow besar = dim overlay.
+   * Tidak terpengaruh overflow:hidden di .demo-app.
+   */
+  syncSpotlightRect(el = this._highlightEl) {
+    const spot = this.guideSpotlight;
+    if (!spot) return;
+    if (!el || !this.guide || this.guide.hidden) {
+      spot.hidden = true;
+      spot.style.top = "";
+      spot.style.left = "";
+      spot.style.width = "";
+      spot.style.height = "";
+      return;
+    }
+    const r = el.getBoundingClientRect();
+    if (r.width < 2 && r.height < 2) {
+      spot.hidden = true;
+      return;
+    }
+    const pad = 8;
+    const top = Math.max(4, r.top - pad);
+    const left = Math.max(4, r.left - pad);
+    const width = Math.min(window.innerWidth - left - 4, r.width + pad * 2);
+    const height = Math.min(window.innerHeight - top - 4, r.height + pad * 2);
+    spot.hidden = false;
+    spot.style.top = `${Math.round(top)}px`;
+    spot.style.left = `${Math.round(left)}px`;
+    spot.style.width = `${Math.round(width)}px`;
+    spot.style.height = `${Math.round(height)}px`;
+  }
+
+  /**
+   * Posisikan tooltip di samping area yang disorot (mirip callout product tour).
    */
   positionGuide() {
     if (!this.guide || this.guide.hidden) return;
 
-    const steps = this.guideSteps(this.guideView || this.activeView);
-    const step = steps[this.guideStepIndex] || steps[0];
-    const isFalcon = (step?.view || this.guideView) === "falcon";
-
-    if (!isFalcon) {
-      this.clearGuidePosition();
-      return;
-    }
-
-    this.guide.classList.add("is-falcon-anchor");
-
-    const rectIsVisible = (el) => {
-      const r = el.getBoundingClientRect();
-      return r.width > 0 && r.height > 0;
-    };
-
     const place = () => {
       if (!this.guide || this.guide.hidden) return;
-      const phone = this.root.querySelector(".iphone-frame");
-      if (!phone || !rectIsVisible(phone)) {
-        // Fallback: kiri area workspace, jauh dari mockup iPhone
+
+      const target =
+        this._highlightEl && this._highlightEl.getBoundingClientRect().width > 0
+          ? this._highlightEl
+          : this.root.querySelector(".iphone-frame");
+
+      this.guide.classList.add("is-anchored");
+      this.guide.classList.toggle(
+        "is-falcon-anchor",
+        (this.guideView || this.activeView) === "falcon",
+      );
+
+      const gw = Math.min(320, window.innerWidth - 24);
+      const gh = this.guide.offsetHeight || 200;
+      const gap = 14;
+      const margin = 12;
+      const minTop = 64;
+
+      if (!target) {
         this.guide.style.top = "92px";
-        this.guide.style.right = "auto";
-        this.guide.style.left = "16px";
+        this.guide.style.right = "24px";
+        this.guide.style.left = "auto";
         this.guide.style.bottom = "auto";
+        this.guide.style.maxWidth = `${gw}px`;
         return;
       }
 
-      const rect = phone.getBoundingClientRect();
-      const gw = Math.min(330, window.innerWidth - 32);
-      const gh = this.guide.offsetHeight || 200;
-      const gap = 16;
-      const minTop = 76;
-
-      let left = rect.left - gw - gap;
+      const rect = target.getBoundingClientRect();
+      let left = rect.right + gap;
       let top = rect.top;
 
-      if (left >= 12) {
-        // Cukup ruang di kiri iPhone — letakkan di samping (kolom role panel)
-        top = Math.max(minTop, Math.min(top, window.innerHeight - gh - 16));
-      } else {
-        // Layout sempit / stacked: di atas iPhone, atau di bawah jika tidak muat
-        left = Math.max(12, Math.min(rect.left, window.innerWidth - gw - 12));
-        top = rect.top - gh - gap;
-        if (top < minTop) {
-          top = Math.min(rect.bottom + gap, window.innerHeight - gh - 16);
-          left = Math.max(
-            12,
-            Math.min(rect.left + (rect.width - gw) / 2, window.innerWidth - gw - 12),
-          );
-        }
+      // Prefer kanan target; jika tidak muat, kiri; lalu atas/bawah.
+      if (left + gw > window.innerWidth - margin) {
+        left = rect.left - gw - gap;
       }
+      if (left < margin) {
+        left = Math.max(
+          margin,
+          Math.min(rect.left, window.innerWidth - gw - margin),
+        );
+        top = rect.bottom + gap;
+        if (top + gh > window.innerHeight - margin) {
+          top = Math.max(minTop, rect.top - gh - gap);
+        }
+      } else {
+        top = Math.max(minTop, Math.min(top, window.innerHeight - gh - margin));
+      }
+
+      // Clamp final
+      left = Math.max(margin, Math.min(left, window.innerWidth - gw - margin));
+      top = Math.max(minTop, Math.min(top, window.innerHeight - gh - margin));
 
       this.guide.style.top = `${Math.round(top)}px`;
       this.guide.style.left = `${Math.round(left)}px`;
@@ -1362,11 +1487,13 @@ class InventoryProductDemo {
       this.guide.style.maxWidth = `${gw}px`;
     };
 
-    // Tunggu layout view Falcon + bubble chat selesai
     requestAnimationFrame(() => {
       requestAnimationFrame(place);
-      // enter() bisa menambah bubble; reposisi sekali lagi setelah layout stabil
       window.setTimeout(place, 80);
+      window.setTimeout(() => {
+        this.syncSpotlightRect();
+        place();
+      }, 200);
     });
   }
 
@@ -1400,14 +1527,27 @@ class InventoryProductDemo {
     const isFirst = this.guideStepIndex <= 0;
 
     if (prev) prev.hidden = isFirst;
-    if (next) next.hidden = isLast;
+    if (next) {
+      next.hidden = isLast;
+      next.textContent = "Berikutnya";
+    }
     if (finish) finish.hidden = !isLast;
 
     if (step.view && step.view !== this.activeView) {
       this.setView(step.view, { fromGuide: true });
     }
     if (typeof step.enter === "function") step.enter();
-    this.positionGuide();
+
+    // Highlight setelah view settle (enter bisa ganti role / bubble)
+    const applyHighlight = () => {
+      if (step.anchor) this.highlightAnchor(step.anchor);
+      else this.clearHighlight();
+      this.positionGuide();
+    };
+    requestAnimationFrame(() => {
+      applyHighlight();
+      window.setTimeout(applyHighlight, 100);
+    });
   }
 
   nextGuideStep() {
