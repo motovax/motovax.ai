@@ -23,10 +23,10 @@ for (const link of document.querySelectorAll("[data-wa]")) {
   if (!menus.length) return;
 
   const path = location.pathname.replace(/\/+$/, "") || "/";
-  const inFiturDir = path.includes("/fitur/") || /\/fitur$/.test(path);
-  const rootPrefix = inFiturDir ? "../" : "./";
-  const fiturPrefix = inFiturDir ? "./" : "./fitur/";
-  const home = inFiturDir ? "../index.html#" : path.endsWith("modul.html") ? "./index.html#" : "#";
+  const inNestedDir = path.includes("/fitur/") || path.includes("/solusi/") || /\/(fitur|solusi)$/.test(path);
+  const rootPrefix = inNestedDir ? "../" : "./";
+  const fiturPrefix = inNestedDir ? "../fitur/" : "./fitur/";
+  const home = inNestedDir ? "../index.html#" : path.endsWith("modul.html") ? "./index.html#" : "#";
   const modul = `${rootPrefix}modul.html`;
   const f = (slug) => `${fiturPrefix}${slug}.html`;
 
@@ -432,7 +432,7 @@ for (const link of document.querySelectorAll("[data-wa]")) {
 
 /**
  * Mega menu Solusi — struktur Industri & Roles mengikuti qontak.com/Solusi.
- * Industri ditambah Otomotif dan Property; Human Resource tidak ditampilkan.
+ * Industri ditambah Otomotif dan Property; role HR tidak ditampilkan.
  */
 (function initSolusiMegaMenu() {
   const solusiLinks = [...document.querySelectorAll('.nav > a[href*="#solusi"]')].filter(
@@ -441,9 +441,10 @@ for (const link of document.querySelectorAll("[data-wa]")) {
   if (!solusiLinks.length) return;
 
   const path = location.pathname.replace(/\/+$/, "") || "/";
-  const inFiturDir = path.includes("/fitur/") || /\/fitur$/.test(path);
-  const fiturPrefix = inFiturDir ? "./" : "./fitur/";
-  const home = inFiturDir ? "../index.html#" : path.endsWith("modul.html") ? "./index.html#" : "#";
+  const inNestedDir = path.includes("/fitur/") || path.includes("/solusi/") || /\/(fitur|solusi)$/.test(path);
+  const fiturPrefix = inNestedDir ? "../fitur/" : "./fitur/";
+  const solusiPrefix = path.includes("/solusi/") || /\/solusi$/.test(path) ? "./" : inNestedDir ? "../solusi/" : "./solusi/";
+  const home = inNestedDir ? "../index.html#" : path.endsWith("modul.html") ? "./index.html#" : "#";
 
   const icon = (paths) =>
     `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${paths}</svg>`;
@@ -472,18 +473,18 @@ for (const link of document.querySelectorAll("[data-wa]")) {
       id: "industri",
       title: "Industri",
       items: [
-        { title: "Pendidikan", desc: "Kelola manajemen sekolah", icon: "education", href: `${home}kontak` },
-        { title: "Keuangan", desc: "Kelola nasabah dengan mudah", icon: "finance", href: `${home}kontak` },
-        { title: "Kesehatan", desc: "Atur manajemen klinik/rumah sakit", icon: "health", href: `${home}kontak` },
-        { title: "Tour & Travel", desc: "Mudahkan kelola agen travel", icon: "travel", href: `${home}kontak` },
-        { title: "Perhotelan", desc: "Percepat reservasi pelanggan", icon: "hotel", href: `${home}kontak` },
-        { title: "Logistik", desc: "Konsolidasi laporan pengiriman", icon: "logistics", href: `${home}kontak` },
-        { title: "FMCG", desc: "Sederhanakan proses penjualan", icon: "fmcg", href: `${home}kontak` },
-        { title: "Ritel", desc: "Kelola pencatatan inventaris", icon: "retail", href: `${home}kontak` },
-        { title: "Teknologi Informasi", desc: "Sinkronisasi data pelanggan", icon: "tech", href: `${home}kontak` },
-        { title: "Outsourcing", desc: "Kelola interaksi pelanggan", icon: "outsourcing", href: `${home}kontak` },
-        { title: "Otomotif", desc: "Optimalkan penjualan dealer", icon: "automotive", href: `${home}solusi` },
-        { title: "Property", desc: "Kelola prospek dan penjualan properti", icon: "property", href: `${home}kontak` },
+        { title: "Pendidikan", desc: "Kelola manajemen sekolah", icon: "education", slug: "pendidikan", href: `${solusiPrefix}pendidikan.html` },
+        { title: "Keuangan", desc: "Kelola nasabah dengan mudah", icon: "finance", slug: "keuangan", href: `${solusiPrefix}keuangan.html` },
+        { title: "Kesehatan", desc: "Atur manajemen klinik/rumah sakit", icon: "health", slug: "kesehatan", href: `${solusiPrefix}kesehatan.html` },
+        { title: "Tour & Travel", desc: "Mudahkan kelola agen travel", icon: "travel", slug: "tour-travel", href: `${solusiPrefix}tour-travel.html` },
+        { title: "Perhotelan", desc: "Percepat reservasi pelanggan", icon: "hotel", slug: "perhotelan", href: `${solusiPrefix}perhotelan.html` },
+        { title: "Logistik", desc: "Konsolidasi laporan pengiriman", icon: "logistics", slug: "logistik", href: `${solusiPrefix}logistik.html` },
+        { title: "FMCG", desc: "Sederhanakan proses penjualan", icon: "fmcg", slug: "fmcg", href: `${solusiPrefix}fmcg.html` },
+        { title: "Ritel", desc: "Kelola pencatatan inventaris", icon: "retail", slug: "ritel", href: `${solusiPrefix}ritel.html` },
+        { title: "Teknologi Informasi", desc: "Sinkronisasi data pelanggan", icon: "tech", slug: "teknologi-informasi", href: `${solusiPrefix}teknologi-informasi.html` },
+        { title: "Outsourcing", desc: "Kelola interaksi pelanggan", icon: "outsourcing", slug: "outsourcing", href: `${solusiPrefix}outsourcing.html` },
+        { title: "Otomotif", desc: "Optimalkan penjualan dealer", icon: "automotive", slug: "otomotif", href: `${solusiPrefix}otomotif.html` },
+        { title: "Property", desc: "Kelola prospek dan penjualan properti", icon: "property", slug: "property", href: `${solusiPrefix}property.html` },
       ],
     },
     {
@@ -499,15 +500,18 @@ for (const link of document.querySelectorAll("[data-wa]")) {
   ];
 
   const renderItems = (group) => group.items
-    .map((item) => `
-      <a class="solusi-mega-item" href="${item.href}" data-solusi-close>
+    .map((item) => {
+      const isCurrent = Boolean(item.slug && (path.endsWith(`/solusi/${item.slug}`) || path.endsWith(`/solusi/${item.slug}.html`)));
+      return `
+      <a class="solusi-mega-item${isCurrent ? " is-current" : ""}" href="${item.href}"${isCurrent ? ' aria-current="page"' : ""} data-solusi-close>
         <span class="solusi-mega-icon">${icons[item.icon]}</span>
         <span class="solusi-mega-meta">
           <strong>${item.title}</strong>
           <small>${item.desc}</small>
         </span>
         <svg class="solusi-mega-arrow" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      </a>`)
+      </a>`;
+    })
     .join("");
 
   const renderMenu = (id) => `
