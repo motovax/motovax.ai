@@ -235,22 +235,53 @@ for (const link of document.querySelectorAll("[data-wa]")) {
   };
 
   function renderMenuHtml() {
+    const firstGroupId = groups[0]?.id || "fitur";
+
+    const tabs = `
+      <div class="produk-mega-tabs" role="tablist" aria-label="Fitur dan Solusi Bisnis">
+        <div class="produk-mega-tabs-inner">
+          ${groups
+            .map(
+              (group) => `
+            <button
+              type="button"
+              class="produk-mega-tab${group.id === firstGroupId ? " is-active" : ""}"
+              role="tab"
+              id="produk-tab-${group.id}"
+              aria-selected="${group.id === firstGroupId ? "true" : "false"}"
+              aria-controls="produk-group-${group.id}"
+              data-produk-tab="${group.id}"
+            >${group.title}</button>`
+            )
+            .join("")}
+        </div>
+      </div>`;
+
     const sidebar = groups
-      .map(
-        (group) => `
-        <div class="produk-mega-group" data-produk-group="${group.id}">
+      .map((group) => {
+        const isActiveGroup = group.id === firstGroupId;
+        const activePaneId = isActiveGroup ? firstPaneId : group.items[0]?.id;
+        return `
+        <div
+          class="produk-mega-group${isActiveGroup ? " is-active" : ""}"
+          id="produk-group-${group.id}"
+          role="tabpanel"
+          aria-labelledby="produk-tab-${group.id}"
+          data-produk-group="${group.id}"
+          ${isActiveGroup ? "" : "hidden"}
+        >
           <div class="produk-mega-group-title">${group.title}</div>
           ${group.items
             .map(
-              (item, index) => `
-            <button type="button" class="produk-mega-nav-btn${item.id === firstPaneId ? " is-active" : ""}" data-produk-pane="${item.id}" aria-selected="${item.id === firstPaneId ? "true" : "false"}">
+              (item) => `
+            <button type="button" class="produk-mega-nav-btn${item.id === activePaneId && isActiveGroup ? " is-active" : ""}" data-produk-pane="${item.id}" data-produk-pane-group="${group.id}" aria-selected="${item.id === activePaneId && isActiveGroup ? "true" : "false"}">
               <span>${item.label}</span>
               <svg class="chev" width="16" height="16" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M8.334 5 13.334 10l-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </button>`
             )
             .join("")}
-        </div>`
-      )
+        </div>`;
+      })
       .join("");
 
     const panes = allPanes
@@ -286,6 +317,7 @@ for (const link of document.querySelectorAll("[data-wa]")) {
       .join("");
 
     return `
+      ${tabs}
       <div class="produk-mega-layout">
         <aside class="produk-mega-sidebar" aria-label="Kategori produk">${sidebar}</aside>
         <div class="produk-mega-content">${panes}</div>
@@ -358,6 +390,30 @@ for (const link of document.querySelectorAll("[data-wa]")) {
     }
   };
 
+  const setActiveTab = (menu, groupId) => {
+    const group = groups.find((g) => g.id === groupId) || groups[0];
+    if (!group) return;
+
+    for (const tab of menu.querySelectorAll("[data-produk-tab]")) {
+      const on = tab.getAttribute("data-produk-tab") === group.id;
+      tab.classList.toggle("is-active", on);
+      tab.setAttribute("aria-selected", on ? "true" : "false");
+    }
+
+    for (const panel of menu.querySelectorAll("[data-produk-group]")) {
+      const on = panel.getAttribute("data-produk-group") === group.id;
+      panel.classList.toggle("is-active", on);
+      panel.hidden = !on;
+    }
+
+    const activeInGroup = menu.querySelector(
+      `[data-produk-group="${group.id}"] [data-produk-pane].is-active`
+    );
+    const paneId =
+      activeInGroup?.getAttribute("data-produk-pane") || group.items[0]?.id || firstPaneId;
+    setActivePane(menu, paneId);
+  };
+
   for (const menu of menus) {
     const trigger = menu.querySelector("[data-produk-trigger]");
     if (!trigger) continue;
@@ -372,6 +428,14 @@ for (const link of document.querySelectorAll("[data-wa]")) {
     menu.addEventListener("click", (event) => {
       const target = event.target;
       if (!(target instanceof Element)) return;
+
+      const tabBtn = target.closest("[data-produk-tab]");
+      if (tabBtn && menu.contains(tabBtn)) {
+        event.preventDefault();
+        event.stopPropagation();
+        setActiveTab(menu, tabBtn.getAttribute("data-produk-tab") || groups[0]?.id);
+        return;
+      }
 
       const paneBtn = target.closest("[data-produk-pane]");
       if (paneBtn && menu.contains(paneBtn)) {
