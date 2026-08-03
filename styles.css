@@ -64,7 +64,8 @@ a {
 
 .brand,
 .mini-brand {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
   font-weight: 900;
   font-style: italic;
   line-height: 1;
@@ -76,13 +77,27 @@ a {
   font-size: 28px;
 }
 
+/* Logo resmi MOTOVAX (wordmark) — dipakai header, footer, favicon */
+.brand-logo {
+  display: block;
+  width: auto;
+  height: 40px;
+  max-width: min(180px, 42vw);
+  object-fit: contain;
+}
+
+.footer-brand .brand-logo {
+  height: 36px;
+}
+
 .brand strong,
 .mini-brand strong {
   color: #e31825;
 }
 
-.brand::after,
-.mini-brand::after {
+/* Underline CSS hanya untuk wordmark teks (fallback); logo PNG sudah punya swoosh */
+.brand:not(:has(.brand-logo))::after,
+.mini-brand:not(:has(.brand-logo))::after {
   content: "";
   position: absolute;
   left: 3px;
@@ -99,7 +114,7 @@ a {
   margin-bottom: 22px;
 }
 
-.mini-brand::after {
+.mini-brand:not(:has(.brand-logo))::after {
   bottom: -5px;
   height: 5px;
   border-bottom-width: 2px;
