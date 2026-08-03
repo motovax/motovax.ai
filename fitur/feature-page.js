@@ -27,22 +27,38 @@
     return;
   }
 
-  const demoHref = data.demoHash ? `../index.html#${data.demoHash}` : "../index.html#solusi";
-  const demoAttr = data.demo
-    ? {
-        omni: "data-open-omni-demo",
-        crm: "data-open-crm-demo",
-        social: "data-open-social-demo",
-        dashboard: "data-open-dashboard-demo",
-        insight: "data-open-insight-demo",
-        inventory: "data-open-inventory-demo",
-      }[data.demo]
-    : "";
-
-  // Demo open only works on index; on feature pages link to index with hash / open via navigation
-  const demoCta = data.demo
-    ? `<a class="btn btn-secondary" href="../index.html#${data.demoHash || "solusi"}">Coba demo terkait <span>-></span></a>`
-    : `<a class="btn btn-secondary" href="../modul.html">Lihat semua modul <span>-></span></a>`;
+  // Satu demo dipakai bersama oleh beberapa halaman detail dalam kelompok yang
+  // sama. Nilai eksplisit di katalog tetap menang (mis. Goal -> Dashboard),
+  // sedangkan fallback memastikan setiap halaman detail punya CTA simulasi.
+  const demoByCategory = {
+    "Aplikasi Omnichannel": "omni",
+    "Aplikasi CRM": "crm",
+    "WhatsApp API": "omni",
+    "Customer Support & Ticketing": "omni",
+    "AI & Chatbot": "omni",
+    "Automasi Operasional & Workflow": "crm",
+    "Manajemen Campaign": "social",
+    "Call Center": "omni",
+    "Solusi Bisnis": "dashboard",
+  };
+  const demoHashes = {
+    inventory: "inventoryDemo",
+    omni: "omniDemo",
+    crm: "crmDemo",
+    social: "socialDemo",
+    dashboard: "dashboardDemo",
+    insight: "insightDemo",
+  };
+  const sharedDemo = data.demo || demoByCategory[data.category] || "dashboard";
+  const sharedDemoHash = data.demoHash || demoHashes[sharedDemo] || "solusi";
+  const demoParams = new URLSearchParams({
+    demo: sharedDemo,
+    from: data.slug || slug,
+  });
+  const demoHref = `../index.html?${demoParams.toString()}#${sharedDemoHash}`;
+  const isRelatedSimulation = /partial|roadmap/i.test(data.status || "");
+  const demoLabel = isRelatedSimulation ? "Lihat Simulasi Terkait" : "Coba Demo Interaktif";
+  const demoCta = `<a class="btn btn-secondary" href="${escapeHtml(demoHref)}">${demoLabel} <span>-></span></a>`;
 
   const related = (data.related || [])
     .map((id) => window.MOTOVAX_FEATURES[id])
