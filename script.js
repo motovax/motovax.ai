@@ -1616,6 +1616,13 @@ class InventoryProductDemo {
    */
   guideSteps(view = this.guideView || this.activeView) {
     const story = this.falconStoryLabel();
+    const falconMessageStep = (title, body, message) => ({
+      view: "falcon",
+      anchor: "falcon-phone",
+      title,
+      body,
+      enter: () => this.sendFalconUserMessage(message, { fromGuide: true }),
+    });
     const byView = {
       units: [
         {
@@ -1694,63 +1701,51 @@ class InventoryProductDemo {
           view: "falcon",
           anchor: "nav-falcon",
           title: "Menu AI Falcon",
-          body: "Chat WhatsApp mock untuk Sales & Management Agent. Panduan template dulu, lalu boleh uji chat real ke Falcon AI + stok Motovax.",
-          enter: () => this.setFalconRole("sales", { greet: true }),
-        },
-        {
-          view: "falcon",
-          anchor: "falcon-badge",
-          title: "Sales Agent (template)",
-          body: "Badge role menunjukkan mode demo. Sales: cek stok, foto, kredit, lead — tanpa laporan management (aging/GP).",
-          enter: () => this.setFalconRole("sales", { greet: true }),
-        },
-        {
-          view: "falcon",
-          anchor: "falcon-phone",
-          title: "Sales: cek stok unit",
-          body: `Pesan dikirim otomatis di mock iPhone: “Halo, mau tanya ${story} dong, masih ready?” — lihat balasan template di chat.`,
+          body: "Panduan ini memperagakan seluruh capability Sales Agent, lalu capability tambahan Management Agent. Setiap langkah mengirim contoh pesan dan menampilkan hasilnya di WhatsApp mock.",
           enter: () => {
-            this.setFalconRole("sales");
-            this.sendFalconUserMessage(
-              `Halo, mau tanya ${story} dong, masih ready?`,
-              { fromGuide: true },
-            );
+            this.falconTutorialDone = { sales: {}, management: {} };
+            this.falconSalesDone = false;
+            this.setFalconRole("sales", { greet: true, reset: true, fromGuide: true });
           },
         },
         {
           view: "falcon",
-          anchor: "falcon-phone",
-          title: "Sales: minta foto unit",
-          body: "Lanjut unit yang sama — “Boleh minta fotonya?” Foto real unit muncul di bubble chat (jika tenant punya foto).",
-          enter: () =>
-            this.sendFalconUserMessage("Boleh minta fotonya?", { fromGuide: true }),
+          anchor: "falcon-badge",
+          title: "Sales Agent · 10 capability",
+          body: "Sales fokus pada layanan customer dan pipeline miliknya. Ikuti semua contoh sampai checklist Sales tercentang penuh; laporan internal Management tetap dibatasi.",
         },
+        falconMessageStep("Sales 1/10 · Cek stok & detail", "Falcon mencari unit ready lalu menampilkan nopol, warna, odometer, cabang, posisi, dan harga OTR.", `Halo, mau tanya ${story} dong, masih ready?`),
+        falconMessageStep("Sales 2/10 · Minta foto unit", "Falcon menjaga konteks unit yang sama dan mengirim beberapa foto real unit di bubble chat.", "Boleh minta fotonya?"),
         {
           view: "falcon",
           anchor: "falcon-phone",
-          title: "Sales: simulasi kredit",
-          body: `Finance demo: “Simulasi kredit ${story} DP 20% tenor 48 bulan”. Angka ilustratif untuk presentasi ke customer.`,
-          enter: () =>
-            this.sendFalconUserMessage(
-              `Simulasi kredit ${story} DP 20% tenor 48 bulan`,
-              { fromGuide: true },
-            ),
+          title: "Sales 3/10 · Upload foto stok",
+          body: "Simulasi lampiran menambahkan dua foto ke unit yang sama, menautkan nopol, lalu memperbarui jumlah galeri stok.",
+          enter: () => this.simulateFalconPhotoUpload({ fromGuide: true }),
         },
+        falconMessageStep("Sales 4/10 · Kredit & asuransi", "Falcon menghitung ilustrasi OTR, DP 20%, tenor 48 bulan, angsuran, serta dukungan skema asuransi.", `Simulasi kredit ${story} DP 20% tenor 48 bulan dan asuransi`),
+        falconMessageStep("Sales 5/10 · Lokasi showroom", "Falcon memberikan alamat, token peta, dan konteks jam operasional cabang tenant.", "Lokasi showroom dan map cabang"),
+        falconMessageStep("Sales 6/10 · Catat lead", "Falcon mencatat customer sebagai lead milik sales yang sedang chat, lengkap dengan HP dan unit minat.", `Catat lead Budi 08123456789 minat ${story}`),
+        falconMessageStep("Sales 7/10 · Handoff customer", "Falcon menampilkan PIC yang tersedia dan menyiapkan perpindahan percakapan customer ke admin.", "Hubungkan customer ke admin"),
+        falconMessageStep("Sales 8/10 · Konten promosi", "Falcon membuat draft caption promosi berdasarkan unit tenant; production juga mendukung visual sesuai permission.", `Buat caption promo ${story}`),
+        falconMessageStep("Sales 9/10 · Performa sendiri", "Sales hanya melihat metrik miliknya: lead, follow-up, closing, dan unit yang sering ditanyakan.", "Performa sales saya"),
+        falconMessageStep("Sales 10/10 · Ringkasan capability", "Falcon merangkum seluruh capability Sales beserta contoh perintah. Checklist Sales kini selesai.", "Tampilkan semua fitur sales"),
         {
           view: "falcon",
           anchor: "falcon-badge",
-          title: "Ganti ke Management Agent",
-          body: "Management membuka laporan stok, aging, GP, import, dan analytics — fitur yang tidak tersedia di Sales.",
-          enter: () => this.setFalconRole("management", { greet: true, fromGuide: true }),
+          title: "Management Agent · 9 capability tambahan",
+          body: "Management mewarisi capability Sales dan memperoleh laporan internal, import, edit unit, dokumen, analisis, serta analytics tenant.",
+          enter: () => this.setFalconRole("management", { greet: true, reset: true, fromGuide: true }),
         },
-        {
-          view: "falcon",
-          anchor: "falcon-phone",
-          title: "Management: laporan stok",
-          body: "Contoh di chat: “Laporan stok per cabang”. Coba juga “Laporan aging unit” setelah panduan selesai.",
-          enter: () =>
-            this.sendFalconUserMessage("Laporan stok per cabang", { fromGuide: true }),
-        },
+        falconMessageStep("Management 1/9 · Stok per cabang", "Falcon menyusun total Ready, Booked, Sold, dan total stok per cabang.", "Laporan stok per cabang"),
+        falconMessageStep("Management 2/9 · Aging unit", "Falcon mengurutkan unit dengan aging tertinggi dan memberi rekomendasi tindak lanjut.", "Laporan aging unit"),
+        falconMessageStep("Management 3/9 · GP & margin", "Angka GP/margin internal hanya tampil untuk Management dan diberi konteks risiko unit aging.", "Gross profit dan margin unit"),
+        falconMessageStep("Management 4/9 · Import inventory", "Falcon memperagakan validasi Excel, jumlah baris diproses, unit terbarui, dan warning data.", "Import inventory lewat Excel"),
+        falconMessageStep("Management 5/9 · Edit status unit", "Falcon memvalidasi permission lalu mensimulasikan perubahan status unit menjadi Booked.", "Ubah status unit jadi Booked"),
+        falconMessageStep("Management 6/9 · Dokumen unit", "Falcon memperagakan upload dan review STNK/BPKB yang tertaut ke inventory.", "Upload dan review dokumen STNK BPKB unit"),
+        falconMessageStep("Management 7/9 · Analisis inventory", "Falcon membaca distribusi stok, aging, dan kelengkapan foto lalu memberi rekomendasi operasional.", "Analisis inventory dan rekomendasi stok"),
+        falconMessageStep("Management 8/9 · Analytics penjualan", "Falcon merangkum tren lead, closing, conversion, channel, dan unit terlaris.", "Tren penjualan dan analytics bulan ini"),
+        falconMessageStep("Management 9/9 · Ringkasan capability", "Falcon merangkum seluruh capability Management. Checklist kedua role kini tercentang penuh.", "Tampilkan semua fitur management"),
         {
           view: "falcon",
           anchor: "falcon-chat",
@@ -3135,11 +3130,12 @@ class InventoryProductDemo {
     }
   }
 
-  markFalconTutorial(id) {
-    if (!this.falconTutorialDone[this.falconRole]) {
-      this.falconTutorialDone[this.falconRole] = {};
+  markFalconTutorial(id, role = this.falconRole) {
+    const targetRole = role === "management" ? "management" : "sales";
+    if (!this.falconTutorialDone[targetRole]) {
+      this.falconTutorialDone[targetRole] = {};
     }
-    this.falconTutorialDone[this.falconRole][id] = true;
+    this.falconTutorialDone[targetRole][id] = true;
     this.renderFalconTutorial();
   }
 
@@ -3237,6 +3233,7 @@ class InventoryProductDemo {
   sendFalconUserMessage(text, options = {}) {
     const content = String(text || "").trim();
     if (!content) return;
+    const roleAtSend = this.falconRole;
 
     // Interaksi user selalu memakai Falcon real; template hanya untuk langkah panduan otomatis.
     if (!options.fromGuide) {
@@ -3257,7 +3254,7 @@ class InventoryProductDemo {
         photos: reply.photos,
         reportHtml: reply.reportHtml,
       });
-      if (reply.tutorialId) this.markFalconTutorial(reply.tutorialId);
+      if (reply.tutorialId) this.markFalconTutorial(reply.tutorialId, roleAtSend);
       this.renderFalconMessages();
     }, options.fromGuide ? 280 : 420);
   }
@@ -3464,6 +3461,7 @@ class InventoryProductDemo {
   }
 
   simulateFalconPhotoUpload(options = {}) {
+    const roleAtUpload = this.falconRole;
     const unit = this.pickFocusUnit("");
     if (!unit) {
       this.pushFalconUser("📷 [Foto unit dari galeri]", { photo: true });
@@ -3511,7 +3509,7 @@ class InventoryProductDemo {
           `Kalau mau, bilang saja untuk simulasi kredit atau jadwal survey.`,
         { photos: this.falconFocus.gallery.slice() },
       );
-      this.markFalconTutorial(this.falconRole === "sales" ? "upload" : "import");
+      this.markFalconTutorial(roleAtUpload === "sales" ? "upload" : "import", roleAtUpload);
       this.renderFalconMessages();
     }, options.fromGuide ? 280 : 400);
   }
