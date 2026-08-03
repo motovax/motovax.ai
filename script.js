@@ -5434,6 +5434,7 @@ const omniDemoSeed = () => [
     channel: "whatsapp",
     tag: "hot",
     bucket: "ai",
+    aiAgeBucket: "under_12_hours",
     handlerName: "Jasmine AI",
     mrName: "",
     priority: "tinggi",
@@ -5469,6 +5470,7 @@ const omniDemoSeed = () => [
     channel: "instagram",
     tag: "warm",
     bucket: "ai",
+    aiAgeBucket: "under_3_days",
     handlerName: "Jasmine AI",
     mrName: "",
     priority: "normal",
@@ -5478,7 +5480,7 @@ const omniDemoSeed = () => [
     closed: false,
     pipelineStage: "warm",
     preview: "Mau test drive besok sore",
-    time: "10:18",
+    time: "Kemarin",
     location: "Jakarta Selatan",
     unit: "Suzuki Ertiga Hybrid",
     budget: "Cicilan ringan",
@@ -5596,12 +5598,75 @@ const omniDemoSeed = () => [
     ],
   },
   {
+    id: "omni-alya",
+    name: "Alya Putri",
+    phone: "62852****614",
+    channel: "instagram",
+    tag: "warm",
+    bucket: "call_center",
+    handlerName: "Agent Demo (Saya)",
+    mrName: "",
+    priority: "normal",
+    escalated: false,
+    mrUnanswered: false,
+    pinned: false,
+    closed: false,
+    pipelineStage: "warm",
+    preview: "Tanya promo dari Instagram",
+    time: "08:32",
+    location: "Jakarta Barat",
+    unit: "Honda City Hatchback",
+    budget: "Cicilan Rp 5–6 jt",
+    notes: "Percakapan Instagram ditangani Call Center",
+    messages: [
+      { role: "customer", content: "Saya lihat promo City Hatchback di Instagram. Cicilannya mulai berapa?", time: "08:25" },
+      { role: "assistant", content: "Saya teruskan ke Call Center agar simulasi cicilannya bisa disesuaikan.", time: "08:26" },
+      { role: "agent", content: "Halo Kak Alya, saya bantu dari Call Center. Boleh info target DP dan tenor yang diinginkan?", time: "08:32" },
+    ],
+    history: [
+      { label: "Lead masuk dari Instagram", time: "08:25" },
+      { label: "Takeover Agent Demo", time: "08:32" },
+    ],
+  },
+  {
+    id: "omni-yusuf",
+    name: "Yusuf Maulana",
+    phone: "62822****735",
+    channel: "messenger",
+    tag: "hot",
+    bucket: "call_center",
+    handlerName: "Agent Demo (Saya)",
+    mrName: "",
+    priority: "tinggi",
+    escalated: false,
+    mrUnanswered: false,
+    pinned: false,
+    closed: false,
+    pipelineStage: "hot",
+    preview: "Follow-up stok dari Facebook",
+    time: "08:18",
+    location: "Bogor",
+    unit: "Toyota Avanza G CVT",
+    budget: "Budget Rp 250 jt",
+    notes: "Percakapan Facebook ditangani Call Center",
+    messages: [
+      { role: "customer", content: "Saya chat dari Facebook. Avanza G CVT yang di posting masih tersedia?", time: "08:12" },
+      { role: "assistant", content: "Saya eskalasi ke Call Center untuk konfirmasi stok dan lokasi unit.", time: "08:13" },
+      { role: "agent", content: "Halo Kak Yusuf, unitnya masih tercatat tersedia. Saya bantu cek cabang terdekat dari Bogor ya.", time: "08:18" },
+    ],
+    history: [
+      { label: "Lead masuk dari Facebook", time: "08:12" },
+      { label: "Takeover Agent Demo", time: "08:18" },
+    ],
+  },
+  {
     id: "omni-farhan",
     name: "Farhan Rizki",
     phone: "62811****330",
     channel: "messenger",
     tag: "warm",
     bucket: "ai",
+    aiAgeBucket: "over_3_days",
     handlerName: "Jasmine AI",
     mrName: "",
     priority: "normal",
@@ -5611,7 +5676,7 @@ const omniDemoSeed = () => [
     closed: false,
     pipelineStage: "warm",
     preview: "Bandingkan HR-V dan Xpander",
-    time: "Kemarin",
+    time: "4 hari lalu",
     location: "Bandung",
     unit: "HR-V / Xpander",
     budget: "250–300 jt",
@@ -5700,15 +5765,15 @@ const omniTutorialSteps = [
     ctxTab: "detail",
   },
   {
-    title: "Role 1 — Call Center: faneling & bucket",
-    body: "Tab Saya Handle · AI · Semua meniru produksi. Group: Ditangani AI, Menunggu Agent, MR Belum/Sudah Balas, dan per agent. Pilih lead Nadia di bucket AI.",
+    title: "Role 1 — Bucket Call Center",
+    body: "Bucket Call Center, Marketing Representative, dan Ditangani AI mengikuti produksi. Klik header atau sub-bucket untuk buka/tutup daftar chat.",
     fanel: "ai",
     contactId: "omni-nadia",
     ctxTab: "detail",
   },
   {
     title: "Ambil alih dari AI",
-    body: "Ketik pesan atau aksi takeover memindahkan lead ke Call Center (Saya Handle). Banner status berubah; agent bisa pakai Aksi Cepat.",
+    body: "Ketik pesan atau aksi takeover memindahkan lead ke bucket Call Center. Banner status berubah; agent bisa pakai Aksi Cepat.",
     fanel: "ai",
     contactId: "omni-nadia",
     ctxTab: "detail",
@@ -5751,10 +5816,20 @@ class OmnichannelAIDemo {
     this.root = root;
     this.contacts = this.cloneSeed();
     this.activeContactId = "omni-nadia";
-    this.fanel = "ai";
+    this.fanel = "all";
     this.channel = "all";
     this.tagFilter = new Set();
     this.selectedIds = new Set();
+    this.mrFilter = "all";
+    this.collapsedBuckets = new Set([
+      "call_center",
+      "mr_pending",
+      "mr_done",
+      "ai_under_12",
+      "ai_under_3",
+      "ai_over_3",
+    ]);
+    this.bucketItems = new Map();
     this.contextOpen = true;
     this.ctxTab = "detail";
     this.lastFocusedElement = null;
@@ -5819,12 +5894,14 @@ class OmnichannelAIDemo {
         },
       },
       {
-        anchor: "fanel",
-        label: "Faneling",
-        title: "Role Call Center: faneling & bucket",
-        body: "Tab Saya Handle · AI · Semua meniru produksi. Group: Ditangani AI, Menunggu Agent, MR Belum/Sudah Balas. Lead Nadia ada di bucket AI.",
+        anchor: "buckets",
+        label: "Bucket",
+        title: "Bucket Call Center produksi",
+        body: "Klik header Call Center, Marketing Representative, atau Ditangani AI untuk buka/tutup bucket. Sub-bucket MR dan umur penanganan AI juga interaktif seperti di Motovax.",
         enter: () => {
-          this.fanel = "ai";
+          this.fanel = "all";
+          this.collapsedBuckets.delete("ai");
+          this.collapsedBuckets.delete("ai_under_12");
           this.activeContactId = "omni-nadia";
           this.render();
         },
@@ -5833,7 +5910,7 @@ class OmnichannelAIDemo {
         anchor: "chat",
         label: "Percakapan",
         title: "Ambil alih dari AI",
-        body: "Ketik pesan atau takeover memindahkan lead ke Call Center (Saya Handle). Banner status berubah; agent bisa pakai Aksi Cepat.",
+        body: "Ketik pesan atau takeover memindahkan lead ke bucket Call Center. Banner status berubah; agent bisa pakai Aksi Cepat.",
         enter: () => {
           this.fanel = "ai";
           this.activeContactId = "omni-nadia";
@@ -5883,6 +5960,8 @@ class OmnichannelAIDemo {
             c.history.push({ label: `Handoff ke MR ${mr}`, time: "baru saja" });
             c.preview = `Handoff → MR ${mr.split(" ")[0]}`;
             this.fanel = "all";
+            this.collapsedBuckets.delete("mr");
+            this.collapsedBuckets.delete("mr_pending");
           }
           this.render();
         },
@@ -5937,12 +6016,6 @@ class OmnichannelAIDemo {
 
     this.searchInput.addEventListener("input", () => this.render());
 
-    for (const button of this.root.querySelectorAll("[data-omni-fanel]")) {
-      button.addEventListener("click", () => {
-        this.fanel = button.dataset.omniFanel || "all";
-        this.render();
-      });
-    }
     for (const button of this.root.querySelectorAll("[data-omni-channel]")) {
       button.addEventListener("click", () => {
         this.channel = button.dataset.omniChannel || "all";
@@ -5973,6 +6046,22 @@ class OmnichannelAIDemo {
     });
 
     this.contactList.addEventListener("click", (event) => {
+      const bucketToggle = event.target.closest("[data-omni-toggle-bucket]");
+      if (bucketToggle) {
+        const key = bucketToggle.dataset.omniToggleBucket;
+        if (this.collapsedBuckets.has(key)) this.collapsedBuckets.delete(key);
+        else this.collapsedBuckets.add(key);
+        this.renderContacts();
+        return;
+      }
+      const selectGroup = event.target.closest("[data-omni-select-group]");
+      if (selectGroup) {
+        event.stopPropagation();
+        const items = this.bucketItems.get(selectGroup.dataset.omniSelectGroup) || [];
+        for (const contact of items) this.selectedIds.add(contact.id);
+        this.render();
+        return;
+      }
       const claim = event.target.closest("[data-omni-claim]");
       if (claim) {
         event.stopPropagation();
@@ -5999,6 +6088,12 @@ class OmnichannelAIDemo {
       const row = event.target.closest("[data-omni-contact]");
       if (!row) return;
       this.activeContactId = row.dataset.omniContact;
+      this.render();
+    });
+    this.contactList.addEventListener("change", (event) => {
+      const filter = event.target.closest("[data-omni-mr-filter]");
+      if (!filter) return;
+      this.mrFilter = filter.value || "all";
       this.render();
     });
 
@@ -6148,10 +6243,19 @@ class OmnichannelAIDemo {
   reset() {
     this.contacts = this.cloneSeed();
     this.activeContactId = "omni-nadia";
-    this.fanel = "ai";
+    this.fanel = "all";
     this.channel = "all";
     this.tagFilter.clear();
     this.selectedIds.clear();
+    this.mrFilter = "all";
+    this.collapsedBuckets = new Set([
+      "call_center",
+      "mr_pending",
+      "mr_done",
+      "ai_under_12",
+      "ai_under_3",
+      "ai_over_3",
+    ]);
     this.contextOpen = true;
     this.ctxTab = "detail";
     this.trace = { ...this.defaultTrace, assertions: [...this.defaultTrace.assertions] };
@@ -6220,17 +6324,11 @@ class OmnichannelAIDemo {
   }
 
   matchesFilters(c) {
-    if (c.closed && this.fanel !== "all") return false;
+    if (c.closed) return false;
     if (this.channel !== "all" && c.channel !== this.channel) return false;
     if (this.tagFilter.size && !this.tagFilter.has(c.tag)) return false;
     const q = (this.searchInput.value || "").trim().toLowerCase();
     if (q && !(`${c.name} ${c.phone} ${c.preview}`.toLowerCase().includes(q))) return false;
-    if (this.fanel === "mine") {
-      return c.bucket === "call_center" && !c.claimedByOther && !c.closed;
-    }
-    if (this.fanel === "ai") {
-      return (c.bucket === "ai" || c.bucket === "pending") && !c.closed;
-    }
     return true;
   }
 
@@ -6243,7 +6341,6 @@ class OmnichannelAIDemo {
 
   render() {
     this.ensureActiveVisible();
-    this.renderFanelTabs();
     this.renderChannelTabs();
     this.renderContacts();
     this.renderChat();
@@ -6256,20 +6353,6 @@ class OmnichannelAIDemo {
     this.root.querySelector("[data-omni-context-panel]").classList.toggle("is-hidden", !this.contextOpen);
   }
 
-  renderFanelTabs() {
-    const counts = {
-      mine: this.contacts.filter((c) => c.bucket === "call_center" && !c.claimedByOther && !c.closed).length,
-      ai: this.contacts.filter((c) => (c.bucket === "ai" || c.bucket === "pending") && !c.closed).length,
-      all: this.contacts.filter((c) => !c.closed).length,
-    };
-    this.root.querySelector("[data-omni-count-mine]").textContent = counts.mine;
-    this.root.querySelector("[data-omni-count-ai]").textContent = counts.ai;
-    this.root.querySelector("[data-omni-count-all]").textContent = counts.all;
-    for (const button of this.root.querySelectorAll("[data-omni-fanel]")) {
-      button.classList.toggle("active", button.dataset.omniFanel === this.fanel);
-    }
-  }
-
   renderChannelTabs() {
     const base = this.contacts.filter((c) => !c.closed);
     const count = (ch) => base.filter((c) => ch === "all" || c.channel === ch).length;
@@ -6278,7 +6361,9 @@ class OmnichannelAIDemo {
     this.root.querySelector("[data-omni-ch-fb]").textContent = count("messenger");
     this.root.querySelector("[data-omni-ch-ig]").textContent = count("instagram");
     for (const button of this.root.querySelectorAll("[data-omni-channel]")) {
-      button.classList.toggle("active", button.dataset.omniChannel === this.channel);
+      const isActive = button.dataset.omniChannel === this.channel;
+      button.classList.toggle("active", isActive);
+      button.setAttribute("aria-selected", String(isActive));
     }
   }
 
@@ -6288,43 +6373,50 @@ class OmnichannelAIDemo {
     this.root.querySelector("[data-omni-bulk-count]").textContent = `${this.selectedIds.size} dipilih`;
   }
 
-  groupContacts(list) {
-    const groups = [];
-    const push = (key, title, cls, items, opts = {}) => {
-      if (items.length) groups.push({ key, title, cls, items, ...opts });
-    };
-    push("mr_pending", "MR Belum Balas", "mr", list.filter((c) => c.bucket === "mr" && c.mrUnanswered && !c.closed));
-    push("mr_done", "MR Sudah Balas", "mr", list.filter((c) => c.bucket === "mr" && !c.mrUnanswered && !c.closed));
-    push("ai", "Ditangani AI", "ai", list.filter((c) => c.bucket === "ai" && !c.closed));
-    push("pending", "Menunggu Agent", "pending", list.filter((c) => c.bucket === "pending" && !c.closed));
-    const agents = {};
-    for (const c of list.filter((x) => x.bucket === "call_center" && !x.closed)) {
-      const key = c.claimedByOther ? c.handlerName : "Saya";
-      agents[key] = agents[key] || [];
-      agents[key].push(c);
-    }
-    for (const [name, items] of Object.entries(agents)) {
-      push("cc-" + name, name === "Saya" ? "Ditangani Agent (Saya)" : `Ditangani ${name}`, "cc", items);
-    }
-    push("closed", "Closed / Riwayat", "closed", list.filter((c) => c.closed));
-    return groups;
+  aiAgeBucket(contact) {
+    if (contact.aiAgeBucket) return contact.aiAgeBucket;
+    const label = String(contact.time || "").toLowerCase();
+    const days = Number(label.match(/(\d+)\s*hari/)?.[1] || 0);
+    if (days > 3 || label.includes("minggu")) return "over_3_days";
+    if (days || label.includes("kemarin")) return "under_3_days";
+    return "under_12_hours";
   }
 
-  renderContacts() {
-    let list = this.contacts.filter((c) => this.matchesFilters(c));
-    list = [...list].sort((a, b) => Number(b.pinned) - Number(a.pinned));
-    if (!list.length) {
-      this.contactList.innerHTML = '<div class="cc-empty">Tidak ada percakapan pada filter ini.</div>';
-      return;
-    }
-    const groups = this.fanel === "all" || this.fanel === "ai" ? this.groupContacts(list) : [{ key: "flat", title: "", cls: "", items: list }];
-    const html = [];
-    for (const group of groups) {
-      if (group.title) {
-        html.push(`<div class="cc-group-title ${group.cls}">${group.title}<span>${group.items.length}</span></div>`);
-        html.push(`<div class="cc-group-actions"><button type="button" data-omni-select-group="${group.key}">Select bucket</button></div>`);
-      }
-      for (const c of group.items) {
+  bucketIcon(kind) {
+    const icons = {
+      call_center: '<svg viewBox="0 0 24 24"><circle cx="12" cy="7" r="3"/><path d="M6 21v-2a6 6 0 0 1 12 0v2"/></svg>',
+      mr: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/></svg>',
+      done: '<svg viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></svg>',
+      ai: '<svg viewBox="0 0 24 24"><rect x="5" y="7" width="14" height="11" rx="2"/><path d="M9 3h6M12 3v4M9 12h.01M15 12h.01M9 16h6"/></svg>',
+      timer: '<svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><path d="M9 2h6M12 5v3M12 13l3-2"/></svg>',
+      list: '<svg viewBox="0 0 24 24"><path d="m3 6 1.5 1.5L7 5M10 6h11M3 12l1.5 1.5L7 11M10 12h11M3 18l1.5 1.5L7 17M10 18h11"/></svg>',
+    };
+    return icons[kind] || icons.mr;
+  }
+
+  renderBucketHeader({ key, title, tone, icon, items, nested = false }) {
+    const collapsed = this.collapsedBuckets.has(key);
+    this.bucketItems.set(key, items);
+    return `
+      <div class="cc-bucket-head ${tone}${nested ? " nested" : ""}">
+        <button type="button" class="cc-bucket-toggle" data-omni-toggle-bucket="${key}" aria-expanded="${!collapsed}" aria-controls="cc-bucket-${key}">
+          <span class="cc-bucket-icon" aria-hidden="true">${this.bucketIcon(icon)}</span>
+          <span class="cc-bucket-title">${title}</span>
+          <span class="cc-bucket-count">${items.length}</span>
+          <span class="cc-bucket-chevron${collapsed ? "" : " is-open"}" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
+          </span>
+        </button>
+        <button type="button" class="cc-bucket-select" data-omni-select-group="${key}" aria-label="Pilih chat di bucket ${title}" title="Select bucket">
+          ${this.bucketIcon("list")}
+        </button>
+      </div>`;
+  }
+
+  renderContactRows(items) {
+    if (!items.length) return '<div class="cc-empty cc-bucket-empty">Tidak ada chat di bucket ini.</div>';
+    return items
+      .map((c) => {
         const classes = ["cc-row"];
         if (c.id === this.activeContactId) classes.push("active");
         if (c.escalated) classes.push("escalated");
@@ -6333,9 +6425,10 @@ class OmnichannelAIDemo {
         const badges = [];
         if (c.escalated) badges.push('<span class="cc-badge-sm es">ESKALASI</span>');
         if (c.mrUnanswered) badges.push('<span class="cc-badge-sm mr">MR BELUM BALAS</span>');
-        if (c.bucket === "pending")
+        if (c.bucket === "pending") {
           badges.push(`<button type="button" class="cc-badge-sm claim" data-omni-claim="${c.id}">Ambil</button>`);
-        html.push(`
+        }
+        return `
           <div class="${classes.join(" ")}" data-omni-contact="${c.id}" role="button" tabindex="0">
             <input type="checkbox" data-omni-select="${c.id}" ${this.selectedIds.has(c.id) ? "checked" : ""} aria-label="Pilih ${c.name}" />
             <span class="cc-avatar ${c.channel}">${this.initials(c.name)}<i class="dot ${c.channel}"></i></span>
@@ -6345,23 +6438,78 @@ class OmnichannelAIDemo {
               ${badges.join(" ")}
             </span>
             <span class="cc-row-side">
-              <div>${c.time}</div>
+              <span>${c.time}</span>
               <button type="button" class="cc-pin ${c.pinned ? "on" : ""}" data-omni-pin="${c.id}" title="Pin">📌</button>
             </span>
+          </div>`;
+      })
+      .join("");
+  }
+
+  renderContacts() {
+    let list = this.contacts.filter((c) => this.matchesFilters(c));
+    list = [...list].sort((a, b) => Number(b.pinned) - Number(a.pinned));
+    this.bucketItems = new Map();
+    if (!list.length) {
+      this.contactList.innerHTML = '<div class="cc-empty">Tidak ada percakapan pada filter ini.</div>';
+      return;
+    }
+
+    const callCenter = list.filter((c) => c.bucket === "call_center" || c.bucket === "pending");
+    const allMR = list.filter((c) => c.bucket === "mr");
+    const mrNames = [...new Set(allMR.map((c) => c.mrName).filter(Boolean))].sort();
+    if (this.mrFilter !== "all" && !mrNames.includes(this.mrFilter)) this.mrFilter = "all";
+    const visibleMR = this.mrFilter === "all" ? allMR : allMR.filter((c) => c.mrName === this.mrFilter);
+    const mrPending = visibleMR.filter((c) => c.mrUnanswered);
+    const mrDone = visibleMR.filter((c) => !c.mrUnanswered);
+    const ai = list.filter((c) => c.bucket === "ai");
+    const aiUnder12 = ai.filter((c) => this.aiAgeBucket(c) === "under_12_hours");
+    const aiUnder3 = ai.filter((c) => this.aiAgeBucket(c) === "under_3_days");
+    const aiOver3 = ai.filter((c) => this.aiAgeBucket(c) === "over_3_days");
+    const html = [];
+
+    if (callCenter.length) {
+      html.push(this.renderBucketHeader({ key: "call_center", title: "Call Center", tone: "call-center", icon: "call_center", items: callCenter }));
+      html.push(`<section class="cc-bucket-content" id="cc-bucket-call_center"${this.collapsedBuckets.has("call_center") ? " hidden" : ""}>${this.renderContactRows(callCenter)}</section>`);
+    }
+
+    if (allMR.length) {
+      html.push(this.renderBucketHeader({ key: "mr", title: "Marketing Representative", tone: "mr", icon: "mr", items: visibleMR }));
+      const options = mrNames.map((name) => `<option value="${name}"${name === this.mrFilter ? " selected" : ""}>${name}</option>`).join("");
+      html.push(`
+        <section class="cc-bucket-content" id="cc-bucket-mr"${this.collapsedBuckets.has("mr") ? " hidden" : ""}>
+          <label class="cc-mr-filter">
+            <span class="cc-visually-hidden">Filter Marketing Representative</span>
+            <select data-omni-mr-filter aria-label="Filter Marketing Representative">
+              <option value="all">Semua MR</option>${options}
+            </select>
+            <span aria-hidden="true">⌄</span>
+          </label>
+          <div class="cc-bucket-nested">
+            ${this.renderBucketHeader({ key: "mr_pending", title: "MR Belum Balas", tone: "mr-pending", icon: "mr", items: mrPending, nested: true })}
+            <section class="cc-bucket-content" id="cc-bucket-mr_pending"${this.collapsedBuckets.has("mr_pending") ? " hidden" : ""}>${this.renderContactRows(mrPending)}</section>
+            ${this.renderBucketHeader({ key: "mr_done", title: "MR Sudah Balas", tone: "mr-done", icon: "done", items: mrDone, nested: true })}
+            <section class="cc-bucket-content" id="cc-bucket-mr_done"${this.collapsedBuckets.has("mr_done") ? " hidden" : ""}>${this.renderContactRows(mrDone)}</section>
           </div>
-        `);
-      }
+        </section>`);
     }
-    this.contactList.innerHTML = html.join("");
-    for (const btn of this.contactList.querySelectorAll("[data-omni-select-group]")) {
-      btn.addEventListener("click", (e) => {
-        e.stopPropagation();
-        const g = groups.find((x) => x.key === btn.dataset.omniSelectGroup);
-        if (!g) return;
-        for (const c of g.items) this.selectedIds.add(c.id);
-        this.render();
-      });
+
+    if (ai.length) {
+      html.push(this.renderBucketHeader({ key: "ai", title: "Ditangani AI", tone: "ai", icon: "ai", items: ai }));
+      html.push(`
+        <section class="cc-bucket-content" id="cc-bucket-ai"${this.collapsedBuckets.has("ai") ? " hidden" : ""}>
+          <div class="cc-bucket-nested ai">
+            ${this.renderBucketHeader({ key: "ai_under_12", title: "Ditangani kurang dari 12 jam", tone: "ai-fresh", icon: "timer", items: aiUnder12, nested: true })}
+            <section class="cc-bucket-content" id="cc-bucket-ai_under_12"${this.collapsedBuckets.has("ai_under_12") ? " hidden" : ""}>${this.renderContactRows(aiUnder12)}</section>
+            ${this.renderBucketHeader({ key: "ai_under_3", title: "Ditangani kurang dari 3 hari", tone: "ai-aging", icon: "mr", items: aiUnder3, nested: true })}
+            <section class="cc-bucket-content" id="cc-bucket-ai_under_3"${this.collapsedBuckets.has("ai_under_3") ? " hidden" : ""}>${this.renderContactRows(aiUnder3)}</section>
+            ${this.renderBucketHeader({ key: "ai_over_3", title: "Ditangani lebih dari 3 hari", tone: "ai-old", icon: "mr", items: aiOver3, nested: true })}
+            <section class="cc-bucket-content" id="cc-bucket-ai_over_3"${this.collapsedBuckets.has("ai_over_3") ? " hidden" : ""}>${this.renderContactRows(aiOver3)}</section>
+          </div>
+        </section>`);
     }
+
+    this.contactList.innerHTML = html.join("") || '<div class="cc-empty">Tidak ada percakapan pada filter ini.</div>';
   }
 
   renderChat() {
@@ -6548,14 +6696,16 @@ class OmnichannelAIDemo {
     c.time = "baru";
     this.activeContactId = c.id;
     this.fanel = "mine";
+    this.collapsedBuckets.delete("call_center");
     this.render();
-    this.showToast("Takeover", `${c.name} sekarang di Saya Handle.`);
+    this.showToast("Takeover", `${c.name} sekarang di bucket Call Center.`);
   }
 
   releaseToAI() {
     const c = this.activeContact();
     if (c.closed) return;
     c.bucket = "ai";
+    c.aiAgeBucket = "under_12_hours";
     c.handlerName = "Jasmine AI";
     c.claimedByOther = false;
     c.mrName = "";
@@ -6568,6 +6718,8 @@ class OmnichannelAIDemo {
     c.history.push({ label: "Release ke AI", time: "baru saja" });
     c.preview = "Kembali ke AI";
     this.fanel = "ai";
+    this.collapsedBuckets.delete("ai");
+    this.collapsedBuckets.delete("ai_under_12");
     this.render();
     this.showToast("AI aktif", "Lead dikembalikan ke bucket Ditangani AI.");
   }
@@ -6585,6 +6737,7 @@ class OmnichannelAIDemo {
     });
     c.history.push({ label: "Takeover dari MR", time: "baru saja" });
     this.fanel = "mine";
+    this.collapsedBuckets.delete("call_center");
     this.render();
     this.showToast("Takeover dari MR", "Lead kembali ke Call Center.");
   }
@@ -6613,6 +6766,8 @@ class OmnichannelAIDemo {
     c.preview = `Handoff → MR ${mr.split(" ")[0]}`;
     this.closeModal("handoff");
     this.fanel = "all";
+    this.collapsedBuckets.delete("mr");
+    this.collapsedBuckets.delete("mr_pending");
     this.render();
     this.showToast("Handoff ke MR", `${c.name} diserahkan ke ${mr}. Lanjut preview role MR.`);
   }
@@ -6632,7 +6787,10 @@ class OmnichannelAIDemo {
   submitEscalate() {
     const c = this.activeContact();
     c.escalated = true;
-    if (c.bucket === "ai") c.bucket = "pending";
+    if (c.bucket === "ai") {
+      c.bucket = "pending";
+      this.collapsedBuckets.delete("call_center");
+    }
     c.history.push({ label: "Eskalasi ditandai", time: "baru saja" });
     this.closeModal("escalate");
     this.render();
@@ -6669,9 +6827,10 @@ class OmnichannelAIDemo {
     });
     this.activeContactId = id;
     this.fanel = "mine";
+    this.collapsedBuckets.delete("call_center");
     this.closeModal("manual");
     this.render();
-    this.showToast("Lead manual", `${name} ditambahkan ke Saya Handle.`);
+    this.showToast("Lead manual", `${name} ditambahkan ke bucket Call Center.`);
   }
 
   openCredit() {
@@ -6823,6 +6982,7 @@ class OmnichannelAIDemo {
       contact.claimedByOther = false;
       contact.history.push({ label: "Takeover via kirim pesan", time: "baru saja" });
       this.fanel = "mine";
+      this.collapsedBuckets.delete("call_center");
     }
     if (contact.claimedByOther) {
       contact.claimedByOther = false;

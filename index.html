@@ -1657,16 +1657,33 @@
                 <button type="button" class="cc-icon-btn" data-omni-tag-filter title="Filter tag" aria-label="Filter tag">⚙</button>
               </div>
               <div class="cc-tag-chips" data-omni-tag-chips hidden></div>
-              <div class="cc-main-tabs" role="tablist" aria-label="Faneling" data-omni-anchor="fanel">
-                <button type="button" role="tab" data-omni-fanel="mine">Saya Handle <b data-omni-count-mine>0</b></button>
-                <button type="button" role="tab" class="active" data-omni-fanel="ai">AI <b data-omni-count-ai>0</b></button>
-                <button type="button" role="tab" data-omni-fanel="all">Semua <b data-omni-count-all>0</b></button>
-              </div>
-              <div class="cc-channel-tabs" role="tablist" aria-label="Channel">
-                <button type="button" class="active" data-omni-channel="all">Semua <b data-omni-ch-all>0</b></button>
-                <button type="button" data-omni-channel="whatsapp">WA <b data-omni-ch-wa>0</b></button>
-                <button type="button" data-omni-channel="messenger">FB <b data-omni-ch-fb>0</b></button>
-                <button type="button" data-omni-channel="instagram">IG <b data-omni-ch-ig>0</b></button>
+              <div class="cc-channel-tabs" role="tablist" aria-label="Sumber percakapan">
+                <button type="button" role="tab" class="active" aria-selected="true" aria-label="Semua sumber" data-omni-channel="all">
+                  <span class="cc-channel-icon all" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" focusable="false"><path d="M4.75 5.25h14.5l1.5 8.25v4.25a1.5 1.5 0 0 1-1.5 1.5H4.75a1.5 1.5 0 0 1-1.5-1.5V13.5l1.5-8.25Z"/><path d="M3.5 13.5h4.25l1.5 2h5.5l1.5-2h4.25"/></svg>
+                  </span>
+                  <span class="cc-channel-label">Semua</span>
+                  <b data-omni-ch-all>0</b>
+                </button>
+                <button type="button" role="tab" aria-selected="false" data-omni-channel="whatsapp">
+                  <span class="cc-channel-icon whatsapp" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" focusable="false"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></svg>
+                  </span>
+                  <span class="cc-channel-label">WA</span>
+                  <b data-omni-ch-wa>0</b>
+                </button>
+                <button type="button" role="tab" aria-selected="false" data-omni-channel="messenger">
+                  <span class="cc-channel-icon messenger" aria-hidden="true">f</span>
+                  <span class="cc-channel-label">FB</span>
+                  <b data-omni-ch-fb>0</b>
+                </button>
+                <button type="button" role="tab" aria-selected="false" data-omni-channel="instagram">
+                  <span class="cc-channel-icon instagram" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" focusable="false"><rect x="3.5" y="3.5" width="17" height="17" rx="5"/><circle cx="12" cy="12" r="4"/><circle class="cc-instagram-dot" cx="17.4" cy="6.8" r="1"/></svg>
+                  </span>
+                  <span class="cc-channel-label">IG</span>
+                  <b data-omni-ch-ig>0</b>
+                </button>
               </div>
               <div class="cc-bulk-bar" data-omni-bulk-bar hidden>
                 <span data-omni-bulk-count>0 dipilih</span>
@@ -1674,7 +1691,7 @@
                 <button type="button" data-omni-bulk-cancel>Batal</button>
               </div>
             </div>
-            <div class="cc-queue-list" data-omni-contact-list></div>
+            <div class="cc-queue-list" data-omni-contact-list data-omni-anchor="buckets" aria-label="Bucket percakapan"></div>
           </aside>
 
           <!-- CENTER: Conversation -->
