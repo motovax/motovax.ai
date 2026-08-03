@@ -3942,49 +3942,6 @@ i.tel,
   line-height: 1.65;
 }
 
-.closing {
-  padding: 0 0 46px;
-}
-
-.closing-inner {
-  position: relative;
-  min-height: 160px;
-  display: grid;
-  grid-template-columns: 1fr auto 260px;
-  align-items: center;
-  gap: 28px;
-  color: #fff;
-  border-radius: 14px;
-  overflow: hidden;
-  padding: 34px 58px;
-  background:
-    radial-gradient(700px 190px at 80% 52%, rgba(18, 103, 245, 0.62), transparent 42%),
-    linear-gradient(90deg, #03132c, #061d3d 58%, #102e55);
-  box-shadow: 0 24px 70px rgba(5, 20, 44, 0.22);
-}
-
-.closing h2 {
-  font-size: 34px;
-  line-height: 1.05;
-  letter-spacing: -0.05em;
-  margin: 0 0 12px;
-}
-
-.closing p {
-  margin: 0;
-  color: rgba(255, 255, 255, 0.72);
-}
-
-.road-car {
-  height: 86px;
-  border-radius: 18px;
-  background:
-    radial-gradient(circle at 22% 88%, #050b14 0 11px, transparent 12px),
-    radial-gradient(circle at 78% 88%, #050b14 0 11px, transparent 12px),
-    linear-gradient(12deg, transparent 0 13%, #303a49 14% 26%, #b7c5d8 27% 50%, #566274 51% 72%, transparent 73%),
-    linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.28), transparent);
-}
-
 .footer {
   padding: 36px 0 24px;
   background: #fff;
@@ -10378,21 +10335,12 @@ body.demo-open {
   }
 
   .dash-grid,
-  .bottom-dash-grid,
-  .closing-inner {
+  .bottom-dash-grid {
     grid-template-columns: 1fr;
   }
 
   .partner-strip {
     grid-template-columns: repeat(2, 1fr);
-  }
-
-  .closing-inner {
-    padding: 30px;
-  }
-
-  .road-car {
-    display: none;
   }
 
   .demo-topbar {
