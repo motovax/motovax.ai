@@ -4903,18 +4903,21 @@ body.demo-open {
  * kiri = rail pilih agent + mode; tengah = mock iPhone WhatsApp hero.
  */
 .falcon-demo-layout {
+  --falcon-card-height: clamp(620px, calc(100dvh - 180px), 720px);
   display: grid;
-  grid-template-columns: minmax(240px, 300px) minmax(0, 1fr);
+  grid-template-columns: minmax(280px, 320px) minmax(0, 1fr);
   gap: 0;
   align-items: stretch;
-  margin-top: 14px;
+  margin: 14px auto 0;
   min-width: 0;
   width: 100%;
-  min-height: min(720px, calc(100dvh - 160px));
+  max-width: 1080px;
+  height: var(--falcon-card-height);
   border: 1px solid #e2e8f0;
   border-radius: 18px;
   overflow: hidden;
   background: #f8fafc;
+  box-shadow: 0 18px 48px rgba(15, 23, 42, 0.09);
 }
 
 /* —— Left rail: pilih agent / mode —— */
@@ -4926,7 +4929,10 @@ body.demo-open {
   padding: 18px 14px 16px;
   background: linear-gradient(180deg, #1e3a8a 0%, #1e40af 42%, #172554 100%);
   color: #e2e8f0;
-  overflow: auto;
+  height: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
 }
 
 .falcon-picker-head span {
@@ -5179,7 +5185,9 @@ body.demo-open {
   justify-content: flex-start;
   gap: 12px;
   min-width: 0;
-  padding: 18px 20px 22px;
+  height: 100%;
+  padding: 18px clamp(20px, 4vw, 42px) 22px;
+  overflow: hidden;
   background:
     radial-gradient(ellipse 80% 50% at 50% 0%, rgba(59, 130, 246, 0.08), transparent 55%),
     linear-gradient(180deg, #f8fafc 0%, #eef2ff 100%);
@@ -5217,14 +5225,14 @@ body.demo-open {
 .falcon-phone-wrap {
   flex: 1 1 auto;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
   width: 100%;
   min-height: 0;
 }
 
 .iphone-frame {
-  width: min(100%, 380px);
+  width: min(100%, 400px);
   max-width: 100%;
   margin: 0 auto;
   padding: 14px 12px 20px;
@@ -5250,8 +5258,8 @@ body.demo-open {
   overflow: hidden;
   display: grid;
   grid-template-rows: auto minmax(0, 1fr) auto;
-  height: min(640px, max(400px, calc(100dvh - 200px)));
-  max-height: min(640px, 78dvh);
+  height: min(590px, calc(var(--falcon-card-height) - 128px));
+  max-height: 100%;
   border-radius: 32px;
   background: #ece5dd;
   min-height: 0;
@@ -5531,10 +5539,12 @@ body.demo-open {
 @media (max-width: 1100px) {
   .falcon-demo-layout {
     grid-template-columns: 1fr;
+    height: auto;
     min-height: 0;
   }
 
   .falcon-picker-rail {
+    height: auto;
     max-height: none;
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   }
@@ -5549,6 +5559,10 @@ body.demo-open {
 
   .iphone-frame {
     width: min(100%, 360px);
+  }
+
+  .iphone-screen {
+    height: min(600px, max(400px, calc(100dvh - 190px)));
   }
 }
 
