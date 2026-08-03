@@ -6279,7 +6279,9 @@ class OmnichannelAIDemo {
     this.root.querySelector("[data-omni-ch-fb]").textContent = count("messenger");
     this.root.querySelector("[data-omni-ch-ig]").textContent = count("instagram");
     for (const button of this.root.querySelectorAll("[data-omni-channel]")) {
-      button.classList.toggle("active", button.dataset.omniChannel === this.channel);
+      const isActive = button.dataset.omniChannel === this.channel;
+      button.classList.toggle("active", isActive);
+      button.setAttribute("aria-selected", String(isActive));
     }
   }
 
