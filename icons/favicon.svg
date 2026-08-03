@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="MOTOVAX">
+  <defs>
+    <linearGradient id="bg" x1="8" y1="4" x2="56" y2="60" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#1267f5"/>
+      <stop offset="1" stop-color="#0b4ccb"/>
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="14" fill="url(#bg)"/>
+  <!-- Italic bold M monogram (path), matches MOTOVAX wordmark weight -->
+  <g transform="translate(32,28) skewX(-14)">
+    <path
+      fill="#ffffff"
+      d="M-16.5 14 V-14 h7.2 l5.4 11.6 5.4-11.6 h7.2 V14 h-6.1 V-3.2 L-2.1 9.4 h-4.1 L-10.4-3.2 V14 Z"
+    />
+  </g>
+  <!-- Red accent (VAX color #e31825) -->
+  <rect x="16" y="45" width="16" height="4" rx="2" fill="#e31825"/>
+  <!-- Blue brand underline curve (white for contrast on blue tile) -->
+  <path d="M20 52.2 C 28 56.2, 40 56.2, 48 52.2" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round"/>
+</svg>
