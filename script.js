@@ -555,7 +555,6 @@ class InventoryProductDemo {
     this.activeUploadTab = "inventory";
     this.guideStepIndex = 0;
     this.guideView = "units";
-    this.seenGuideViews = this.loadSeenGuideViews();
     this._guideAutoShowing = false;
     this.falconRole = "sales"; // sales | management
     this.falconMessages = [];
@@ -647,37 +646,10 @@ class InventoryProductDemo {
     this.loadTenantData();
   }
 
-  /** localStorage: panduan per-menu sidebar hanya auto-muncul sekali per tab. */
-  loadSeenGuideViews() {
-    try {
-      const raw = localStorage.getItem("motovax-ims-guide-seen");
-      if (!raw) return {};
-      const parsed = JSON.parse(raw);
-      return parsed && typeof parsed === "object" ? parsed : {};
-    } catch {
-      return {};
-    }
-  }
-
-  persistSeenGuideViews() {
-    try {
-      localStorage.setItem("motovax-ims-guide-seen", JSON.stringify(this.seenGuideViews || {}));
-    } catch {
-      /* ignore quota / private mode */
-    }
-  }
-
-  markGuideViewSeen(view) {
-    if (!view) return;
-    this.seenGuideViews = this.seenGuideViews || {};
-    if (this.seenGuideViews[view]) return;
-    this.seenGuideViews[view] = true;
-    this.persistSeenGuideViews();
-  }
-
   /**
    * Panduan pendek per menu sidebar + spotlight (highlight area seperti product tour).
    * Tiap tab punya langkah sendiri; `anchor` menunjuk elemen data-ims-anchor.
+   * Auto-aktif setiap kali user buka menu sidebar (bukan sekali-saja).
    */
   guideSteps(view = this.guideView || this.activeView) {
     const story = this.falconStoryLabel();
@@ -711,7 +683,7 @@ class InventoryProductDemo {
           view: "units",
           anchor: "nav",
           title: "Menu lain di sidebar",
-          body: "Unit per Cabang, Upload Data, dan AI Falcon masing-masing punya panduan singkat saat pertama dibuka. Klik menu kiri untuk beralih.",
+          body: "Unit per Cabang, Upload Data, dan AI Falcon masing-masing punya panduan sendiri. Klik menu kiri — panduan langsung aktif tanpa perlu tekan tombol dulu.",
         },
       ],
       "per-cabang": [
@@ -1225,7 +1197,7 @@ class InventoryProductDemo {
       },
       falcon: {
         title: "Chat AI Falcon",
-        body: "Panduan Falcon muncul saat pertama buka tab ini. Sales Agent dulu, lalu Management — atau buka lewat tombol Panduan.",
+        body: "Panduan Falcon aktif otomatis saat buka menu ini. Sales Agent dulu, lalu Management — atau buka ulang lewat tombol Panduan.",
       },
     };
     const tip = tips[next] || tips.units;
@@ -1252,28 +1224,28 @@ class InventoryProductDemo {
       this.closeGuide();
     }
 
-    // Auto-panduan hanya saat user buka tab (nav / open demo), sekali per tab.
+    // Auto-panduan setiap kali user buka menu sidebar (atau open demo) — tidak perlu tombol Panduan dulu.
     if (!options.fromGuide && !options.skipGuide) {
       this.maybeShowViewGuide(next);
     }
   }
 
   /**
-   * Tampilkan panduan singkat untuk tab sidebar jika belum pernah dilihat.
-   * Hanya saat demo terbuka (bukan saat construct).
+   * Tampilkan panduan demo untuk tab sidebar yang dibuka.
+   * Selalu aktif saat menu dibuka (tiap Unit / Cabang / Upload / Falcon punya tour sendiri).
    */
   maybeShowViewGuide(view) {
     if (!this.root?.classList.contains("is-open")) return;
     if (this._guideAutoShowing) return;
     const key = ["units", "per-cabang", "uploads", "falcon"].includes(view) ? view : "units";
-    if (this.seenGuideViews?.[key]) return;
 
     this._guideAutoShowing = true;
-    this.markGuideViewSeen(key);
-    // Biarkan layout tab settle dulu.
+    // Biarkan layout tab settle dulu (kartu cabang / panel upload ter-render).
     requestAnimationFrame(() => {
-      this.openGuide(0, key);
-      this._guideAutoShowing = false;
+      requestAnimationFrame(() => {
+        this.openGuide(0, key);
+        this._guideAutoShowing = false;
+      });
     });
   }
 
@@ -1319,16 +1291,14 @@ class InventoryProductDemo {
       : this.activeView || "units";
     this.guideView = key;
     this.guideStepIndex = Math.max(0, startIndex);
-    // Manual "Panduan" juga menandai tab sudah dilihat.
-    this.markGuideViewSeen(key);
     if (this.activeView !== key) {
       this.setView(key, { fromGuide: true });
     }
-    this.guide.hidden = false;
+    if (this.guide) this.guide.hidden = false;
     this.renderGuideStep();
     const focusBtn =
-      this.guide.querySelector("[data-demo-guide-next]:not([hidden])") ||
-      this.guide.querySelector("[data-demo-guide-finish]:not([hidden])");
+      this.guide?.querySelector("[data-demo-guide-next]:not([hidden])") ||
+      this.guide?.querySelector("[data-demo-guide-finish]:not([hidden])");
     focusBtn?.focus();
   }
 
