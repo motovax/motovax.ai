@@ -699,11 +699,80 @@ if (contactForm instanceof HTMLFormElement) {
   });
 })();
 
-/** Navigasi mobile beranda — menjaga Produk, Solusi, Cara Kerja, dan Keunggulan tetap dapat diakses. */
+/** Navigasi mobile seluruh halaman — menjaga menu utama tetap dapat diakses. */
 (function initMobileNavigation() {
-  const trigger = document.querySelector("[data-mobile-nav-trigger]");
-  const panel = document.querySelector("[data-mobile-nav-panel]");
-  const backdrop = document.querySelector("[data-mobile-nav-backdrop]");
+  const header = document.querySelector(".site-header");
+  const headerInner = header?.querySelector(".header-inner");
+  if (!(header instanceof HTMLElement) || !(headerInner instanceof HTMLElement)) return;
+
+  let trigger = header.querySelector("[data-mobile-nav-trigger]");
+  let panel = header.querySelector("[data-mobile-nav-panel]");
+  let backdrop = header.querySelector("[data-mobile-nav-backdrop]");
+
+  /* Halaman selain beranda memakai header yang sama, tetapi markup menu mobile
+   * tidak diduplikasi ke puluhan file HTML. Bentuk menu di sini agar setiap
+   * halaman selalu mendapat navigasi mobile/tablet yang identik. */
+  if (!trigger || !panel || !backdrop) {
+    const path = location.pathname.replace(/\/+$/, "") || "/";
+    const nested = path.includes("/fitur/") || path.includes("/solusi/") || /\/(fitur|solusi)$/.test(path);
+    const root = nested ? "../" : "./";
+    const home = `${root}index.html`;
+    const industries = [
+      ["Otomotif", "Live", "otomotif"],
+      ["Property", "Adaptif", "property"],
+      ["Pendidikan", "Adaptif", "pendidikan"],
+      ["Keuangan", "Adaptif", "keuangan"],
+      ["Kesehatan", "Adaptif", "kesehatan"],
+      ["Tour & Travel", "Adaptif", "tour-travel"],
+      ["Perhotelan", "Adaptif", "perhotelan"],
+      ["Logistik", "Adaptif", "logistik"],
+      ["FMCG", "Adaptif", "fmcg"],
+      ["Ritel", "Adaptif", "ritel"],
+      ["Teknologi Informasi", "Adaptif", "teknologi-informasi"],
+      ["Outsourcing", "Adaptif", "outsourcing"],
+    ];
+
+    trigger = document.createElement("button");
+    trigger.className = "mobile-nav-trigger";
+    trigger.type = "button";
+    trigger.setAttribute("aria-expanded", "false");
+    trigger.setAttribute("aria-controls", "mobile-navigation");
+    trigger.setAttribute("aria-label", "Buka menu navigasi");
+    trigger.setAttribute("data-mobile-nav-trigger", "");
+    trigger.innerHTML = "<span></span><span></span><span></span>";
+
+    backdrop = document.createElement("button");
+    backdrop.className = "mobile-nav-backdrop";
+    backdrop.type = "button";
+    backdrop.hidden = true;
+    backdrop.setAttribute("aria-label", "Tutup menu navigasi");
+    backdrop.setAttribute("data-mobile-nav-backdrop", "");
+
+    panel = document.createElement("aside");
+    panel.className = "mobile-nav-panel";
+    panel.id = "mobile-navigation";
+    panel.hidden = true;
+    panel.setAttribute("aria-label", "Navigasi mobile");
+    panel.setAttribute("data-mobile-nav-panel", "");
+    panel.innerHTML = `
+      <nav class="mobile-nav-links">
+        <a href="${root}modul.html" data-mobile-nav-close>Produk <span>→</span></a>
+        <details>
+          <summary>Solusi berdasarkan industri <span>+</span></summary>
+          <div class="mobile-solutions-grid">
+            ${industries.map(([name, status, slug]) => `<a href="${root}solusi/${slug}.html" data-mobile-nav-close>${name} <small>${status}</small></a>`).join("")}
+          </div>
+        </details>
+        <a href="${home}#cara-kerja" data-mobile-nav-close>Cara Kerja <span>→</span></a>
+        <a href="${home}#keunggulan" data-mobile-nav-close>Keunggulan <span>→</span></a>
+        <a href="${root}hubungi-kami.html" data-mobile-nav-close>Hubungi Kami <span>→</span></a>
+      </nav>
+      <a class="btn btn-primary mobile-nav-cta" href="${root}hubungi-kami.html" data-mobile-nav-close>Diskusikan Bisnis Anda <span>→</span></a>`;
+
+    headerInner.appendChild(trigger);
+    header.append(backdrop, panel);
+  }
+
   if (!(trigger instanceof HTMLButtonElement) || !(panel instanceof HTMLElement) || !(backdrop instanceof HTMLElement)) return;
 
   const close = ({ restoreFocus = false } = {}) => {

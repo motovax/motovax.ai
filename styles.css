@@ -17605,6 +17605,7 @@ body.demo-open {
 
 @media (max-width: 700px) {
   .contact-page .header-inner {
+    grid-template-columns: 1fr auto auto;
     min-height: 62px;
     gap: 16px;
   }
