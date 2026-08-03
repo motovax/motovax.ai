@@ -13,6 +13,70 @@ for (const link of document.querySelectorAll("[data-wa]")) {
   }
 }
 
+/** Mega menu Produk (klik = buka detail fitur, ala qontak.com) */
+(function initProdukMegaMenu() {
+  const menus = document.querySelectorAll("[data-produk-menu]");
+  if (!menus.length) return;
+
+  const closeAll = (except = null) => {
+    for (const menu of menus) {
+      if (menu === except) continue;
+      menu.classList.remove("is-open");
+      const trigger = menu.querySelector("[data-produk-trigger]");
+      const panel = menu.querySelector("[data-produk-panel]");
+      if (trigger) trigger.setAttribute("aria-expanded", "false");
+      if (panel) panel.hidden = true;
+    }
+  };
+
+  const openMenu = (menu) => {
+    closeAll(menu);
+    menu.classList.add("is-open");
+    const trigger = menu.querySelector("[data-produk-trigger]");
+    const panel = menu.querySelector("[data-produk-panel]");
+    if (trigger) trigger.setAttribute("aria-expanded", "true");
+    if (panel) panel.hidden = false;
+  };
+
+  const closeMenu = (menu) => {
+    menu.classList.remove("is-open");
+    const trigger = menu.querySelector("[data-produk-trigger]");
+    const panel = menu.querySelector("[data-produk-panel]");
+    if (trigger) trigger.setAttribute("aria-expanded", "false");
+    if (panel) panel.hidden = true;
+  };
+
+  for (const menu of menus) {
+    const trigger = menu.querySelector("[data-produk-trigger]");
+    if (!trigger) continue;
+
+    trigger.addEventListener("click", (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      if (menu.classList.contains("is-open")) closeMenu(menu);
+      else openMenu(menu);
+    });
+
+    for (const closer of menu.querySelectorAll("[data-produk-close]")) {
+      closer.addEventListener("click", () => {
+        // Delay close slightly so demo open handlers run first on buttons
+        requestAnimationFrame(() => closeMenu(menu));
+      });
+    }
+  }
+
+  document.addEventListener("click", (event) => {
+    const target = event.target;
+    if (!(target instanceof Element)) return;
+    if (target.closest("[data-produk-menu]")) return;
+    closeAll();
+  });
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") closeAll();
+  });
+})();
+
 class PublicDemoDataBridge {
   constructor() {
     this.baseUrl = "https://mobix.motovax.com/api/public/demo/motovax-ai";
