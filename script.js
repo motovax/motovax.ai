@@ -13,6 +13,41 @@ for (const link of document.querySelectorAll("[data-wa]")) {
   }
 }
 
+const contactForm = document.querySelector("[data-contact-form]");
+if (contactForm instanceof HTMLFormElement) {
+  contactForm.addEventListener("submit", (event) => {
+    event.preventDefault();
+    if (!contactForm.reportValidity()) return;
+
+    const data = new FormData(contactForm);
+    const value = (name) => String(data.get(name) || "").trim();
+    const message = [
+      "Halo MOTOVAX, saya ingin berkonsultasi.",
+      "",
+      `Nama: ${value("name")}`,
+      `Perusahaan/dealer: ${value("company")}`,
+      `Email: ${value("email")}`,
+      `Nomor WhatsApp: ${value("phone")}`,
+      `Kebutuhan: ${value("need")}`,
+      value("message") ? `Detail: ${value("message")}` : "",
+    ]
+      .filter(Boolean)
+      .join("\n");
+
+    window.open(`https://wa.me/6281999197186?text=${encodeURIComponent(message)}`, "_blank", "noopener,noreferrer");
+  });
+}
+
+for (const link of document.querySelectorAll("[data-contact-focus]")) {
+  link.addEventListener("click", () => {
+    window.setTimeout(() => {
+      const fieldName = link.getAttribute("data-contact-focus");
+      const field = contactForm?.elements.namedItem(fieldName || "");
+      if (field instanceof HTMLElement) field.focus({ preventScroll: true });
+    }, 350);
+  });
+}
+
 /**
  * Mega menu Produk — katalog kapabilitas dan suite Motovax.
  * Link diarahkan ke halaman detail fitur terkait.
@@ -23,9 +58,10 @@ for (const link of document.querySelectorAll("[data-wa]")) {
 
   const path = location.pathname.replace(/\/+$/, "") || "/";
   const inNestedDir = path.includes("/fitur/") || path.includes("/solusi/") || /\/(fitur|solusi)$/.test(path);
+  const isStandaloneRoot = path.endsWith("modul.html") || path.endsWith("hubungi-kami.html");
   const rootPrefix = inNestedDir ? "../" : "./";
   const fiturPrefix = inNestedDir ? "../fitur/" : "./fitur/";
-  const home = inNestedDir ? "../index.html#" : path.endsWith("modul.html") ? "./index.html#" : "#";
+  const home = inNestedDir ? "../index.html#" : isStandaloneRoot ? "./index.html#" : "#";
   const modul = `${rootPrefix}modul.html`;
   const f = (slug) => `${fiturPrefix}${slug}.html`;
 
