@@ -14,9 +14,8 @@ for (const link of document.querySelectorAll("[data-wa]")) {
 }
 
 /**
- * Mega menu Produk — layout, copy, dan interaksi selaras qontak.com/Produk
- * (sidebar kategori + pane detail). Teks menu mengikuti Qontak; suite
- * berbrand diganti Motovax. Link diarahkan ke demo / modul Motovax.
+ * Mega menu Produk — katalog kapabilitas dan suite Motovax.
+ * Link diarahkan ke halaman detail fitur terkait.
  */
 (function initProdukMegaMenu() {
   const menus = document.querySelectorAll("[data-produk-menu]");
@@ -63,11 +62,11 @@ for (const link of document.querySelectorAll("[data-wa]")) {
     suite: icon('<rect x="3" y="3" width="8" height="8" rx="1.5"/><rect x="13" y="3" width="8" height="8" rx="1.5"/><rect x="3" y="13" width="8" height="8" rx="1.5"/><rect x="13" y="13" width="8" height="8" rx="1.5"/>'),
   };
 
-  /** Copy & struktur menu = qontak.com Produk; link → Motovax */
+  /** Kapabilitas platform dan paket suite Motovax. */
   const groups = [
     {
-      id: "fitur",
-      title: "Fitur",
+      id: "kapabilitas",
+      title: "Kapabilitas",
       items: [
         {
           id: "omni",
@@ -157,8 +156,8 @@ for (const link of document.querySelectorAll("[data-wa]")) {
       ],
     },
     {
-      id: "solusi",
-      title: "Solusi Bisnis",
+      id: "suite",
+      title: "Suite Motovax",
       items: [
         {
           id: "broadcast",
@@ -200,10 +199,10 @@ for (const link of document.querySelectorAll("[data-wa]")) {
   const firstPaneId = allPanes[0]?.id || "omni";
 
   function renderMenuHtml() {
-    const firstGroupId = groups[0]?.id || "fitur";
+    const firstGroupId = groups[0]?.id || "kapabilitas";
 
     const tabs = `
-      <div class="produk-mega-tabs" role="tablist" aria-label="Fitur dan Solusi Bisnis">
+      <div class="produk-mega-tabs" role="tablist" aria-label="Kapabilitas dan Suite Motovax">
         <div class="produk-mega-tabs-inner">
           ${groups
             .map(

@@ -66,11 +66,11 @@ const template = (industry) => {
                 <path d="M2.5 4.5 6 8l3.5-3.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
               </svg>
             </button>
-            <div class="produk-mega" id="produk-mega-menu" role="region" aria-label="Menu produk dan fitur" hidden data-produk-panel data-produk-mount></div>
+            <div class="produk-mega" id="produk-mega-menu" role="region" aria-label="Menu produk Motovax" hidden data-produk-panel data-produk-mount></div>
           </div>
           <a href="../index.html#solusi">Solusi</a>
-          <a href="../index.html#fitur">Fitur</a>
           <a href="../index.html#cara-kerja">Cara Kerja</a>
+          <a href="../index.html#keunggulan">Keunggulan</a>
           <a href="../index.html#kontak">Kontak</a>
         </nav>
         <a class="btn btn-primary header-cta" href="../index.html#kontak">Jadwalkan Demo <span>→</span></a>
@@ -91,7 +91,6 @@ const template = (industry) => {
           <h3>Produk</h3>
           <a href="../modul.html">Semua produk</a>
           <a href="../index.html#solusi">Solusi</a>
-          <a href="../index.html#fitur">Fitur</a>
         </div>
         <div>
           <h3>Hubungi Kami</h3>
