@@ -23,10 +23,10 @@ for (const link of document.querySelectorAll("[data-wa]")) {
   if (!menus.length) return;
 
   const path = location.pathname.replace(/\/+$/, "") || "/";
-  const inFiturDir = path.includes("/fitur/") || /\/fitur$/.test(path);
-  const rootPrefix = inFiturDir ? "../" : "./";
-  const fiturPrefix = inFiturDir ? "./" : "./fitur/";
-  const home = inFiturDir ? "../index.html#" : path.endsWith("modul.html") ? "./index.html#" : "#";
+  const inNestedDir = path.includes("/fitur/") || path.includes("/solusi/") || /\/(fitur|solusi)$/.test(path);
+  const rootPrefix = inNestedDir ? "../" : "./";
+  const fiturPrefix = inNestedDir ? "../fitur/" : "./fitur/";
+  const home = inNestedDir ? "../index.html#" : path.endsWith("modul.html") ? "./index.html#" : "#";
   const modul = `${rootPrefix}modul.html`;
   const f = (slug) => `${fiturPrefix}${slug}.html`;
 
@@ -73,8 +73,6 @@ for (const link of document.querySelectorAll("[data-wa]")) {
           id: "omni",
           label: "Aplikasi Omnichannel",
           paneTitle: "Aplikasi Omnichannel",
-          moreHref: `${fiturPrefix}index.html`,
-          moreLabel: "Lihat semua fitur",
           features: [
             { title: "Omnichannel", desc: "Satu platform untuk kelola chat dari berbagai saluran", icon: "chat", href: f("aplikasi-omnichannel") },
             { title: "Instagram API", desc: "Respons DM otomatis untuk tingkatkan penjualan", icon: "ig", href: f("instagram-api") },
@@ -86,8 +84,6 @@ for (const link of document.querySelectorAll("[data-wa]")) {
           id: "crm",
           label: "Aplikasi CRM",
           paneTitle: "Aplikasi CRM",
-          moreHref: `${fiturPrefix}index.html`,
-          moreLabel: "Lihat semua fitur",
           features: [
             { title: "Aplikasi CRM", desc: "Automasi proses penjualan & layanan pelanggan", icon: "crm", href: f("aplikasi-crm") },
             { title: "Manajemen Deal", desc: "Kelola deal secara end-to-end lebih ciamik", icon: "deal", href: f("manajemen-deal") },
@@ -101,8 +97,6 @@ for (const link of document.querySelectorAll("[data-wa]")) {
           id: "wa",
           label: "WhatsApp API",
           paneTitle: "WhatsApp API",
-          moreHref: `${fiturPrefix}index.html`,
-          moreLabel: "Lihat semua fitur",
           features: [
             { title: "WhatsApp API", desc: "Optimalkan interaksi dengan WhatsApp Business API", icon: "wa", href: f("whatsapp-business-api") },
             { title: "WhatsApp Centang Biru", desc: "Tingkatkan kredibilitas dengan verifikasi WhatsApp", icon: "verify", href: f("centang-biru-whatsapp") },
@@ -117,8 +111,6 @@ for (const link of document.querySelectorAll("[data-wa]")) {
           id: "cs",
           label: "Customer Support & Ticketing",
           paneTitle: "Customer Support & Ticketing",
-          moreHref: `${fiturPrefix}index.html`,
-          moreLabel: "Lihat semua fitur",
           features: [
             { title: "Aplikasi Customer Service", desc: "Platform terintegrasi untuk layanan pelanggan efisien", icon: "cs", href: f("aplikasi-customer-service") },
             { title: "Manajemen Tiket", desc: "Tangani keluhan pelanggan lebih cepat & akurat", icon: "ticket", href: f("sistem-manajemen-tiket") },
@@ -130,8 +122,6 @@ for (const link of document.querySelectorAll("[data-wa]")) {
           id: "ai",
           label: "AI & Chatbot",
           paneTitle: "AI & Chatbot",
-          moreHref: `${fiturPrefix}index.html`,
-          moreLabel: "Lihat semua fitur",
           features: [
             { title: "Chatbot & Conversational AI", desc: "Respons pelanggan lebih cepat dengan chatbot 24/7", icon: "bot", href: f("chatbot") },
             { title: "Airene", desc: "Maksimalkan kinerja agen CS dengan dukungan Airene", icon: "agent", href: f("integrasi-airene") },
@@ -142,8 +132,6 @@ for (const link of document.querySelectorAll("[data-wa]")) {
           id: "workflow",
           label: "Automasi Operasional & Workflow",
           paneTitle: "Automasi Operasional & Workflow",
-          moreHref: `${fiturPrefix}index.html`,
-          moreLabel: "Lihat semua fitur",
           features: [
             { title: "Knowledge Base", desc: "Pusat informasi untuk layanan pelanggan efisien", icon: "kb", href: f("knowledge-base") },
             { title: "Workflow", desc: "Otomatisasi alur kerja lintas tim dan sistem", icon: "workflow", href: f("automasi-workflow") },
@@ -153,8 +141,6 @@ for (const link of document.querySelectorAll("[data-wa]")) {
           id: "campaign",
           label: "Manajemen Campaign",
           paneTitle: "Manajemen Campaign",
-          moreHref: `${fiturPrefix}index.html`,
-          moreLabel: "Lihat semua fitur",
           features: [
             { title: "WhatsApp Broadcast", desc: "Jangkau ribuan pelanggan secara otomatis", icon: "blast", href: f("aplikasi-broadcast-whatsapp") },
             { title: "WhatsApp Bulk", desc: "Kirim pesan ke banyak kontak secara bersamaan", icon: "bulk", href: f("whatsapp-bulk") },
@@ -164,8 +150,6 @@ for (const link of document.querySelectorAll("[data-wa]")) {
           id: "callcenter",
           label: "Call Center",
           paneTitle: "Call Center",
-          moreHref: `${fiturPrefix}index.html`,
-          moreLabel: "Lihat semua fitur",
           features: [
             { title: "Call Center", desc: "Pusat layanan panggilan fleksibel berbasis cloud", icon: "call", href: f("aplikasi-call-center") },
           ],
@@ -180,8 +164,6 @@ for (const link of document.querySelectorAll("[data-wa]")) {
           id: "broadcast",
           label: "Motovax Broadcast",
           paneTitle: "Motovax Broadcast",
-          moreHref: `${fiturPrefix}index.html`,
-          moreLabel: "Lihat semua fitur",
           features: [
             { title: "Motovax Broadcast", desc: "Jangkau ribuan pelanggan tanpa proses manual", icon: "blast", href: f("motovax-broadcast") },
           ],
@@ -190,8 +172,6 @@ for (const link of document.querySelectorAll("[data-wa]")) {
           id: "sales-suite",
           label: "Motovax Sales Suite",
           paneTitle: "Motovax Sales Suite",
-          moreHref: `${fiturPrefix}index.html`,
-          moreLabel: "Lihat semua fitur",
           features: [
             { title: "Motovax Sales Suite", desc: "Optimalkan penjualan dengan solusi komprehensif", icon: "suite", href: f("motovax-sales-suite") },
           ],
@@ -200,8 +180,6 @@ for (const link of document.querySelectorAll("[data-wa]")) {
           id: "service-suite",
           label: "Motovax Service Suite",
           paneTitle: "Motovax Service Suite",
-          moreHref: `${fiturPrefix}index.html`,
-          moreLabel: "Lihat semua fitur",
           features: [
             { title: "Motovax Service Suite", desc: "Respons pelanggan lebih cepat dengan layanan optimal", icon: "cs", href: f("motovax-service-suite") },
           ],
@@ -210,8 +188,6 @@ for (const link of document.querySelectorAll("[data-wa]")) {
           id: "suite-360",
           label: "Motovax 360",
           paneTitle: "Motovax 360",
-          moreHref: `${fiturPrefix}index.html`,
-          moreLabel: "Lihat semua fitur",
           features: [
             { title: "Motovax 360", desc: "Manajemen pelanggan terintegrasi untuk proses efisien", icon: "suite", href: f("motovax-360") },
           ],
@@ -293,10 +269,6 @@ for (const link of document.querySelectorAll("[data-wa]")) {
           <div class="produk-mega-pane${item.id === firstPaneId ? " is-active" : ""}" data-produk-pane-panel="${item.id}" ${item.id === firstPaneId ? "" : "hidden"}>
             <h3 class="produk-mega-pane-title">${item.paneTitle}</h3>
             <div class="produk-mega-items">${features}</div>
-            <a class="produk-mega-more" href="${item.moreHref}" data-produk-close>
-              ${item.moreLabel}
-              <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            </a>
           </div>`;
       })
       .join("");
@@ -350,6 +322,7 @@ for (const link of document.querySelectorAll("[data-wa]")) {
     if (panel) panel.hidden = false;
     scrim.hidden = false;
     document.body.classList.add("produk-menu-open");
+    document.dispatchEvent(new CustomEvent("motovax:nav-menu-open", { detail: { source: "produk" } }));
   };
 
   const closeMenu = (menu) => {
@@ -450,6 +423,227 @@ for (const link of document.querySelectorAll("[data-wa]")) {
 
   document.addEventListener("keydown", (event) => {
     if (event.key === "Escape") closeAll();
+  });
+
+  document.addEventListener("motovax:nav-menu-open", (event) => {
+    if (event.detail?.source !== "produk") closeAll();
+  });
+})();
+
+/**
+ * Mega menu Solusi — struktur Industri & Roles mengikuti qontak.com/Solusi.
+ * Industri ditambah Otomotif dan Property; role HR tidak ditampilkan.
+ */
+(function initSolusiMegaMenu() {
+  const solusiLinks = [...document.querySelectorAll('.nav > a[href*="#solusi"]')].filter(
+    (link) => link.textContent.trim() === "Solusi",
+  );
+  if (!solusiLinks.length) return;
+
+  const path = location.pathname.replace(/\/+$/, "") || "/";
+  const inNestedDir = path.includes("/fitur/") || path.includes("/solusi/") || /\/(fitur|solusi)$/.test(path);
+  const fiturPrefix = inNestedDir ? "../fitur/" : "./fitur/";
+  const solusiPrefix = path.includes("/solusi/") || /\/solusi$/.test(path) ? "./" : inNestedDir ? "../solusi/" : "./solusi/";
+  const home = inNestedDir ? "../index.html#" : path.endsWith("modul.html") ? "./index.html#" : "#";
+
+  const icon = (paths) =>
+    `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${paths}</svg>`;
+
+  const icons = {
+    education: icon('<path d="M4 5.5A3.5 3.5 0 0 1 7.5 2H20v17H7.5A3.5 3.5 0 0 0 4 22z"/><path d="M4 5.5v13A3.5 3.5 0 0 1 7.5 15H20"/>'),
+    finance: icon('<path d="m3 9 9-5 9 5"/><path d="M5 10v8m5-8v8m4-8v8m5-8v8M3 21h18"/>'),
+    health: icon('<path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8z"/><path d="M8 12h2l1-2 2 4 1-2h2"/>'),
+    travel: icon('<path d="m22 2-7 20-4-9-9-4z"/><path d="M22 2 11 13"/>'),
+    hotel: icon('<path d="M3 21V8l9-5 9 5v13"/><path d="M8 21v-5h8v5M8 10h.01M12 10h.01M16 10h.01"/>'),
+    logistics: icon('<path d="M3 6h11v11H3zM14 10h4l3 3v4h-7z"/><circle cx="7" cy="19" r="2"/><circle cx="18" cy="19" r="2"/>'),
+    fmcg: icon('<path d="m12 2 9 5-9 5-9-5z"/><path d="m3 7 9 5 9-5v10l-9 5-9-5z"/><path d="M12 12v10"/>'),
+    retail: icon('<path d="M4 10h16v11H4zM3 10l2-6h14l2 6"/><path d="M8 21v-6h8v6M7 10a2 2 0 0 0 4 0m0 0a2 2 0 0 0 4 0m0 0a2 2 0 0 0 4 0"/>'),
+    tech: icon('<path d="m8 9-4 3 4 3m8-6 4 3-4 3M14 5l-4 14"/>'),
+    outsourcing: icon('<path d="M4 14v-3a8 8 0 0 1 16 0v3"/><path d="M4 14a3 3 0 0 0 3 3h1v-6H7a3 3 0 0 0-3 3zm16 0a3 3 0 0 1-3 3h-1v-6h1a3 3 0 0 1 3 3zM16 19c-1 2-3 2-5 2"/>'),
+    automotive: icon('<path d="M5 16 3.5 14.5 5 10l2-4h10l2 4 1.5 4.5L19 16"/><path d="M5 10h14M6 16h12M7 19v2m10-2v2"/><circle cx="7.5" cy="14" r="1"/><circle cx="16.5" cy="14" r="1"/>'),
+    property: icon('<path d="m3 11 9-8 9 8"/><path d="M5 10v11h14V10M9 21v-7h6v7"/>'),
+    sales: icon('<path d="M4 19V9m6 10V5m6 14v-7m4 7H2"/><path d="m5 7 5-4 5 3 5-4"/>'),
+    service: icon('<path d="M12 3a8 8 0 0 0-8 8v3a3 3 0 0 0 3 3h1v-7H7a3 3 0 0 0-3 3m16 0a3 3 0 0 0-3-3h-1v7h1a3 3 0 0 0 3-3z"/><path d="M16 19c-1 2-3 2-5 2"/>'),
+    marketing: icon('<path d="M3 11v4h4l9 4V7l-9 4z"/><path d="M7 15l2 5h3M19 9c1 1 1 4 0 5"/>'),
+    operations: icon('<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1-2.8 2.8-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.6V21h-4v-.1a1.7 1.7 0 0 0-1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1L4.2 17l.1-.1a1.7 1.7 0 0 0 .3-1.9A1.7 1.7 0 0 0 3 14H3v-4h.1a1.7 1.7 0 0 0 1.6-1 1.7 1.7 0 0 0-.3-1.9L4.2 7 7 4.2l.1.1A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1-1.6V3h4v.1a1.7 1.7 0 0 0 1 1.6 1.7 1.7 0 0 0 1.9-.3l.1-.1L19.8 7l-.1.1a1.7 1.7 0 0 0-.3 1.9 1.7 1.7 0 0 0 1.6 1h.1v4H21a1.7 1.7 0 0 0-1.6 1z"/>'),
+  };
+
+  const groups = [
+    {
+      id: "industri",
+      title: "Industri",
+      items: [
+        { title: "Pendidikan", desc: "Kelola manajemen sekolah", icon: "education", slug: "pendidikan", href: `${solusiPrefix}pendidikan.html` },
+        { title: "Keuangan", desc: "Kelola nasabah dengan mudah", icon: "finance", slug: "keuangan", href: `${solusiPrefix}keuangan.html` },
+        { title: "Kesehatan", desc: "Atur manajemen klinik/rumah sakit", icon: "health", slug: "kesehatan", href: `${solusiPrefix}kesehatan.html` },
+        { title: "Tour & Travel", desc: "Mudahkan kelola agen travel", icon: "travel", slug: "tour-travel", href: `${solusiPrefix}tour-travel.html` },
+        { title: "Perhotelan", desc: "Percepat reservasi pelanggan", icon: "hotel", slug: "perhotelan", href: `${solusiPrefix}perhotelan.html` },
+        { title: "Logistik", desc: "Konsolidasi laporan pengiriman", icon: "logistics", slug: "logistik", href: `${solusiPrefix}logistik.html` },
+        { title: "FMCG", desc: "Sederhanakan proses penjualan", icon: "fmcg", slug: "fmcg", href: `${solusiPrefix}fmcg.html` },
+        { title: "Ritel", desc: "Kelola pencatatan inventaris", icon: "retail", slug: "ritel", href: `${solusiPrefix}ritel.html` },
+        { title: "Teknologi Informasi", desc: "Sinkronisasi data pelanggan", icon: "tech", slug: "teknologi-informasi", href: `${solusiPrefix}teknologi-informasi.html` },
+        { title: "Outsourcing", desc: "Kelola interaksi pelanggan", icon: "outsourcing", slug: "outsourcing", href: `${solusiPrefix}outsourcing.html` },
+        { title: "Otomotif", desc: "Optimalkan penjualan dealer", icon: "automotive", slug: "otomotif", href: `${solusiPrefix}otomotif.html` },
+        { title: "Property", desc: "Kelola prospek dan penjualan properti", icon: "property", slug: "property", href: `${solusiPrefix}property.html` },
+      ],
+    },
+    {
+      id: "roles",
+      title: "Roles",
+      items: [
+        { title: "Sales", desc: "Lacak penjualan barang", icon: "sales", href: `${fiturPrefix}motovax-sales-suite.html` },
+        { title: "Customer Service", desc: "Kelola pelayanan pelanggan", icon: "service", href: `${fiturPrefix}motovax-service-suite.html` },
+        { title: "Marketing", desc: "Atur pemasaran produk", icon: "marketing", href: `${fiturPrefix}motovax-broadcast.html` },
+        { title: "Operasional", desc: "Otomatiskan proses operasional", icon: "operations", href: `${fiturPrefix}automasi-workflow.html` },
+      ],
+    },
+  ];
+
+  const renderItems = (group) => group.items
+    .map((item) => {
+      const isCurrent = Boolean(item.slug && (path.endsWith(`/solusi/${item.slug}`) || path.endsWith(`/solusi/${item.slug}.html`)));
+      return `
+      <a class="solusi-mega-item${isCurrent ? " is-current" : ""}" href="${item.href}"${isCurrent ? ' aria-current="page"' : ""} data-solusi-close>
+        <span class="solusi-mega-icon">${icons[item.icon]}</span>
+        <span class="solusi-mega-meta">
+          <strong>${item.title}</strong>
+          <small>${item.desc}</small>
+        </span>
+        <svg class="solusi-mega-arrow" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>`;
+    })
+    .join("");
+
+  const renderMenu = (id) => `
+    <button type="button" class="nav-produk-trigger nav-solusi-trigger" aria-expanded="false" aria-haspopup="true" aria-controls="${id}" data-solusi-trigger>
+      Solusi
+      <svg class="nav-chevron" width="12" height="12" viewBox="0 0 12 12" aria-hidden="true">
+        <path d="M2.5 4.5 6 8l3.5-3.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+    <div class="produk-mega solusi-mega" id="${id}" role="region" aria-label="Menu solusi berdasarkan industri dan peran" hidden data-solusi-panel>
+      <div class="produk-mega-tabs">
+        <div class="produk-mega-tabs-inner" role="tablist" aria-label="Kategori solusi">
+          ${groups.map((group, index) => `
+            <button type="button" class="produk-mega-tab${index === 0 ? " is-active" : ""}" id="${id}-tab-${group.id}" role="tab" aria-selected="${index === 0 ? "true" : "false"}" aria-controls="${id}-panel-${group.id}" data-solusi-tab="${group.id}">${group.title}</button>`).join("")}
+        </div>
+      </div>
+      <div class="solusi-mega-content">
+        ${groups.map((group, index) => `
+          <section class="solusi-mega-panel${index === 0 ? " is-active" : ""}" id="${id}-panel-${group.id}" role="tabpanel" aria-labelledby="${id}-tab-${group.id}" data-solusi-panel-content="${group.id}" ${index === 0 ? "" : "hidden"}>
+            <div class="solusi-mega-heading">
+              <span>Solusi</span>
+              <h3>${group.title}</h3>
+            </div>
+            <div class="solusi-mega-grid solusi-mega-grid-${group.id}">${renderItems(group)}</div>
+            <a class="solusi-mega-contact" href="${home}kontak" data-solusi-close>
+              Belum menemukan yang Anda cari? <strong>Diskusikan kebutuhan bisnis Anda</strong>
+              <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </a>
+          </section>`).join("")}
+      </div>
+    </div>`;
+
+  solusiLinks.forEach((link, index) => {
+    const menu = document.createElement("div");
+    menu.className = "nav-item nav-item-produk nav-item-solusi";
+    menu.setAttribute("data-solusi-menu", "");
+    menu.innerHTML = renderMenu(`solusi-mega-menu-${index + 1}`);
+    link.replaceWith(menu);
+  });
+
+  const menus = document.querySelectorAll("[data-solusi-menu]");
+  let scrim = document.querySelector("[data-solusi-scrim]");
+  if (!scrim) {
+    scrim = document.createElement("div");
+    scrim.className = "produk-mega-scrim solusi-mega-scrim";
+    scrim.hidden = true;
+    scrim.setAttribute("data-solusi-scrim", "");
+    document.body.appendChild(scrim);
+  }
+
+  const closeAll = (except = null) => {
+    for (const menu of menus) {
+      if (menu === except) continue;
+      menu.classList.remove("is-open");
+      menu.querySelector("[data-solusi-trigger]")?.setAttribute("aria-expanded", "false");
+      const panel = menu.querySelector("[data-solusi-panel]");
+      if (panel) panel.hidden = true;
+    }
+    if (!except) {
+      scrim.hidden = true;
+      document.body.classList.remove("solusi-menu-open");
+    }
+  };
+
+  const openMenu = (menu) => {
+    closeAll(menu);
+    menu.classList.add("is-open");
+    menu.querySelector("[data-solusi-trigger]")?.setAttribute("aria-expanded", "true");
+    const panel = menu.querySelector("[data-solusi-panel]");
+    if (panel) panel.hidden = false;
+    scrim.hidden = false;
+    document.body.classList.add("solusi-menu-open");
+    document.dispatchEvent(new CustomEvent("motovax:nav-menu-open", { detail: { source: "solusi" } }));
+  };
+
+  const closeMenu = (menu) => {
+    menu.classList.remove("is-open");
+    menu.querySelector("[data-solusi-trigger]")?.setAttribute("aria-expanded", "false");
+    const panel = menu.querySelector("[data-solusi-panel]");
+    if (panel) panel.hidden = true;
+    scrim.hidden = true;
+    document.body.classList.remove("solusi-menu-open");
+  };
+
+  const setActiveTab = (menu, groupId) => {
+    for (const tab of menu.querySelectorAll("[data-solusi-tab]")) {
+      const active = tab.getAttribute("data-solusi-tab") === groupId;
+      tab.classList.toggle("is-active", active);
+      tab.setAttribute("aria-selected", active ? "true" : "false");
+    }
+    for (const panel of menu.querySelectorAll("[data-solusi-panel-content]")) {
+      const active = panel.getAttribute("data-solusi-panel-content") === groupId;
+      panel.classList.toggle("is-active", active);
+      panel.hidden = !active;
+    }
+  };
+
+  for (const menu of menus) {
+    const trigger = menu.querySelector("[data-solusi-trigger]");
+    trigger?.addEventListener("click", (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      if (menu.classList.contains("is-open")) closeMenu(menu);
+      else openMenu(menu);
+    });
+
+    menu.addEventListener("click", (event) => {
+      const target = event.target;
+      if (!(target instanceof Element)) return;
+      const tab = target.closest("[data-solusi-tab]");
+      if (tab) {
+        event.preventDefault();
+        event.stopPropagation();
+        setActiveTab(menu, tab.getAttribute("data-solusi-tab") || "industri");
+        return;
+      }
+      if (target.closest("[data-solusi-close]")) requestAnimationFrame(() => closeMenu(menu));
+    });
+  }
+
+  scrim.addEventListener("click", () => closeAll());
+  document.addEventListener("click", (event) => {
+    const target = event.target;
+    if (!(target instanceof Element)) return;
+    if (target.closest("[data-solusi-menu], [data-solusi-scrim]")) return;
+    closeAll();
+  });
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") closeAll();
+  });
+  document.addEventListener("motovax:nav-menu-open", (event) => {
+    if (event.detail?.source !== "solusi") closeAll();
   });
 })();
 
