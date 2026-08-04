@@ -102,6 +102,7 @@ if (contactForm instanceof HTMLFormElement) {
           demo: { id: "omni", hash: "omniDemo", context: "omnichannel", label: "Coba Simulasi" },
           features: [
             { title: "Omnichannel", desc: "Satu platform untuk kelola chat dari berbagai saluran", icon: "chat", href: f("aplikasi-omnichannel") },
+            { title: "Call Center", desc: "Workspace layanan omnichannel dengan AI, agent, dan handoff MR", icon: "call", href: f("aplikasi-call-center") },
             { title: "WhatsApp Business API", desc: "Hubungkan percakapan WhatsApp ke inbox omnichannel", icon: "wa", href: f("whatsapp-business-api") },
             { title: "Facebook Messenger", desc: "Kelola chat Facebook bersama kanal pelanggan lainnya", icon: "fb", href: f("aplikasi-omnichannel") },
             { title: "Instagram API", desc: "Respons DM otomatis untuk tingkatkan penjualan", icon: "ig", href: f("instagram-api") },
@@ -179,15 +180,6 @@ if (contactForm instanceof HTMLFormElement) {
           features: [
             { title: "WhatsApp Broadcast", desc: "Jangkau ribuan pelanggan secara otomatis", icon: "blast", href: f("aplikasi-broadcast-whatsapp") },
             { title: "WhatsApp Bulk", desc: "Kirim pesan ke banyak kontak secara bersamaan", icon: "bulk", href: f("whatsapp-bulk") },
-          ],
-        },
-        {
-          id: "callcenter",
-          label: "Call Center",
-          paneTitle: "Call Center",
-          demo: { id: "omni", hash: "omniDemo", context: "call-center", label: "Coba Call Center" },
-          features: [
-            { title: "Call Center", desc: "Workspace layanan omnichannel dengan AI, agent, dan handoff MR", icon: "call", href: f("aplikasi-call-center") },
           ],
         },
       ],
