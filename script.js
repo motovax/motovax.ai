@@ -125,21 +125,6 @@ if (contactForm instanceof HTMLFormElement) {
           ],
         },
         {
-          id: "wa",
-          label: "WhatsApp API",
-          paneTitle: "WhatsApp API",
-          demo: { id: "whatsapp", hash: "capabilityDemo", context: "whatsapp", label: "Coba Integrasi" },
-          features: [
-            { title: "WhatsApp API", desc: "Optimalkan interaksi dengan WhatsApp Business API", icon: "wa", href: f("whatsapp-business-api") },
-            { title: "WhatsApp Centang Biru", desc: "Tingkatkan kredibilitas dengan verifikasi WhatsApp", icon: "verify", href: f("centang-biru-whatsapp") },
-            { title: "WhatsApp Blast", desc: "Jangkau ribuan pelanggan secara otomatis", icon: "blast", href: f("wa-blast") },
-            { title: "Click-to-WhatsApp Ads", desc: "Tingkatkan penjualan di WhatsApp lebih mudah", icon: "ads", href: f("ctwa") },
-            { title: "WhatsApp Call", desc: "Layanan panggilan untuk komunikasi lebih lancar", icon: "call", href: f("whatsapp-business-calling") },
-            { title: "WhatsApp Bulk", desc: "Kirim pesan ke banyak kontak secara bersamaan", icon: "bulk", href: f("whatsapp-bulk") },
-            { title: "WhatsApp Flows", desc: "Buat formulir terintegrasi untuk pelayanan lebih tepat", icon: "flow", href: f("whatsapp-flows") },
-          ],
-        },
-        {
           id: "cs",
           label: "Customer Support & Ticketing",
           paneTitle: "Customer Support & Ticketing",

@@ -146,7 +146,6 @@ Simulasi kredit, TNS/GP, trade-in, MRP, promotion — belum full accounting ERP.
 |-------------------|------|---------|
 | Omnichannel | `#omniDemo` | Inbox seluruh channel |
 | Aplikasi CRM | `#crmDemo` | Customer, pipeline, auto-follow |
-| WhatsApp API & Integration | `#capabilityDemo` | Session, role, routing, health channel |
 | Customer Support & Ticketing | `#omniDemo` | Antrian, takeover, resolusi, riwayat |
 | AI & Chatbot | `#falconDemo` | Falcon sebagai demo standalone |
 | Automasi Operasional & Workflow | `#capabilityDemo` | Automasi aktif; builder visual tetap roadmap |
