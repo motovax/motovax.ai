@@ -9,7 +9,7 @@ window.MOTOVAX_FEATURES = {
     title: "Aplikasi Omnichannel",
     heroTitle: "Satu inbox omnichannel untuk semua channel chat pelanggan",
     heroDesc:
-      "Satukan WhatsApp, Instagram DM, Facebook Messenger, dan channel lain dalam Call Center Motovax. Faneling AI / agent / MR, realtime SSE, handoff, dan aksi cepat inventori serta simulasi kredit untuk mempercepat layanan pelanggan.",
+      "Satukan WhatsApp, Instagram DM, Facebook Messenger, dan channel lain dalam Call Center Motovax. Faneling AI / agent / MR, update percakapan realtime, handoff, dan aksi cepat inventori serta simulasi kredit untuk mempercepat layanan pelanggan.",
     status: "Live",
     module: "M3 · AI Omnichannel & Call Center",
     flag: "whatsapp_ai",
@@ -20,15 +20,15 @@ window.MOTOVAX_FEATURES = {
     capabilities: [
       {
         title: "Inbox multi-channel",
-        desc: "Kelola percakapan WhatsApp, Facebook, dan Instagram dalam satu workspace Call Center — tidak perlu bolak-balik aplikasi.",
+        desc: "Kelola percakapan WhatsApp, Facebook, dan Instagram dalam satu workspace Call Center. Pesan dan perubahan status langsung diperbarui tanpa perlu refresh.",
       },
       {
         title: "Faneling AI · Agent · MR",
         desc: "Chat masuk ditangani AI, dapat diambil alih Agent tanpa kehilangan konteks, lalu di-handoff ke Marketing Representative untuk follow-up dan closing.",
       },
       {
-        title: "Realtime SSE",
-        desc: "Update inbox lewat Server-Sent Events (bukan polling) agar agent melihat pesan baru secara live.",
+        title: "Notifikasi & status realtime",
+        desc: "Pesan baru, status percakapan, dan aktivitas agent langsung muncul di workspace agar pelanggan dapat ditangani lebih cepat.",
       },
       {
         title: "Handoff & takeover",
