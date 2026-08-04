@@ -6037,6 +6037,18 @@ class OmnichannelAIDemo {
         },
       },
       {
+        anchor: "jasmine",
+        label: "Jasmine AI",
+        title: "AI Sales Consultant dari discovery sampai HOT",
+        body: "Jalankan empat tahap Jasmine: gali kebutuhan, cek stok terverifikasi, kualifikasi finance tanpa mengarang angka, lalu siapkan handoff kontekstual ke MR.",
+        enter: () => {
+          this.fanel = "ai";
+          this.activeContactId = "omni-nadia";
+          this.ctxTab = "trace";
+          this.render();
+        },
+      },
+      {
         anchor: "chat",
         label: "Percakapan",
         title: "Ambil alih dari AI",
@@ -6123,10 +6135,10 @@ class OmnichannelAIDemo {
     ];
 
     if (this.entryContext === "omnichannel") {
-      return [steps[0], steps[1], steps[2], steps[4]];
+      return [steps[0], steps[1], steps[2], steps[3], steps[5]];
     }
     if (this.entryContext === "customer-support") {
-      const supportSteps = [steps[0], steps[2], steps[3], steps[4], steps[6]];
+      const supportSteps = [steps[0], steps[3], steps[4], steps[5], steps[7]];
       supportSteps[2] = {
         ...supportSteps[2],
         label: "Resolusi",
@@ -6258,6 +6270,9 @@ class OmnichannelAIDemo {
 
     for (const button of this.root.querySelectorAll("[data-omni-prompt]")) {
       button.addEventListener("click", () => this.runPrompt(button.dataset.omniPrompt || "", { asCustomer: true }));
+    }
+    for (const button of this.root.querySelectorAll("[data-omni-jasmine]")) {
+      button.addEventListener("click", () => this.runJasmineJourney(button.dataset.omniJasmine || "discovery"));
     }
 
     this.form.addEventListener("submit", (event) => {
@@ -6435,6 +6450,9 @@ class OmnichannelAIDemo {
     this.ctxTab = "detail";
     this.trace = { ...this.defaultTrace, assertions: [...this.defaultTrace.assertions] };
     this.input.value = "";
+    this.root.querySelector("[data-omni-jasmine-outcome]").textContent =
+      "Pilih tahap untuk melihat cara Jasmine menangani lead tanpa mengirim pesan nyata.";
+    for (const button of this.root.querySelectorAll("[data-omni-jasmine]")) button.classList.remove("active");
     this.toast.hidden = true;
     for (const modal of this.root.querySelectorAll(".cc-modal-backdrop")) modal.hidden = true;
     this.render();
@@ -7169,6 +7187,92 @@ class OmnichannelAIDemo {
     contact.time = "baru";
     contact.history.push({ label: "Balasan Call Center", time: "baru saja" });
     this.render();
+  }
+
+  runJasmineJourney(stage) {
+    const contact = this.contacts.find((item) => item.id === "omni-nadia");
+    if (!contact) return;
+
+    const journeys = {
+      discovery: {
+        customer: "Saya cari mobil keluarga, tapi belum tahu model yang cocok.",
+        response: "Siap, Kak. Biar rekomendasinya tepat: biasanya dipakai berapa orang, lebih sering dalam kota atau luar kota, dan kisaran budgetnya berapa?",
+        outcome: "Discovery kebutuhan · Jasmine menggali use case sebelum menawarkan unit.",
+        tag: "cold",
+        pipelineStage: "cold",
+        trace: { domain: "qualification", effect: "read_only", tool: "conversation.context · read_only" },
+      },
+      inventory: {
+        customer: "Untuk keluarga 4 orang, budget sekitar 250 juta. Stok yang cocok apa?",
+        response: "Dari stok demo yang terverifikasi, ada Honda BR-V Prestige 2021 Rp255 jt dan Toyota Rush G AT 2022 Rp190 jt. Kakak lebih prioritas kabin luas atau cicilan ringan?",
+        outcome: "Stok ter-grounding · Harga dan unit hanya berasal dari hasil inventori demo.",
+        tag: "warm",
+        pipelineStage: "warm",
+        unit: "Honda BR-V / Toyota Rush",
+        budget: "Budget customer ~Rp 250 jt",
+        trace: { domain: "inventory", effect: "read_only", tool: "inventory.search · read_only" },
+      },
+      finance: {
+        customer: "BR-V menarik. Kalau kredit, saya siap DP 50 juta dengan tenor 5 tahun.",
+        response: "DP Rp50 juta dan tenor 5 tahun saya catat sebagai preferensi. Saya tidak akan mengarang cicilan; nominal simulasi harus dihitung dari kalkulator pembiayaan resmi. Apakah BR-V ini yang ingin diproses, Kak?",
+        outcome: "Lead WARM · Preferensi finance dicatat tanpa mengarang angka cicilan.",
+        tag: "warm",
+        pipelineStage: "warm",
+        unit: "Honda BR-V Prestige 2021",
+        budget: "DP Rp 50 jt · tenor 5 tahun",
+        trace: { domain: "finance", effect: "read_only", tool: "finance.simulate · parameterized" },
+      },
+      handoff: {
+        customer: "Ya, saya mau test drive BR-V besok sore dan lanjut kalau cocok.",
+        response: "Siap, Kak. Minat test drive besok sore saya tandai HOT. Konteks unit, budget, dan jadwal sudah dirangkum agar MR dapat melanjutkan tanpa mengulang pertanyaan.",
+        outcome: "Lead HOT · Siap handoff kontekstual ke MR, tanpa kehilangan riwayat.",
+        tag: "hot",
+        pipelineStage: "hot",
+        unit: "Honda BR-V Prestige 2021",
+        budget: "DP Rp 50 jt · tenor 5 tahun",
+        trace: { domain: "handoff", effect: "simulated_write", tool: "lead.assign_sales_rep · tenant demo" },
+      },
+    };
+    const journey = journeys[stage] || journeys.discovery;
+    contact.bucket = "ai";
+    contact.aiAgeBucket = "under_12_hours";
+    contact.handlerName = "Jasmine AI";
+    contact.mrName = "";
+    contact.mrUnanswered = false;
+    contact.closed = false;
+    contact.tag = journey.tag;
+    contact.pipelineStage = journey.pipelineStage;
+    if (journey.unit) contact.unit = journey.unit;
+    if (journey.budget) contact.budget = journey.budget;
+    contact.messages.push(
+      { role: "customer", content: journey.customer, time: "baru saja" },
+      { role: "assistant", content: journey.response, time: "baru saja" },
+    );
+    contact.preview = journey.response;
+    contact.time = "baru";
+    contact.history.push({ label: `Jasmine · ${journey.outcome.split(" · ")[0]}`, time: "baru saja" });
+    this.trace = {
+      ...this.defaultTrace,
+      ...journey.trace,
+      router: `Jasmine memilih domain ${journey.trace.domain} dari konteks percakapan dan status lead.`,
+      grounding: stage === "inventory"
+        ? "Unit dan harga berasal dari inventori tenant demo."
+        : "Respons memakai konteks lead dan guardrail sesuai tahap perjalanan.",
+      evalTitle: `Jasmine journey · ${stage}`,
+      blocked: false,
+      assertions: ["Konteks percakapan dipertahankan", "Status lead sesuai intent", "Tidak mengarang data", "External send = 0"],
+    };
+    this.activeContactId = contact.id;
+    this.fanel = "ai";
+    this.collapsedBuckets.delete("ai");
+    this.collapsedBuckets.delete("ai_under_12");
+    this.ctxTab = stage === "handoff" ? "detail" : "trace";
+    this.root.querySelector("[data-omni-jasmine-outcome]").textContent = journey.outcome;
+    for (const button of this.root.querySelectorAll("[data-omni-jasmine]")) {
+      button.classList.toggle("active", button.dataset.omniJasmine === stage);
+    }
+    this.render();
+    this.showToast("Jasmine AI", journey.outcome);
   }
 
   extractUnitInterest(message) {
