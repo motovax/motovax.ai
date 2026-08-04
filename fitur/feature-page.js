@@ -568,49 +568,74 @@
   function renderShowcaseVisual(feature, productProfile, capability, index) {
     const title = String(feature.title || "fitur Motovax");
     const capabilityTitle = String(capability.title || "");
-    const previews = previewSetFor(String(feature.slug || ""), (file, label) => ({
+    const slug = String(feature.slug || "");
+    const captured = (file, label, caption, dimensions = [1440, 900]) => ({
       file,
       label,
-      alt: `Tampilan ${label} di aplikasi Motovax untuk ${capability.title} pada ${title} dengan data demo`,
-    }));
-    // Setiap capability Omnichannel memakai capture state yang benar-benar
-    // menonjolkan capability tersebut, bukan rotasi screenshot umum.
-    const omnichannelPreview = String(feature.slug || "") === "aplikasi-omnichannel"
-      ? [
-          [/inbox multi-channel/i, "omnichannel-multichannel-public.png", "Inbox · WhatsApp / Facebook / Instagram", "Bucket dan filter channel tampil dalam satu workspace Call Center."],
-          [/fanel/i, "omnichannel-faneling-public.png", "Call Center · AI → Agent → MR", "Jejak AI dan takeover Agent tetap terlihat setelah lead masuk bucket MR Belum Balas."],
-          [/realtime sse/i, "omnichannel-realtime-public.png", "Call Center · SSE realtime aktif", "Status koneksi realtime dan perubahan conversation terlihat di workspace yang sama."],
-          [/handoff|takeover/i, "omnichannel-handoff-public.png", "Call Center · Dialog Handoff ke MR", "Agent memilih MR, alasan, dan catatan sebelum menyerahkan lead."],
-          [/aksi cepat operasional/i, "omnichannel-inventory-public.png", "Call Center · Cek Inventori", "Hasil pencarian unit dapat dipakai untuk Hitung Kredit atau dibagikan ke conversation."],
-          [/performa omnichannel/i, "omnichannel-performance-public.png", "Analytics · Performa Call Center", "Ringkasan inbox aktif, AI, MR, dan eskalasi tersedia dari Call Center."],
-        ].find(([pattern]) => pattern.test(capabilityTitle))
-      : null;
-    const preview = omnichannelPreview
-      ? {
-          file: omnichannelPreview[1],
-          label: omnichannelPreview[2],
-          caption: omnichannelPreview[3],
-          alt: `Tampilan ${omnichannelPreview[2]} untuk ${capabilityTitle} dengan data demo`,
-          width: omnichannelPreview[1] === "omnichannel-inventory-public.png" ? 1851 : 1440,
-          height: omnichannelPreview[1] === "omnichannel-inventory-public.png" ? 849 : 900,
-          fullLink: true,
-        }
-      : /aksi cepat operasional/i.test(capabilityTitle)
-      ? {
-          file: "omnichannel-inventory-public.png",
-          label: "Call Center · Cek Inventori",
-          alt: "Tampilan Cek Inventori dari Call Center Motovax dengan seluruh identitas privat dianonimkan",
-          wide: true,
-          width: 1918,
-          height: 880,
-        }
-      : /fanel|handoff|takeover/i.test(capabilityTitle)
-        ? {
-            file: "omnichannel-inbox.webp",
-            label: "Omnichannel Inbox · AI / Agent / MR",
-            alt: `Tampilan Call Center Motovax untuk ${capabilityTitle} dengan data demo`,
-          }
-        : previews[index % previews.length];
+      caption,
+      alt: `Tampilan ${label} untuk ${capabilityTitle} pada ${title} dengan data demo`,
+      width: dimensions[0],
+      height: dimensions[1],
+      fullLink: true,
+    });
+    const matches = (pattern) => pattern.test(`${slug} ${capabilityTitle}`);
+    let preview;
+
+    // Tiap capability diarahkan ke state produk yang relevan. Urutannya sengaja
+    // semantik dan tidak bergantung pada nomor kartu/rotasi screenshot umum.
+    if (matches(/fanel/i)) {
+      preview = captured("omnichannel-faneling-public.png", "Call Center · AI → Agent → MR", "Jejak AI dan takeover Agent tetap terlihat setelah lead masuk bucket MR.");
+    } else if (matches(/handoff|takeover|eskalasi/i)) {
+      preview = captured("omnichannel-handoff-public.png", "Call Center · Handoff ke MR", "Agent memilih MR, alasan, dan catatan sebelum menyerahkan lead.");
+    } else if (matches(/aksi cepat|inventori|stok akurat|konteks stok|unit ready/i)) {
+      preview = captured("omnichannel-inventory-public.png", "Call Center · Cek Inventori", "Unit ready dapat dicari, dihitung kreditnya, lalu dibagikan ke conversation.", [1851, 849]);
+    } else if (matches(/performa omnichannel|manajemen-sla|metrik channel|respons realtime|realtime sse/i)) {
+      preview = /realtime sse/i.test(capabilityTitle)
+        ? captured("omnichannel-realtime-public.png", "Call Center · SSE realtime aktif", "Status koneksi realtime dan perubahan conversation terlihat dalam satu workspace.")
+        : captured("omnichannel-performance-public.png", "Analytics · Performa Call Center", "Ringkasan inbox, AI, MR, dan eskalasi membantu pemantauan layanan.");
+    } else if (matches(/aplikasi-omnichannel|instagram-api|embedded-live-chat|ticket-creation|customer-service|sistem-manajemen-tiket|aplikasi-call-center|motovax-service-suite|integrasi-airene|omnichannel inbox|multi-channel|multi-channel|dm di inbox|status percakapan|riwayat channel|channel bisnis|call center workspace|satu model inbox|multi-channel/i)) {
+      preview = captured("omnichannel-multichannel-public.png", "Inbox · WhatsApp / Facebook / Instagram", "Percakapan dan filter channel tersedia dalam satu workspace Call Center.");
+    } else if (matches(/broadcast|blast|bulk|ctwa|ads campaign|promo unit|outbound scale|segment|template ai|campaign insight/i)) {
+      if (matches(/insight|atribusi|performa/i)) {
+        preview = captured("product-social-insight.png", "Campaign Insight", "Hasil campaign dan respons pelanggan dipantau dalam satu tampilan.");
+      } else if (matches(/kalender|posting/i)) {
+        preview = captured("product-social-calendar.png", "Kalender Posting", "Jadwal konten dan campaign tersusun dalam kalender tim.");
+      } else if (matches(/konten dari stok|konten stok/i)) {
+        preview = captured("product-social-studio.png", "Content Studio", "Konten campaign disusun dari data unit dan inventori.");
+      } else {
+        preview = captured("product-social-broadcast.png", "WhatsApp Broadcast Terukur", "Audiens, pesan personal, jadwal, dan ringkasan pengiriman tampil jelas.");
+      }
+    } else if (matches(/goal|report|scorecard|dashboard|kpi|cabang|lokasi|analytics|motovax-360/i)) {
+      if (matches(/channel|omnichannel/i)) {
+        preview = captured("product-dashboard-channels.png", "Dashboard · Omnichannel", "Performa channel dan sumber percakapan dapat dibandingkan.");
+      } else if (matches(/cabang|lokasi/i)) {
+        preview = captured("product-dashboard-locations.png", "Dashboard · Performa Cabang", "Kinerja antar-cabang tampil dalam satu command center.");
+      } else if (matches(/sales|scorecard|konversi/i)) {
+        preview = captured("product-dashboard-sales.png", "Dashboard · Sales Performance", "KPI pipeline, konversi, dan performa sales terlihat bersama.");
+      } else {
+        preview = captured("product-dashboard-overview.png", "Dashboard · Executive Overview", "KPI utama dan forecast bisnis tersedia dalam ringkasan eksekutif.");
+      }
+    } else if (matches(/crm|deal|kontak|gps|sales suite|customer database|pipeline|follow|guideline|salespeople/i)) {
+      if (matches(/follow/i)) {
+        preview = captured("product-crm-auto-follow.png", "CRM · Auto Follow Customer", "Daftar tindak lanjut membantu sales memprioritaskan customer.");
+      } else if (matches(/guideline|panduan/i)) {
+        preview = captured("product-crm-panduan.png", "CRM · Guideline", "Panduan kerja dapat diakses langsung dari workspace CRM.");
+      } else if (matches(/customer|kontak|gps|salespeople/i)) {
+        preview = captured("product-crm-customer.png", "CRM · Customer Database", "Profil customer, cabang, PIC, dan aktivitas tersusun dalam satu daftar.");
+      } else {
+        preview = captured("product-crm-pipeline.png", "CRM · Pipeline Sales", "Lead terkelompok berdasarkan tahap agar tindak lanjut terlihat jelas.");
+      }
+    } else if (matches(/agentic-ai|chatbot|falcon|ai sales|tool-rich agent|native tools|multi-peran|permission aware|knowledge|web/i)) {
+      preview = matches(/management|laporan|aging|gp|permission|knowledge|web/i)
+        ? captured("product-falcon-management.png", "Falcon · Management Agent", "Management Agent menyediakan tool laporan, aging, margin, dan analytics.")
+        : captured("product-falcon-sales.png", "Falcon · Sales Agent", "Sales Agent menjawab stok, foto, kredit, dan kebutuhan lead.");
+    } else if (matches(/whatsapp|session|flows|tool schema|governance|brand trust/i)) {
+      preview = captured("product-capability-whatsapp.png", "WhatsApp Business API", "Konfigurasi channel dan capability WhatsApp terlihat dalam workspace produk.");
+    } else if (matches(/automasi|workflow|workers|tool chains/i)) {
+      preview = captured("product-capability-automation.png", "Automation Workflow", "Trigger dan aksi otomasi tersusun sebagai alur kerja yang dapat dipantau.");
+    } else {
+      preview = captured("product-dashboard-overview.png", "Motovax · Executive Overview", "Ringkasan operasional produk tersedia dalam satu dashboard.");
+    }
     return `
       <figure class="feature-showcase-visual feature-showcase-preview family-${productProfile.family}">
         <div class="feature-showcase-preview-window">
