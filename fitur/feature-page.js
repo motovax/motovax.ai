@@ -84,7 +84,7 @@
 
   function renderShowcaseAction(capability) {
     if (isFanelingCapability(capability)) return "";
-    return `<a href="../index.html#kontak">Konsultasikan kebutuhan <span>-></span></a>`;
+    return `<a href="https://motovax.ai/hubungi-kami.html">Konsultasikan kebutuhan <span>-></span></a>`;
   }
 
   const heroBenefits = benefits
