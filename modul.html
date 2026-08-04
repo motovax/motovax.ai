@@ -6,7 +6,7 @@
     <title>Produk & Fitur MOTOVAX — Agentic AI ERP</title>
     <meta
       name="description"
-      content="Produk Motovax: inventory, agentic AI, call center omnichannel, CRM autopilot, social ads, dashboard, platform — plus roadmap ERP yang bisa dibangun."
+      content="Produk Motovax yang siap digunakan: inventory, agentic AI, call center omnichannel, CRM autopilot, social ads, analytics, finance, serta trade-in dan MRP."
     />
     <meta name="theme-color" content="#1267f5" />
     <link rel="icon" href="./favicon.ico" sizes="any" />
@@ -54,33 +54,6 @@
         line-height: 1.7;
         max-width: 640px;
       }
-      .status-legend {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 10px;
-        margin: 28px 0 8px;
-      }
-      .status-pill {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        padding: 6px 12px;
-        border-radius: 999px;
-        font-size: 12px;
-        font-weight: 700;
-        border: 1px solid #dbe7f5;
-        background: #fff;
-        color: #334155;
-      }
-      .status-pill i {
-        width: 8px;
-        height: 8px;
-        border-radius: 50%;
-        display: inline-block;
-      }
-      .status-pill.live i { background: #10b981; }
-      .status-pill.partial i { background: #f59e0b; }
-      .status-pill.roadmap i { background: #6366f1; }
       .module-grid {
         display: grid;
         grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -126,28 +99,6 @@
         font-size: 18px;
         letter-spacing: -0.02em;
       }
-      .module-card .badge {
-        font-size: 11px;
-        font-weight: 800;
-        padding: 4px 10px;
-        border-radius: 999px;
-        white-space: nowrap;
-      }
-      .badge.live {
-        background: #ecfdf5;
-        color: #047857;
-        border: 1px solid #a7f3d0;
-      }
-      .badge.partial {
-        background: #fffbeb;
-        color: #b45309;
-        border: 1px solid #fde68a;
-      }
-      .badge.roadmap {
-        background: #eef2ff;
-        color: #4338ca;
-        border: 1px solid #c7d2fe;
-      }
       .module-card > p {
         margin: 0;
         color: #536175;
@@ -192,45 +143,6 @@
       }
       .module-card footer a:hover {
         text-decoration: underline;
-      }
-      .roadmap-section {
-        margin-top: 56px;
-      }
-      .roadmap-section .section-head {
-        margin-bottom: 22px;
-      }
-      .roadmap-grid {
-        display: grid;
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-        gap: 16px;
-      }
-      .roadmap-card {
-        background: #0b1220;
-        color: #e2e8f0;
-        border-radius: 16px;
-        padding: 22px;
-        border: 1px solid #1e293b;
-      }
-      .roadmap-card h3 {
-        margin: 0 0 6px;
-        font-size: 15px;
-        color: #93c5fd;
-      }
-      .roadmap-card strong {
-        display: block;
-        margin-bottom: 12px;
-        font-size: 18px;
-        letter-spacing: -0.02em;
-        color: #fff;
-      }
-      .roadmap-card ul {
-        margin: 0;
-        padding-left: 18px;
-        display: grid;
-        gap: 6px;
-        font-size: 13px;
-        line-height: 1.5;
-        color: #cbd5e1;
       }
       .pitch-banner {
         margin-top: 48px;
@@ -288,8 +200,7 @@
         border-bottom: 0;
       }
       @media (max-width: 900px) {
-        .module-grid,
-        .roadmap-grid {
+        .module-grid {
           grid-template-columns: 1fr;
         }
         .pitch-banner {
@@ -336,7 +247,7 @@
         <div class="modules-hero">
           <div class="eyebrow">
             <span class="icon-dot">AI</span>
-            Agentic AI ERP · Breakdown Produk
+            Agentic AI ERP · Produk Motovax
           </div>
           <h1>
             Satu platform.<br />
@@ -344,23 +255,16 @@
             <span>Agen AI di setiap alur bisnis.</span>
           </h1>
           <p>
-            Motovax mengintegrasikan operasional dealer (dan ke depan industri lain) dengan
-            agen AI yang punya tool nyata — stok, inbox, CRM, konten, insight — bukan chatbot
-            generik. Di bawah: modul yang sudah live di produksi, yang partial, dan yang bisa
-            kita bangun.
+            Motovax mengintegrasikan operasional bisnis dengan agen AI yang punya tool nyata —
+            stok, inbox, CRM, konten, finance, dan insight — bukan chatbot generik. Seluruh
+            capability di bawah sudah tersedia dan dapat dikonfigurasi sesuai kebutuhan bisnis.
           </p>
-          <div class="status-legend" aria-label="Legenda status">
-            <span class="status-pill live"><i></i> Live di produksi</span>
-            <span class="status-pill partial"><i></i> Partial / flag</span>
-            <span class="status-pill roadmap"><i></i> Roadmap bisa dibangun</span>
-          </div>
         </div>
 
         <div class="module-grid">
           <article class="module-card" id="m1-inventory">
             <header>
               <div class="code">M1</div>
-              <span class="badge live">Live</span>
             </header>
             <h2>Inventory Management System</h2>
             <p>Stok multi-cabang real-time: unit, foto, import Excel, status ready/booked/sold.</p>
@@ -376,15 +280,15 @@
           <article class="module-card" id="m2-agentic">
             <header>
               <div class="code">M2</div>
-              <span class="badge live">Live</span>
             </header>
             <h2>Agentic AI (WhatsApp)</h2>
-            <p>Agen Falcon / Jasmine dengan tool native: stok, foto, kredit, handoff, konten.</p>
+            <p>Agen Falcon / Jasmine dengan tool native untuk melayani pelanggan dan operasional internal.</p>
             <ul>
               <li>Bukan keyword bot — LLM + tool schema</li>
               <li>Simulasi kredit, TNS/GP, trade-in</li>
               <li>Handoff ke admin, call center, MR</li>
-              <li>Caption & posting promo, stock alert</li>
+              <li>Sales lead, registrasi user & login dashboard</li>
+              <li>Caption, posting promo & stock alert</li>
             </ul>
             <footer>Settings: Integrasi WhatsApp · Meta · Instagram</footer>
           </article>
@@ -392,15 +296,14 @@
           <article class="module-card" id="m3-omni">
             <header>
               <div class="code">M3</div>
-              <span class="badge live">Live</span>
             </header>
             <h2>AI Omnichannel & Call Center</h2>
             <p>Inbox WA + Messenger + Instagram: AI 24/7, takeover manusia, handoff MR.</p>
             <ul>
-              <li>Faneling AI / agent / MR + tag lead</li>
+              <li>Faneling AI / agent / MR + tag Cold–Hot–Booking</li>
               <li>Realtime SSE (tanpa polling)</li>
               <li>Aksi cepat: inventori & simulasi</li>
-              <li>Performa omnichannel / CRM</li>
+              <li>Auto-routing, pin, bulk close & morning briefing</li>
             </ul>
             <footer>Demo: <a href="./index.html#omniDemo">Call Center</a></footer>
           </article>
@@ -408,10 +311,9 @@
           <article class="module-card" id="m4-crm">
             <header>
               <div class="code">M4</div>
-              <span class="badge partial">Live · flag</span>
             </header>
             <h2>Autopilot CRM</h2>
-            <p>Pipeline, customer, MR, follow-up otomatis, guideline, dan agent workspace.</p>
+            <p>Pipeline, customer, MR, follow-up otomatis, guideline, dan agent workspace dalam satu alur.</p>
             <ul>
               <li>Customer & pipeline Cold→Deal</li>
               <li>Program follow-up / campaign</li>
@@ -424,7 +326,6 @@
           <article class="module-card" id="m5-social">
             <header>
               <div class="code">M5</div>
-              <span class="badge partial">Live · flag</span>
             </header>
             <h2>Social Media & Ads Automation</h2>
             <p>Dari stok live ke creative, jadwal posting, campaign insight, publish Meta Business.</p>
@@ -440,7 +341,6 @@
           <article class="module-card" id="m6-dashboard">
             <header>
               <div class="code">M6</div>
-              <span class="badge live">Live</span>
             </header>
             <h2>One Dashboard & Analytics</h2>
             <p>Command center per role: unit, revenue, GP, funnel, cabang, top agent.</p>
@@ -456,15 +356,14 @@
           <article class="module-card" id="m7-insight">
             <header>
               <div class="code">M7</div>
-              <span class="badge partial">Partial</span>
             </header>
             <h2>Data Insight & Conversion</h2>
-            <p>Funnel & channel performance; attribution LTV multi-touch masih roadmap.</p>
+            <p>Insight funnel, channel, serta performa MR dan agent untuk meningkatkan conversion.</p>
             <ul>
               <li>Lead → booking → sold</li>
               <li>Breakdown channel WA/FB/IG/web</li>
               <li>Email report terjadwal</li>
-              <li>Roadmap: multi-touch & BI builder</li>
+              <li>Performa MR, agent & conversion funnel</li>
             </ul>
             <footer>Demo: <a href="./index.html#insightDemo">Data Insight</a></footer>
           </article>
@@ -472,7 +371,6 @@
           <article class="module-card" id="m8-platform">
             <header>
               <div class="code">M8</div>
-              <span class="badge live">Live</span>
             </header>
             <h2>Platform · IAM · Integrasi</h2>
             <p>Multi-tenant SaaS: role, config cabang, pairing channel, developer API.</p>
@@ -484,71 +382,57 @@
             </ul>
             <footer>Fondasi ERP multi-tenant untuk semua modul</footer>
           </article>
+
+          <article class="module-card" id="m9-finance">
+            <header>
+              <div class="code">M9</div>
+            </header>
+            <h2>Finance & Kalkulator</h2>
+            <p>Perhitungan pembiayaan dan profit unit yang terhubung ke dashboard serta agen AI.</p>
+            <ul>
+              <li>Simulasi kredit melalui web & WhatsApp</li>
+              <li>Kalkulasi TNS, GP, HPP & margin</li>
+              <li>Detail finansial dan profit per unit</li>
+              <li>Analisis finansial untuk tim internal</li>
+            </ul>
+            <footer>Terhubung langsung dengan inventory dan Agentic AI</footer>
+          </article>
+
+          <article class="module-card" id="m10-trade-in-mrp">
+            <header>
+              <div class="code">M10</div>
+            </header>
+            <h2>Trade-in, MRP & Promosi</h2>
+            <p>Proses appraisal, pengolahan MRP, dan program promosi dalam satu workflow operasional.</p>
+            <ul>
+              <li>Appraisal trade-in melalui agen WhatsApp</li>
+              <li>Upload, parsing & ringkasan data MRP</li>
+              <li>Detail hasil dan download Excel</li>
+              <li>Promotion campaign & sinkronisasi listing</li>
+            </ul>
+            <footer>Mempercepat evaluasi unit dan eksekusi program penjualan</footer>
+          </article>
         </div>
 
-        <section class="roadmap-section" aria-labelledby="roadmap-title">
-          <div class="section-head">
-            <span>ROADMAP</span>
-            <h2 id="roadmap-title">Yang bisa kita bangun sebagai Agentic AI ERP</h2>
-            <p>Perluasan di atas fondasi yang sudah hidup — bukan rewrite dari nol.</p>
-          </div>
-          <div class="roadmap-grid">
-            <article class="roadmap-card">
-              <h3>P0 · 3–6 bulan</h3>
-              <strong>Perkuat otomotif</strong>
-              <ul>
-                <li>Document AI (SPK, invoice, PJB)</li>
-                <li>Atribusi iklan → deal</li>
-                <li>Voice / call notes AI</li>
-                <li>Stock intelligence & pricing</li>
-                <li>Mini katalog self-serve</li>
-              </ul>
-            </article>
-            <article class="roadmap-card">
-              <h3>P1 · 6–12 bulan</h3>
-              <strong>ERP lintas fungsi</strong>
-              <ul>
-                <li>Finance ops (AR/AP, cashflow)</li>
-                <li>Aftersales / service booking</li>
-                <li>HR lite: target & komisi</li>
-                <li>Procurement unit masuk</li>
-                <li>Workflow builder event-driven</li>
-              </ul>
-            </article>
-            <article class="roadmap-card">
-              <h3>P2–P3 · 12+ bulan</h3>
-              <strong>Multi-industri & GTM</strong>
-              <ul>
-                <li>Pack properti, ritel, jasa</li>
-                <li>Self-serve onboarding bisnis</li>
-                <li>Billing / credit usage AI</li>
-                <li>Connector leasing & insurance</li>
-                <li>White-label partner</li>
-              </ul>
-            </article>
-          </div>
-        </section>
-
-        <div class="matrix-wrap" role="region" aria-label="Matriks status modul">
+        <div class="matrix-wrap" role="region" aria-label="Ringkasan capability modul">
           <table>
             <thead>
               <tr>
                 <th>Modul</th>
-                <th>Status</th>
-                <th>Catatan</th>
+                <th>Capability utama</th>
+                <th>Outcome</th>
               </tr>
             </thead>
             <tbody>
-              <tr><td>Inventory / Unit</td><td><span class="badge live">Live</span></td><td>Core dealer</td></tr>
-              <tr><td>WhatsApp Agentic AI</td><td><span class="badge live">Live</span></td><td>Tool-rich Falcon/Jasmine</td></tr>
-              <tr><td>Call Center Omnichannel</td><td><span class="badge live">Live</span></td><td>WA + FB + IG, SSE</td></tr>
-              <tr><td>Autopilot CRM</td><td><span class="badge partial">Flag</span></td><td>crm_autopilot</td></tr>
-              <tr><td>Social + Ads + Meta publish</td><td><span class="badge partial">Flag</span></td><td>social_media_automation</td></tr>
-              <tr><td>Analytics / Dashboard</td><td><span class="badge live">Live</span></td><td>Trend & role home</td></tr>
-              <tr><td>Platform multi-tenant + RBAC</td><td><span class="badge live">Live</span></td><td>TenantConfig JSON</td></tr>
-              <tr><td>Finance simulation</td><td><span class="badge partial">Partial</span></td><td>Kredit + TNS/GP</td></tr>
-              <tr><td>Full accounting / aftersales / HR</td><td><span class="badge roadmap">Roadmap</span></td><td>Agentic ERP expansion</td></tr>
-              <tr><td>Multi-industry packs</td><td><span class="badge roadmap">Roadmap</span></td><td>Demo dashboard sudah explore</td></tr>
+              <tr><td>Inventory / Unit</td><td>Stok, cabang, foto & import</td><td>Data unit siap jual dan mudah dicari</td></tr>
+              <tr><td>WhatsApp Agentic AI</td><td>Falcon/Jasmine + business tools</td><td>Layanan dan operasional otomatis 24/7</td></tr>
+              <tr><td>Call Center Omnichannel</td><td>WA, FB, IG & realtime inbox</td><td>AI dan tim manusia bekerja dalam satu alur</td></tr>
+              <tr><td>Autopilot CRM</td><td>Pipeline, customer & follow-up</td><td>Lead bergerak konsisten menuju deal</td></tr>
+              <tr><td>Social Media & Ads</td><td>Creative, schedule & Meta publish</td><td>Dari stok menjadi konten dan lead</td></tr>
+              <tr><td>Dashboard & Insight</td><td>Sales, channel, funnel & margin</td><td>Keputusan berbasis data real-time</td></tr>
+              <tr><td>Platform & Integrasi</td><td>Multi-tenant, RBAC & API</td><td>Fondasi operasional yang aman dan fleksibel</td></tr>
+              <tr><td>Finance & Kalkulator</td><td>Kredit, TNS, GP & unit financials</td><td>Perhitungan pembiayaan lebih cepat</td></tr>
+              <tr><td>Trade-in, MRP & Promosi</td><td>Appraisal, parsing & campaign</td><td>Evaluasi unit dan program penjualan terintegrasi</td></tr>
             </tbody>
           </table>
         </div>
