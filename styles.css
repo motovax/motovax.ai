@@ -5181,7 +5181,7 @@ body.demo-open {
 
 .falcon-stage-caption {
   text-align: center;
-  max-width: 42ch;
+  max-width: 32ch;
 }
 
 .falcon-stage-caption > span {
@@ -5195,17 +5195,18 @@ body.demo-open {
 
 .falcon-stage-caption b {
   display: block;
-  margin: 4px 0 2px;
+  margin: 3px 0 1px;
   color: #0f172a;
-  font-size: 16px;
+  font-size: 15px;
+  line-height: 1.25;
   letter-spacing: -0.02em;
 }
 
 .falcon-stage-caption p {
   margin: 0;
   color: #64748b;
-  font-size: 11px;
-  line-height: 1.5;
+  font-size: 10px;
+  line-height: 1.4;
 }
 
 .falcon-phone-wrap {
@@ -5551,7 +5552,7 @@ body.demo-open {
   }
 
   .iphone-frame {
-    width: min(100%, 304px);
+    width: min(100%, clamp(288px, 42vw, 320px));
     height: auto;
     max-height: none;
   }
@@ -5559,6 +5560,12 @@ body.demo-open {
   .iphone-screen {
     height: auto;
     aspect-ratio: 9 / 17.9;
+  }
+}
+
+@media (max-width: 600px) {
+  .iphone-frame {
+    width: min(100%, 292px);
   }
 }
 
