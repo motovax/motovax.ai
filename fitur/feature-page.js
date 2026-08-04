@@ -513,12 +513,21 @@
 
   function renderShowcaseVisual(feature, productProfile, capability, index) {
     const title = String(feature.title || "fitur Motovax");
+    const capabilityTitle = String(capability.title || "");
     const previews = previewSetFor(String(feature.slug || ""), (file, label) => ({
       file,
       label,
       alt: `Tampilan ${label} di aplikasi Motovax untuk ${capability.title} pada ${title} dengan data demo`,
     }));
-    const preview = previews[index % previews.length];
+    // Capability faneling hidup di workspace /call-center. Jangan memilih
+    // screenshot Integrasi Channel hanya karena posisinya kebetulan urutan ke-2.
+    const preview = /fanel|handoff|takeover/i.test(capabilityTitle)
+      ? {
+          file: "omnichannel-inbox.webp",
+          label: "Omnichannel Inbox · AI / Agent / MR",
+          alt: `Tampilan Call Center Motovax untuk ${capabilityTitle} dengan data demo`,
+        }
+      : previews[index % previews.length];
     return `
       <figure class="feature-showcase-visual feature-showcase-preview family-${productProfile.family}">
         <div class="feature-showcase-preview-window">
