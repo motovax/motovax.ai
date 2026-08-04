@@ -101,13 +101,12 @@ if (contactForm instanceof HTMLFormElement) {
           paneTitle: "Aplikasi Omnichannel",
           demo: { id: "omni", hash: "omniDemo", context: "omnichannel", label: "Coba Simulasi" },
           features: [
-            { title: "Omnichannel", desc: "Satu platform untuk kelola chat dari berbagai saluran", icon: "chat", href: f("aplikasi-omnichannel") },
-            { title: "Call Center", desc: "Workspace layanan omnichannel dengan AI, agent, dan handoff MR", icon: "call", href: f("aplikasi-call-center") },
+            { title: "Call Center AI Omnichannel", desc: "Satu workspace untuk channel, AI, agent, antrean, dan handoff MR", icon: "call", href: f("aplikasi-omnichannel") },
             { title: "WhatsApp Business API", desc: "Hubungkan percakapan WhatsApp ke inbox omnichannel", icon: "wa", href: f("whatsapp-business-api") },
             { title: "Facebook Messenger", desc: "Kelola chat Facebook bersama kanal pelanggan lainnya", icon: "fb", href: f("aplikasi-omnichannel") },
             { title: "Instagram API", desc: "Respons DM otomatis untuk tingkatkan penjualan", icon: "ig", href: f("instagram-api") },
             { title: "Embedded Live Chat", desc: "Integrasi layanan live chat 24/7 untuk aplikasi Anda", icon: "live", href: f("embedded-live-chat") },
-            { title: "Ticket Creation Integration", desc: "Sederhanakan proses resolusi masalah pelanggan", icon: "ticket", href: f("ticket-creation-integration") },
+            { title: "Manajemen Tiket", desc: "Kelola status, eskalasi, resolusi, dan tindak lanjut dari chat", icon: "ticket", href: f("sistem-manajemen-tiket") },
           ],
         },
         {
@@ -130,7 +129,6 @@ if (contactForm instanceof HTMLFormElement) {
           paneTitle: "Customer Support & Ticketing",
           demo: { id: "omni", hash: "omniDemo", context: "customer-support", label: "Simulasi Customer Service" },
           features: [
-            { title: "Aplikasi Customer Service", desc: "Platform terintegrasi untuk layanan pelanggan efisien", icon: "cs", href: f("aplikasi-customer-service") },
             { title: "Manajemen Tiket", desc: "Tangani keluhan pelanggan lebih cepat & akurat", icon: "ticket", href: f("sistem-manajemen-tiket") },
             { title: "Manajemen SLA", desc: "Optimalkan resolusi masalah pelanggan & kinerja agen", icon: "sla", href: f("manajemen-sla") },
             { title: "Agent Scorecard", desc: "Pantau & evaluasi kualitas layanan pelanggan lebih mudah", icon: "score", href: f("agent-scorecard") },
@@ -142,9 +140,8 @@ if (contactForm instanceof HTMLFormElement) {
           paneTitle: "AI & Chatbot",
           demo: { id: "falcon", hash: "falconDemo", context: "agentic-ai", label: "Coba Agentic AI" },
           features: [
-            { title: "Chatbot & Conversational AI", desc: "Respons pelanggan lebih cepat dengan chatbot 24/7", icon: "bot", href: f("chatbot") },
             { title: "Airene", desc: "Maksimalkan kinerja agen CS dengan dukungan Airene", icon: "agent", href: f("integrasi-airene") },
-            { title: "Agentic AI", desc: "Agen AI cerdas untuk proses bisnis lebih optimal", icon: "ai", href: f("agentic-ai"), badge: "New" },
+            { title: "Agentic & Conversational AI", desc: "Percakapan AI yang dapat menjalankan proses bisnis melalui tools", icon: "ai", href: f("agentic-ai"), badge: "New" },
           ],
         },
         {
@@ -163,8 +160,7 @@ if (contactForm instanceof HTMLFormElement) {
           paneTitle: "Manajemen Campaign",
           demo: { id: "social", hash: "socialDemo", context: "broadcast", label: "Coba Campaign" },
           features: [
-            { title: "WhatsApp Broadcast", desc: "Jangkau ribuan pelanggan secara otomatis", icon: "blast", href: f("aplikasi-broadcast-whatsapp") },
-            { title: "WhatsApp Bulk", desc: "Kirim pesan ke banyak kontak secara bersamaan", icon: "bulk", href: f("whatsapp-bulk") },
+            { title: "WhatsApp Broadcast", desc: "Kirim campaign massal tersegmentasi dan kelola balasannya", icon: "blast", href: f("aplikasi-broadcast-whatsapp") },
           ],
         },
       ],

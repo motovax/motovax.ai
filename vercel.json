@@ -1,4 +1,12 @@
 {
+  "redirects": [
+    { "source": "/fitur/aplikasi-call-center.html", "destination": "/fitur/aplikasi-omnichannel.html", "permanent": true },
+    { "source": "/fitur/aplikasi-customer-service.html", "destination": "/fitur/aplikasi-omnichannel.html", "permanent": true },
+    { "source": "/fitur/ticket-creation-integration.html", "destination": "/fitur/sistem-manajemen-tiket.html", "permanent": true },
+    { "source": "/fitur/wa-blast.html", "destination": "/fitur/aplikasi-broadcast-whatsapp.html", "permanent": true },
+    { "source": "/fitur/whatsapp-bulk.html", "destination": "/fitur/aplikasi-broadcast-whatsapp.html", "permanent": true },
+    { "source": "/fitur/chatbot.html", "destination": "/fitur/agentic-ai.html", "permanent": true }
+  ],
   "cleanUrls": true,
   "trailingSlash": false
 }

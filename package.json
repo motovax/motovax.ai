@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "python -m http.server 5179",
     "start": "python -m http.server 5179",
+    "generate:fitur": "node scripts/generate-fitur-pages.mjs",
     "generate:solusi": "node scripts/generate-solusi-pages.mjs"
   }
 }

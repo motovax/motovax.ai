@@ -23,6 +23,15 @@ if (!features) {
   process.exit(1);
 }
 
+const redirects = {
+  "aplikasi-call-center": "aplikasi-omnichannel",
+  "aplikasi-customer-service": "aplikasi-omnichannel",
+  "ticket-creation-integration": "sistem-manajemen-tiket",
+  "wa-blast": "aplikasi-broadcast-whatsapp",
+  "whatsapp-bulk": "aplikasi-broadcast-whatsapp",
+  chatbot: "agentic-ai",
+};
+
 const template = (slug, title, description) => `<!doctype html>
 <html lang="id">
   <head>
@@ -30,6 +39,7 @@ const template = (slug, title, description) => `<!doctype html>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>${escapeHtml(title)} — MOTOVAX</title>
     <meta name="description" content="${escapeHtml(description)}" />
+    <link rel="canonical" href="https://motovax.ai/fitur/${escapeHtml(slug)}.html" />
     <meta name="theme-color" content="#1267f5" />
     <link rel="icon" href="../favicon.ico" sizes="any" />
     <link rel="icon" type="image/png" sizes="32x32" href="../icons/favicon-32.png" />
@@ -159,3 +169,27 @@ fs.writeFileSync(
 );
 
 console.log("done,", written.size, "feature pages + index");
+
+for (const [from, to] of Object.entries(redirects)) {
+  fs.writeFileSync(
+    path.join(outDir, `${from}.html`),
+    `<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Halaman dipindahkan — MOTOVAX</title>
+  <meta name="robots" content="noindex,follow" />
+  <meta http-equiv="refresh" content="0; url=./${escapeHtml(to)}.html" />
+  <link rel="canonical" href="https://motovax.ai/fitur/${escapeHtml(to)}.html" />
+</head>
+<body>
+  <p>Halaman ini telah dipindahkan ke <a href="./${escapeHtml(to)}.html">halaman fitur terbaru Motovax</a>.</p>
+  <script>location.replace(${JSON.stringify(`./${to}.html`)} + location.search + location.hash);</script>
+</body>
+</html>
+`,
+    "utf8",
+  );
+  console.log("redirect", `${from}.html`, "->", `${to}.html`);
+}
