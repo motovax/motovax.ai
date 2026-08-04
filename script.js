@@ -10049,8 +10049,39 @@ class CapabilityProductDemo {
       { time: "10:34", title: "Auto-follow CRM", copy: "12 lead stale → task MR" },
       { time: "09:00", title: "Email report worker", copy: "Rekap harian terkirim" },
     ];
+    this.tour = new DemoProductTour(root, {
+      ns: "capability",
+      anchorAttr: "data-capability-anchor",
+      getSteps: () => this.guideSteps(),
+      getStepLabel: (_step, index, total) => `AUTOMASI · LANGKAH ${index} DARI ${total}`,
+    });
     this.bind();
     this.render();
+  }
+
+  guideSteps() {
+    return [
+      {
+        anchor: "automation-status",
+        title: "Mulai dari status automasi",
+        body: "Ringkasan ini membedakan automasi yang aktif di produk dari workflow builder visual yang masih berstatus roadmap.",
+      },
+      {
+        anchor: "automation-rules",
+        title: "Pilih rule yang ingin diuji",
+        body: "Klik salah satu rule aktif. Diagram event di sebelahnya akan berubah mengikuti Auto-follow CRM, routing, report worker, atau photo maintenance.",
+      },
+      {
+        anchor: "automation-simulator",
+        title: "Jalankan event demo",
+        body: "Tekan “Jalankan event demo” untuk memproses simulasi aman. Hasilnya muncul di panel ini tanpa menghubungi customer atau mengubah data produksi.",
+      },
+      {
+        anchor: "automation-log",
+        title: "Periksa jejak eksekusi",
+        body: "Setiap simulasi menambahkan event terbaru ke log. Coba rule lain, jalankan kembali, atau gunakan Clear demo untuk mengosongkan jejak.",
+      },
+    ];
   }
 
   roleConfigs() {
@@ -10160,7 +10191,9 @@ class CapabilityProductDemo {
       }
     });
     document.addEventListener("keydown", (event) => {
-      if (event.key === "Escape" && this.root.classList.contains("is-open")) this.close();
+      if (event.key !== "Escape" || !this.root.classList.contains("is-open")) return;
+      if (this.tour.isOpen) this.tour.close();
+      else this.close();
     });
   }
 
@@ -10170,10 +10203,12 @@ class CapabilityProductDemo {
     this.root.classList.add("is-open");
     this.root.setAttribute("aria-hidden", "false");
     document.body.classList.add("demo-open");
-    this.root.querySelector("[data-close-capability-demo]")?.focus();
+    if (this.mode === "automation") this.tour.open(0);
+    else this.root.querySelector("[data-close-capability-demo]")?.focus();
   }
 
   close() {
+    this.tour.close();
     this.root.classList.remove("is-open");
     this.root.setAttribute("aria-hidden", "true");
     document.body.classList.remove("demo-open");
@@ -10196,6 +10231,7 @@ class CapabilityProductDemo {
 
   switchMode(mode) {
     this.mode = mode === "automation" ? "automation" : "whatsapp";
+    if (this.mode !== "automation" && this.tour?.isOpen) this.tour.close();
     const copy = this.mode === "automation"
       ? {
           title: "Automasi Operasional",
@@ -10216,6 +10252,8 @@ class CapabilityProductDemo {
     this.root.querySelector("[data-capability-breadcrumb]").textContent = copy.breadcrumb;
     this.root.querySelector("[data-capability-heading]").textContent = copy.heading;
     this.root.querySelector("[data-capability-description]").textContent = copy.description;
+    const guideTrigger = this.root.querySelector("[data-capability-guide-trigger]");
+    if (guideTrigger) guideTrigger.hidden = this.mode !== "automation";
     for (const button of this.root.querySelectorAll("[data-capability-nav]")) {
       const active = button.dataset.capabilityNav === this.mode;
       button.classList.toggle("active", active);

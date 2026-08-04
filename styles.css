@@ -8198,7 +8198,8 @@ body.demo-open {
 .demo-guide-popover.demo-guide-tooltip > button[data-close-social-guide],
 .demo-guide-popover.demo-guide-tooltip > button[data-close-omni-guide],
 .demo-guide-popover.demo-guide-tooltip > button[data-close-dashboard-guide],
-.demo-guide-popover.demo-guide-tooltip > button[data-close-insight-guide] {
+.demo-guide-popover.demo-guide-tooltip > button[data-close-insight-guide],
+.demo-guide-popover.demo-guide-tooltip > button[data-close-capability-guide] {
   color: #fff;
   background: rgba(255, 255, 255, 0.16);
 }
@@ -8208,7 +8209,8 @@ body.demo-open {
 .demo-guide-popover.demo-guide-tooltip > button[data-close-social-guide]:hover,
 .demo-guide-popover.demo-guide-tooltip > button[data-close-omni-guide]:hover,
 .demo-guide-popover.demo-guide-tooltip > button[data-close-dashboard-guide]:hover,
-.demo-guide-popover.demo-guide-tooltip > button[data-close-insight-guide]:hover {
+.demo-guide-popover.demo-guide-tooltip > button[data-close-insight-guide]:hover,
+.demo-guide-popover.demo-guide-tooltip > button[data-close-capability-guide]:hover {
   background: rgba(255, 255, 255, 0.28);
 }
 
@@ -8564,6 +8566,21 @@ body.demo-open {
   font-size: 10px;
   font-weight: 800;
 }
+
+.capability-heading-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.capability-heading-actions > button {
+  min-height: 34px;
+  white-space: nowrap;
+}
+
+.capability-heading-actions > button[hidden] { display: none !important; }
 
 .capability-live-badge i,
 .automation-status-strip i {
@@ -8928,6 +8945,7 @@ body.demo-open {
 }
 
 @media (max-width: 520px) {
+  .capability-heading-actions { justify-content: flex-start; width: 100%; }
   .capability-kpis { grid-template-columns: 1fr; }
   .automation-flow { grid-template-columns: 1fr 1fr; }
   .automation-flow i { display: none; }
