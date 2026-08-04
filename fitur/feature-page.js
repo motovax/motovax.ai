@@ -299,7 +299,22 @@
           <a class="btn btn-secondary" href="../index.html#kontak">Jadwalkan Demo</a>
         </div>
       </div>
-    </section>`;
+    </section>
+
+    <div class="feature-image-modal" data-feature-image-modal hidden role="dialog" aria-modal="true" aria-labelledby="featureImageModalTitle">
+      <div class="feature-image-modal-panel">
+        <header>
+          <div>
+            <span>SCREENSHOT PRODUK</span>
+            <strong id="featureImageModalTitle" data-feature-image-modal-title>Pratinjau fitur Motovax</strong>
+          </div>
+          <button type="button" data-feature-image-close aria-label="Tutup screenshot">×</button>
+        </header>
+        <div class="feature-image-modal-scroll">
+          <img data-feature-image-modal-img src="" alt="">
+        </div>
+      </div>
+    </div>`;
 
   const whatsappUrl =
     "https://wa.me/6281999197186?text=Halo%20MOTOVAX%2C%20saya%20ingin%20jadwalkan%20demo.";
@@ -310,6 +325,36 @@
       link.rel = "noreferrer";
     }
   }
+
+  const imageModal = root.querySelector("[data-feature-image-modal]");
+  const imageModalImg = root.querySelector("[data-feature-image-modal-img]");
+  const imageModalTitle = root.querySelector("[data-feature-image-modal-title]");
+  let imageModalTrigger = null;
+  const closeImageModal = () => {
+    if (!imageModal || imageModal.hidden) return;
+    imageModal.hidden = true;
+    document.body.classList.remove("feature-image-open");
+    imageModalImg?.removeAttribute("src");
+    imageModalTrigger?.focus();
+  };
+  for (const button of root.querySelectorAll("[data-feature-image-open]")) {
+    button.addEventListener("click", () => {
+      if (!imageModal || !imageModalImg) return;
+      imageModalTrigger = button;
+      imageModalImg.src = button.dataset.imageSrc || "";
+      imageModalImg.alt = button.dataset.imageAlt || "Screenshot fitur Motovax ukuran penuh";
+      if (imageModalTitle) imageModalTitle.textContent = button.dataset.imageTitle || "Pratinjau fitur Motovax";
+      imageModal.hidden = false;
+      document.body.classList.add("feature-image-open");
+      imageModal.querySelector("[data-feature-image-close]")?.focus();
+    });
+  }
+  imageModal?.addEventListener("click", (event) => {
+    if (event.target === imageModal || event.target.closest("[data-feature-image-close]")) closeImageModal();
+  });
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && imageModal && !imageModal.hidden) closeImageModal();
+  });
 
   function profileFor(feature) {
     const id = feature.slug || "";
@@ -586,7 +631,7 @@
           </div>
           <figcaption>
             <span>${escapeHtml(preview.caption || `${capability.title} dalam workspace Motovax`)}</span>
-            ${preview.fullLink ? `<a href="../assets/feature-previews/${escapeHtml(preview.file)}" target="_blank" rel="noreferrer">Buka ukuran penuh ↗</a>` : ""}
+            ${preview.fullLink ? `<button type="button" data-feature-image-open data-image-src="../assets/feature-previews/${escapeHtml(preview.file)}" data-image-alt="${escapeHtml(preview.alt)}" data-image-title="${escapeHtml(preview.label)}">Buka ukuran penuh ↗</button>` : ""}
           </figcaption>
         </div>
       </figure>`;
