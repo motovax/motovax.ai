@@ -2684,7 +2684,12 @@
                 <h2 data-capability-heading>Channel Control Center</h2>
                 <p data-capability-description>Hubungkan channel per role, pantau status session, dan kendalikan AI tenant dari satu workspace.</p>
               </div>
-              <span class="capability-live-badge"><i></i> Tenant demo aktif</span>
+              <div class="capability-heading-actions">
+                <button class="demo-secondary-action" type="button" data-capability-guide data-capability-guide-trigger hidden>
+                  <span aria-hidden="true">▶</span> Panduan demo
+                </button>
+                <span class="capability-live-badge"><i></i> Tenant demo aktif</span>
+              </div>
             </div>
 
             <section class="capability-view is-active" data-capability-view="whatsapp">
@@ -2729,13 +2734,13 @@
             </section>
 
             <section class="capability-view" data-capability-view="automation" hidden>
-              <div class="automation-status-strip">
+              <div class="automation-status-strip" data-capability-anchor="automation-status">
                 <span><i></i> 4 automasi aktif</span>
                 <span>Berbasis event, agent tools, dan worker</span>
                 <em>Builder visual · roadmap</em>
               </div>
               <div class="capability-grid automation-capability-grid">
-                <article class="capability-panel automation-rules">
+                <article class="capability-panel automation-rules" data-capability-anchor="automation-rules">
                   <header><div><span>AUTOMASI AKTIF</span><h3>Rules &amp; worker produksi</h3></div><em>Truth-aligned</em></header>
                   <div class="automation-rule-list">
                     <button class="active" type="button" data-automation-rule="followup"><span>01</span><div><b>Auto-follow CRM</b><small>Lead stale → reminder &amp; task MR</small></div><em>Aktif</em></button>
@@ -2745,7 +2750,7 @@
                   </div>
                 </article>
 
-                <article class="capability-panel automation-simulator">
+                <article class="capability-panel automation-simulator" data-capability-anchor="automation-simulator">
                   <header><div><span>EVENT SIMULATOR</span><h3 data-automation-title>Auto-follow CRM</h3></div><em>Simulasi</em></header>
                   <div class="automation-flow" data-automation-flow></div>
                   <button type="button" data-automation-run>Jalankan event demo →</button>
@@ -2757,13 +2762,25 @@
                   <ul><li><span>Guideline sales/CS</span><b>12 aturan</b></li><li><span>Preferensi reply</span><b>Brand voice aktif</b></li><li><span>URL knowledge</span><b>4 sumber</b></li><li><span>Knowledge base formal</span><b class="roadmap">Roadmap</b></li></ul>
                 </article>
 
-                <article class="capability-panel automation-log-panel">
+                <article class="capability-panel automation-log-panel" data-capability-anchor="automation-log">
                   <header><div><span>EVENT LOG</span><h3>Jejak eksekusi</h3></div><button type="button" data-automation-clear>Clear demo</button></header>
                   <ol data-automation-log></ol>
                 </article>
               </div>
             </section>
           </main>
+        </div>
+      </div>
+      <div class="demo-guide-spotlight" data-capability-guide-spotlight hidden aria-hidden="true"></div>
+      <div class="demo-guide-popover demo-guide-tooltip capability-guide-popover" data-capability-guide-popover hidden>
+        <button type="button" data-close-capability-guide aria-label="Tutup panduan">×</button>
+        <span data-capability-guide-step-label>AUTOMASI · LANGKAH 1 DARI 4</span>
+        <h3 data-capability-guide-title>Kenali status automasi</h3>
+        <p data-capability-guide-body>Panduan singkat akan menyorot alur demo Automation dari memilih rule sampai membaca hasil event.</p>
+        <div class="demo-guide-actions">
+          <button type="button" class="demo-secondary-action demo-guide-prev" data-capability-guide-prev hidden>Kembali</button>
+          <button type="button" class="demo-guide-next" data-capability-guide-next>Berikutnya</button>
+          <button type="button" class="demo-guide-finish" data-capability-guide-finish hidden>Selesai</button>
         </div>
       </div>
     </div>
