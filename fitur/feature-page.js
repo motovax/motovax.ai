@@ -79,7 +79,7 @@
   const demoCta = `<a class="btn btn-secondary feature-hero-demo" href="${escapeHtml(demoHref)}">${demoLabel} <span>-></span></a>`;
 
   function isFanelingCapability(capability) {
-    return slug === "aplikasi-omnichannel" && /fanel|handoff|takeover/i.test(String(capability?.title || ""));
+    return slug === "aplikasi-omnichannel" && /fanel/i.test(String(capability?.title || ""));
   }
 
   function renderShowcaseAction(capability) {
@@ -528,35 +528,29 @@
       label,
       alt: `Tampilan ${label} di aplikasi Motovax untuk ${capability.title} pada ${title} dengan data demo`,
     }));
-    // Capability faneling hidup di workspace /call-center. Jangan memilih
-    // screenshot Integrasi Channel hanya karena posisinya kebetulan urutan ke-2.
-    if (isFanelingCapability(capability)) {
-      return `
-        <figure class="feature-showcase-visual feature-showcase-preview family-${productProfile.family}">
-          <div class="feature-showcase-preview-window">
-            <div class="feature-showcase-preview-topbar">
-              <span><i></i> Screenshot produk</span>
-              <strong>Call Center · AI → Agent → MR</strong>
-              <em>Data demo</em>
-            </div>
-            <div class="feature-showcase-preview-image is-wide">
-              <img
-                src="../assets/feature-previews/omnichannel-faneling-public.png"
-                width="1440"
-                height="828"
-                alt="Call Center Motovax setelah chat berpindah dari Jasmine AI ke Agent lalu di-handoff ke Marketing Representative"
-                loading="eager"
-                decoding="async"
-              >
-            </div>
-            <figcaption>
-              <span>State akhir: jejak AI dan takeover Agent tetap terlihat, lead masuk bucket MR Belum Balas, dan konteks Role MR tersedia.</span>
-              <a href="../assets/feature-previews/omnichannel-faneling-public.png" target="_blank" rel="noreferrer">Buka ukuran penuh ↗</a>
-            </figcaption>
-          </div>
-        </figure>`;
-    }
-    const preview = /aksi cepat operasional/i.test(capabilityTitle)
+    // Setiap capability Omnichannel memakai capture state yang benar-benar
+    // menonjolkan capability tersebut, bukan rotasi screenshot umum.
+    const omnichannelPreview = String(feature.slug || "") === "aplikasi-omnichannel"
+      ? [
+          [/inbox multi-channel/i, "omnichannel-multichannel-public.png", "Inbox · WhatsApp / Facebook / Instagram", "Bucket dan filter channel tampil dalam satu workspace Call Center."],
+          [/fanel/i, "omnichannel-faneling-public.png", "Call Center · AI → Agent → MR", "Jejak AI dan takeover Agent tetap terlihat setelah lead masuk bucket MR Belum Balas."],
+          [/realtime sse/i, "omnichannel-realtime-public.png", "Call Center · SSE realtime aktif", "Status koneksi realtime dan perubahan conversation terlihat di workspace yang sama."],
+          [/handoff|takeover/i, "omnichannel-handoff-public.png", "Call Center · Dialog Handoff ke MR", "Agent memilih MR, alasan, dan catatan sebelum menyerahkan lead."],
+          [/aksi cepat operasional/i, "omnichannel-inventory-public.png", "Call Center · Cek Inventori", "Hasil pencarian unit dapat dipakai untuk Hitung Kredit atau dibagikan ke conversation."],
+          [/performa omnichannel/i, "omnichannel-performance-public.png", "Analytics · Performa Call Center", "Ringkasan inbox aktif, AI, MR, dan eskalasi tersedia dari Call Center."],
+        ].find(([pattern]) => pattern.test(capabilityTitle))
+      : null;
+    const preview = omnichannelPreview
+      ? {
+          file: omnichannelPreview[1],
+          label: omnichannelPreview[2],
+          caption: omnichannelPreview[3],
+          alt: `Tampilan ${omnichannelPreview[2]} untuk ${capabilityTitle} dengan data demo`,
+          width: omnichannelPreview[1] === "omnichannel-inventory-public.png" ? 1851 : 1440,
+          height: omnichannelPreview[1] === "omnichannel-inventory-public.png" ? 849 : 900,
+          fullLink: true,
+        }
+      : /aksi cepat operasional/i.test(capabilityTitle)
       ? {
           file: "omnichannel-inventory-public.png",
           label: "Call Center · Cek Inventori",
@@ -590,7 +584,10 @@
               decoding="async"
             >
           </div>
-          <figcaption>${escapeHtml(capability.title)} dalam workspace Motovax</figcaption>
+          <figcaption>
+            <span>${escapeHtml(preview.caption || `${capability.title} dalam workspace Motovax`)}</span>
+            ${preview.fullLink ? `<a href="../assets/feature-previews/${escapeHtml(preview.file)}" target="_blank" rel="noreferrer">Buka ukuran penuh ↗</a>` : ""}
+          </figcaption>
         </div>
       </figure>`;
   }
