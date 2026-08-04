@@ -78,6 +78,15 @@
   const demoLabel = isRelatedSimulation ? "Lihat Simulasi Terkait" : "Coba Demo Interaktif";
   const demoCta = `<a class="btn btn-secondary feature-hero-demo" href="${escapeHtml(demoHref)}">${demoLabel} <span>-></span></a>`;
 
+  function isFanelingCapability(capability) {
+    return slug === "aplikasi-omnichannel" && /fanel/i.test(String(capability?.title || ""));
+  }
+
+  function renderShowcaseAction(capability) {
+    if (isFanelingCapability(capability)) return "";
+    return `<a href="https://motovax.ai/hubungi-kami.html">Konsultasikan kebutuhan <span>-></span></a>`;
+  }
+
   const heroBenefits = benefits
     .slice(0, 4)
     .map((benefit) => `<li><span aria-hidden="true">✓</span>${escapeHtml(benefit)}</li>`)
@@ -129,7 +138,7 @@
               ${step ? `<li>${escapeHtml(step.title)} — ${escapeHtml(step.desc)}</li>` : ""}
               ${benefit ? `<li>${escapeHtml(benefit)}</li>` : ""}
             </ul>
-            <a href="../index.html#kontak">Konsultasikan kebutuhan <span>-></span></a>
+            ${renderShowcaseAction(capability)}
           </div>
           ${renderShowcaseVisual(data, profile, capability, index)}
         </article>`;
@@ -246,7 +255,7 @@
           <span>CARA KERJA</span>
           <h2>Dari aktivitas masuk hingga tindak lanjut</h2>
           <p>${escapeHtml(availability.detail)}</p>
-          <a class="btn btn-primary" href="../index.html#kontak">Diskusikan kebutuhan Anda</a>
+          <a class="btn btn-primary" href="https://motovax.ai/hubungi-kami.html">Diskusikan kebutuhan Anda</a>
         </div>
         <ol class="feature-steps">${steps}</ol>
       </div>
@@ -290,7 +299,22 @@
           <a class="btn btn-secondary" href="../index.html#kontak">Jadwalkan Demo</a>
         </div>
       </div>
-    </section>`;
+    </section>
+
+    <div class="feature-image-modal" data-feature-image-modal hidden role="dialog" aria-modal="true" aria-labelledby="featureImageModalTitle">
+      <div class="feature-image-modal-panel">
+        <header>
+          <div>
+            <span>SCREENSHOT PRODUK</span>
+            <strong id="featureImageModalTitle" data-feature-image-modal-title>Pratinjau fitur Motovax</strong>
+          </div>
+          <button type="button" data-feature-image-close aria-label="Tutup screenshot">×</button>
+        </header>
+        <div class="feature-image-modal-scroll">
+          <img data-feature-image-modal-img src="" alt="">
+        </div>
+      </div>
+    </div>`;
 
   const whatsappUrl =
     "https://wa.me/6281999197186?text=Halo%20MOTOVAX%2C%20saya%20ingin%20jadwalkan%20demo.";
@@ -301,6 +325,36 @@
       link.rel = "noreferrer";
     }
   }
+
+  const imageModal = root.querySelector("[data-feature-image-modal]");
+  const imageModalImg = root.querySelector("[data-feature-image-modal-img]");
+  const imageModalTitle = root.querySelector("[data-feature-image-modal-title]");
+  let imageModalTrigger = null;
+  const closeImageModal = () => {
+    if (!imageModal || imageModal.hidden) return;
+    imageModal.hidden = true;
+    document.body.classList.remove("feature-image-open");
+    imageModalImg?.removeAttribute("src");
+    imageModalTrigger?.focus();
+  };
+  for (const button of root.querySelectorAll("[data-feature-image-open]")) {
+    button.addEventListener("click", () => {
+      if (!imageModal || !imageModalImg) return;
+      imageModalTrigger = button;
+      imageModalImg.src = button.dataset.imageSrc || "";
+      imageModalImg.alt = button.dataset.imageAlt || "Screenshot fitur Motovax ukuran penuh";
+      if (imageModalTitle) imageModalTitle.textContent = button.dataset.imageTitle || "Pratinjau fitur Motovax";
+      imageModal.hidden = false;
+      document.body.classList.add("feature-image-open");
+      imageModal.querySelector("[data-feature-image-close]")?.focus();
+    });
+  }
+  imageModal?.addEventListener("click", (event) => {
+    if (event.target === imageModal || event.target.closest("[data-feature-image-close]")) closeImageModal();
+  });
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && imageModal && !imageModal.hidden) closeImageModal();
+  });
 
   function profileFor(feature) {
     const id = feature.slug || "";
@@ -513,12 +567,75 @@
 
   function renderShowcaseVisual(feature, productProfile, capability, index) {
     const title = String(feature.title || "fitur Motovax");
-    const previews = previewSetFor(String(feature.slug || ""), (file, label) => ({
+    const capabilityTitle = String(capability.title || "");
+    const slug = String(feature.slug || "");
+    const captured = (file, label, caption, dimensions = [1440, 900]) => ({
       file,
       label,
-      alt: `Tampilan ${label} di aplikasi Motovax untuk ${capability.title} pada ${title} dengan data demo`,
-    }));
-    const preview = previews[index % previews.length];
+      caption,
+      alt: `Tampilan ${label} untuk ${capabilityTitle} pada ${title} dengan data demo`,
+      width: dimensions[0],
+      height: dimensions[1],
+      fullLink: true,
+    });
+    const matches = (pattern) => pattern.test(`${slug} ${capabilityTitle}`);
+    let preview;
+
+    // Tiap capability diarahkan ke state produk yang relevan. Urutannya sengaja
+    // semantik dan tidak bergantung pada nomor kartu/rotasi screenshot umum.
+    if (matches(/fanel/i)) {
+      preview = captured("omnichannel-faneling-public.png", "Call Center · AI → Agent → MR", "Jejak AI dan takeover Agent tetap terlihat setelah lead masuk bucket MR.");
+    } else if (matches(/handoff|takeover|eskalasi/i)) {
+      preview = captured("omnichannel-handoff-public.png", "Call Center · Handoff ke MR", "Agent memilih MR, alasan, dan catatan sebelum menyerahkan lead.");
+    } else if (matches(/aksi cepat|inventori|stok akurat|konteks stok|unit ready/i)) {
+      preview = captured("omnichannel-inventory-public.png", "Call Center · Cek Inventori", "Unit ready dapat dicari, dihitung kreditnya, lalu dibagikan ke conversation.", [1851, 849]);
+    } else if (matches(/performa omnichannel|manajemen-sla|metrik channel|respons realtime|realtime sse/i)) {
+      preview = /realtime sse/i.test(capabilityTitle)
+        ? captured("omnichannel-realtime-public.png", "Call Center · SSE realtime aktif", "Status koneksi realtime dan perubahan conversation terlihat dalam satu workspace.")
+        : captured("omnichannel-performance-public.png", "Analytics · Performa Call Center", "Ringkasan inbox, AI, MR, dan eskalasi membantu pemantauan layanan.");
+    } else if (matches(/aplikasi-omnichannel|instagram-api|embedded-live-chat|ticket-creation|customer-service|sistem-manajemen-tiket|aplikasi-call-center|motovax-service-suite|integrasi-airene|omnichannel inbox|multi-channel|multi-channel|dm di inbox|status percakapan|riwayat channel|channel bisnis|call center workspace|satu model inbox|multi-channel/i)) {
+      preview = captured("omnichannel-multichannel-public.png", "Inbox · WhatsApp / Facebook / Instagram", "Percakapan dan filter channel tersedia dalam satu workspace Call Center.");
+    } else if (matches(/broadcast|blast|bulk|ctwa|ads campaign|promo unit|outbound scale|segment|template ai|campaign insight/i)) {
+      if (matches(/insight|atribusi|performa/i)) {
+        preview = captured("product-social-insight.png", "Campaign Insight", "Hasil campaign dan respons pelanggan dipantau dalam satu tampilan.");
+      } else if (matches(/kalender|posting/i)) {
+        preview = captured("product-social-calendar.png", "Kalender Posting", "Jadwal konten dan campaign tersusun dalam kalender tim.");
+      } else if (matches(/konten dari stok|konten stok/i)) {
+        preview = captured("product-social-studio.png", "Content Studio", "Konten campaign disusun dari data unit dan inventori.");
+      } else {
+        preview = captured("product-social-broadcast.png", "WhatsApp Broadcast Terukur", "Audiens, pesan personal, jadwal, dan ringkasan pengiriman tampil jelas.");
+      }
+    } else if (matches(/goal|report|scorecard|dashboard|kpi|cabang|lokasi|analytics|motovax-360/i)) {
+      if (matches(/channel|omnichannel/i)) {
+        preview = captured("product-dashboard-channels.png", "Dashboard · Omnichannel", "Performa channel dan sumber percakapan dapat dibandingkan.");
+      } else if (matches(/cabang|lokasi/i)) {
+        preview = captured("product-dashboard-locations.png", "Dashboard · Performa Cabang", "Kinerja antar-cabang tampil dalam satu command center.");
+      } else if (matches(/sales|scorecard|konversi/i)) {
+        preview = captured("product-dashboard-sales.png", "Dashboard · Sales Performance", "KPI pipeline, konversi, dan performa sales terlihat bersama.");
+      } else {
+        preview = captured("product-dashboard-overview.png", "Dashboard · Executive Overview", "KPI utama dan forecast bisnis tersedia dalam ringkasan eksekutif.");
+      }
+    } else if (matches(/crm|deal|kontak|gps|sales suite|customer database|pipeline|follow|guideline|salespeople/i)) {
+      if (matches(/follow/i)) {
+        preview = captured("product-crm-auto-follow.png", "CRM · Auto Follow Customer", "Daftar tindak lanjut membantu sales memprioritaskan customer.");
+      } else if (matches(/guideline|panduan/i)) {
+        preview = captured("product-crm-panduan.png", "CRM · Guideline", "Panduan kerja dapat diakses langsung dari workspace CRM.");
+      } else if (matches(/customer|kontak|gps|salespeople/i)) {
+        preview = captured("product-crm-customer.png", "CRM · Customer Database", "Profil customer, cabang, PIC, dan aktivitas tersusun dalam satu daftar.");
+      } else {
+        preview = captured("product-crm-pipeline.png", "CRM · Pipeline Sales", "Lead terkelompok berdasarkan tahap agar tindak lanjut terlihat jelas.");
+      }
+    } else if (matches(/agentic-ai|chatbot|falcon|ai sales|tool-rich agent|native tools|multi-peran|permission aware|knowledge|web/i)) {
+      preview = matches(/management|laporan|aging|gp|permission|knowledge|web/i)
+        ? captured("product-falcon-management.png", "Falcon · Management Agent", "Management Agent menyediakan tool laporan, aging, margin, dan analytics.")
+        : captured("product-falcon-sales.png", "Falcon · Sales Agent", "Sales Agent menjawab stok, foto, kredit, dan kebutuhan lead.");
+    } else if (matches(/whatsapp|session|flows|tool schema|governance|brand trust/i)) {
+      preview = captured("product-capability-whatsapp.png", "WhatsApp Business API", "Konfigurasi channel dan capability WhatsApp terlihat dalam workspace produk.");
+    } else if (matches(/automasi|workflow|workers|tool chains/i)) {
+      preview = captured("product-capability-automation.png", "Automation Workflow", "Trigger dan aksi otomasi tersusun sebagai alur kerja yang dapat dipantau.");
+    } else {
+      preview = captured("product-dashboard-overview.png", "Motovax · Executive Overview", "Ringkasan operasional produk tersedia dalam satu dashboard.");
+    }
     return `
       <figure class="feature-showcase-visual feature-showcase-preview family-${productProfile.family}">
         <div class="feature-showcase-preview-window">
@@ -527,17 +644,20 @@
             <strong>${escapeHtml(preview.label)}</strong>
             <em>Data demo</em>
           </div>
-          <div class="feature-showcase-preview-image">
+          <div class="feature-showcase-preview-image${preview.wide ? " is-wide" : ""}">
             <img
               src="../assets/feature-previews/${escapeHtml(preview.file)}"
-              width="1440"
-              height="900"
+              width="${preview.width || 1440}"
+              height="${preview.height || 900}"
               alt="${escapeHtml(preview.alt)}"
               loading="eager"
               decoding="async"
             >
           </div>
-          <figcaption>${escapeHtml(capability.title)} dalam workspace Motovax</figcaption>
+          <figcaption>
+            <span>${escapeHtml(preview.caption || `${capability.title} dalam workspace Motovax`)}</span>
+            ${preview.fullLink ? `<button type="button" data-feature-image-open data-image-src="../assets/feature-previews/${escapeHtml(preview.file)}" data-image-alt="${escapeHtml(preview.alt)}" data-image-title="${escapeHtml(preview.label)}">Buka ukuran penuh ↗</button>` : ""}
+          </figcaption>
         </div>
       </figure>`;
   }

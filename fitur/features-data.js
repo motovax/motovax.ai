@@ -24,7 +24,7 @@ window.MOTOVAX_FEATURES = {
       },
       {
         title: "Faneling AI · Agent · MR",
-        desc: "Alur faneling membagi chat ke AI, agent manusia, atau Marketing Representative sesuai kebijakan tenant.",
+        desc: "Chat masuk ditangani AI, dapat diambil alih Agent tanpa kehilangan konteks, lalu di-handoff ke Marketing Representative untuk follow-up dan closing.",
       },
       {
         title: "Realtime SSE",

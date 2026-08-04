@@ -61,6 +61,7 @@ if (contactForm instanceof HTMLFormElement) {
   const I = {
     chat: icon('<path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"/>'),
     ig: icon('<rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/>'),
+    fb: icon('<circle cx="12" cy="12" r="9"/><path d="M14.5 7.5h-1.2c-1.2 0-1.8.7-1.8 1.8V20M9 12.5h6"/>'),
     shop: icon('<path d="M4 7h16l-1.2 12.2A2 2 0 0 1 16.8 21H7.2a2 2 0 0 1-2-1.8L4 7z"/><path d="M8 7V5a4 4 0 0 1 8 0v2"/>'),
     live: icon('<path d="M8 10h.01M12 10h.01M16 10h.01"/><path d="M21 12a9 9 0 1 1-9-9"/><path d="M21 3v6h-6"/>'),
     ticket: icon('<path d="M4 9V7a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v2a2 2 0 0 0 0 4v2a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-2a2 2 0 0 0 0-4z"/>'),
@@ -101,6 +102,9 @@ if (contactForm instanceof HTMLFormElement) {
           demo: { id: "omni", hash: "omniDemo", context: "omnichannel", label: "Coba Simulasi" },
           features: [
             { title: "Omnichannel", desc: "Satu platform untuk kelola chat dari berbagai saluran", icon: "chat", href: f("aplikasi-omnichannel") },
+            { title: "Call Center", desc: "Workspace layanan omnichannel dengan AI, agent, dan handoff MR", icon: "call", href: f("aplikasi-call-center") },
+            { title: "WhatsApp Business API", desc: "Hubungkan percakapan WhatsApp ke inbox omnichannel", icon: "wa", href: f("whatsapp-business-api") },
+            { title: "Facebook Messenger", desc: "Kelola chat Facebook bersama kanal pelanggan lainnya", icon: "fb", href: f("aplikasi-omnichannel") },
             { title: "Instagram API", desc: "Respons DM otomatis untuk tingkatkan penjualan", icon: "ig", href: f("instagram-api") },
             { title: "Embedded Live Chat", desc: "Integrasi layanan live chat 24/7 untuk aplikasi Anda", icon: "live", href: f("embedded-live-chat") },
             { title: "Ticket Creation Integration", desc: "Sederhanakan proses resolusi masalah pelanggan", icon: "ticket", href: f("ticket-creation-integration") },
@@ -118,21 +122,6 @@ if (contactForm instanceof HTMLFormElement) {
             { title: "Manajemen Goal", desc: "Mudah kelola goal dan target yang terkustomisasi", icon: "goal", href: f("manajemen-goal") },
             { title: "Sales GPS Tracking", desc: "Pelacakan lokasi tim sales lapangan real-time", icon: "gps", href: f("sales-gps-tracking") },
             { title: "Custom CRM Report", desc: "Buat laporan dari data CRM sesuai kebutuhan", icon: "report", href: f("personalisasi-report-sales") },
-          ],
-        },
-        {
-          id: "wa",
-          label: "WhatsApp API",
-          paneTitle: "WhatsApp API",
-          demo: { id: "whatsapp", hash: "capabilityDemo", context: "whatsapp", label: "Coba Integrasi" },
-          features: [
-            { title: "WhatsApp API", desc: "Optimalkan interaksi dengan WhatsApp Business API", icon: "wa", href: f("whatsapp-business-api") },
-            { title: "WhatsApp Centang Biru", desc: "Tingkatkan kredibilitas dengan verifikasi WhatsApp", icon: "verify", href: f("centang-biru-whatsapp") },
-            { title: "WhatsApp Blast", desc: "Jangkau ribuan pelanggan secara otomatis", icon: "blast", href: f("wa-blast") },
-            { title: "Click-to-WhatsApp Ads", desc: "Tingkatkan penjualan di WhatsApp lebih mudah", icon: "ads", href: f("ctwa") },
-            { title: "WhatsApp Call", desc: "Layanan panggilan untuk komunikasi lebih lancar", icon: "call", href: f("whatsapp-business-calling") },
-            { title: "WhatsApp Bulk", desc: "Kirim pesan ke banyak kontak secara bersamaan", icon: "bulk", href: f("whatsapp-bulk") },
-            { title: "WhatsApp Flows", desc: "Buat formulir terintegrasi untuk pelayanan lebih tepat", icon: "flow", href: f("whatsapp-flows") },
           ],
         },
         {
@@ -176,15 +165,6 @@ if (contactForm instanceof HTMLFormElement) {
           features: [
             { title: "WhatsApp Broadcast", desc: "Jangkau ribuan pelanggan secara otomatis", icon: "blast", href: f("aplikasi-broadcast-whatsapp") },
             { title: "WhatsApp Bulk", desc: "Kirim pesan ke banyak kontak secara bersamaan", icon: "bulk", href: f("whatsapp-bulk") },
-          ],
-        },
-        {
-          id: "callcenter",
-          label: "Call Center",
-          paneTitle: "Call Center",
-          demo: { id: "omni", hash: "omniDemo", context: "call-center", label: "Coba Call Center" },
-          features: [
-            { title: "Call Center", desc: "Workspace layanan omnichannel dengan AI, agent, dan handoff MR", icon: "call", href: f("aplikasi-call-center") },
           ],
         },
       ],
@@ -699,11 +679,80 @@ if (contactForm instanceof HTMLFormElement) {
   });
 })();
 
-/** Navigasi mobile beranda — menjaga Produk, Solusi, Cara Kerja, dan Keunggulan tetap dapat diakses. */
+/** Navigasi mobile seluruh halaman — menjaga menu utama tetap dapat diakses. */
 (function initMobileNavigation() {
-  const trigger = document.querySelector("[data-mobile-nav-trigger]");
-  const panel = document.querySelector("[data-mobile-nav-panel]");
-  const backdrop = document.querySelector("[data-mobile-nav-backdrop]");
+  const header = document.querySelector(".site-header");
+  const headerInner = header?.querySelector(".header-inner");
+  if (!(header instanceof HTMLElement) || !(headerInner instanceof HTMLElement)) return;
+
+  let trigger = header.querySelector("[data-mobile-nav-trigger]");
+  let panel = header.querySelector("[data-mobile-nav-panel]");
+  let backdrop = header.querySelector("[data-mobile-nav-backdrop]");
+
+  /* Halaman selain beranda memakai header yang sama, tetapi markup menu mobile
+   * tidak diduplikasi ke puluhan file HTML. Bentuk menu di sini agar setiap
+   * halaman selalu mendapat navigasi mobile/tablet yang identik. */
+  if (!trigger || !panel || !backdrop) {
+    const path = location.pathname.replace(/\/+$/, "") || "/";
+    const nested = path.includes("/fitur/") || path.includes("/solusi/") || /\/(fitur|solusi)$/.test(path);
+    const root = nested ? "../" : "./";
+    const home = `${root}index.html`;
+    const industries = [
+      ["Otomotif", "Live", "otomotif"],
+      ["Property", "Adaptif", "property"],
+      ["Pendidikan", "Adaptif", "pendidikan"],
+      ["Keuangan", "Adaptif", "keuangan"],
+      ["Kesehatan", "Adaptif", "kesehatan"],
+      ["Tour & Travel", "Adaptif", "tour-travel"],
+      ["Perhotelan", "Adaptif", "perhotelan"],
+      ["Logistik", "Adaptif", "logistik"],
+      ["FMCG", "Adaptif", "fmcg"],
+      ["Ritel", "Adaptif", "ritel"],
+      ["Teknologi Informasi", "Adaptif", "teknologi-informasi"],
+      ["Outsourcing", "Adaptif", "outsourcing"],
+    ];
+
+    trigger = document.createElement("button");
+    trigger.className = "mobile-nav-trigger";
+    trigger.type = "button";
+    trigger.setAttribute("aria-expanded", "false");
+    trigger.setAttribute("aria-controls", "mobile-navigation");
+    trigger.setAttribute("aria-label", "Buka menu navigasi");
+    trigger.setAttribute("data-mobile-nav-trigger", "");
+    trigger.innerHTML = "<span></span><span></span><span></span>";
+
+    backdrop = document.createElement("button");
+    backdrop.className = "mobile-nav-backdrop";
+    backdrop.type = "button";
+    backdrop.hidden = true;
+    backdrop.setAttribute("aria-label", "Tutup menu navigasi");
+    backdrop.setAttribute("data-mobile-nav-backdrop", "");
+
+    panel = document.createElement("aside");
+    panel.className = "mobile-nav-panel";
+    panel.id = "mobile-navigation";
+    panel.hidden = true;
+    panel.setAttribute("aria-label", "Navigasi mobile");
+    panel.setAttribute("data-mobile-nav-panel", "");
+    panel.innerHTML = `
+      <nav class="mobile-nav-links">
+        <a href="${root}modul.html" data-mobile-nav-close>Produk <span>→</span></a>
+        <details>
+          <summary>Solusi berdasarkan industri <span>+</span></summary>
+          <div class="mobile-solutions-grid">
+            ${industries.map(([name, status, slug]) => `<a href="${root}solusi/${slug}.html" data-mobile-nav-close>${name} <small>${status}</small></a>`).join("")}
+          </div>
+        </details>
+        <a href="${home}#cara-kerja" data-mobile-nav-close>Cara Kerja <span>→</span></a>
+        <a href="${home}#keunggulan" data-mobile-nav-close>Keunggulan <span>→</span></a>
+        <a href="${root}hubungi-kami.html" data-mobile-nav-close>Hubungi Kami <span>→</span></a>
+      </nav>
+      <a class="btn btn-primary mobile-nav-cta" href="${root}hubungi-kami.html" data-mobile-nav-close>Diskusikan Bisnis Anda <span>→</span></a>`;
+
+    headerInner.appendChild(trigger);
+    header.append(backdrop, panel);
+  }
+
   if (!(trigger instanceof HTMLButtonElement) || !(panel instanceof HTMLElement) || !(backdrop instanceof HTMLElement)) return;
 
   const close = ({ restoreFocus = false } = {}) => {
@@ -739,7 +788,7 @@ if (contactForm instanceof HTMLFormElement) {
     if (event.key === "Escape" && trigger.getAttribute("aria-expanded") === "true") close({ restoreFocus: true });
   });
   window.addEventListener("resize", () => {
-    if (window.innerWidth > 900 && trigger.getAttribute("aria-expanded") === "true") close();
+    if (window.innerWidth > 1024 && trigger.getAttribute("aria-expanded") === "true") close();
   });
 })();
 
