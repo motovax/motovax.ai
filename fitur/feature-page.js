@@ -83,19 +83,8 @@
   }
 
   function renderShowcaseAction(capability) {
-    if (!isFanelingCapability(capability)) {
-      return `<a href="../index.html#kontak">Konsultasikan kebutuhan <span>-></span></a>`;
-    }
-    return `
-      <div class="feature-faneling-action">
-        <strong>Alur untuk memunculkan state Faneling ini</strong>
-        <ol>
-          <li><b>1</b><span>Di <em>Call Center</em>, pilih conversation pada bucket <em>Ditangani AI</em></span></li>
-          <li><b>2</b><span>Balas chat atau klik <em>Ambil</em> agar Agent mengambil alih</span></li>
-          <li><b>3</b><span>Klik <em>Handoff</em>, pilih MR, lalu isi alasan dan ringkasan</span></li>
-          <li><b>4</b><span>Klik <em>Handoff ke MR</em>; lead pindah ke bucket Marketing Representative</span></li>
-        </ol>
-      </div>`;
+    if (isFanelingCapability(capability)) return "";
+    return `<a href="../index.html#kontak">Konsultasikan kebutuhan <span>-></span></a>`;
   }
 
   const heroBenefits = benefits

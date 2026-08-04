@@ -1654,25 +1654,6 @@ body.solusi-menu-open {
   text-decoration: none;
 }
 
-.feature-faneling-action {
-  display: grid;
-  gap: 12px;
-  margin-top: 24px;
-  padding: 18px;
-  border: 1px solid #c7d2fe;
-  border-radius: 16px;
-  background: #f5f7ff;
-}
-.feature-faneling-action > strong { color: #1e1b4b; font-size: 14px; line-height: 1.45; }
-.feature-faneling-action ol { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
-.feature-faneling-action li { display: flex; align-items: center; gap: 9px; color: #475569; font-size: 12px; line-height: 1.45; }
-.feature-faneling-action li::before { display: none; }
-.feature-faneling-action li b { width: 24px; height: 24px; display: grid; flex: 0 0 24px; place-items: center; border-radius: 50%; color: #fff; background: #4f46e5; font-size: 11px; }
-.feature-faneling-action li em { color: #312e81; font-style: normal; font-weight: 800; }
-@media (max-width: 680px) {
-  .feature-faneling-action { padding: 15px; }
-}
-
 .feature-showcase-visual {
   min-width: 0;
   padding: 44px;
