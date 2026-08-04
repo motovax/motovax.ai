@@ -255,7 +255,7 @@
           <span>CARA KERJA</span>
           <h2>Dari aktivitas masuk hingga tindak lanjut</h2>
           <p>${escapeHtml(availability.detail)}</p>
-          <a class="btn btn-primary" href="../index.html#kontak">Diskusikan kebutuhan Anda</a>
+          <a class="btn btn-primary" href="https://motovax.ai/hubungi-kami.html">Diskusikan kebutuhan Anda</a>
         </div>
         <ol class="feature-steps">${steps}</ol>
       </div>
