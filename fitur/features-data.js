@@ -24,7 +24,7 @@ window.MOTOVAX_FEATURES = {
       },
       {
         title: "Faneling AI · Agent · MR",
-        desc: "Dari conversation aktif, agent dapat membuka Cek Inventori, mencari unit, lalu memakai hasilnya untuk respons dan tindak lanjut ke Marketing Representative.",
+        desc: "Chat masuk ditangani AI, dapat diambil alih Agent tanpa kehilangan konteks, lalu di-handoff ke Marketing Representative untuk follow-up dan closing.",
       },
       {
         title: "Realtime SSE",

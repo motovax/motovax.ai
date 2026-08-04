@@ -88,12 +88,12 @@
     }
     return `
       <div class="feature-faneling-action">
-        <strong>Urutan untuk membuka tampilan ini di Call Center</strong>
+        <strong>Alur untuk memunculkan state Faneling ini</strong>
         <ol>
-          <li><b>1</b><span>Buka menu <em>Call Center</em></span></li>
-          <li><b>2</b><span>Pilih salah satu <em>conversation</em></span></li>
-          <li><b>3</b><span>Klik <em>Cek Inventori</em> pada Aksi Cepat</span></li>
-          <li><b>4</b><span>Ketik nama unit, lalu tekan <em>Enter</em></span></li>
+          <li><b>1</b><span>Di <em>Call Center</em>, pilih conversation pada bucket <em>Ditangani AI</em></span></li>
+          <li><b>2</b><span>Balas chat atau klik <em>Ambil</em> agar Agent mengambil alih</span></li>
+          <li><b>3</b><span>Klik <em>Handoff</em>, pilih MR, lalu isi alasan dan ringkasan</span></li>
+          <li><b>4</b><span>Klik <em>Handoff ke MR</em>; lead pindah ke bucket Marketing Representative</span></li>
         </ol>
       </div>`;
   }
@@ -547,20 +547,23 @@
           <div class="feature-showcase-preview-window">
             <div class="feature-showcase-preview-topbar">
               <span><i></i> Screenshot produk</span>
-              <strong>Call Center · Hasil pencarian inventori</strong>
-              <em>Data dianonimkan</em>
+              <strong>Call Center · AI → Agent → MR</strong>
+              <em>Data demo</em>
             </div>
             <div class="feature-showcase-preview-image is-wide">
               <img
-                src="../assets/feature-previews/omnichannel-inventory-public.png"
-                width="1851"
-                height="849"
-                alt="Call Center Motovax setelah memilih conversation, membuka Cek Inventori, dan mencari unit Avanza; data pelanggan dianonimkan"
+                src="../assets/feature-previews/omnichannel-faneling-public.png"
+                width="1440"
+                height="828"
+                alt="Call Center Motovax setelah chat berpindah dari Jasmine AI ke Agent lalu di-handoff ke Marketing Representative"
                 loading="eager"
                 decoding="async"
               >
             </div>
-            <figcaption>Hasil: unit yang cocok tampil lengkap dengan foto, harga, Hitung Kredit, dan Share.</figcaption>
+            <figcaption>
+              <span>State akhir: jejak AI dan takeover Agent tetap terlihat, lead masuk bucket MR Belum Balas, dan konteks Role MR tersedia.</span>
+              <a href="../assets/feature-previews/omnichannel-faneling-public.png" target="_blank" rel="noreferrer">Buka ukuran penuh ↗</a>
+            </figcaption>
           </div>
         </figure>`;
     }
