@@ -588,7 +588,7 @@
     } else if (matches(/handoff|takeover|eskalasi/i)) {
       preview = captured("omnichannel-handoff-public.png", "Call Center · Handoff ke MR", "Agent memilih MR, alasan, dan catatan sebelum menyerahkan lead.");
     } else if (matches(/aksi cepat|inventori|stok akurat|konteks stok|unit ready/i)) {
-      preview = captured("omnichannel-inventory-public.png", "Call Center · Cek Inventori", "Unit ready dapat dicari, dihitung kreditnya, lalu dibagikan ke conversation.", [1851, 849]);
+      preview = captured("omnichannel-inventory-public.png", "Manajemen Unit · Inventori", "Unit demo tampil langsung dari Manajemen Unit pada aplikasi produksi.");
     } else if (matches(/performa omnichannel|manajemen-sla|metrik channel|respons realtime|realtime sse/i)) {
       preview = /realtime sse/i.test(capabilityTitle)
         ? captured("omnichannel-realtime-public.png", "Call Center · SSE realtime aktif", "Status koneksi realtime dan perubahan conversation terlihat dalam satu workspace.")
@@ -603,7 +603,7 @@
       } else if (matches(/konten dari stok|konten stok/i)) {
         preview = captured("product-social-studio.png", "Content Studio", "Konten campaign disusun dari data unit dan inventori.");
       } else {
-        preview = captured("product-social-broadcast.png", "WhatsApp Broadcast Terukur", "Audiens, pesan personal, jadwal, dan ringkasan pengiriman tampil jelas.");
+        preview = captured("product-social-broadcast.png", "CRM · Campaign", "Program campaign dan tindak lanjut tampil langsung dari aplikasi produksi.");
       }
     } else if (matches(/goal|report|scorecard|dashboard|kpi|cabang|lokasi|analytics|motovax-360/i)) {
       if (matches(/channel|omnichannel/i)) {
@@ -613,11 +613,11 @@
       } else if (matches(/sales|scorecard|konversi/i)) {
         preview = captured("product-dashboard-sales.png", "Dashboard · Sales Performance", "KPI pipeline, konversi, dan performa sales terlihat bersama.");
       } else {
-        preview = captured("product-dashboard-overview.png", "Dashboard · Executive Overview", "KPI utama dan forecast bisnis tersedia dalam ringkasan eksekutif.");
+        preview = captured("product-dashboard-overview.png", "Dashboard · Operasional", "KPI unit, cabang, dan penjualan tampil langsung dari dashboard produksi.");
       }
     } else if (matches(/crm|deal|kontak|gps|sales suite|customer database|pipeline|follow|guideline|salespeople/i)) {
       if (matches(/follow/i)) {
-        preview = captured("product-crm-auto-follow.png", "CRM · Auto Follow Customer", "Daftar tindak lanjut membantu sales memprioritaskan customer.");
+        preview = captured("product-crm-auto-follow.png", "CRM · Campaign & Follow-up", "Program campaign membantu tim mengelola tindak lanjut customer.");
       } else if (matches(/guideline|panduan/i)) {
         preview = captured("product-crm-panduan.png", "CRM · Guideline", "Panduan kerja dapat diakses langsung dari workspace CRM.");
       } else if (matches(/customer|kontak|gps|salespeople/i)) {
@@ -627,12 +627,12 @@
       }
     } else if (matches(/agentic-ai|chatbot|falcon|ai sales|tool-rich agent|native tools|multi-peran|permission aware|knowledge|web/i)) {
       preview = matches(/management|laporan|aging|gp|permission|knowledge|web/i)
-        ? captured("product-falcon-management.png", "Falcon · Management Agent", "Management Agent menyediakan tool laporan, aging, margin, dan analytics.")
-        : captured("product-falcon-sales.png", "Falcon · Sales Agent", "Sales Agent menjawab stok, foto, kredit, dan kebutuhan lead.");
+        ? captured("product-falcon-management.png", "Analytics · Management", "Laporan dan tren operasional terlihat langsung pada aplikasi produksi.")
+        : captured("product-falcon-sales.png", "Call Center · AI / Agent / MR", "Jejak AI, takeover agent, dan tindak lanjut MR terlihat pada aplikasi produksi.");
     } else if (matches(/whatsapp|session|flows|tool schema|governance|brand trust/i)) {
       preview = captured("product-capability-whatsapp.png", "WhatsApp Business API", "Konfigurasi channel dan capability WhatsApp terlihat dalam workspace produk.");
     } else if (matches(/automasi|workflow|workers|tool chains/i)) {
-      preview = captured("product-capability-automation.png", "Automation Workflow", "Trigger dan aksi otomasi tersusun sebagai alur kerja yang dapat dipantau.");
+      preview = captured("product-capability-automation.png", "Automation · Email Report", "Konfigurasi report otomatis terlihat langsung pada aplikasi produksi.");
     } else {
       preview = captured("product-dashboard-overview.png", "Motovax · Executive Overview", "Ringkasan operasional produk tersedia dalam satu dashboard.");
     }
