@@ -4814,7 +4814,6 @@ class AutopilotCRMDemo {
     this.view = "pipeline";
     this.selectedId = null;
     this.lastFocusedElement = null;
-    this.hasOpenedGuide = false;
     this.guideStepIndex = 0;
 
     this.board = root.querySelector("[data-crm-board]");
@@ -5062,14 +5061,18 @@ class AutopilotCRMDemo {
 
   open(trigger) {
     this.lastFocusedElement = trigger;
+    this.closeDetail();
+    this.closeGuide();
+    this.switchView("pipeline");
     this.root.classList.add("is-open");
     this.root.setAttribute("aria-hidden", "false");
     document.body.classList.add("demo-open");
-    this.root.querySelector("[data-close-crm-demo]")?.focus();
-    if (!this.hasOpenedGuide) {
+    // Tunggu modal benar-benar ter-layout agar spotlight dan popover mendapat
+    // ukuran anchor yang valid. Panduan selalu dimulai saat demo CRM dibuka.
+    requestAnimationFrame(() => {
+      if (!this.root.classList.contains("is-open")) return;
       this.openGuide(0);
-      this.hasOpenedGuide = true;
-    }
+    });
   }
 
   close() {
