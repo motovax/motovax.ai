@@ -588,11 +588,11 @@
     } else if (matches(/handoff|takeover|eskalasi/i)) {
       preview = captured("omnichannel-handoff-public.png", "Call Center · Handoff ke MR", "Agent memilih MR, alasan, dan catatan sebelum menyerahkan lead.");
     } else if (matches(/aksi cepat|inventori|stok akurat|konteks stok|unit ready/i)) {
-      preview = captured("omnichannel-inventory-public.png", "Manajemen Unit · Inventori", "Unit demo tampil langsung dari Manajemen Unit pada aplikasi produksi.");
+      preview = captured("omnichannel-inventory-public.png", "Call Center · Cek Inventori", "Agent mencari unit ready langsung dari Aksi Cepat tanpa meninggalkan percakapan.");
     } else if (matches(/performa omnichannel|manajemen-sla|metrik channel|respons realtime|realtime sse/i)) {
       preview = /realtime sse/i.test(capabilityTitle)
         ? captured("omnichannel-realtime-public.png", "Call Center · SSE realtime aktif", "Status koneksi realtime dan perubahan conversation terlihat dalam satu workspace.")
-        : captured("omnichannel-performance-public.png", "Analytics · Performa Call Center", "Ringkasan inbox, AI, MR, dan eskalasi membantu pemantauan layanan.");
+        : captured("omnichannel-performance-public.png", "Analytics · Performa Omnichannel", "Journey customer dan funnel penanganan membantu tim memantau hasil AI, Call Center, dan MR.");
     } else if (matches(/aplikasi-omnichannel|instagram-api|embedded-live-chat|ticket-creation|customer-service|sistem-manajemen-tiket|aplikasi-call-center|motovax-service-suite|integrasi-airene|omnichannel inbox|multi-channel|multi-channel|dm di inbox|status percakapan|riwayat channel|channel bisnis|call center workspace|satu model inbox|multi-channel/i)) {
       preview = captured("omnichannel-multichannel-public.png", "Inbox · WhatsApp / Facebook / Instagram", "Percakapan dan filter channel tersedia dalam satu workspace Call Center.");
     } else if (matches(/broadcast|blast|bulk|ctwa|ads campaign|promo unit|outbound scale|segment|template ai|campaign insight/i)) {
