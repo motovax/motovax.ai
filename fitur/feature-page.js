@@ -88,13 +88,13 @@
     }
     return `
       <div class="feature-faneling-action">
-        <strong>Lihat alurnya langsung — tidak perlu menebak menu</strong>
+        <strong>Urutan untuk membuka tampilan ini di Call Center</strong>
         <ol>
-          <li><b>1</b><span>Klik <em>Mulai demo Faneling</em></span></li>
-          <li><b>2</b><span>Klik <em>Lanjut</em> sampai AI diambil alih Agent</span></li>
-          <li><b>3</b><span>Klik <em>Lanjut</em> lagi untuk handoff ke MR</span></li>
+          <li><b>1</b><span>Buka menu <em>Call Center</em></span></li>
+          <li><b>2</b><span>Pilih salah satu <em>conversation</em></span></li>
+          <li><b>3</b><span>Klik <em>Cek Inventori</em> pada Aksi Cepat</span></li>
+          <li><b>4</b><span>Ketik nama unit, lalu tekan <em>Enter</em></span></li>
         </ol>
-        <a class="btn btn-primary" href="${escapeHtml(demoHref)}" aria-label="Mulai demo Faneling AI, Agent, dan MR">Mulai demo Faneling <span>-></span></a>
       </div>`;
   }
 
@@ -543,36 +543,24 @@
     // screenshot Integrasi Channel hanya karena posisinya kebetulan urutan ke-2.
     if (isFanelingCapability(capability)) {
       return `
-        <figure class="feature-showcase-visual feature-faneling-visual family-${productProfile.family}" aria-label="Alur Faneling dari AI ke Agent lalu MR">
-          <div class="feature-faneling-window">
-            <div class="feature-faneling-topbar">
-              <span><i></i> Demo interaktif</span>
-              <strong>Faneling penanganan lead</strong>
-              <em>LIVE</em>
+        <figure class="feature-showcase-visual feature-showcase-preview family-${productProfile.family}">
+          <div class="feature-showcase-preview-window">
+            <div class="feature-showcase-preview-topbar">
+              <span><i></i> Screenshot produk</span>
+              <strong>Call Center · Hasil pencarian inventori</strong>
+              <em>Data dianonimkan</em>
             </div>
-            <div class="feature-faneling-flow">
-              <article class="is-ai">
-                <span>LANGKAH 1</span>
-                <b>AI</b>
-                <strong>Chat masuk</strong>
-                <p>Lead baru ditangani AI dan tampil di bucket “Ditangani AI”.</p>
-              </article>
-              <i class="feature-faneling-arrow" aria-hidden="true">→</i>
-              <article class="is-agent">
-                <span>LANGKAH 2</span>
-                <b>AGENT</b>
-                <strong>Takeover</strong>
-                <p>Agent mengambil alih chat dengan konteks percakapan tetap utuh.</p>
-              </article>
-              <i class="feature-faneling-arrow" aria-hidden="true">→</i>
-              <article class="is-mr">
-                <span>LANGKAH 3</span>
-                <b>MR</b>
-                <strong>Handoff</strong>
-                <p>Lead HOT diteruskan ke Marketing Representative untuk follow-up.</p>
-              </article>
+            <div class="feature-showcase-preview-image is-wide">
+              <img
+                src="../assets/feature-previews/omnichannel-inventory-public.png"
+                width="1851"
+                height="849"
+                alt="Call Center Motovax setelah memilih conversation, membuka Cek Inventori, dan mencari unit Avanza; data pelanggan dianonimkan"
+                loading="eager"
+                decoding="async"
+              >
             </div>
-            <figcaption><span>AI menangani</span><i>→</i><span>Agent takeover</span><i>→</i><span>MR follow-up</span></figcaption>
+            <figcaption>Hasil: unit yang cocok tampil lengkap dengan foto, harga, Hitung Kredit, dan Share.</figcaption>
           </div>
         </figure>`;
     }

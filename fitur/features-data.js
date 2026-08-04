@@ -24,7 +24,7 @@ window.MOTOVAX_FEATURES = {
       },
       {
         title: "Faneling AI · Agent · MR",
-        desc: "Lihat perpindahan lead secara jelas: chat masuk ditangani AI, diambil alih agent manusia, lalu di-handoff ke Marketing Representative untuk follow-up.",
+        desc: "Dari conversation aktif, agent dapat membuka Cek Inventori, mencari unit, lalu memakai hasilnya untuk respons dan tindak lanjut ke Marketing Representative.",
       },
       {
         title: "Realtime SSE",
