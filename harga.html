@@ -63,21 +63,18 @@
       }
       .core-card {
         display: flex;
+        flex-direction: column;
         align-items: center;
-        justify-content: space-between;
-        gap: 20px;
-        flex-wrap: wrap;
-        margin-top: 28px;
-        padding: 24px 28px;
+        gap: 10px;
+        width: fit-content;
+        max-width: 100%;
+        margin: 28px auto 0;
+        padding: 20px 36px;
         border-radius: 16px;
         color: #fff;
+        text-align: center;
         background: linear-gradient(135deg, #1967f2, #0a54d2);
         box-shadow: var(--shadow-soft);
-      }
-      .core-card .core-info {
-        display: flex;
-        align-items: center;
-        gap: 14px;
       }
       .core-card .badge {
         flex-shrink: 0;
@@ -90,7 +87,7 @@
         text-transform: uppercase;
       }
       .core-card h2 {
-        margin: 0 0 4px;
+        margin: 0;
         font-size: 19px;
         letter-spacing: -0.02em;
       }
@@ -103,6 +100,7 @@
       }
       .core-card .core-price {
         flex-shrink: 0;
+        margin-top: 4px;
         padding: 9px 18px;
         border-radius: 999px;
         background: rgba(255, 255, 255, 0.16);
@@ -118,32 +116,34 @@
       }
       .price-grid {
         display: grid;
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-        gap: 18px;
-        margin-top: 22px;
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        align-items: stretch;
+        gap: 14px;
+        margin-top: 28px;
       }
       .price-card {
         background: #fff;
         border: 1px solid #dfebf7;
         border-radius: 16px;
-        padding: 22px;
+        padding: 18px;
         box-shadow: var(--shadow-soft);
         display: flex;
         flex-direction: column;
-        gap: 12px;
+        gap: 10px;
         min-height: 100%;
       }
       .price-card header {
         display: flex;
+        flex-direction: column;
         align-items: flex-start;
-        justify-content: space-between;
-        gap: 12px;
+        gap: 8px;
       }
       .price-card h2 {
         margin: 0;
-        font-size: 17px;
-        letter-spacing: -0.02em;
-        max-width: 70%;
+        font-size: 15px;
+        line-height: 1.3;
+        letter-spacing: -0.015em;
+        max-width: 100%;
       }
       .price-card .price-tag {
         flex-shrink: 0;
@@ -151,7 +151,7 @@
         border-radius: 999px;
         background: #eaf2ff;
         color: var(--blue);
-        font-size: 12px;
+        font-size: 11px;
         font-weight: 800;
         white-space: nowrap;
         text-decoration: none;
@@ -168,8 +168,8 @@
       }
       .price-card li {
         position: relative;
-        padding-left: 16px;
-        font-size: 13px;
+        padding-left: 14px;
+        font-size: 12.5px;
         color: #334155;
         line-height: 1.5;
       }
@@ -240,21 +240,25 @@
       .pitch-banner .btn {
         white-space: nowrap;
       }
-      @media (max-width: 1080px) {
+      @media (max-width: 1180px) {
         .price-grid {
-          grid-template-columns: repeat(2, minmax(0, 1fr));
+          grid-template-columns: repeat(3, minmax(0, 1fr));
         }
       }
       @media (max-width: 900px) {
-        .core-card {
-          flex-direction: column;
-          align-items: flex-start;
-        }
         .pitch-banner {
           grid-template-columns: 1fr;
         }
       }
-      @media (max-width: 620px) {
+      @media (max-width: 760px) {
+        .price-grid {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+      }
+      @media (max-width: 480px) {
+        .core-card {
+          padding: 20px 24px;
+        }
         .price-grid {
           grid-template-columns: 1fr;
         }
@@ -332,13 +336,9 @@
         </div>
 
         <div class="core-card">
-          <div class="core-info">
-            <span class="badge">Wajib</span>
-            <div>
-              <h2>Core — Platform Integrasi Agentic AI</h2>
-              <p>Fondasi tenant: integrasi agentic AI, akses dashboard, dan konfigurasi awal untuk seluruh modul di bawah.</p>
-            </div>
-          </div>
+          <span class="badge">Wajib</span>
+          <h2>Core — Platform Integrasi Agentic AI</h2>
+          <p>Fondasi tenant: integrasi agentic AI, akses dashboard, dan konfigurasi awal untuk seluruh modul di bawah.</p>
           <a class="core-price" href="./hubungi-kami.html">Hubungi Kami<!-- Rp 1,5jt --></a>
         </div>
 
