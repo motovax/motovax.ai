@@ -4950,6 +4950,7 @@ class AutopilotCRMDemo {
         },
       },
     ];
+    return steps;
   }
 
   bind() {
