@@ -78,6 +78,26 @@
   const demoLabel = isRelatedSimulation ? "Lihat Simulasi Terkait" : "Coba Demo Interaktif";
   const demoCta = `<a class="btn btn-secondary feature-hero-demo" href="${escapeHtml(demoHref)}">${demoLabel} <span>-></span></a>`;
 
+  function isFanelingCapability(capability) {
+    return slug === "aplikasi-omnichannel" && /fanel|handoff|takeover/i.test(String(capability?.title || ""));
+  }
+
+  function renderShowcaseAction(capability) {
+    if (!isFanelingCapability(capability)) {
+      return `<a href="../index.html#kontak">Konsultasikan kebutuhan <span>-></span></a>`;
+    }
+    return `
+      <div class="feature-faneling-action">
+        <strong>Lihat alurnya langsung — tidak perlu menebak menu</strong>
+        <ol>
+          <li><b>1</b><span>Klik <em>Mulai demo Faneling</em></span></li>
+          <li><b>2</b><span>Klik <em>Lanjut</em> sampai AI diambil alih Agent</span></li>
+          <li><b>3</b><span>Klik <em>Lanjut</em> lagi untuk handoff ke MR</span></li>
+        </ol>
+        <a class="btn btn-primary" href="${escapeHtml(demoHref)}" aria-label="Mulai demo Faneling AI, Agent, dan MR">Mulai demo Faneling <span>-></span></a>
+      </div>`;
+  }
+
   const heroBenefits = benefits
     .slice(0, 4)
     .map((benefit) => `<li><span aria-hidden="true">✓</span>${escapeHtml(benefit)}</li>`)
@@ -129,7 +149,7 @@
               ${step ? `<li>${escapeHtml(step.title)} — ${escapeHtml(step.desc)}</li>` : ""}
               ${benefit ? `<li>${escapeHtml(benefit)}</li>` : ""}
             </ul>
-            <a href="../index.html#kontak">Konsultasikan kebutuhan <span>-></span></a>
+            ${renderShowcaseAction(capability)}
           </div>
           ${renderShowcaseVisual(data, profile, capability, index)}
         </article>`;
@@ -521,6 +541,41 @@
     }));
     // Capability faneling hidup di workspace /call-center. Jangan memilih
     // screenshot Integrasi Channel hanya karena posisinya kebetulan urutan ke-2.
+    if (isFanelingCapability(capability)) {
+      return `
+        <figure class="feature-showcase-visual feature-faneling-visual family-${productProfile.family}" aria-label="Alur Faneling dari AI ke Agent lalu MR">
+          <div class="feature-faneling-window">
+            <div class="feature-faneling-topbar">
+              <span><i></i> Demo interaktif</span>
+              <strong>Faneling penanganan lead</strong>
+              <em>LIVE</em>
+            </div>
+            <div class="feature-faneling-flow">
+              <article class="is-ai">
+                <span>LANGKAH 1</span>
+                <b>AI</b>
+                <strong>Chat masuk</strong>
+                <p>Lead baru ditangani AI dan tampil di bucket “Ditangani AI”.</p>
+              </article>
+              <i class="feature-faneling-arrow" aria-hidden="true">→</i>
+              <article class="is-agent">
+                <span>LANGKAH 2</span>
+                <b>AGENT</b>
+                <strong>Takeover</strong>
+                <p>Agent mengambil alih chat dengan konteks percakapan tetap utuh.</p>
+              </article>
+              <i class="feature-faneling-arrow" aria-hidden="true">→</i>
+              <article class="is-mr">
+                <span>LANGKAH 3</span>
+                <b>MR</b>
+                <strong>Handoff</strong>
+                <p>Lead HOT diteruskan ke Marketing Representative untuk follow-up.</p>
+              </article>
+            </div>
+            <figcaption><span>AI menangani</span><i>→</i><span>Agent takeover</span><i>→</i><span>MR follow-up</span></figcaption>
+          </div>
+        </figure>`;
+    }
     const preview = /aksi cepat operasional/i.test(capabilityTitle)
       ? {
           file: "omnichannel-inventory-public.png",
