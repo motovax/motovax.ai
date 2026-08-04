@@ -570,8 +570,8 @@
           label: "Call Center · Cek Inventori",
           alt: "Tampilan Cek Inventori dari Call Center Motovax dengan seluruh identitas privat dianonimkan",
           wide: true,
-          width: 1851,
-          height: 849,
+          width: 1918,
+          height: 880,
         }
       : /fanel|handoff|takeover/i.test(capabilityTitle)
         ? {
