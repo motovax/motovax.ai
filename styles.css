@@ -4889,7 +4889,7 @@ body.demo-open {
  * kiri = rail pilih agent + mode; tengah = mock iPhone WhatsApp hero.
  */
 .falcon-demo-layout {
-  --falcon-card-height: clamp(620px, calc(100dvh - 180px), 720px);
+  --falcon-card-height: clamp(680px, calc(100dvh - 145px), 800px);
   display: grid;
   grid-template-columns: minmax(280px, 320px) minmax(0, 1fr);
   gap: 0;
@@ -4897,7 +4897,7 @@ body.demo-open {
   margin: 14px auto 0;
   min-width: 0;
   width: 100%;
-  max-width: 1080px;
+  max-width: 1240px;
   height: var(--falcon-card-height);
   border: 1px solid #e2e8f0;
   border-radius: 18px;
@@ -5169,44 +5169,13 @@ body.demo-open {
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
-  gap: 12px;
   min-width: 0;
   height: 100%;
-  padding: 18px clamp(20px, 4vw, 42px) 22px;
+  padding: 16px clamp(20px, 4vw, 44px) 18px;
   overflow: hidden;
   background:
     radial-gradient(ellipse 80% 50% at 50% 0%, rgba(59, 130, 246, 0.08), transparent 55%),
     linear-gradient(180deg, #f8fafc 0%, #eef2ff 100%);
-}
-
-.falcon-stage-caption {
-  text-align: center;
-  max-width: 32ch;
-}
-
-.falcon-stage-caption > span {
-  display: block;
-  color: #6366f1;
-  font-size: 9px;
-  font-weight: 900;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-}
-
-.falcon-stage-caption b {
-  display: block;
-  margin: 3px 0 1px;
-  color: #0f172a;
-  font-size: 15px;
-  line-height: 1.25;
-  letter-spacing: -0.02em;
-}
-
-.falcon-stage-caption p {
-  margin: 0;
-  color: #64748b;
-  font-size: 10px;
-  line-height: 1.4;
 }
 
 .falcon-phone-wrap {
@@ -5573,10 +5542,6 @@ body.demo-open {
 @media (max-height: 720px) {
   .falcon-tutorial-list {
     max-height: min(120px, 22dvh);
-  }
-
-  .falcon-stage-caption p {
-    display: none;
   }
 
   .ims-view[data-ims-view="falcon"] .demo-page-heading p {
