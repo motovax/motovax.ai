@@ -17516,6 +17516,11 @@ body.demo-open {
   object-position: top left;
 }
 
+.feature-showcase-preview-image.is-wide img {
+  object-fit: contain;
+  object-position: center;
+}
+
 .feature-showcase-preview-window figcaption {
   margin: 0;
   padding: 10px 13px 11px;

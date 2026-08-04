@@ -521,13 +521,22 @@
     }));
     // Capability faneling hidup di workspace /call-center. Jangan memilih
     // screenshot Integrasi Channel hanya karena posisinya kebetulan urutan ke-2.
-    const preview = /fanel|handoff|takeover/i.test(capabilityTitle)
+    const preview = /aksi cepat operasional/i.test(capabilityTitle)
       ? {
-          file: "omnichannel-inbox.webp",
-          label: "Omnichannel Inbox · AI / Agent / MR",
-          alt: `Tampilan Call Center Motovax untuk ${capabilityTitle} dengan data demo`,
+          file: "omnichannel-inventory-public.png",
+          label: "Call Center · Cek Inventori",
+          alt: "Tampilan Cek Inventori dari Call Center Motovax dengan seluruh identitas privat dianonimkan",
+          wide: true,
+          width: 1851,
+          height: 849,
         }
-      : previews[index % previews.length];
+      : /fanel|handoff|takeover/i.test(capabilityTitle)
+        ? {
+            file: "omnichannel-inbox.webp",
+            label: "Omnichannel Inbox · AI / Agent / MR",
+            alt: `Tampilan Call Center Motovax untuk ${capabilityTitle} dengan data demo`,
+          }
+        : previews[index % previews.length];
     return `
       <figure class="feature-showcase-visual feature-showcase-preview family-${productProfile.family}">
         <div class="feature-showcase-preview-window">
@@ -536,11 +545,11 @@
             <strong>${escapeHtml(preview.label)}</strong>
             <em>Data demo</em>
           </div>
-          <div class="feature-showcase-preview-image">
+          <div class="feature-showcase-preview-image${preview.wide ? " is-wide" : ""}">
             <img
               src="../assets/feature-previews/${escapeHtml(preview.file)}"
-              width="1440"
-              height="900"
+              width="${preview.width || 1440}"
+              height="${preview.height || 900}"
               alt="${escapeHtml(preview.alt)}"
               loading="eager"
               decoding="async"
