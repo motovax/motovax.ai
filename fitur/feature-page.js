@@ -555,6 +555,22 @@
       analytics: previewFactory("sales-analytics.webp", "Analytics & Performance"),
     };
 
+    if (id === "core-platform-agentic-ai") {
+      return [previewFactory("product-capability-whatsapp-connected-public.png", "Core Platform · Integrasi"), previews.analytics, previews.integrations];
+    }
+    if (id === "omni-jasmine-ai") {
+      return [previewFactory("omnichannel-faneling-public.png", "Omni + Jasmine AI"), previews.omni, previews.integrations];
+    }
+    if (id === "inventory-falcon-ai") {
+      return [previewFactory("product-falcon-sales.png", "Inventory + Falcon AI"), previewFactory("product-social-studio.png", "Inventory Unit"), previews.analytics];
+    }
+    if (id === "ana-ai-analytics") {
+      return [previewFactory("product-dashboard-overview.png", "Ana AI · Analytics"), previewFactory("product-dashboard-sales.png", "Sales Performance"), previewFactory("product-dashboard-locations.png", "Performa Cabang")];
+    }
+    if (id === "social-media-sora-ai") {
+      return [previewFactory("product-social-studio.png", "Social Media + Sora AI"), previewFactory("product-social-calendar.png", "Kalender Posting"), previewFactory("product-social-insight.png", "Campaign Insight")];
+    }
+
     if (id === "whatsapp-business-api") {
       const whatsappPreview = previewFactory("product-capability-whatsapp-connected-public.png", "WhatsApp Business API");
       whatsappPreview.wide = true;
@@ -600,7 +616,19 @@
 
     // Tiap capability diarahkan ke state produk yang relevan. Urutannya sengaja
     // semantik dan tidak bergantung pada nomor kartu/rotasi screenshot umum.
-    if (slug === "facebook-messenger" && /inbox messenger/i.test(capabilityTitle)) {
+    if (slug === "inventory-falcon-ai" && /listing|import|validasi/i.test(capabilityTitle)) {
+      preview = captured("product-social-studio.png", "Inventory · Unit Ready", "Unit ready dari inventory tenant tersedia sebagai sumber data dan materi operasional.");
+    } else if (slug === "inventory-falcon-ai" && /falcon|foto|rekomendasi/i.test(capabilityTitle)) {
+      preview = captured("product-falcon-sales.png", "Falcon · Pencarian & Rekomendasi", "Falcon memakai inventory tenant untuk membantu pencarian, foto, dan rekomendasi unit.");
+    } else if (slug === "inventory-falcon-ai" && /katalog api/i.test(capabilityTitle)) {
+      preview = captured("product-capability-whatsapp-content.png", "Developer API · Katalog", "Capability integrasi menyediakan data produk untuk kanal eksternal melalui API.");
+    } else if (slug === "social-media-sora-ai" && /content studio|visual/i.test(capabilityTitle)) {
+      preview = captured("product-social-studio.png", "Social Media · Content Studio", "Unit inventory dipilih sebagai sumber desain dan materi konten.");
+    } else if (slug === "social-media-sora-ai" && /publish|scheduler/i.test(capabilityTitle)) {
+      preview = captured("product-social-calendar.png", "Social Media · Kalender Posting", "Konten terjadwal tersusun dalam kalender publikasi tim.");
+    } else if (slug === "social-media-sora-ai" && /analytics/i.test(capabilityTitle)) {
+      preview = captured("product-social-insight.png", "Social Media · Campaign Insight", "Klik, lead, dan hasil campaign dipantau dalam satu tampilan.");
+    } else if (slug === "facebook-messenger" && /inbox messenger/i.test(capabilityTitle)) {
       preview = captured("facebook-messenger-inbox-public.png", "Inbox · Facebook Messenger", "Filter Facebook aktif menampilkan seluruh inquiry Messenger dalam satu antrean.");
     } else if (slug === "facebook-messenger" && /respons ai|takeover agent/i.test(capabilityTitle)) {
       preview = captured("facebook-messenger-ai-takeover-public.png", "Messenger · AI dan Takeover Agent", "Respons AI, takeover Call Center, dan lanjutan MR tetap tersimpan dalam satu percakapan Messenger.");

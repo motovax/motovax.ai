@@ -89,120 +89,70 @@ if (contactForm instanceof HTMLFormElement) {
     suite: icon('<rect x="3" y="3" width="8" height="8" rx="1.5"/><rect x="13" y="3" width="8" height="8" rx="1.5"/><rect x="3" y="13" width="8" height="8" rx="1.5"/><rect x="13" y="13" width="8" height="8" rx="1.5"/>'),
   };
 
-  /** Kapabilitas platform dan paket suite Motovax. */
+  /** Produk modular yang ditawarkan pada halaman Harga. */
   const groups = [
     {
-      id: "kapabilitas",
-      title: "Kapabilitas",
+      id: "fondasi",
+      title: "Fondasi",
       items: [
         {
-          id: "omni",
-          label: "Aplikasi Omnichannel",
-          paneTitle: "Aplikasi Omnichannel",
-          demo: { id: "omni", hash: "omniDemo", context: "omnichannel", label: "Coba Simulasi" },
+          id: "core-platform",
+          label: "Core Platform",
+          paneTitle: "Core — Platform Integrasi Agentic AI",
+          demo: { id: "whatsapp", hash: "capabilityDemo", context: "core-platform", label: "Lihat Fondasi Platform" },
           features: [
-            { title: "Call Center AI Omnichannel", desc: "Satu workspace untuk channel, AI, agent, antrean, dan handoff MR", icon: "call", href: f("aplikasi-omnichannel") },
-            { title: "WhatsApp Business API", desc: "Hubungkan percakapan WhatsApp ke inbox omnichannel", icon: "wa", href: f("whatsapp-business-api") },
-            { title: "Facebook Messenger", desc: "Respons inquiry Facebook dengan AI, agent, dan handoff MR", icon: "fb", href: f("facebook-messenger") },
-            { title: "Instagram API", desc: "Respons DM otomatis untuk tingkatkan penjualan", icon: "ig", href: f("instagram-api") },
-            { title: "Embedded Live Chat", desc: "Integrasi layanan live chat 24/7 untuk aplikasi Anda", icon: "live", href: f("embedded-live-chat") },
-            { title: "Manajemen Tiket", desc: "Kelola status, eskalasi, resolusi, dan tindak lanjut dari chat", icon: "ticket", href: f("sistem-manajemen-tiket") },
-          ],
-        },
-        {
-          id: "crm",
-          label: "Aplikasi CRM",
-          paneTitle: "Aplikasi CRM",
-          demo: { id: "crm", hash: "crmDemo", context: "crm", label: "Coba Simulasi" },
-          features: [
-            { title: "Aplikasi CRM", desc: "Automasi proses penjualan & layanan pelanggan", icon: "crm", href: f("aplikasi-crm") },
-            { title: "Manajemen Deal", desc: "Kelola deal secara end-to-end lebih ciamik", icon: "deal", href: f("manajemen-deal") },
-            { title: "Manajemen Kontak", desc: "Kelola kontak pelanggan lebih mulus", icon: "contact", href: f("manajemen-kontak") },
-            { title: "Manajemen Goal", desc: "Mudah kelola goal dan target yang terkustomisasi", icon: "goal", href: f("manajemen-goal") },
-            { title: "Sales GPS Tracking", desc: "Pelacakan lokasi tim sales lapangan real-time", icon: "gps", href: f("sales-gps-tracking") },
-            { title: "Custom CRM Report", desc: "Buat laporan dari data CRM sesuai kebutuhan", icon: "report", href: f("personalisasi-report-sales") },
-          ],
-        },
-        {
-          id: "cs",
-          label: "Customer Support & Ticketing",
-          paneTitle: "Customer Support & Ticketing",
-          demo: { id: "omni", hash: "omniDemo", context: "customer-support", label: "Simulasi Customer Service" },
-          features: [
-            { title: "Manajemen Tiket", desc: "Tangani keluhan pelanggan lebih cepat & akurat", icon: "ticket", href: f("sistem-manajemen-tiket") },
-            { title: "Manajemen SLA", desc: "Optimalkan resolusi masalah pelanggan & kinerja agen", icon: "sla", href: f("manajemen-sla") },
-            { title: "Agent Scorecard", desc: "Pantau & evaluasi kualitas layanan pelanggan lebih mudah", icon: "score", href: f("agent-scorecard") },
-          ],
-        },
-        {
-          id: "ai",
-          label: "AI & Chatbot",
-          paneTitle: "AI & Chatbot",
-          demo: { id: "falcon", hash: "falconDemo", context: "agentic-ai", label: "Coba Agentic AI" },
-          features: [
-            { title: "Airene", desc: "Maksimalkan kinerja agen CS dengan dukungan Airene", icon: "agent", href: f("integrasi-airene") },
-            { title: "Agentic & Conversational AI", desc: "Percakapan AI yang dapat menjalankan proses bisnis melalui tools", icon: "ai", href: f("agentic-ai"), badge: "New" },
-          ],
-        },
-        {
-          id: "workflow",
-          label: "Automasi Operasional & Workflow",
-          paneTitle: "Automasi Operasional & Workflow",
-          demo: { id: "automation", hash: "capabilityDemo", context: "automation", label: "Lihat Automasi Aktif" },
-          features: [
-            { title: "Knowledge Base", desc: "Pusat informasi untuk layanan pelanggan efisien", icon: "kb", href: f("knowledge-base") },
-            { title: "Workflow", desc: "Otomatisasi alur kerja lintas tim dan sistem", icon: "workflow", href: f("automasi-workflow") },
-          ],
-        },
-        {
-          id: "campaign",
-          label: "Manajemen Campaign",
-          paneTitle: "Manajemen Campaign",
-          demo: { id: "social", hash: "socialDemo", context: "broadcast", label: "Coba Campaign" },
-          features: [
-            { title: "WhatsApp Broadcast", desc: "Kirim campaign massal tersegmentasi dan kelola balasannya", icon: "blast", href: f("aplikasi-broadcast-whatsapp") },
+            { title: "Core Platform Agentic AI", desc: "Fondasi multi-tenant, akses berbasis peran, integrasi, dashboard, dan konfigurasi modul", icon: "suite", href: f("core-platform-agentic-ai") },
           ],
         },
       ],
     },
     {
-      id: "suite",
-      title: "Suite Motovax",
+      id: "modul",
+      title: "Modul",
       items: [
         {
-          id: "broadcast",
-          label: "Motovax Broadcast",
-          paneTitle: "Motovax Broadcast",
-          demo: { id: "social", hash: "socialDemo", context: "broadcast", label: "Coba Broadcast" },
+          id: "crm",
+          label: "CRM",
+          paneTitle: "CRM",
+          demo: { id: "crm", hash: "crmDemo", context: "crm", label: "Coba CRM" },
           features: [
-            { title: "Motovax Broadcast", desc: "Jangkau ribuan pelanggan tanpa proses manual", icon: "blast", href: f("motovax-broadcast") },
+            { title: "CRM", desc: "Customer list, pipeline, journey, analytics, dan program auto follow-up", icon: "crm", href: f("aplikasi-crm") },
           ],
         },
         {
-          id: "sales-suite",
-          label: "Motovax Sales Suite",
-          paneTitle: "Motovax Sales Suite",
-          demo: { id: "crm", hash: "crmDemo", context: "sales-suite", label: "Coba Sales Suite" },
+          id: "omni-jasmine",
+          label: "Omni + Jasmine AI",
+          paneTitle: "Omni + Jasmine AI",
+          demo: { id: "omni", hash: "omniDemo", context: "omnichannel", label: "Coba Omnichannel" },
           features: [
-            { title: "Motovax Sales Suite", desc: "Optimalkan penjualan dengan solusi komprehensif", icon: "suite", href: f("motovax-sales-suite") },
+            { title: "Omni + Jasmine AI", desc: "WhatsApp, Instagram, Facebook, funneling, routing, aksi cepat, dan AI percakapan", icon: "call", href: f("omni-jasmine-ai") },
           ],
         },
         {
-          id: "service-suite",
-          label: "Motovax Service Suite",
-          paneTitle: "Motovax Service Suite",
-          demo: { id: "omni", hash: "omniDemo", context: "customer-support", label: "Coba Service Suite" },
+          id: "inventory-falcon",
+          label: "Inventory + Falcon AI",
+          paneTitle: "Inventory + Falcon AI",
+          demo: { id: "inventory", hash: "inventoryDemo", context: "inventory", label: "Coba Inventory" },
           features: [
-            { title: "Motovax Service Suite", desc: "Respons pelanggan lebih cepat dengan layanan optimal", icon: "cs", href: f("motovax-service-suite") },
+            { title: "Inventory + Falcon AI", desc: "Listing multi-cabang, import data, pencarian AI, foto, rekomendasi, dan live katalog API", icon: "shop", href: f("inventory-falcon-ai") },
           ],
         },
         {
-          id: "suite-360",
-          label: "Motovax 360",
-          paneTitle: "Motovax 360",
-          demo: { id: "dashboard", hash: "dashboardDemo", context: "motovax-360", label: "Lihat Command Center" },
+          id: "ana-analytics",
+          label: "Ana AI Analytics",
+          paneTitle: "Ana AI — Advanced Analytics",
+          demo: { id: "dashboard", hash: "dashboardDemo", context: "analytics", label: "Lihat Analytics" },
           features: [
-            { title: "Motovax 360", desc: "Manajemen pelanggan terintegrasi untuk proses efisien", icon: "suite", href: f("motovax-360") },
+            { title: "Ana AI — Advanced Analytics", desc: "Analitik operasional, finansial, sales performance, dan insight lintas cabang", icon: "report", href: f("ana-ai-analytics") },
+          ],
+        },
+        {
+          id: "social-sora",
+          label: "Social Media + Sora AI",
+          paneTitle: "Social Media + Sora AI",
+          demo: { id: "social", hash: "socialDemo", context: "social", label: "Coba Social Studio" },
+          features: [
+            { title: "Social Media + Sora AI", desc: "Content studio, AI image, publish, scheduler, ads manager, dan campaign analytics", icon: "ads", href: f("social-media-sora-ai") },
           ],
         },
       ],
@@ -210,10 +160,10 @@ if (contactForm instanceof HTMLFormElement) {
   ];
 
   const allPanes = groups.flatMap((g) => g.items);
-  const firstPaneId = allPanes[0]?.id || "omni";
+  const firstPaneId = allPanes[0]?.id || "core-platform";
 
   function renderMenuHtml() {
-    const firstGroupId = groups[0]?.id || "kapabilitas";
+    const firstGroupId = groups[0]?.id || "fondasi";
 
     const tabs = `
       <div class="produk-mega-tabs" role="tablist" aria-label="Kapabilitas dan Suite Motovax">
