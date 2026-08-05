@@ -36,6 +36,7 @@ Jika workspace punya clone `motovax-app`, utamakan:
 
 ## Screenshot fitur landing
 
+- Screenshot fitur publik **tidak boleh menyertakan menu sidebar aplikasi**. Crop atau atur viewport agar hanya area konten/capability yang relevan yang terlihat, tanpa sidebar di sisi kiri.
 - Jangan memakai screenshot umum hanya karena berasal dari modul yang sama. Telusuri route dan alur produksi di `motovax-app`, jalankan interaksi yang diperlukan sampai capability yang dibahas terlihat jelas, lalu capture **state hasil akhirnya**.
 - Contoh pola: buka halaman produk → pilih data/conversation yang relevan → jalankan aksi capability → tunggu hasil/state tujuan muncul → baru ambil screenshot. Untuk Faneling Omnichannel, state yang dicapture harus memperlihatkan jejak AI, takeover Agent, dan handoff/bucket MR.
 - Screenshot publik wajib memakai data demo atau data yang sudah dianonimkan. Jangan mempublikasikan nama, nomor telepon, pelat, ID unit, credential, atau identitas operasional asli.
