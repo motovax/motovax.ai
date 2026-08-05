@@ -110,7 +110,9 @@ if (contactForm instanceof HTMLFormElement) {
           paneTitle: "CRM",
           demo: { id: "crm", hash: "crmDemo", context: "crm", label: "Coba CRM" },
           features: [
-            { title: "CRM", desc: "Customer list, pipeline, journey, analytics, dan program auto follow-up", icon: "crm", href: f("aplikasi-crm") },
+            { title: "Lead / Customer List", desc: "Data lead dan customer terpusat dengan riwayat interaksi serta unit yang diminati", icon: "contact", href: f("manajemen-kontak") },
+            { title: "Pipeline & Customer Journey", desc: "Pantau perjalanan customer dan progres deal dari lead masuk hingga closing", icon: "deal", href: f("manajemen-deal") },
+            { title: "Analytics", desc: "Ukur performa sales, conversion, channel, dan hasil pipeline CRM", icon: "report", href: f("personalisasi-report-sales") },
           ],
         },
         {
