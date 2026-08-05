@@ -467,7 +467,7 @@
               <strong>${escapeHtml(preview.label)}</strong>
               <span class="feature-preview-status"><i></i> Data demo</span>
             </div>
-            <div class="feature-preview-image-shell">
+            <div class="feature-preview-image-shell${feature.slug === "instagram-api" ? " is-instagram-preview" : ""}">
               <img
                 src="../assets/feature-previews/${escapeHtml(preview.file)}"
                 width="1440"
@@ -477,6 +477,7 @@
                 decoding="async"
                 fetchpriority="high"
               >
+              ${feature.slug === "instagram-api" ? '<span class="feature-instagram-focus" aria-hidden="true"><strong>Instagram DM</strong><small>Terintegrasi</small></span>' : ""}
             </div>
             <figcaption>Tampilan aplikasi Motovax dengan data yang telah dianonimkan.</figcaption>
           </div>
@@ -536,6 +537,10 @@
 
     if (id === "facebook-messenger") {
       return preview("facebook-messenger-integration-public.png", "Integrasi Facebook Messenger");
+    }
+
+    if (id === "instagram-api") {
+      return preview("omnichannel-multichannel-public.png", "Integrasi Instagram DM");
     }
 
     return previewSetFor(id, preview)[0];
