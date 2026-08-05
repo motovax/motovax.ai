@@ -17503,6 +17503,11 @@ body.demo-open {
   object-position: top left;
 }
 
+.feature-preview-image-shell.is-wide img {
+  object-fit: contain;
+  object-position: center;
+}
+
 .feature-preview-window figcaption {
   margin: 0;
   padding: 9px 15px 10px;

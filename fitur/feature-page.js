@@ -467,7 +467,7 @@
               <strong>${escapeHtml(preview.label)}</strong>
               <span class="feature-preview-status"><i></i> Data demo</span>
             </div>
-            <div class="feature-preview-image-shell">
+            <div class="feature-preview-image-shell${preview.wide ? " is-wide" : ""}">
               <img
                 src="../assets/feature-previews/${escapeHtml(preview.file)}"
                 width="1440"
@@ -556,8 +556,10 @@
     };
 
     if (id === "whatsapp-business-api") {
+      const whatsappPreview = previewFactory("product-capability-whatsapp-content.png", "WhatsApp Business API");
+      whatsappPreview.wide = true;
       return [
-        previewFactory("product-capability-whatsapp.png", "WhatsApp Business API"),
+        whatsappPreview,
         previews.omni,
         previews.social,
       ];
@@ -657,7 +659,8 @@
         ? captured("product-falcon-management.png", "Analytics · Management", "Laporan dan tren operasional terlihat langsung pada aplikasi produksi.")
         : captured("product-falcon-sales.png", "Call Center · AI / Agent / MR", "Jejak AI, takeover agent, dan tindak lanjut MR terlihat pada aplikasi produksi.");
     } else if (matches(/whatsapp|session|flows|tool schema|governance|brand trust/i)) {
-      preview = captured("product-capability-whatsapp.png", "WhatsApp Business API", "Konfigurasi channel dan capability WhatsApp terlihat dalam workspace produk.");
+      preview = captured("product-capability-whatsapp-content.png", "WhatsApp Business API", "Konfigurasi channel dan capability WhatsApp terlihat dalam workspace produk.", [1168, 900]);
+      preview.wide = true;
     } else if (matches(/automasi|workflow|workers|tool chains/i)) {
       preview = captured("product-capability-automation.png", "Automation · Email Report", "Konfigurasi report otomatis terlihat langsung pada aplikasi produksi.");
     } else {
