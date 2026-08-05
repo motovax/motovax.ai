@@ -620,12 +620,20 @@
 
     // Tiap capability diarahkan ke state produk yang relevan. Urutannya sengaja
     // semantik dan tidak bergantung pada nomor kartu/rotasi screenshot umum.
-    if (slug === "manajemen-kontak" && index === 2) {
+    if (slug === "manajemen-kontak" && index === 1) {
       preview = captured(
-        "manajemen-kontak-pipeline-public.png",
+        "manajemen-kontak-riwayat-channel-public.png?v=20260805-2",
+        "CRM · Riwayat Channel",
+        "Riwayat chat, respons AI, takeover Call Center, dan aktivitas lead tersimpan dalam satu timeline customer.",
+        [1862, 845],
+      );
+      preview.wide = true;
+    } else if (slug === "manajemen-kontak" && index === 2) {
+      preview = captured(
+        "manajemen-kontak-pipeline-public.png?v=20260805-2",
         "CRM · Pipeline Sales",
         "Customer siap ditindaklanjuti di pipeline hingga deal dan handover tercatat dalam satu workspace.",
-        [1900, 865],
+        [1854, 848],
       );
       preview.wide = true;
     } else if (slug === "core-platform-agentic-ai" && /multi-tenant|multi-cabang/i.test(capabilityTitle)) {
