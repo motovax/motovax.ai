@@ -534,6 +534,10 @@
       alt: `Tampilan aplikasi Motovax untuk ${title} dengan data demo`,
     });
 
+    if (id === "facebook-messenger") {
+      return preview("facebook-messenger-integration-public.png", "Integrasi Facebook Messenger");
+    }
+
     return previewSetFor(id, preview)[0];
   }
 
