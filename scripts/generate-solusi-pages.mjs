@@ -71,9 +71,10 @@ const template = (industry) => {
           <a href="../index.html#solusi">Solusi</a>
           <a href="../index.html#cara-kerja">Cara Kerja</a>
           <a href="../index.html#keunggulan">Keunggulan</a>
+          <a href="../harga.html">Harga</a>
           <a href="../hubungi-kami.html">Hubungi Kami</a>
         </nav>
-        <a class="btn btn-primary header-cta" href="../index.html#kontak">Jadwalkan Demo <span>→</span></a>
+        <a class="btn btn-primary header-cta" href="../hubungi-kami.html">Jadwalkan Demo <span>→</span></a>
       </div>
     </header>
 

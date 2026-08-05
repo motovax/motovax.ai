@@ -68,9 +68,10 @@ const template = (slug, title, description) => `<!doctype html>
           <a href="../index.html#solusi">Solusi</a>
           <a href="../index.html#cara-kerja">Cara Kerja</a>
           <a href="../index.html#keunggulan">Keunggulan</a>
+          <a href="../harga.html">Harga</a>
           <a href="../hubungi-kami.html">Hubungi Kami</a>
         </nav>
-        <a class="btn btn-primary header-cta" href="../index.html#kontak">Jadwalkan Demo <span>-></span></a>
+        <a class="btn btn-primary header-cta" href="../hubungi-kami.html">Jadwalkan Demo <span>-></span></a>
       </div>
     </header>
 
@@ -150,8 +151,22 @@ fs.writeFileSync(
 <body class="feature-detail-page">
   <header class="site-header">
     <div class="container header-inner">
-      <a class="brand" href="../index.html"><img class="brand-logo" src="../icons/logo-motovax.png" width="160" height="55" alt="MOTOVAX" /></a>
-      <a class="btn btn-primary header-cta" href="../index.html#kontak">Jadwalkan Demo</a>
+      <a class="brand" href="../index.html#top" aria-label="MOTOVAX home"><img class="brand-logo" src="../icons/logo-motovax.png" width="160" height="55" alt="MOTOVAX" /></a>
+      <nav class="nav" aria-label="Navigasi utama">
+        <div class="nav-item nav-item-produk" data-produk-menu>
+          <button type="button" class="nav-produk-trigger" aria-expanded="false" aria-haspopup="true" aria-controls="produk-mega-menu" data-produk-trigger>
+            Produk
+            <svg class="nav-chevron" width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 4.5 6 8l3.5-3.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <div class="produk-mega" id="produk-mega-menu" role="region" aria-label="Menu produk Motovax" hidden data-produk-panel data-produk-mount></div>
+        </div>
+        <a href="../index.html#solusi">Solusi</a>
+        <a href="../index.html#cara-kerja">Cara Kerja</a>
+        <a href="../index.html#keunggulan">Keunggulan</a>
+        <a href="../harga.html">Harga</a>
+        <a href="../hubungi-kami.html">Hubungi Kami</a>
+      </nav>
+      <a class="btn btn-primary header-cta" href="../hubungi-kami.html">Jadwalkan Demo <span>-></span></a>
     </div>
   </header>
   <main class="feature-page-section">

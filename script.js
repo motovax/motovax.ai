@@ -691,6 +691,7 @@ if (contactForm instanceof HTMLFormElement) {
         </details>
         <a href="${home}#cara-kerja" data-mobile-nav-close>Cara Kerja <span>→</span></a>
         <a href="${home}#keunggulan" data-mobile-nav-close>Keunggulan <span>→</span></a>
+        <a href="${root}harga.html" data-mobile-nav-close>Harga <span>→</span></a>
         <a href="${root}hubungi-kami.html" data-mobile-nav-close>Hubungi Kami <span>→</span></a>
       </nav>
       <a class="btn btn-primary mobile-nav-cta" href="${root}hubungi-kami.html" data-mobile-nav-close>Diskusikan Bisnis Anda <span>→</span></a>`;
