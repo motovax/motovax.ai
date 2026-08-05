@@ -594,8 +594,18 @@
 
     // Tiap capability diarahkan ke state produk yang relevan. Urutannya sengaja
     // semantik dan tidak bergantung pada nomor kartu/rotasi screenshot umum.
-    if (slug === "facebook-messenger") {
-      preview = captured("facebook-messenger-inbox-public.png", "Inbox · Facebook Messenger", "Filter Facebook aktif dan percakapan Messenger ditangani bersama AI, Agent, dan MR.");
+    if (slug === "facebook-messenger" && /inbox messenger/i.test(capabilityTitle)) {
+      preview = captured("facebook-messenger-inbox-public.png", "Inbox · Facebook Messenger", "Filter Facebook aktif menampilkan seluruh inquiry Messenger dalam satu antrean.");
+    } else if (slug === "facebook-messenger" && /respons ai|takeover agent/i.test(capabilityTitle)) {
+      preview = captured("facebook-messenger-ai-takeover-public.png", "Messenger · AI dan Takeover Agent", "Respons AI, takeover Call Center, dan lanjutan MR tetap tersimpan dalam satu percakapan Messenger.");
+    } else if (slug === "facebook-messenger" && /routing lead|ke mr/i.test(capabilityTitle)) {
+      preview = captured("facebook-messenger-handoff-public.png", "Messenger · Handoff ke MR", "Agent memilih MR, alasan, dan ringkasan sebelum menyerahkan lead Messenger.");
+    } else if (slug === "facebook-messenger" && /konteks stok|simulasi kredit/i.test(capabilityTitle)) {
+      preview = captured("facebook-messenger-inventory-public.png", "Messenger · Cek Inventori", "Agent mencari unit ready dan melanjutkan ke hitung kredit tanpa meninggalkan percakapan Messenger.");
+    } else if (slug === "facebook-messenger" && /realtime/i.test(capabilityTitle)) {
+      preview = captured("facebook-messenger-realtime-public.png", "Messenger · Realtime Aktif", "Status koneksi dan pesan Messenger diperbarui langsung di workspace Call Center.");
+    } else if (slug === "facebook-messenger" && /journey lead/i.test(capabilityTitle)) {
+      preview = captured("omnichannel-performance-public.png", "Analytics · Journey Lead", "Perjalanan customer dan funnel penanganan menghubungkan aktivitas channel ke hasil lead.");
     } else if (matches(/fanel/i)) {
       preview = captured("omnichannel-faneling-public.png", "Call Center · AI → Agent → MR", "Jejak AI dan takeover Agent tetap terlihat setelah lead masuk bucket MR.");
     } else if (matches(/handoff|takeover|eskalasi/i)) {
