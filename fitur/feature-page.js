@@ -627,7 +627,7 @@
     } else if (slug === "core-platform-agentic-ai" && /integrasi channel/i.test(capabilityTitle)) {
       preview = captured("core-platform-whatsapp-integrations-public.png", "Core Platform · Integrasi WhatsApp", "WhatsApp Sales dan Call Center aktif dalam satu pusat konfigurasi tanpa menampilkan kanal yang tidak relevan.");
     } else if (slug === "core-platform-agentic-ai" && /agentic ai|native tools/i.test(capabilityTitle)) {
-      preview = captured("core-platform-native-ai-tools-public.png", "Core Platform · Native AI Tools", "Jasmine memakai inventori tenant untuk menjawab kebutuhan unit, memperbarui konteks lead, dan mendukung takeover serta handoff sesuai role.");
+      preview = captured("core-platform-native-ai-tools-public.png?v=20260805-2", "Core Platform · Native AI Tools", "Jasmine memakai inventori tenant untuk menjawab kebutuhan unit, memperbarui konteks lead, dan mendukung takeover serta handoff sesuai role.");
     } else if (slug === "inventory-falcon-ai" && /listing|import|validasi/i.test(capabilityTitle)) {
       preview = captured("product-social-studio.png", "Inventory · Unit Ready", "Unit ready dari inventory tenant tersedia sebagai sumber data dan materi operasional.");
     } else if (slug === "inventory-falcon-ai" && /falcon|foto|rekomendasi/i.test(capabilityTitle)) {
