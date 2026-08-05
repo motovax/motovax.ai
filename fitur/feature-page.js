@@ -556,7 +556,7 @@
     };
 
     if (id === "core-platform-agentic-ai") {
-      return [previewFactory("product-capability-whatsapp-connected-public.png", "Core Platform · Integrasi"), previews.analytics, previews.integrations];
+      return [previewFactory("core-platform-whatsapp-integrations-public.png", "Core Platform · Integrasi WhatsApp"), previews.analytics, previews.integrations];
     }
     if (id === "omni-jasmine-ai") {
       return [previewFactory("omnichannel-faneling-public.png", "Omni + Jasmine AI"), previews.omni, previews.integrations];
@@ -616,7 +616,15 @@
 
     // Tiap capability diarahkan ke state produk yang relevan. Urutannya sengaja
     // semantik dan tidak bergantung pada nomor kartu/rotasi screenshot umum.
-    if (slug === "inventory-falcon-ai" && /listing|import|validasi/i.test(capabilityTitle)) {
+    if (slug === "core-platform-agentic-ai" && /multi-tenant|multi-cabang/i.test(capabilityTitle)) {
+      preview = captured("core-platform-multi-branch-public.png", "Core Platform · Multi-cabang", "Data inventory dan ringkasan operasional dipisahkan per cabang dalam tenant yang sama.");
+    } else if (slug === "core-platform-agentic-ai" && /role|permission/i.test(capabilityTitle)) {
+      preview = captured("core-platform-role-permission-public.png", "Core Platform · Role & Permission", "Admin mengatur hak akses per role melalui halaman edit permission yang lengkap.");
+    } else if (slug === "core-platform-agentic-ai" && /integrasi channel/i.test(capabilityTitle)) {
+      preview = captured("core-platform-whatsapp-integrations-public.png", "Core Platform · Integrasi WhatsApp", "WhatsApp Sales dan Call Center aktif dalam satu pusat konfigurasi tanpa menampilkan kanal yang tidak relevan.");
+    } else if (slug === "core-platform-agentic-ai" && /agentic ai|native tools/i.test(capabilityTitle)) {
+      preview = captured("product-falcon-sales.png", "Core Platform · Native AI Tools", "Agen AI memakai inventori tenant, simulasi kredit, dan handoff sesuai role untuk membantu percakapan operasional.");
+    } else if (slug === "inventory-falcon-ai" && /listing|import|validasi/i.test(capabilityTitle)) {
       preview = captured("product-social-studio.png", "Inventory · Unit Ready", "Unit ready dari inventory tenant tersedia sebagai sumber data dan materi operasional.");
     } else if (slug === "inventory-falcon-ai" && /falcon|foto|rekomendasi/i.test(capabilityTitle)) {
       preview = captured("product-falcon-sales.png", "Falcon · Pencarian & Rekomendasi", "Falcon memakai inventory tenant untuk membantu pencarian, foto, dan rekomendasi unit.");
