@@ -128,8 +128,9 @@
     .map((capability, index) => {
       const step = workflow[index % Math.max(workflow.length, 1)];
       const benefit = benefits[index % Math.max(benefits.length, 1)];
+      const expandedPreview = slug === "core-platform-agentic-ai" && (index === 1 || index === 3);
       return `
-        <article class="feature-showcase-row${index % 2 ? " reverse" : ""}">
+        <article class="feature-showcase-row${index % 2 ? " reverse" : ""}${expandedPreview ? " is-expanded-preview" : ""}">
           <div class="feature-showcase-copy">
             <span class="feature-showcase-number">FITUR ${String(index + 1).padStart(2, "0")}</span>
             <h3>${escapeHtml(capability.title)}</h3>
@@ -619,11 +620,11 @@
     if (slug === "core-platform-agentic-ai" && /multi-tenant|multi-cabang/i.test(capabilityTitle)) {
       preview = captured("core-platform-multi-branch-public.png", "Core Platform · Multi-cabang", "Data inventory dan ringkasan operasional dipisahkan per cabang dalam tenant yang sama.");
     } else if (slug === "core-platform-agentic-ai" && /role|permission/i.test(capabilityTitle)) {
-      preview = captured("core-platform-role-permission-public.png", "Core Platform · Role & Permission", "Admin mengatur hak akses per role melalui halaman edit permission yang lengkap.");
+      preview = captured("core-platform-role-permission-public.png", "Core Platform · Role & Permission", "Admin mengatur hak akses per role melalui halaman edit permission yang lengkap.", [1586, 992]);
     } else if (slug === "core-platform-agentic-ai" && /integrasi channel/i.test(capabilityTitle)) {
       preview = captured("core-platform-whatsapp-integrations-public.png", "Core Platform · Integrasi WhatsApp", "WhatsApp Sales dan Call Center aktif dalam satu pusat konfigurasi tanpa menampilkan kanal yang tidak relevan.");
     } else if (slug === "core-platform-agentic-ai" && /agentic ai|native tools/i.test(capabilityTitle)) {
-      preview = captured("core-platform-native-ai-tools-public.png", "Core Platform · Native AI Tools", "Jasmine memakai inventori tenant untuk menjawab kebutuhan unit, memperbarui konteks lead, dan mendukung takeover serta handoff sesuai role.");
+      preview = captured("core-platform-native-ai-tools-public.png", "Core Platform · Native AI Tools", "Jasmine memakai inventori tenant untuk menjawab kebutuhan unit, memperbarui konteks lead, dan mendukung takeover serta handoff sesuai role.", [1586, 992]);
     } else if (slug === "inventory-falcon-ai" && /listing|import|validasi/i.test(capabilityTitle)) {
       preview = captured("product-social-studio.png", "Inventory · Unit Ready", "Unit ready dari inventory tenant tersedia sebagai sumber data dan materi operasional.");
     } else if (slug === "inventory-falcon-ai" && /falcon|foto|rekomendasi/i.test(capabilityTitle)) {

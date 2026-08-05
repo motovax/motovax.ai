@@ -1598,6 +1598,20 @@ body.solusi-menu-open {
   order: 1;
 }
 
+.feature-showcase-row.is-expanded-preview {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 30px;
+}
+
+.feature-showcase-row.is-expanded-preview .feature-showcase-copy,
+.feature-showcase-row.is-expanded-preview .feature-showcase-visual {
+  order: initial;
+}
+
+.feature-showcase-row.is-expanded-preview .feature-showcase-copy {
+  max-width: 780px;
+}
+
 .feature-showcase-number {
   display: inline-block;
   margin-bottom: 14px;
@@ -17612,8 +17626,8 @@ body.demo-open {
   display: block;
   width: 100%;
   height: 100%;
-  object-fit: cover;
-  object-position: top left;
+  object-fit: contain;
+  object-position: center;
 }
 
 .feature-showcase-preview-image.is-wide img {
