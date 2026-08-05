@@ -92,8 +92,8 @@ if (contactForm instanceof HTMLFormElement) {
   /** Produk modular yang ditawarkan pada halaman Harga. */
   const groups = [
     {
-      id: "fondasi",
-      title: "Fondasi",
+      id: "produk",
+      title: "Produk",
       items: [
         {
           id: "core-platform",
@@ -104,12 +104,6 @@ if (contactForm instanceof HTMLFormElement) {
             { title: "Core Platform Agentic AI", desc: "Fondasi multi-tenant, akses berbasis peran, integrasi, dashboard, dan konfigurasi modul", icon: "suite", href: f("core-platform-agentic-ai") },
           ],
         },
-      ],
-    },
-    {
-      id: "modul",
-      title: "Modul",
-      items: [
         {
           id: "crm",
           label: "CRM",
@@ -163,9 +157,9 @@ if (contactForm instanceof HTMLFormElement) {
   const firstPaneId = allPanes[0]?.id || "core-platform";
 
   function renderMenuHtml() {
-    const firstGroupId = groups[0]?.id || "fondasi";
+    const firstGroupId = groups[0]?.id || "produk";
 
-    const tabs = `
+    const tabs = groups.length > 1 ? `
       <div class="produk-mega-tabs" role="tablist" aria-label="Kapabilitas dan Suite Motovax">
         <div class="produk-mega-tabs-inner">
           ${groups
@@ -183,7 +177,7 @@ if (contactForm instanceof HTMLFormElement) {
             )
             .join("")}
         </div>
-      </div>`;
+      </div>` : "";
 
     const sidebar = groups
       .map((group) => {
