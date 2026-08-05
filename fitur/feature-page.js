@@ -128,7 +128,7 @@
     .map((capability, index) => {
       const step = workflow[index % Math.max(workflow.length, 1)];
       const benefit = benefits[index % Math.max(benefits.length, 1)];
-      const expandedPreview = slug === "core-platform-agentic-ai" && (index === 1 || index === 3);
+      const expandedPreview = slug === "core-platform-agentic-ai" && index === 3;
       return `
         <article class="feature-showcase-row${index % 2 ? " reverse" : ""}${expandedPreview ? " is-expanded-preview" : ""}">
           <div class="feature-showcase-copy">
@@ -624,7 +624,7 @@
     if (slug === "core-platform-agentic-ai" && /multi-tenant|multi-cabang/i.test(capabilityTitle)) {
       preview = captured("core-platform-multi-branch-public.png", "Core Platform · Multi-cabang", "Data inventory dan ringkasan operasional dipisahkan per cabang dalam tenant yang sama.");
     } else if (slug === "core-platform-agentic-ai" && /role|permission/i.test(capabilityTitle)) {
-      preview = captured("core-platform-role-permission-public.png", "Core Platform · Role & Permission", "Admin mengatur hak akses per role melalui halaman edit permission yang lengkap.", [1586, 992]);
+      preview = captured("core-platform-role-permission-public.png", "Core Platform · Role & Permission", "Admin mengatur hak akses per role melalui halaman edit permission yang lengkap.");
     } else if (slug === "core-platform-agentic-ai" && /integrasi channel/i.test(capabilityTitle)) {
       preview = captured("core-platform-whatsapp-integrations-public.png", "Core Platform · Integrasi WhatsApp", "WhatsApp Sales dan Call Center aktif dalam satu pusat konfigurasi tanpa menampilkan kanal yang tidak relevan.");
     } else if (slug === "core-platform-agentic-ai" && /agentic ai|native tools/i.test(capabilityTitle)) {
