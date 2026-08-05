@@ -1594,6 +1594,10 @@ body.solusi-menu-open {
   order: 2;
 }
 
+.feature-showcase-row.reverse {
+  grid-template-columns: minmax(460px, 1.18fr) minmax(0, 0.82fr);
+}
+
 .feature-showcase-row.reverse .feature-showcase-visual {
   order: 1;
 }
@@ -2103,6 +2107,7 @@ body.solusi-menu-open {
 
   .feature-hero-grid,
   .feature-showcase-row,
+  .feature-showcase-row.reverse,
   .feature-process-grid,
   .feature-faq-layout {
     grid-template-columns: 1fr;
