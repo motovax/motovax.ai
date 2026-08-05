@@ -550,7 +550,7 @@
     if (/broadcast|blast|bulk|ctwa/.test(id)) {
       return [previews.social, previews.omni, previews.analytics];
     }
-    if (/instagram-api|whatsapp-business-api|centang-biru|whatsapp-business-calling|whatsapp-flows|ticket-creation-integration/.test(id)) {
+    if (/facebook-messenger|instagram-api|whatsapp-business-api|centang-biru|whatsapp-business-calling|whatsapp-flows|ticket-creation-integration/.test(id)) {
       return [previews.integrations, previews.omni, previews.social];
     }
     if (/goal|report|scorecard|motovax-360/.test(id)) {
@@ -583,7 +583,9 @@
 
     // Tiap capability diarahkan ke state produk yang relevan. Urutannya sengaja
     // semantik dan tidak bergantung pada nomor kartu/rotasi screenshot umum.
-    if (matches(/fanel/i)) {
+    if (slug === "facebook-messenger") {
+      preview = captured("facebook-messenger-inbox-public.png", "Inbox · Facebook Messenger", "Filter Facebook aktif dan percakapan Messenger ditangani bersama AI, Agent, dan MR.");
+    } else if (matches(/fanel/i)) {
       preview = captured("omnichannel-faneling-public.png", "Call Center · AI → Agent → MR", "Jejak AI dan takeover Agent tetap terlihat setelah lead masuk bucket MR.");
     } else if (matches(/handoff|takeover|eskalasi/i)) {
       preview = captured("omnichannel-handoff-public.png", "Call Center · Handoff ke MR", "Agent memilih MR, alasan, dan catatan sebelum menyerahkan lead.");

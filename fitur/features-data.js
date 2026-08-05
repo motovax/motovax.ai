@@ -62,6 +62,60 @@ window.MOTOVAX_FEATURES = {
     related: ["instagram-api", "sistem-manajemen-tiket", "agentic-ai", "manajemen-sla"],
   },
 
+  "facebook-messenger": {
+    slug: "facebook-messenger",
+    title: "Facebook Messenger",
+    heroTitle: "Layani lead Facebook langsung dari satu workspace",
+    heroDesc:
+      "Hubungkan Facebook Messenger ke Call Center Motovax agar inquiry dari Facebook ditangani realtime oleh AI dan agent, tetap membawa konteks lead, lalu diteruskan ke MR tanpa berpindah aplikasi.",
+    status: "Live",
+    module: "M3 · Omnichannel + integrasi Meta",
+    flag: "whatsapp_ai",
+    demo: "omni",
+    demoHash: "omniDemo",
+    category: "Aplikasi Omnichannel",
+    breadcrumbs: ["Produk", "Fitur", "Facebook Messenger"],
+    capabilities: [
+      {
+        title: "Inbox Messenger terpusat",
+        desc: "Filter Facebook menampilkan percakapan Messenger dalam workspace Call Center yang sama, tanpa mencampurkan fokus agent dengan channel lain.",
+      },
+      {
+        title: "Respons AI dan takeover agent",
+        desc: "AI menangani respons awal, lalu agent dapat mengambil alih percakapan dengan konteks chat dan kebutuhan customer tetap tersimpan.",
+      },
+      {
+        title: "Routing lead ke MR",
+        desc: "Lead Messenger dapat di-handoff ke Marketing Representative lengkap dengan status, alasan, dan catatan tindak lanjut.",
+      },
+      {
+        title: "Konteks stok dan simulasi kredit",
+        desc: "Agent dapat mengecek inventori, menjalankan simulasi kredit, dan bertanya ke AI langsung dari percakapan Messenger.",
+      },
+      {
+        title: "Update percakapan realtime",
+        desc: "Pesan dan perubahan status hadir langsung di inbox melalui koneksi realtime agar respons tim lebih cepat.",
+      },
+      {
+        title: "Journey lead terukur",
+        desc: "Aktivitas dari Messenger tetap terhubung ke status lead, pipeline, dan performa omnichannel Motovax.",
+      },
+    ],
+    howItWorks: [
+      { title: "Hubungkan akun Meta", desc: "Aktifkan Facebook Messenger dari pengaturan integrasi tenant Motovax." },
+      { title: "Inquiry masuk", desc: "Pesan Facebook tampil di filter Messenger pada inbox Call Center." },
+      { title: "AI atau agent merespons", desc: "AI memberi respons awal dan agent mengambil alih saat dibutuhkan." },
+      { title: "Lanjutkan ke sales", desc: "Handoff lead ke MR atau lanjutkan tindak lanjut melalui pipeline CRM." },
+    ],
+    benefits: [
+      "Inquiry Facebook tidak tercecer di akun atau perangkat personal",
+      "Respons awal lebih cepat dengan AI dan update realtime",
+      "Takeover manusia tanpa kehilangan konteks percakapan",
+      "Lead Messenger tersambung ke MR, CRM, dan performa channel",
+    ],
+    related: ["aplikasi-omnichannel", "instagram-api", "agentic-ai", "aplikasi-crm"],
+  },
+
   "instagram-api": {
     slug: "instagram-api",
     title: "Instagram API",

@@ -103,7 +103,7 @@ if (contactForm instanceof HTMLFormElement) {
           features: [
             { title: "Call Center AI Omnichannel", desc: "Satu workspace untuk channel, AI, agent, antrean, dan handoff MR", icon: "call", href: f("aplikasi-omnichannel") },
             { title: "WhatsApp Business API", desc: "Hubungkan percakapan WhatsApp ke inbox omnichannel", icon: "wa", href: f("whatsapp-business-api") },
-            { title: "Facebook Messenger", desc: "Kelola chat Facebook bersama kanal pelanggan lainnya", icon: "fb", href: f("aplikasi-omnichannel") },
+            { title: "Facebook Messenger", desc: "Respons inquiry Facebook dengan AI, agent, dan handoff MR", icon: "fb", href: f("facebook-messenger") },
             { title: "Instagram API", desc: "Respons DM otomatis untuk tingkatkan penjualan", icon: "ig", href: f("instagram-api") },
             { title: "Embedded Live Chat", desc: "Integrasi layanan live chat 24/7 untuk aplikasi Anda", icon: "live", href: f("embedded-live-chat") },
             { title: "Manajemen Tiket", desc: "Kelola status, eskalasi, resolusi, dan tindak lanjut dari chat", icon: "ticket", href: f("sistem-manajemen-tiket") },
