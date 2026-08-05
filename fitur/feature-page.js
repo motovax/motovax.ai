@@ -620,7 +620,15 @@
 
     // Tiap capability diarahkan ke state produk yang relevan. Urutannya sengaja
     // semantik dan tidak bergantung pada nomor kartu/rotasi screenshot umum.
-    if (slug === "core-platform-agentic-ai" && /multi-tenant|multi-cabang/i.test(capabilityTitle)) {
+    if (slug === "manajemen-kontak" && index === 2) {
+      preview = captured(
+        "manajemen-kontak-pipeline-public.png",
+        "CRM · Pipeline Sales",
+        "Customer siap ditindaklanjuti di pipeline hingga deal dan handover tercatat dalam satu workspace.",
+        [1900, 865],
+      );
+      preview.wide = true;
+    } else if (slug === "core-platform-agentic-ai" && /multi-tenant|multi-cabang/i.test(capabilityTitle)) {
       preview = captured("core-platform-multi-branch-public.png", "Core Platform · Multi-cabang", "Data inventory dan ringkasan operasional dipisahkan per cabang dalam tenant yang sama.");
     } else if (slug === "core-platform-agentic-ai" && /role|permission/i.test(capabilityTitle)) {
       preview = captured("core-platform-role-permission-public.png", "Core Platform · Role & Permission", "Admin mengatur hak akses per role melalui halaman edit permission yang lengkap.");
