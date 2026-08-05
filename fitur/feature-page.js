@@ -543,6 +543,10 @@
       return preview("instagram-integration-public.png", "Integrasi Instagram");
     }
 
+    if (id === "manajemen-kontak") {
+      return preview("manajemen-kontak-customer-public.png", "CRM · Customer Database");
+    }
+
     return previewSetFor(id, preview)[0];
   }
 
@@ -687,8 +691,7 @@
       } else if (matches(/guideline|panduan/i)) {
         preview = captured("product-crm-panduan.png", "CRM · Guideline", "Panduan kerja dapat diakses langsung dari workspace CRM.");
       } else if (matches(/customer|kontak|gps|salespeople/i)) {
-        preview = captured("product-crm-customer.png", "CRM · Customer Database", "Profil customer, cabang, PIC, dan aktivitas tersusun dalam satu daftar.", [1874, 839]);
-        preview.wide = true;
+        preview = captured("product-crm-customer.png", "CRM · Customer Database", "Profil customer, cabang, PIC, dan aktivitas tersusun dalam satu daftar.");
       } else {
         preview = captured("product-crm-pipeline.png", "CRM · Pipeline Sales", "Lead terkelompok berdasarkan tahap agar tindak lanjut terlihat jelas.");
       }
