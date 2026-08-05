@@ -551,6 +551,13 @@
       analytics: previewFactory("sales-analytics.webp", "Analytics & Performance"),
     };
 
+    if (id === "whatsapp-business-api") {
+      return [
+        previewFactory("product-capability-whatsapp.png", "WhatsApp Business API"),
+        previews.omni,
+        previews.social,
+      ];
+    }
     if (/broadcast|blast|bulk|ctwa/.test(id)) {
       return [previews.social, previews.omni, previews.analytics];
     }
