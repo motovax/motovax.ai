@@ -546,6 +546,10 @@
       return preview("manajemen-kontak-customer-public.png", "CRM · Customer Database");
     }
 
+    if (id === "manajemen-deal") {
+      return preview("product-crm-pipeline.png?v=20260806-deal-1", "CRM · Pipeline Deal");
+    }
+
     return previewSetFor(id, preview)[0];
   }
 
@@ -620,7 +624,29 @@
 
     // Tiap capability diarahkan ke state produk yang relevan. Urutannya sengaja
     // semantik dan tidak bergantung pada nomor kartu/rotasi screenshot umum.
-    if (slug === "manajemen-kontak" && index === 1) {
+    if (slug === "manajemen-deal" && index === 0) {
+      preview = captured(
+        "manajemen-kontak-pipeline-public.png?v=20260806-deal-1",
+        "CRM · Board Pipeline",
+        "Deal tersusun per stage Cold, Warm, Prospect, dan Hot, lengkap dengan nilai pipeline serta hasil deal dan handover.",
+        [1854, 848],
+      );
+      preview.wide = true;
+    } else if (slug === "manajemen-deal" && index === 1) {
+      preview = captured(
+        "manajemen-kontak-customer-public.png?v=20260806-deal-1",
+        "CRM · Customer dan Unit",
+        "Customer, sumber lead, PIC sales, cabang, serta unit yang terhubung terlihat dalam satu tampilan.",
+        [1440, 900],
+      );
+    } else if (slug === "manajemen-deal" && index === 2) {
+      preview = captured(
+        "product-crm-customer.png?v=20260806-deal-1",
+        "CRM · Aktivitas Deal",
+        "Komunikasi awal dan terakhir, minat unit, deal stage, dan riwayat customer menjaga konteks follow-up hingga closing.",
+        [1440, 900],
+      );
+    } else if (slug === "manajemen-kontak" && index === 1) {
       preview = captured(
         "manajemen-kontak-riwayat-channel-public.png?v=20260805-2",
         "CRM · Riwayat Channel",
