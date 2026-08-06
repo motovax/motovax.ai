@@ -624,7 +624,31 @@
 
     // Tiap capability diarahkan ke state produk yang relevan. Urutannya sengaja
     // semantik dan tidak bergantung pada nomor kartu/rotasi screenshot umum.
-    if (slug === "manajemen-deal" && index === 0) {
+    if (slug === "personalisasi-report-sales" && index === 0) {
+      preview = captured(
+        "report-sales-trend-public.png",
+        "Report · Sales Trend",
+        "Pendapatan, pipeline, tingkat konversi, rata-rata deal, kecepatan closing, dan tren forecast tampil dengan data terisi.",
+      );
+    } else if (slug === "personalisasi-report-sales" && index === 1) {
+      preview = captured(
+        "report-channel-breakdown-public.png",
+        "Report · Channel Breakdown",
+        "Percakapan aktif diturunkan ke kanal masuk, marketing source, dan campaign agar kontribusi setiap channel mudah dibandingkan.",
+      );
+    } else if (slug === "personalisasi-report-sales" && index === 2) {
+      preview = captured(
+        "report-email-scheduler-public.png",
+        "Platform · Email Report",
+        "Konfigurasi scheduler memperlihatkan subject, frekuensi, attachment, dan jumlah penerima laporan otomatis.",
+      );
+    } else if (slug === "personalisasi-report-sales" && index === 3) {
+      preview = captured(
+        "report-conversion-insight-public.png",
+        "Report · Insight Konversi",
+        "Perjalanan customer dan funnel per penanganan menghubungkan lead masuk dengan prospect, hot lead, deal, dan handover.",
+      );
+    } else if (slug === "manajemen-deal" && index === 0) {
       preview = captured(
         "manajemen-kontak-pipeline-public.png?v=20260806-deal-1",
         "CRM · Board Pipeline",
