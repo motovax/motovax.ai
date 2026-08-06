@@ -1,3 +1,4 @@
 
 # local agent clipboard
 .fural-clipboard/
+node_modules/

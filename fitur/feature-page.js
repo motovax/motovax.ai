@@ -468,15 +468,7 @@
               <span class="feature-preview-status"><i></i> Data demo</span>
             </div>
             <div class="feature-preview-image-shell${preview.wide ? " is-wide" : ""}">
-              <img
-                src="../assets/feature-previews/${escapeHtml(preview.file)}"
-                width="1440"
-                height="900"
-                alt="${escapeHtml(preview.alt)}"
-                loading="eager"
-                decoding="async"
-                fetchpriority="high"
-              >
+              ${renderPreviewImage(preview, { hero: true })}
             </div>
             <figcaption>Tampilan aplikasi Motovax dengan data yang telah dianonimkan.</figcaption>
           </div>
@@ -551,6 +543,39 @@
     }
 
     return previewSetFor(id, preview)[0];
+  }
+
+  function renderPreviewImage(preview, { hero = false } = {}) {
+    const file = String(preview.file || "");
+    const pathname = file.split("?")[0];
+    const originalSrc = `../assets/feature-previews/${escapeHtml(file)}`;
+    const width = preview.width || 1440;
+    const height = preview.height || 900;
+    const loading = hero ? "eager" : "lazy";
+    const priority = hero ? "high" : "low";
+    const image = `<img
+                src="${originalSrc}"
+                width="${width}"
+                height="${height}"
+                alt="${escapeHtml(preview.alt)}"
+                loading="${loading}"
+                decoding="async"
+                fetchpriority="${priority}"
+              >`;
+
+    if (!/\.png$/i.test(pathname)) return image;
+
+    const stem = pathname.replace(/\.png$/i, "");
+    const variantBase = `../assets/feature-previews/${escapeHtml(stem)}`;
+    const sizes = hero ? "(max-width: 900px) calc(100vw - 36px), 540px" : "(max-width: 900px) calc(100vw - 36px), 560px";
+    return `<picture>
+              <source
+                type="image/webp"
+                srcset="${variantBase}-720.webp?v=20260806-img-1 720w, ${variantBase}-1200.webp?v=20260806-img-1 1200w"
+                sizes="${sizes}"
+              >
+              ${image}
+            </picture>`;
   }
 
   function previewSetFor(id, previewFactory) {
@@ -781,14 +806,7 @@
             <em>Data demo</em>
           </div>
           <div class="feature-showcase-preview-image${preview.wide ? " is-wide" : ""}">
-            <img
-              src="../assets/feature-previews/${escapeHtml(preview.file)}"
-              width="${preview.width || 1440}"
-              height="${preview.height || 900}"
-              alt="${escapeHtml(preview.alt)}"
-              loading="eager"
-              decoding="async"
-            >
+            ${renderPreviewImage(preview)}
           </div>
           <figcaption>
             <span>${escapeHtml(preview.caption || `${capability.title} dalam workspace Motovax`)}</span>
