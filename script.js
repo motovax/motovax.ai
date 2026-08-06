@@ -121,7 +121,11 @@ if (contactForm instanceof HTMLFormElement) {
           paneTitle: "Omni + Jasmine AI",
           demo: { id: "omni", hash: "omniDemo", context: "omnichannel", label: "Coba Omnichannel" },
           features: [
-            { title: "Omni + Jasmine AI", desc: "WhatsApp, Instagram, Facebook, funneling, routing, aksi cepat, dan AI percakapan", icon: "call", href: f("omni-jasmine-ai") },
+            { title: "WhatsApp, Instagram & Facebook", desc: "Satukan chat pelanggan dari tiga channel dalam satu inbox Call Center", icon: "chat", href: f("omni-jasmine-ai") },
+            { title: "Omni analytic", desc: "Pantau journey lead, performa channel, respons, dan hasil penanganan tim", icon: "report", href: f("omni-jasmine-ai") },
+            { title: "Custom aksi cepat", desc: "Jalankan cek inventori, simulasi kredit, dan aksi operasional dari percakapan", icon: "workflow", href: f("omni-jasmine-ai") },
+            { title: "3 funneling & 1 auto routing", desc: "Kelola alur Jasmine AI, Call Center, dan MR dengan routing otomatis", icon: "flow", href: f("omni-jasmine-ai") },
+            { title: "AI 500 credit", desc: "Gunakan 500 kredit AI untuk respons dan dukungan percakapan Jasmine", icon: "ai", href: f("omni-jasmine-ai") },
           ],
         },
         {

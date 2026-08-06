@@ -104,7 +104,7 @@ const template = (industry) => {
     <script>window.__INDUSTRY_SLUG__ = ${JSON.stringify(industry.slug)};</script>
     <script src="./industry-data.js"></script>
     <script src="./industry-page.js"></script>
-    <script src="../script.js"></script>
+    <script src="../script.js?v=20260806-1"></script>
   </body>
 </html>
 `;
