@@ -113,6 +113,7 @@ if (contactForm instanceof HTMLFormElement) {
             { title: "Lead / Customer List", desc: "Data lead dan customer terpusat dengan riwayat interaksi serta unit yang diminati", icon: "contact", href: f("manajemen-kontak") },
             { title: "Pipeline & Customer Journey", desc: "Pantau perjalanan customer dan progres deal dari lead masuk hingga closing", icon: "deal", href: f("manajemen-deal") },
             { title: "Analytics", desc: "Ukur performa sales, conversion, channel, dan hasil pipeline CRM", icon: "report", href: f("personalisasi-report-sales") },
+            { title: "Auto Follow Up", desc: "Aktifkan tindak lanjut customer terjadwal sebagai add-on CRM", icon: "workflow", href: f("automasi-workflow"), badge: "Add-on" },
           ],
         },
         {
@@ -134,7 +135,12 @@ if (contactForm instanceof HTMLFormElement) {
           paneTitle: "Inventory + Falcon AI",
           demo: { id: "inventory", hash: "inventoryDemo", context: "inventory", label: "Coba Inventory" },
           features: [
-            { title: "Inventory + Falcon AI", desc: "Listing multi-cabang, import data, pencarian AI, foto, rekomendasi, dan live katalog API", icon: "shop", href: f("inventory-falcon-ai") },
+            { title: "Item / listing multi cabang", desc: "Kelola item dan listing dari seluruh cabang dalam satu inventori", icon: "shop", href: f("inventory-falcon-ai") },
+            { title: "Import listing via WhatsApp", desc: "Tambahkan data listing melalui alur WhatsApp yang terhubung ke inventori", icon: "wa", href: f("inventory-falcon-ai") },
+            { title: "Custom tagging / status & filter slicing", desc: "Atur tag, status, dan filter untuk menemukan kelompok stok yang dibutuhkan", icon: "ticket", href: f("inventory-falcon-ai") },
+            { title: "Falcon AI: searching, kirim foto & rekomendasi otomatis", desc: "Cari unit, kirim foto, dan rekomendasikan alternatif secara otomatis", icon: "ai", href: f("inventory-falcon-ai") },
+            { title: "Live katalog API", desc: "Hubungkan stok aktif ke katalog dan aplikasi eksternal melalui API", icon: "live", href: f("inventory-falcon-ai") },
+            { title: "AI 500 credit", desc: "Gunakan 500 kredit AI untuk pencarian dan bantuan operasional Falcon", icon: "ai", href: f("inventory-falcon-ai") },
           ],
         },
         {
@@ -143,7 +149,10 @@ if (contactForm instanceof HTMLFormElement) {
           paneTitle: "Ana AI — Advanced Analytics",
           demo: { id: "dashboard", hash: "dashboardDemo", context: "analytics", label: "Lihat Analytics" },
           features: [
-            { title: "Ana AI — Advanced Analytics", desc: "Analitik operasional, finansial, sales performance, dan insight lintas cabang", icon: "report", href: f("ana-ai-analytics") },
+            { title: "Analitik operasional", desc: "Pantau aktivitas, produktivitas, dan indikator utama operasional bisnis", icon: "report", href: f("ana-ai-analytics") },
+            { title: "Analitik financial", desc: "Baca revenue, biaya, HPP, gross profit, dan tren finansial", icon: "deal", href: f("ana-ai-analytics") },
+            { title: "Analitik sales performance", desc: "Bandingkan performa sales, cabang, channel, dan hasil konversi", icon: "score", href: f("ana-ai-analytics") },
+            { title: "Additional custom analytic", desc: "Tambahkan analitik khusus sesuai KPI dan kebutuhan manajemen", icon: "workflow", href: f("ana-ai-analytics") },
           ],
         },
         {
@@ -152,7 +161,13 @@ if (contactForm instanceof HTMLFormElement) {
           paneTitle: "Social Media + Sora AI",
           demo: { id: "social", hash: "socialDemo", context: "social", label: "Coba Social Studio" },
           features: [
-            { title: "Social Media + Sora AI", desc: "Content studio, AI image, publish, scheduler, ads manager, dan campaign analytics", icon: "ads", href: f("social-media-sora-ai") },
+            { title: "Content studio", desc: "Susun materi promosi dan caption dari data produk dalam satu workspace", icon: "shop", href: f("social-media-sora-ai") },
+            { title: "Sora AI upscale & background edit", desc: "Tingkatkan kualitas visual dan edit latar gambar dengan bantuan AI", icon: "ai", href: f("social-media-sora-ai") },
+            { title: "Publish ke Facebook, Instagram & WhatsApp", desc: "Publikasikan konten ke channel sosial yang aktif dari satu alur", icon: "blast", href: f("social-media-sora-ai") },
+            { title: "Scheduler", desc: "Jadwalkan konten agar tayang sesuai kalender campaign", icon: "sla", href: f("social-media-sora-ai") },
+            { title: "Meta ads manager", desc: "Kelola campaign Meta dan lead template WhatsApp dari Social Studio", icon: "ads", href: f("social-media-sora-ai") },
+            { title: "Meta ads analytic by Sora", desc: "Pantau performa iklan dan insight campaign dengan bantuan AI", icon: "report", href: f("social-media-sora-ai") },
+            { title: "AI 500 credit", desc: "Gunakan 500 kredit AI untuk pembuatan dan pengolahan konten", icon: "ai", href: f("social-media-sora-ai") },
           ],
         },
       ],
