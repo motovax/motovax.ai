@@ -665,7 +665,7 @@
       );
     } else if (slug === "manajemen-deal" && index === 2) {
       preview = captured(
-        "product-crm-customer.png?v=20260806-deal-1",
+        "manajemen-deal-aktivitas-public.png?v=20260806-deal-2",
         "CRM · Aktivitas Deal",
         "Komunikasi awal dan terakhir, minat unit, deal stage, dan riwayat customer menjaga konteks follow-up hingga closing.",
         [1440, 900],
