@@ -100,7 +100,7 @@ const template = (slug, title, description) => `<!doctype html>
 
     <script>window.__FEATURE_SLUG__ = ${JSON.stringify(slug)};</script>
     <script src="./features-data.js"></script>
-    <script src="./feature-page.js?v=20260806-image-performance-1"></script>
+    <script src="./feature-page.js?v=20260806-image-performance-2"></script>
     <script src="../script.js?v=20260806-2"></script>
   </body>
 </html>

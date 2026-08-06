@@ -571,7 +571,7 @@
     return `<picture>
               <source
                 type="image/webp"
-                srcset="${variantBase}-720.webp?v=20260806-img-1 720w, ${variantBase}-1200.webp?v=20260806-img-1 1200w"
+                srcset="${variantBase}-720.webp?v=20260806-img-2 720w, ${variantBase}-1200.webp?v=20260806-img-2 1200w"
                 sizes="${sizes}"
               >
               ${image}
@@ -657,7 +657,7 @@
       );
     } else if (slug === "personalisasi-report-sales" && index === 1) {
       preview = captured(
-        "report-channel-breakdown-public.png",
+        "report-channel-breakdown-public.png?v=20260806-report-channel-2",
         "Report · Channel Breakdown",
         "Percakapan aktif diturunkan ke kanal masuk, marketing source, dan campaign agar kontribusi setiap channel mudah dibandingkan.",
       );
