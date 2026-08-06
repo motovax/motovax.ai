@@ -542,6 +542,10 @@
       return preview("product-crm-pipeline.png?v=20260806-deal-1", "CRM · Pipeline Deal");
     }
 
+    if (id === "personalisasi-report-sales") {
+      return preview("report-sales-hero-public.png?v=20260806-sales-hero-1", "Report · Performa Sales");
+    }
+
     return previewSetFor(id, preview)[0];
   }
 
