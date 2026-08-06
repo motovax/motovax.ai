@@ -546,6 +546,10 @@
       return preview("report-sales-hero-public.png?v=20260806-sales-hero-1", "Report · Performa Sales");
     }
 
+    if (id === "automasi-workflow") {
+      return preview("product-falcon-sales.png?v=20260806-workflow-1", "Automation · Chat, CRM & Stock");
+    }
+
     return previewSetFor(id, preview)[0];
   }
 
@@ -653,7 +657,25 @@
 
     // Tiap capability diarahkan ke state produk yang relevan. Urutannya sengaja
     // semantik dan tidak bergantung pada nomor kartu/rotasi screenshot umum.
-    if (slug === "personalisasi-report-sales" && index === 0) {
+    if (slug === "automasi-workflow" && index === 0) {
+      preview = captured(
+        "workflow-auto-follow-public.png?v=20260806-workflow-1",
+        "Sales Agent · Auto Follow",
+        "Lead aktif, butuh follow-up, dan overdue terlihat bersama waktu interaksi terakhir agar prioritas tindak lanjut lebih jelas.",
+      );
+    } else if (slug === "automasi-workflow" && index === 1) {
+      preview = captured(
+        "report-email-scheduler-public.png?v=20260806-workflow-1",
+        "Platform · Email Report Scheduler",
+        "Worker laporan menjalankan jadwal harian dengan attachment dan daftar penerima yang sudah dikonfigurasi.",
+      );
+    } else if (slug === "automasi-workflow" && index === 2) {
+      preview = captured(
+        "omnichannel-inventory-public.png?v=20260806-workflow-1",
+        "Call Center · Inventory Tool Chain",
+        "Dari percakapan, agent mencari unit ready lalu melanjutkan ke hitung kredit atau membagikan hasil tanpa berpindah workspace.",
+      );
+    } else if (slug === "personalisasi-report-sales" && index === 0) {
       preview = captured(
         "report-sales-trend-public.png?v=20260806-report-2",
         "Report · Sales Trend",
