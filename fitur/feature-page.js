@@ -560,7 +560,7 @@
     };
 
     if (id === "core-platform-agentic-ai") {
-      return [previewFactory("core-platform-whatsapp-integrations-public.png", "Core Platform · Integrasi WhatsApp"), previews.analytics, previews.integrations];
+      return [previewFactory("core-platform-whatsapp-integrations-public.png?v=20260806-1", "Core Platform · Integrasi WhatsApp"), previews.analytics, previews.integrations];
     }
     if (id === "omni-jasmine-ai") {
       return [previewFactory("omnichannel-faneling-public.png", "Omni + Jasmine AI"), previews.omni, previews.integrations];
@@ -641,7 +641,7 @@
     } else if (slug === "core-platform-agentic-ai" && /role|permission/i.test(capabilityTitle)) {
       preview = captured("core-platform-role-permission-public.png", "Core Platform · Role & Permission", "Admin mengatur hak akses per role melalui halaman edit permission yang lengkap.");
     } else if (slug === "core-platform-agentic-ai" && /integrasi channel/i.test(capabilityTitle)) {
-      preview = captured("core-platform-whatsapp-integrations-public.png", "Core Platform · Integrasi WhatsApp", "WhatsApp Sales dan Call Center aktif dalam satu pusat konfigurasi tanpa menampilkan kanal yang tidak relevan.");
+      preview = captured("core-platform-whatsapp-integrations-public.png?v=20260806-1", "Core Platform · Integrasi WhatsApp", "WhatsApp Sales dan Call Center aktif dalam satu pusat konfigurasi tanpa menampilkan kanal yang tidak relevan.");
     } else if (slug === "core-platform-agentic-ai" && /agentic ai|native tools/i.test(capabilityTitle)) {
       preview = captured("core-platform-native-ai-tools-public.png?v=20260805-2", "Core Platform · Native AI Tools", "Jasmine memakai inventori tenant untuk menjawab kebutuhan unit, memperbarui konteks lead, dan mendukung takeover serta handoff sesuai role.");
     } else if (slug === "inventory-falcon-ai" && /listing|import|validasi/i.test(capabilityTitle)) {
