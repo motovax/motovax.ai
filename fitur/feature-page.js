@@ -626,7 +626,7 @@
     // semantik dan tidak bergantung pada nomor kartu/rotasi screenshot umum.
     if (slug === "personalisasi-report-sales" && index === 0) {
       preview = captured(
-        "report-sales-trend-public.png",
+        "report-sales-trend-public.png?v=20260806-report-2",
         "Report · Sales Trend",
         "Pendapatan, pipeline, tingkat konversi, rata-rata deal, kecepatan closing, dan tren forecast tampil dengan data terisi.",
       );
