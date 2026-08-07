@@ -77,7 +77,6 @@
   const isRelatedSimulation = /partial|roadmap/i.test(data.status || "");
   const demoLabel = isRelatedSimulation ? "Lihat Simulasi Terkait" : "Coba Demo Interaktif";
   const demoCta = `<a class="btn btn-secondary feature-hero-demo" href="${escapeHtml(demoHref)}">${demoLabel} <span>-></span></a>`;
-  const isWorkflowHero = slug === "automasi-workflow";
 
   function isFanelingCapability(capability) {
     return slug === "aplikasi-omnichannel" && /fanel/i.test(String(capability?.title || ""));
@@ -91,29 +90,6 @@
   const heroBenefits = benefits
     .slice(0, 4)
     .map((benefit) => `<li><span aria-hidden="true">✓</span>${escapeHtml(benefit)}</li>`)
-    .join("");
-
-  const workflowHeroCards = [
-    {
-      title: "Distribusi & handoff terarah",
-      desc: "Lead bergerak dari AI ke Call Center dan MR dengan konteks serta jejak yang tetap terbaca.",
-    },
-    {
-      title: "Cek inventori instan",
-      desc: "Agent menemukan unit ready dari percakapan tanpa berpindah workspace.",
-    },
-    {
-      title: "Tindak lanjut otomatis",
-      desc: "Reminder dan follow-up dijalankan mengikuti skenario yang sudah diaktifkan.",
-    },
-  ]
-    .map(
-      (item, index) => `
-        <li>
-          <span class="workflow-hero-benefit-icon" aria-hidden="true">${workflowHeroIcon(index)}</span>
-          <span><strong>${escapeHtml(item.title)}</strong><small>${escapeHtml(item.desc)}</small></span>
-        </li>`,
-    )
     .join("");
 
   const outcomeCards = benefits
@@ -209,7 +185,7 @@
   injectFaqSchema(faqs, data);
 
   root.innerHTML = `
-    <section class="feature-page-hero${isWorkflowHero ? " workflow-reference-hero" : ""}">
+    <section class="feature-page-hero">
       <div class="container">
         <p class="feature-breadcrumb">${crumbs}</p>
         <div class="feature-hero-grid">
@@ -218,30 +194,12 @@
               <span class="feature-badge">${escapeHtml(profile.eyebrow)}</span>
               <span class="feature-badge ${availability.tone}">${escapeHtml(availability.label)}</span>
             </div>
-            <h1>${
-              isWorkflowHero
-                ? `Otomatisasi Workflow, <span class="workflow-hero-title-accent">Tingkatkan Produktivitas Call Center</span>`
-                : escapeHtml(data.heroTitle)
-            }</h1>
-            <p class="feature-hero-desc">${
-              isWorkflowHero
-                ? "Hubungkan percakapan, pengelolaan lead, cek inventori, dan tindak lanjut dalam satu workspace operasional."
-                : escapeHtml(data.heroDesc)
-            }</p>
-            ${
-              isWorkflowHero
-                ? `<ul class="workflow-hero-benefits">${workflowHeroCards}</ul>`
-                : heroBenefits
-                  ? `<ul class="feature-hero-list">${heroBenefits}</ul>`
-                  : ""
-            }
+            <h1>${escapeHtml(data.heroTitle)}</h1>
+            <p class="feature-hero-desc">${escapeHtml(data.heroDesc)}</p>
+            ${heroBenefits ? `<ul class="feature-hero-list">${heroBenefits}</ul>` : ""}
             <div class="feature-hero-actions">
-              <a class="btn btn-primary" href="${isWorkflowHero ? "../hubungi-kami.html" : "../index.html#kontak"}">${isWorkflowHero ? "Jadwalkan Demo Gratis" : "Jadwalkan Demo"} <span>-></span></a>
-              ${
-                isWorkflowHero
-                  ? `<a class="workflow-hero-learn" href="#kemampuan">Pelajari Selengkapnya <span>-></span></a>`
-                  : demoCta
-              }
+              <a class="btn btn-primary" href="../index.html#kontak">Jadwalkan Demo <span>-></span></a>
+              ${demoCta}
             </div>
           </div>
           ${renderProductVisual(data, profile, capabilities, workflow)}
@@ -501,14 +459,6 @@
   function renderProductVisual(feature, productProfile, caps, flow) {
     const preview = previewFor(feature);
     if (preview) {
-      const workflowVisualFlow = feature.slug === "automasi-workflow"
-        ? `<div class="workflow-hero-visual-flow" aria-label="Alur workflow dalam satu workspace">
-            <span><i aria-hidden="true">1</i><b>Percakapan masuk</b></span>
-            <span><i aria-hidden="true">2</i><b>Konteks CRM</b></span>
-            <span><i aria-hidden="true">3</i><b>Stok ditemukan</b></span>
-          </div>
-          <span class="workflow-hero-ai-node" aria-hidden="true">AI</span>`
-        : "";
       return `
         <figure class="feature-product-visual feature-product-preview family-${productProfile.family}" aria-label="Pratinjau antarmuka ${escapeHtml(feature.title)}">
           <div class="feature-preview-window">
@@ -522,7 +472,6 @@
             </div>
             <figcaption>Tampilan aplikasi Motovax dengan data yang telah dianonimkan.</figcaption>
           </div>
-          ${workflowVisualFlow}
           <span class="feature-visual-orbit one"></span>
           <span class="feature-visual-orbit two"></span>
         </figure>`;
@@ -598,7 +547,7 @@
     }
 
     if (id === "automasi-workflow") {
-      return preview("omnichannel-inventory-public.png?v=20260807-workflow-hero-1", "Workflow · Chat, CRM & Inventori");
+      return preview("product-falcon-sales.png?v=20260806-workflow-1", "Automation · Chat, CRM & Stock");
     }
 
     return previewSetFor(id, preview)[0];
@@ -956,15 +905,6 @@
 
   function outcomeIcon(index) {
     return ["↗", "◎", "✓", "⚡"][index % 4];
-  }
-
-  function workflowHeroIcon(index) {
-    const icons = [
-      '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 5h10v5H7zM4 14h6v5H4zm10 0h6v5h-6zM12 10v3m-5 1v-1h10v1"/></svg>',
-      '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 8 4.5-8 4.5-8-4.5L12 3Zm-8 4.5V16l8 5 8-5V7.5M12 12v9"/></svg>',
-      '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5h14v10H9l-4 4V5Zm4 5h6m-3-3v6"/></svg>',
-    ];
-    return icons[index % icons.length];
   }
 
   function shorten(value, max) {
