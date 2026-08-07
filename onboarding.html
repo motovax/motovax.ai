@@ -6,7 +6,7 @@
     <title>Mulai Coba MOTOVAX — Onboarding User Baru</title>
     <meta
       name="description"
-      content="Daftar atau login, isi profil dealer, pilih modul prioritas, dan mulai coba MOTOVAX dalam hitungan menit."
+      content="Daftar atau login, isi profil bisnis, pilih modul prioritas, dan mulai coba MOTOVAX dalam hitungan menit."
     />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -14,7 +14,7 @@
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="./styles.css" />
+    <link rel="stylesheet" href="./styles.css?v=onb-20260808" />
   </head>
   <body class="onboarding-body">
     <header class="site-header onboarding-header">
@@ -38,7 +38,7 @@
           </div>
           <h1>
             Siapkan ruang kerja<br />
-            <span>dealer Anda.</span>
+            <span>bisnis Anda.</span>
           </h1>
           <p>
             Satu alur untuk daftar/login, profil bisnis, dan modul prioritas — selaras dengan
@@ -57,7 +57,7 @@
               <i>2</i>
               <div>
                 <b>Profil bisnis</b>
-                <small>Dealer &amp; cabang</small>
+                <small>Organisasi &amp; cabang</small>
               </div>
             </li>
             <li data-rail-step="3">
@@ -88,7 +88,7 @@
               <span>✓</span>
               <div>
                 <b>Personalisasi cepat</b>
-                <small>KPI &amp; modul menyesuaikan industri dealer Anda.</small>
+                <small>KPI &amp; modul menyesuaikan industri bisnis Anda.</small>
               </div>
             </li>
             <li>
@@ -111,26 +111,50 @@
             <header class="onboarding-step-head">
               <span>LANGKAH 1 · AKUN</span>
               <h2 id="onboardingPanelTitle">Masuk atau buat akun baru</h2>
-              <p>Gunakan email kerja dealer. Mode demo — tidak mengirim email verifikasi nyata.</p>
+              <p data-auth-lead>
+                Gunakan email kerja Anda. Mode demo — tidak mengirim email verifikasi nyata.
+              </p>
             </header>
 
             <div class="onboarding-auth-tabs" role="tablist" aria-label="Mode akun">
-              <button type="button" class="is-active" role="tab" aria-selected="true" data-auth-mode="signup">
+              <button
+                type="button"
+                class="is-active"
+                role="tab"
+                id="authTabSignup"
+                aria-selected="true"
+                aria-controls="authFormSignup"
+                data-auth-mode="signup"
+              >
                 Daftar
               </button>
-              <button type="button" role="tab" aria-selected="false" data-auth-mode="login">
+              <button
+                type="button"
+                role="tab"
+                id="authTabLogin"
+                aria-selected="false"
+                aria-controls="authFormLogin"
+                data-auth-mode="login"
+              >
                 Login
               </button>
             </div>
 
-            <form class="onboarding-form" data-auth-form="signup" novalidate>
+            <form
+              class="onboarding-form"
+              id="authFormSignup"
+              data-auth-form="signup"
+              role="tabpanel"
+              aria-labelledby="authTabSignup"
+              novalidate
+            >
               <label>
                 <span>Nama lengkap</span>
                 <input type="text" name="fullName" autocomplete="name" placeholder="Contoh: Budi Santoso" required />
               </label>
               <label>
                 <span>Email kerja</span>
-                <input type="email" name="email" autocomplete="email" placeholder="nama@dealeranda.com" required />
+                <input type="email" name="email" autocomplete="email" placeholder="nama@perusahaan.com" required />
               </label>
               <div class="onboarding-form-row">
                 <label>
@@ -149,10 +173,18 @@
               </div>
             </form>
 
-            <form class="onboarding-form" data-auth-form="login" hidden novalidate>
+            <form
+              class="onboarding-form"
+              id="authFormLogin"
+              data-auth-form="login"
+              role="tabpanel"
+              aria-labelledby="authTabLogin"
+              hidden
+              novalidate
+            >
               <label>
                 <span>Email</span>
-                <input type="email" name="email" autocomplete="email" placeholder="nama@dealeranda.com" required />
+                <input type="email" name="email" autocomplete="email" placeholder="nama@perusahaan.com" required />
               </label>
               <label>
                 <span>Password</span>
@@ -170,23 +202,23 @@
           <div class="onboarding-step" data-step="2" hidden>
             <header class="onboarding-step-head">
               <span>LANGKAH 2 · PROFIL BISNIS</span>
-              <h2>Ceritakan dealer Anda</h2>
+              <h2>Ceritakan bisnis Anda</h2>
               <p>Data ini menyesuaikan label KPI, funnel, dan modul di workspace demo.</p>
             </header>
 
             <form class="onboarding-form" data-business-form novalidate>
               <label>
-                <span>Nama dealer / brand</span>
-                <input type="text" name="businessName" placeholder="Contoh: Motovax Auto Group" required />
+                <span>Nama bisnis / brand</span>
+                <input type="text" name="businessName" placeholder="Contoh: PT Nusantara Digital" required />
               </label>
 
               <div class="onboarding-form-row">
                 <label>
-                  <span>Jumlah cabang</span>
+                  <span>Jumlah cabang / lokasi</span>
                   <select name="branchCount" required>
-                    <option value="1">1 cabang</option>
-                    <option value="2-3">2–3 cabang</option>
-                    <option value="4-10" selected>4–10 cabang</option>
+                    <option value="1">1 lokasi</option>
+                    <option value="2-3">2–3 lokasi</option>
+                    <option value="4-10" selected>4–10 lokasi</option>
                     <option value="10+">Lebih dari 10</option>
                   </select>
                 </label>
@@ -199,32 +231,32 @@
               <fieldset class="onboarding-choice-field">
                 <legend>Industri</legend>
                 <div class="onboarding-choice-grid" role="listbox" aria-label="Pilih industri" data-industry-grid>
-                  <button type="button" role="option" class="onboarding-choice-card is-active" data-industry="automotive" aria-selected="true">
+                  <button type="button" role="option" class="onboarding-choice-card is-active" data-industry="general" aria-selected="true">
+                    <span class="onboarding-choice-icon">GN</span>
+                    <b>Umum / Lainnya</b>
+                    <small>Template generik multi-industri</small>
+                  </button>
+                  <button type="button" role="option" class="onboarding-choice-card" data-industry="automotive" aria-selected="false">
                     <span class="onboarding-choice-icon">OT</span>
-                    <b>Otomotif / Dealer</b>
-                    <small>Unit, cabang, lead sales</small>
+                    <b>Otomotif</b>
+                    <small>Stok, cabang, lead sales</small>
                   </button>
                   <button type="button" role="option" class="onboarding-choice-card" data-industry="property" aria-selected="false">
                     <span class="onboarding-choice-icon">PR</span>
                     <b>Properti</b>
-                    <small>Inquiry → booking → akad</small>
+                    <small>Inquiry → booking → closing</small>
                   </button>
                   <button type="button" role="option" class="onboarding-choice-card" data-industry="retail" aria-selected="false">
                     <span class="onboarding-choice-icon">RT</span>
                     <b>Retail</b>
                     <small>Sell-through &amp; outlet</small>
                   </button>
-                  <button type="button" role="option" class="onboarding-choice-card" data-industry="other" aria-selected="false">
-                    <span class="onboarding-choice-icon">+</span>
-                    <b>Lainnya</b>
-                    <small>Template generik</small>
-                  </button>
                 </div>
               </fieldset>
 
               <label>
                 <span>Deskripsi singkat <em>(opsional)</em></span>
-                <textarea name="description" rows="2" maxlength="240" placeholder="Contoh: Dealer mobil bekas 5 cabang, fokus MPV &amp; SUV family…"></textarea>
+                <textarea name="description" rows="2" maxlength="240" placeholder="Contoh: Retail multi-cabang, fokus omnichannel &amp; follow-up lead…"></textarea>
               </label>
 
               <p class="onboarding-form-error" data-form-error hidden></p>
@@ -250,7 +282,7 @@
                   <span class="onboarding-module-check" aria-hidden="true"></span>
                   <span class="onboarding-module-icon">IM</span>
                   <b>Inventory Management</b>
-                  <small>Stok live multi-cabang, booking unit, upload data</small>
+                  <small>Stok live multi-lokasi, reservasi, upload data</small>
                 </label>
                 <label class="onboarding-module-card">
                   <input type="checkbox" name="modules" value="omni" checked />
@@ -264,7 +296,7 @@
                   <span class="onboarding-module-check" aria-hidden="true"></span>
                   <span class="onboarding-module-icon">SM</span>
                   <b>Social &amp; Ads</b>
-                  <small>Creative unit, jadwal post, UTM campaign</small>
+                  <small>Konten, jadwal post, UTM campaign</small>
                 </label>
                 <label class="onboarding-module-card">
                   <input type="checkbox" name="modules" value="crm" checked />
@@ -278,7 +310,7 @@
                   <span class="onboarding-module-check" aria-hidden="true"></span>
                   <span class="onboarding-module-icon">OD</span>
                   <b>One Dashboard</b>
-                  <small>KPI cabang, funnel, command center</small>
+                  <small>KPI lokasi, funnel, command center</small>
                 </label>
                 <label class="onboarding-module-card">
                   <input type="checkbox" name="modules" value="insight" />
@@ -295,7 +327,7 @@
                   <button type="button" class="onboarding-goal-chip is-active" data-goal="conversion">Tingkatkan konversi</button>
                   <button type="button" class="onboarding-goal-chip" data-goal="response">Percepat respon lead</button>
                   <button type="button" class="onboarding-goal-chip" data-goal="inventory">Kontrol stok &amp; aging</button>
-                  <button type="button" class="onboarding-goal-chip" data-goal="scale">Scale multi-cabang</button>
+                  <button type="button" class="onboarding-goal-chip" data-goal="scale">Scale multi-lokasi</button>
                 </div>
               </fieldset>
 
@@ -318,16 +350,16 @@
             <div class="onboarding-success-card" data-success-summary>
               <div class="onboarding-success-hero">
                 <span class="onboarding-success-badge">Demo ready</span>
-                <h3 data-summary-name>Dealer Anda</h3>
+                <h3 data-summary-name>Bisnis Anda</h3>
                 <p data-summary-user>Siap masuk sebagai user demo</p>
               </div>
               <dl class="onboarding-summary-grid">
                 <div>
                   <dt>Industri</dt>
-                  <dd data-summary-industry>Otomotif / Dealer</dd>
+                  <dd data-summary-industry>Umum / Lainnya</dd>
                 </div>
                 <div>
-                  <dt>Cabang</dt>
+                  <dt>Lokasi</dt>
                   <dd data-summary-branches>4–10</dd>
                 </div>
                 <div>
@@ -377,7 +409,7 @@
       </div>
     </div>
 
-    <script src="./script.js"></script>
-    <script src="./onboarding.js"></script>
+    <script src="./script.js?v=onb-20260808"></script>
+    <script src="./onboarding.js?v=onb-20260808"></script>
   </body>
 </html>

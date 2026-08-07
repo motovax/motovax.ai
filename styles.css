@@ -18254,6 +18254,12 @@ body.feature-image-open { overflow: hidden; }
   gap: 14px;
 }
 
+/* display:grid di atas menimpa UA [hidden]; wajib force-hide */
+.onboarding-form[hidden],
+.onboarding-step[hidden] {
+  display: none !important;
+}
+
 .onboarding-form label {
   display: grid;
   gap: 6px;

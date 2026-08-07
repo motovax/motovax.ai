@@ -3,10 +3,11 @@
 
   var STORAGE_KEY = "motovax_onboarding_v1";
   var INDUSTRY_LABELS = {
-    automotive: "Otomotif / Dealer",
+    general: "Umum / Lainnya",
+    automotive: "Otomotif",
     property: "Properti",
     retail: "Retail",
-    other: "Lainnya",
+    other: "Umum / Lainnya", // legacy localStorage
   };
   var MODULE_LABELS = {
     ims: "Inventory",
@@ -20,7 +21,11 @@
     conversion: "Tingkatkan konversi",
     response: "Percepat respon lead",
     inventory: "Kontrol stok & aging",
-    scale: "Scale multi-cabang",
+    scale: "Scale multi-lokasi",
+  };
+  var AUTH_LEAD = {
+    signup: "Gunakan email kerja Anda. Mode demo — tidak mengirim email verifikasi nyata.",
+    login: "Masuk dengan email yang sudah terdaftar. Mode demo — terima kredensial apa pun.",
   };
   var DEMO_ANCHORS = {
     ims: "#inventoryDemo",
@@ -50,7 +55,7 @@
         businessName: "",
         branchCount: "4-10",
         region: "",
-        industry: "automotive",
+        industry: "general",
         description: "",
       },
       modules: ["ims", "omni", "crm"],
@@ -189,13 +194,30 @@
 
   OnboardingApp.prototype.setAuthMode = function (mode) {
     this.state.authMode = mode === "login" ? "login" : "signup";
+    var isLogin = this.state.authMode === "login";
+
     this.authTabs.forEach(function (tab) {
       var active = tab.getAttribute("data-auth-mode") === this.state.authMode;
       tab.classList.toggle("is-active", active);
       tab.setAttribute("aria-selected", active ? "true" : "false");
+      tab.setAttribute("tabindex", active ? "0" : "-1");
     }, this);
-    if (this.signupForm) this.signupForm.hidden = this.state.authMode !== "signup";
-    if (this.loginForm) this.loginForm.hidden = this.state.authMode !== "login";
+
+    // Pakai hidden + display agar UI pasti berganti (display:grid menimpa UA [hidden])
+    if (this.signupForm) {
+      this.signupForm.hidden = isLogin;
+      this.signupForm.style.display = isLogin ? "none" : "";
+      this.signupForm.setAttribute("aria-hidden", isLogin ? "true" : "false");
+    }
+    if (this.loginForm) {
+      this.loginForm.hidden = !isLogin;
+      this.loginForm.style.display = isLogin ? "" : "none";
+      this.loginForm.setAttribute("aria-hidden", isLogin ? "false" : "true");
+    }
+
+    var lead = qs("[data-auth-lead]");
+    if (lead) lead.textContent = AUTH_LEAD[this.state.authMode] || AUTH_LEAD.signup;
+
     this.clearErrors();
     saveState(this.state);
   };
@@ -260,7 +282,7 @@
     this.state.account = { fullName: fullName, email: email, password: password };
     this.state.authMode = "signup";
     saveState(this.state);
-    this.showToast("Akun demo dibuat", "Lanjut isi profil bisnis dealer.");
+    this.showToast("Akun demo dibuat", "Lanjut isi profil bisnis Anda.");
     this.goTo(2);
   };
 
@@ -315,7 +337,7 @@
     var description = String(fd.get("description") || "").trim();
 
     if (businessName.length < 2) {
-      this.showError(form, "Nama dealer / brand wajib diisi.");
+      this.showError(form, "Nama bisnis / brand wajib diisi.");
       return;
     }
     if (region.length < 2) {
@@ -323,11 +345,13 @@
       return;
     }
 
+    var industry = this.state.business.industry || "general";
+    if (industry === "other") industry = "general";
     this.state.business = {
       businessName: businessName,
       branchCount: branchCount,
       region: region,
-      industry: this.state.business.industry || "automotive",
+      industry: industry,
       description: description,
     };
     saveState(this.state);
@@ -373,7 +397,9 @@
       if (this.businessForm.description) this.businessForm.description.value = biz.description || "";
     }
 
-    this.selectIndustry(biz.industry || "automotive");
+    var industry = biz.industry || "general";
+    if (industry === "other") industry = "general";
+    this.selectIndustry(industry);
     this.selectGoal(this.state.goal || "conversion");
     this.setAuthMode(this.state.authMode || "signup");
 
@@ -397,14 +423,14 @@
     var goalEl = qs("[data-summary-goal]");
     var modulesEl = qs("[data-summary-modules]");
 
-    if (nameEl) nameEl.textContent = biz.businessName || "Dealer Anda";
+    if (nameEl) nameEl.textContent = biz.businessName || "Bisnis Anda";
     if (userEl) {
       userEl.textContent = acc.fullName
         ? acc.fullName + " · " + (acc.email || "")
         : acc.email || "Siap masuk sebagai user demo";
     }
-    if (industryEl) industryEl.textContent = INDUSTRY_LABELS[biz.industry] || INDUSTRY_LABELS.automotive;
-    if (branchesEl) branchesEl.textContent = (biz.branchCount || "—") + " cabang";
+    if (industryEl) industryEl.textContent = INDUSTRY_LABELS[biz.industry] || INDUSTRY_LABELS.general;
+    if (branchesEl) branchesEl.textContent = (biz.branchCount || "—") + " lokasi";
     if (regionEl) regionEl.textContent = biz.region || "—";
     if (goalEl) goalEl.textContent = GOAL_LABELS[this.state.goal] || GOAL_LABELS.conversion;
 
@@ -469,8 +495,16 @@
     }, 3200);
   };
 
-  document.addEventListener("DOMContentLoaded", function () {
+  function bootOnboarding() {
     if (!qs("[data-step]")) return;
+    if (window.motovaxOnboarding) return;
     window.motovaxOnboarding = new OnboardingApp();
-  });
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", bootOnboarding);
+  } else {
+    bootOnboarding();
+  }
 })();
+
