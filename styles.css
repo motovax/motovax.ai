@@ -17959,3 +17959,402 @@ body.feature-image-open { overflow: hidden; }
     padding-block: 17px;
   }
 }
+
+/* Hero Automasi Workflow — komposisi khusus mengikuti referensi campaign. */
+.workflow-reference-hero {
+  min-height: min(900px, calc(100vh - 76px));
+  padding: 62px 0 72px;
+  border-bottom: 0;
+  background:
+    radial-gradient(circle at 79% 17%, rgba(115, 91, 241, 0.16), transparent 34%),
+    radial-gradient(circle at 70% 92%, rgba(151, 114, 255, 0.12), transparent 30%),
+    linear-gradient(145deg, #ffffff 0%, #fbfbff 58%, #f6f3ff 100%);
+}
+
+.workflow-reference-hero::before {
+  opacity: 0.18;
+  background-image:
+    linear-gradient(rgba(102, 84, 226, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(102, 84, 226, 0.05) 1px, transparent 1px);
+  background-size: 64px 64px;
+}
+
+.workflow-reference-hero .feature-breadcrumb {
+  display: none;
+}
+
+.workflow-reference-hero .feature-hero-grid {
+  grid-template-columns: minmax(380px, 0.72fr) minmax(620px, 1.28fr);
+  gap: clamp(30px, 3.5vw, 58px);
+  align-items: start;
+}
+
+.workflow-reference-hero .feature-hero-copy {
+  position: relative;
+  z-index: 4;
+}
+
+.workflow-reference-hero .feature-hero-badges {
+  margin-bottom: 22px;
+}
+
+.workflow-reference-hero .feature-badge {
+  border-color: #ddd7ff;
+  background: #f4f1ff;
+  color: #6250d8;
+}
+
+.workflow-reference-hero .feature-badge.partial {
+  border-color: #e5dcff;
+  background: rgba(255, 255, 255, 0.82);
+  color: #7457ce;
+}
+
+.workflow-reference-hero h1 {
+  max-width: 590px;
+  margin-bottom: 22px;
+  color: #111c34;
+  font-size: clamp(44px, 4.25vw, 62px);
+  line-height: 1.08;
+  letter-spacing: -0.052em;
+}
+
+.workflow-hero-title-accent {
+  display: block;
+  margin-top: 8px;
+  color: #6954e8;
+  background: linear-gradient(100deg, #7054e8 0%, #514dcc 54%, #7a65f0 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.workflow-reference-hero .feature-hero-desc {
+  max-width: 570px;
+  margin-bottom: 26px;
+  color: #53617a;
+  font-size: 17px;
+  line-height: 1.72;
+}
+
+.workflow-hero-benefits {
+  display: grid;
+  gap: 13px;
+  max-width: 585px;
+  margin: 0 0 30px;
+  padding: 0;
+  list-style: none;
+}
+
+.workflow-hero-benefits li {
+  display: grid;
+  grid-template-columns: 52px minmax(0, 1fr);
+  gap: 15px;
+  align-items: center;
+  padding: 13px 16px 13px 13px;
+  border: 1px solid rgba(221, 217, 244, 0.78);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.76);
+  box-shadow: 0 12px 32px rgba(69, 56, 141, 0.06);
+  backdrop-filter: blur(12px);
+}
+
+.workflow-hero-benefit-icon {
+  display: grid;
+  width: 52px;
+  height: 52px;
+  place-items: center;
+  border-radius: 15px;
+  color: #6753df;
+  background: linear-gradient(145deg, #f1edff, #e5e0ff);
+}
+
+.workflow-hero-benefit-icon svg {
+  width: 25px;
+  height: 25px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.workflow-hero-benefits li > span:last-child {
+  display: grid;
+  gap: 4px;
+}
+
+.workflow-hero-benefits strong {
+  color: #172238;
+  font-size: 14px;
+  letter-spacing: -0.01em;
+}
+
+.workflow-hero-benefits small {
+  color: #657289;
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.workflow-reference-hero .feature-hero-actions {
+  align-items: center;
+  gap: 20px;
+}
+
+.workflow-reference-hero .feature-hero-actions .btn-primary {
+  border-color: #654ee3;
+  background: linear-gradient(105deg, #6d4ee6, #5143d3);
+  box-shadow: 0 16px 34px rgba(88, 66, 212, 0.25);
+}
+
+.workflow-hero-learn {
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+  color: #344158;
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.workflow-hero-learn:hover,
+.workflow-hero-learn:focus-visible {
+  color: #5d48d9;
+}
+
+.workflow-reference-hero .feature-product-preview {
+  isolation: isolate;
+  margin-right: -4vw;
+  padding: 0 0 88px;
+}
+
+.workflow-reference-hero .feature-product-visual::before {
+  inset: 2% -4% 9% 7%;
+  border-radius: 42px;
+  background:
+    radial-gradient(circle at 82% 20%, rgba(111, 84, 235, 0.22), transparent 34%),
+    linear-gradient(145deg, rgba(237, 232, 255, 0.96), rgba(255, 255, 255, 0.3));
+  transform: rotate(-1.4deg);
+}
+
+.workflow-reference-hero .feature-preview-window {
+  overflow: hidden;
+  border-color: rgba(135, 122, 211, 0.28);
+  border-radius: 24px;
+  box-shadow: 0 38px 90px rgba(45, 38, 99, 0.2), 0 10px 30px rgba(75, 62, 159, 0.11);
+}
+
+.workflow-reference-hero .feature-preview-topbar,
+.workflow-reference-hero .feature-preview-window figcaption {
+  display: none;
+}
+
+.workflow-reference-hero .feature-preview-image-shell {
+  border-radius: inherit;
+}
+
+.workflow-hero-visual-flow {
+  position: absolute;
+  z-index: 5;
+  bottom: 4px;
+  left: -34px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  width: min(68%, 520px);
+  padding: 15px;
+  border: 1px solid rgba(224, 218, 249, 0.9);
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 22px 50px rgba(74, 59, 151, 0.16);
+  backdrop-filter: blur(15px);
+}
+
+.workflow-hero-visual-flow > span {
+  display: grid;
+  grid-template-columns: 28px 1fr;
+  gap: 8px;
+  align-items: center;
+  min-width: 0;
+  padding: 5px 9px;
+  border-right: 1px solid #ece9f8;
+}
+
+.workflow-hero-visual-flow > span:last-child {
+  border-right: 0;
+}
+
+.workflow-hero-visual-flow i {
+  display: grid;
+  width: 28px;
+  height: 28px;
+  place-items: center;
+  border-radius: 9px;
+  color: #634edb;
+  background: #eeeaff;
+  font-size: 10px;
+  font-style: normal;
+  font-weight: 800;
+}
+
+.workflow-hero-visual-flow b {
+  overflow: hidden;
+  color: #26344c;
+  font-size: 10px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.workflow-hero-ai-node {
+  position: absolute;
+  z-index: 6;
+  right: 9%;
+  bottom: 38px;
+  display: grid;
+  width: 52px;
+  height: 52px;
+  place-items: center;
+  border: 7px solid rgba(255, 255, 255, 0.92);
+  border-radius: 50%;
+  color: #fff;
+  background: linear-gradient(145deg, #7b61ee, #4f46cf);
+  box-shadow: 0 14px 30px rgba(88, 67, 205, 0.32);
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.workflow-reference-hero + .feature-proof-strip {
+  display: none;
+}
+
+@media (max-width: 1180px) {
+  .workflow-reference-hero .feature-hero-grid {
+    grid-template-columns: minmax(350px, 0.8fr) minmax(530px, 1.2fr);
+    gap: 28px;
+  }
+
+  .workflow-reference-hero h1 {
+    font-size: 44px;
+  }
+
+  .workflow-reference-hero .feature-product-preview {
+    margin-right: -2vw;
+  }
+}
+
+@media (max-width: 980px) {
+  .workflow-reference-hero {
+    min-height: 0;
+    padding: 58px 0 72px;
+  }
+
+  .workflow-reference-hero .feature-hero-grid {
+    grid-template-columns: 1fr;
+    gap: 38px;
+  }
+
+  .workflow-reference-hero h1,
+  .workflow-reference-hero .feature-hero-desc,
+  .workflow-hero-benefits {
+    max-width: 780px;
+  }
+
+  .workflow-hero-benefits {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .workflow-hero-benefits li {
+    grid-template-columns: 42px 1fr;
+    padding: 12px;
+  }
+
+  .workflow-hero-benefit-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+  }
+
+  .workflow-hero-benefit-icon svg {
+    width: 21px;
+    height: 21px;
+  }
+
+  .workflow-hero-benefits small {
+    font-size: 11px;
+  }
+
+  .workflow-reference-hero .feature-product-preview {
+    margin-right: 0;
+  }
+
+  .workflow-hero-visual-flow {
+    left: 20px;
+  }
+}
+
+@media (max-width: 680px) {
+  .workflow-reference-hero {
+    padding: 48px 0 54px;
+  }
+
+  .workflow-reference-hero .feature-hero-badges {
+    margin-bottom: 18px;
+  }
+
+  .workflow-reference-hero h1 {
+    margin-bottom: 18px;
+    font-size: clamp(36px, 10.4vw, 43px);
+    line-height: 1.09;
+  }
+
+  .workflow-reference-hero .feature-hero-desc {
+    margin-bottom: 22px;
+    font-size: 15px;
+    line-height: 1.65;
+  }
+
+  .workflow-hero-benefits {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .workflow-hero-benefits li {
+    grid-template-columns: 44px minmax(0, 1fr);
+  }
+
+  .workflow-hero-benefit-icon {
+    width: 44px;
+    height: 44px;
+  }
+
+  .workflow-hero-benefits small {
+    font-size: 11.5px;
+  }
+
+  .workflow-reference-hero .feature-hero-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .workflow-reference-hero .feature-hero-actions .btn-primary {
+    width: 100%;
+  }
+
+  .workflow-hero-learn {
+    justify-content: center;
+    min-height: 42px;
+  }
+
+  .workflow-reference-hero .feature-product-preview {
+    padding: 4px 0 12px;
+  }
+
+  .workflow-hero-visual-flow,
+  .workflow-hero-ai-node {
+    display: none;
+  }
+
+  .workflow-reference-hero .feature-preview-window {
+    border-radius: 16px;
+  }
+}
