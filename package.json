@@ -4,6 +4,12 @@
   "private": true,
   "scripts": {
     "dev": "python -m http.server 5179",
-    "start": "python -m http.server 5179"
+    "start": "python -m http.server 5179",
+    "generate:feature-images": "node scripts/generate-feature-image-variants.mjs",
+    "generate:fitur": "node scripts/generate-fitur-pages.mjs",
+    "generate:solusi": "node scripts/generate-solusi-pages.mjs"
+  },
+  "devDependencies": {
+    "sharp": "^0.35.3"
   }
 }

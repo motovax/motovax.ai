@@ -13,6 +13,747 @@ for (const link of document.querySelectorAll("[data-wa]")) {
   }
 }
 
+const contactForm = document.querySelector("[data-contact-form]");
+if (contactForm instanceof HTMLFormElement) {
+  contactForm.addEventListener("submit", (event) => {
+    event.preventDefault();
+    if (!contactForm.reportValidity()) return;
+
+    const data = new FormData(contactForm);
+    const value = (name) => String(data.get(name) || "").trim();
+    const message = [
+      "Halo MOTOVAX, saya ingin berkonsultasi.",
+      "",
+      `Nama: ${value("name")}`,
+      `Perusahaan/dealer: ${value("company")}`,
+      `Email: ${value("email")}`,
+      `Nomor WhatsApp: ${value("phone")}`,
+      `Kebutuhan: ${value("need")}`,
+      value("message") ? `Detail: ${value("message")}` : "",
+    ]
+      .filter(Boolean)
+      .join("\n");
+
+    window.open(`https://wa.me/6281999197186?text=${encodeURIComponent(message)}`, "_blank", "noopener,noreferrer");
+  });
+}
+
+/**
+ * Mega menu Produk — katalog kapabilitas dan suite Motovax.
+ * Link diarahkan ke halaman detail fitur terkait.
+ */
+(function initProdukMegaMenu() {
+  const menus = document.querySelectorAll("[data-produk-menu]");
+  if (!menus.length) return;
+
+  const path = location.pathname.replace(/\/+$/, "") || "/";
+  const inNestedDir = path.includes("/fitur/") || path.includes("/solusi/") || /\/(fitur|solusi)$/.test(path);
+  const isStandaloneRoot = path.endsWith("modul.html") || path.endsWith("hubungi-kami.html");
+  const rootPrefix = inNestedDir ? "../" : "./";
+  const fiturPrefix = inNestedDir ? "../fitur/" : "./fitur/";
+  const home = inNestedDir ? "../index.html#" : isStandaloneRoot ? "./index.html#" : "#";
+  const modul = `${rootPrefix}modul.html`;
+  const f = (slug) => `${fiturPrefix}${slug}.html`;
+
+  const icon = (paths, viewBox = "0 0 24 24") =>
+    `<svg viewBox="${viewBox}" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${paths}</svg>`;
+
+  const I = {
+    chat: icon('<path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"/>'),
+    ig: icon('<rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/>'),
+    fb: icon('<circle cx="12" cy="12" r="9"/><path d="M14.5 7.5h-1.2c-1.2 0-1.8.7-1.8 1.8V20M9 12.5h6"/>'),
+    shop: icon('<path d="M4 7h16l-1.2 12.2A2 2 0 0 1 16.8 21H7.2a2 2 0 0 1-2-1.8L4 7z"/><path d="M8 7V5a4 4 0 0 1 8 0v2"/>'),
+    live: icon('<path d="M8 10h.01M12 10h.01M16 10h.01"/><path d="M21 12a9 9 0 1 1-9-9"/><path d="M21 3v6h-6"/>'),
+    ticket: icon('<path d="M4 9V7a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v2a2 2 0 0 0 0 4v2a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-2a2 2 0 0 0 0-4z"/>'),
+    crm: icon('<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>'),
+    deal: icon('<path d="M12 3v18M8 7h7a3 3 0 0 1 0 6H9a3 3 0 0 0 0 6h8"/>'),
+    contact: icon('<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>'),
+    goal: icon('<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1" fill="currentColor"/>'),
+    gps: icon('<path d="M12 21s-7-4.5-7-10a7 7 0 1 1 14 0c0 5.5-7 10-7 10z"/><circle cx="12" cy="11" r="2.5"/>'),
+    report: icon('<path d="M4 19V9m8 10V5m8 14v-7M2 19h20"/>'),
+    wa: icon('<path d="M20.5 11.5a8.5 8.5 0 0 1-12.7 7.4L4 20l1.2-3.6A8.5 8.5 0 1 1 20.5 11.5z"/><path d="M9.2 9.6c.2-.5.4-.5.7-.5h.5c.2 0 .4 0 .5.4l.7 1.7c.1.2 0 .4-.1.6l-.4.5c-.1.1-.2.3 0 .5.3.4 1 1.1 2 1.7 1 .6 1.4.5 1.7.4l.6-.3c.2-.1.4 0 .5.1l1.1 1.3c.1.2.2.4 0 .6-.3.4-1.2.9-1.8.9-.5 0-1.3 0-2.6-.6-1.6-.7-2.8-2.2-3.2-2.7-.4-.5-1.1-1.5-1.1-2.5 0-1 .5-1.5.7-1.7z"/>'),
+    verify: icon('<path d="M12 3 4.5 6.5v5.2c0 4.5 3.1 7.8 7.5 9.3 4.4-1.5 7.5-4.8 7.5-9.3V6.5L12 3z"/><path d="m9 12 2 2 4-4"/>'),
+    blast: icon('<path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4 20-7z"/>'),
+    ads: icon('<path d="M4 12v8a1 1 0 0 0 1 1h3v-9z"/><path d="M12 5v16h3a1 1 0 0 0 1-1V9z"/><path d="M20 9v11a1 1 0 0 0 1 1h0"/>'),
+    call: icon('<path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6 19.8 19.8 0 0 1-3.1-8.7A2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.6a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.5-1.2a2 2 0 0 1 2.1-.4c.8.3 1.7.6 2.6.7a2 2 0 0 1 1.7 2z"/>'),
+    bulk: icon('<path d="M17 8h4v12H7v-4"/><path d="M3 4h14v12H3z"/>'),
+    flow: icon('<rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="8.5" y="14" width="7" height="7" rx="1.5"/><path d="M10 6.5h4M12 10v4"/>'),
+    cs: icon('<path d="M12 2a7 7 0 0 0-7 7v3a3 3 0 0 0 3 3h1V9a5 5 0 0 1 10 0v6h-1a3 3 0 0 0-2.8 2"/><path d="M12 19a2 2 0 0 0 2 2h1"/>'),
+    sla: icon('<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>'),
+    score: icon('<path d="M12 17.3 6.2 20.5l1.1-6.5L2.5 9.5l6.6-1L12 2.5l2.9 6 6.6 1-4.8 4.5 1.1 6.5z"/>'),
+    bot: icon('<rect x="5" y="8" width="14" height="11" rx="3"/><path d="M9 13h.01M15 13h.01M9 17h6M12 8V5"/><path d="M8 5h8"/>'),
+    agent: icon('<path d="M12 3 4 7v5c0 5 3.5 8.5 8 10 4.5-1.5 8-5 8-10V7l-8-4z"/><path d="M9.5 12.5 11 14l3.5-3.5"/>'),
+    ai: icon('<path d="m12 3 1.4 4.1L18 8.5l-4.6 1.4L12 14l-1.4-4.1L6 8.5l4.6-1.4L12 3z"/><path d="m19 13 .8 2.2L22 16l-2.2.8L19 19l-.8-2.2L16 16l2.2-.8L19 13z"/>'),
+    kb: icon('<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>'),
+    workflow: icon('<circle cx="6" cy="6" r="2.5"/><circle cx="18" cy="6" r="2.5"/><circle cx="12" cy="18" r="2.5"/><path d="M8.5 6h7M6 8.5v4.2A3 3 0 0 0 9 15.7h0M18 8.5v4.2A3 3 0 0 1 15 15.7h0M9 15.7h6"/>'),
+    suite: icon('<rect x="3" y="3" width="8" height="8" rx="1.5"/><rect x="13" y="3" width="8" height="8" rx="1.5"/><rect x="3" y="13" width="8" height="8" rx="1.5"/><rect x="13" y="13" width="8" height="8" rx="1.5"/>'),
+  };
+
+  /** Produk modular yang ditawarkan pada halaman Harga. */
+  const groups = [
+    {
+      id: "produk",
+      title: "Produk",
+      items: [
+        {
+          id: "core-platform",
+          label: "Core Platform",
+          paneTitle: "Core — Platform Integrasi Agentic AI",
+          demo: { id: "whatsapp", hash: "capabilityDemo", context: "core-platform", label: "Lihat Fondasi Platform" },
+          features: [
+            { title: "Core Platform Agentic AI", desc: "Fondasi multi-tenant, akses berbasis peran, integrasi, dashboard, dan konfigurasi modul", icon: "suite", href: f("core-platform-agentic-ai") },
+          ],
+        },
+        {
+          id: "crm",
+          label: "CRM",
+          paneTitle: "CRM",
+          demo: { id: "crm", hash: "crmDemo", context: "crm", label: "Coba CRM" },
+          features: [
+            { title: "Lead / Customer List", desc: "Data lead dan customer terpusat dengan riwayat interaksi serta unit yang diminati", icon: "contact", href: f("manajemen-kontak") },
+            { title: "Pipeline & Customer Journey", desc: "Pantau perjalanan customer dan progres deal dari lead masuk hingga closing", icon: "deal", href: f("manajemen-deal") },
+            { title: "Analytics", desc: "Ukur performa sales, conversion, channel, dan hasil pipeline CRM", icon: "report", href: f("personalisasi-report-sales") },
+            { title: "Auto Follow Up", desc: "Aktifkan tindak lanjut customer terjadwal sebagai add-on CRM", icon: "workflow", href: f("automasi-workflow"), badge: "Add-on" },
+          ],
+        },
+        {
+          id: "omni-jasmine",
+          label: "Omni + Jasmine AI",
+          paneTitle: "Omni + Jasmine AI",
+          demo: { id: "omni", hash: "omniDemo", context: "omnichannel", label: "Coba Omnichannel" },
+          features: [
+            { title: "WhatsApp, Instagram & Facebook", desc: "Satukan chat pelanggan dari tiga channel dalam satu inbox Call Center", icon: "chat", href: f("omni-jasmine-ai") },
+            { title: "Omni analytic", desc: "Pantau journey lead, performa channel, respons, dan hasil penanganan tim", icon: "report", href: f("omni-jasmine-ai") },
+            { title: "Custom aksi cepat", desc: "Jalankan cek inventori, simulasi kredit, dan aksi operasional dari percakapan", icon: "workflow", href: f("omni-jasmine-ai") },
+            { title: "3 funneling & 1 auto routing", desc: "Kelola alur Jasmine AI, Call Center, dan MR dengan routing otomatis", icon: "flow", href: f("omni-jasmine-ai") },
+            { title: "AI 500 credit", desc: "Gunakan 500 kredit AI untuk respons dan dukungan percakapan Jasmine", icon: "ai", href: f("omni-jasmine-ai") },
+          ],
+        },
+        {
+          id: "inventory-falcon",
+          label: "Inventory + Falcon AI",
+          paneTitle: "Inventory + Falcon AI",
+          demo: { id: "inventory", hash: "inventoryDemo", context: "inventory", label: "Coba Inventory" },
+          features: [
+            { title: "Item / listing multi cabang", desc: "Kelola item dan listing dari seluruh cabang dalam satu inventori", icon: "shop", href: f("inventory-falcon-ai") },
+            { title: "Import listing via WhatsApp", desc: "Tambahkan data listing melalui alur WhatsApp yang terhubung ke inventori", icon: "wa", href: f("inventory-falcon-ai") },
+            { title: "Custom tagging / status & filter slicing", desc: "Atur tag, status, dan filter untuk menemukan kelompok stok yang dibutuhkan", icon: "ticket", href: f("inventory-falcon-ai") },
+            { title: "Falcon AI: searching, kirim foto & rekomendasi otomatis", desc: "Cari unit, kirim foto, dan rekomendasikan alternatif secara otomatis", icon: "ai", href: f("inventory-falcon-ai") },
+            { title: "Live katalog API", desc: "Hubungkan stok aktif ke katalog dan aplikasi eksternal melalui API", icon: "live", href: f("inventory-falcon-ai") },
+            { title: "AI 500 credit", desc: "Gunakan 500 kredit AI untuk pencarian dan bantuan operasional Falcon", icon: "ai", href: f("inventory-falcon-ai") },
+          ],
+        },
+        {
+          id: "ana-analytics",
+          label: "Ana AI Analytics",
+          paneTitle: "Ana AI — Advanced Analytics",
+          demo: { id: "dashboard", hash: "dashboardDemo", context: "analytics", label: "Lihat Analytics" },
+          features: [
+            { title: "Analitik operasional", desc: "Pantau aktivitas, produktivitas, dan indikator utama operasional bisnis", icon: "report", href: f("ana-ai-analytics") },
+            { title: "Analitik financial", desc: "Baca revenue, biaya, HPP, gross profit, dan tren finansial", icon: "deal", href: f("ana-ai-analytics") },
+            { title: "Analitik sales performance", desc: "Bandingkan performa sales, cabang, channel, dan hasil konversi", icon: "score", href: f("ana-ai-analytics") },
+            { title: "Additional custom analytic", desc: "Tambahkan analitik khusus sesuai KPI dan kebutuhan manajemen", icon: "workflow", href: f("ana-ai-analytics") },
+          ],
+        },
+        {
+          id: "social-sora",
+          label: "Social Media + Sora AI",
+          paneTitle: "Social Media + Sora AI",
+          demo: { id: "social", hash: "socialDemo", context: "social", label: "Coba Social Studio" },
+          features: [
+            { title: "Content studio", desc: "Susun materi promosi dan caption dari data produk dalam satu workspace", icon: "shop", href: f("social-media-sora-ai") },
+            { title: "Sora AI upscale & background edit", desc: "Tingkatkan kualitas visual dan edit latar gambar dengan bantuan AI", icon: "ai", href: f("social-media-sora-ai") },
+            { title: "Publish ke Facebook, Instagram & WhatsApp", desc: "Publikasikan konten ke channel sosial yang aktif dari satu alur", icon: "blast", href: f("social-media-sora-ai") },
+            { title: "Scheduler", desc: "Jadwalkan konten agar tayang sesuai kalender campaign", icon: "sla", href: f("social-media-sora-ai") },
+            { title: "Meta ads manager", desc: "Kelola campaign Meta dan lead template WhatsApp dari Social Studio", icon: "ads", href: f("social-media-sora-ai") },
+            { title: "Meta ads analytic by Sora", desc: "Pantau performa iklan dan insight campaign dengan bantuan AI", icon: "report", href: f("social-media-sora-ai") },
+            { title: "AI 500 credit", desc: "Gunakan 500 kredit AI untuk pembuatan dan pengolahan konten", icon: "ai", href: f("social-media-sora-ai") },
+          ],
+        },
+      ],
+    },
+  ];
+
+  const allPanes = groups.flatMap((g) => g.items);
+  const firstPaneId = allPanes[0]?.id || "core-platform";
+
+  function renderMenuHtml() {
+    const firstGroupId = groups[0]?.id || "produk";
+
+    const tabs = groups.length > 1 ? `
+      <div class="produk-mega-tabs" role="tablist" aria-label="Kapabilitas dan Suite Motovax">
+        <div class="produk-mega-tabs-inner">
+          ${groups
+            .map(
+              (group) => `
+            <button
+              type="button"
+              class="produk-mega-tab${group.id === firstGroupId ? " is-active" : ""}"
+              role="tab"
+              id="produk-tab-${group.id}"
+              aria-selected="${group.id === firstGroupId ? "true" : "false"}"
+              aria-controls="produk-group-${group.id}"
+              data-produk-tab="${group.id}"
+            >${group.title}</button>`
+            )
+            .join("")}
+        </div>
+      </div>` : "";
+
+    const sidebar = groups
+      .map((group) => {
+        const isActiveGroup = group.id === firstGroupId;
+        const activePaneId = isActiveGroup ? firstPaneId : group.items[0]?.id;
+        return `
+        <div
+          class="produk-mega-group${isActiveGroup ? " is-active" : ""}"
+          id="produk-group-${group.id}"
+          role="tabpanel"
+          aria-labelledby="produk-tab-${group.id}"
+          data-produk-group="${group.id}"
+          ${isActiveGroup ? "" : "hidden"}
+        >
+          <div class="produk-mega-group-title">${group.title}</div>
+          ${group.items
+            .map(
+              (item) => `
+            <button type="button" class="produk-mega-nav-btn${item.id === activePaneId && isActiveGroup ? " is-active" : ""}" data-produk-pane="${item.id}" data-produk-pane-group="${group.id}" aria-selected="${item.id === activePaneId && isActiveGroup ? "true" : "false"}">
+              <span>${item.label}</span>
+              <svg class="chev" width="16" height="16" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M8.334 5 13.334 10l-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>`
+            )
+            .join("")}
+        </div>`;
+      })
+      .join("");
+
+    const panes = allPanes
+      .map((item) => {
+        const demoHref = item.demo
+          ? `${rootPrefix}index.html?demo=${item.demo.id}&from=${encodeURIComponent(item.demo.context || item.id)}#${item.demo.hash}`
+          : "";
+        const demoCta = item.demo
+          ? `<a href="${demoHref}" class="produk-mega-demo-button" data-open-${item.demo.id}-demo data-demo-context="${item.demo.context || item.id}" data-produk-close>
+              ${item.demo.label}
+              <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </a>`
+          : "";
+        const features = item.features
+          .map((feat) => {
+            const badge = feat.badge ? ` <span class="badge-new">${feat.badge}</span>` : "";
+            return `
+              <a href="${feat.href}" class="produk-mega-item" data-produk-close>
+                <span class="produk-mega-icon">${I[feat.icon] || I.chat}</span>
+                <span class="produk-mega-meta">
+                  <span class="produk-mega-item-title">${feat.title}${badge}</span>
+                  <span class="produk-mega-item-desc">${feat.desc}</span>
+                </span>
+              </a>`;
+          })
+          .join("");
+
+        return `
+          <div class="produk-mega-pane${item.id === firstPaneId ? " is-active" : ""}" data-produk-pane-panel="${item.id}" ${item.id === firstPaneId ? "" : "hidden"}>
+            <div class="produk-mega-pane-heading">
+              <h3 class="produk-mega-pane-title">${item.paneTitle}</h3>
+              ${demoCta}
+            </div>
+            <div class="produk-mega-items">${features}</div>
+          </div>`;
+      })
+      .join("");
+
+    return `
+      ${tabs}
+      <div class="produk-mega-layout">
+        <aside class="produk-mega-sidebar" aria-label="Kategori produk">${sidebar}</aside>
+        <div class="produk-mega-content">${panes}</div>
+      </div>`;
+  }
+
+  let scrim = document.querySelector("[data-produk-scrim]");
+  if (!scrim) {
+    scrim = document.createElement("div");
+    scrim.className = "produk-mega-scrim";
+    scrim.hidden = true;
+    scrim.setAttribute("data-produk-scrim", "");
+    document.body.appendChild(scrim);
+  }
+
+  for (const menu of menus) {
+    const panel = menu.querySelector("[data-produk-mount], [data-produk-panel]");
+    if (panel && !panel.dataset.built) {
+      panel.innerHTML = renderMenuHtml();
+      panel.dataset.built = "1";
+    }
+  }
+
+  const closeAll = (except = null) => {
+    for (const menu of menus) {
+      if (menu === except) continue;
+      menu.classList.remove("is-open");
+      const trigger = menu.querySelector("[data-produk-trigger]");
+      const panel = menu.querySelector("[data-produk-panel]");
+      if (trigger) trigger.setAttribute("aria-expanded", "false");
+      if (panel) panel.hidden = true;
+    }
+    if (!except) {
+      scrim.hidden = true;
+      document.body.classList.remove("produk-menu-open");
+    }
+  };
+
+  const openMenu = (menu) => {
+    closeAll(menu);
+    menu.classList.add("is-open");
+    const trigger = menu.querySelector("[data-produk-trigger]");
+    const panel = menu.querySelector("[data-produk-panel]");
+    if (trigger) trigger.setAttribute("aria-expanded", "true");
+    if (panel) panel.hidden = false;
+    scrim.hidden = false;
+    document.body.classList.add("produk-menu-open");
+    document.dispatchEvent(new CustomEvent("motovax:nav-menu-open", { detail: { source: "produk" } }));
+  };
+
+  const closeMenu = (menu) => {
+    menu.classList.remove("is-open");
+    const trigger = menu.querySelector("[data-produk-trigger]");
+    const panel = menu.querySelector("[data-produk-panel]");
+    if (trigger) trigger.setAttribute("aria-expanded", "false");
+    if (panel) panel.hidden = true;
+    scrim.hidden = true;
+    document.body.classList.remove("produk-menu-open");
+  };
+
+  const setActivePane = (menu, paneId) => {
+    for (const btn of menu.querySelectorAll("[data-produk-pane]")) {
+      const on = btn.getAttribute("data-produk-pane") === paneId;
+      btn.classList.toggle("is-active", on);
+      btn.setAttribute("aria-selected", on ? "true" : "false");
+    }
+    for (const pane of menu.querySelectorAll("[data-produk-pane-panel]")) {
+      const on = pane.getAttribute("data-produk-pane-panel") === paneId;
+      pane.classList.toggle("is-active", on);
+      pane.hidden = !on;
+    }
+  };
+
+  const setActiveTab = (menu, groupId) => {
+    const group = groups.find((g) => g.id === groupId) || groups[0];
+    if (!group) return;
+
+    for (const tab of menu.querySelectorAll("[data-produk-tab]")) {
+      const on = tab.getAttribute("data-produk-tab") === group.id;
+      tab.classList.toggle("is-active", on);
+      tab.setAttribute("aria-selected", on ? "true" : "false");
+    }
+
+    for (const panel of menu.querySelectorAll("[data-produk-group]")) {
+      const on = panel.getAttribute("data-produk-group") === group.id;
+      panel.classList.toggle("is-active", on);
+      panel.hidden = !on;
+    }
+
+    const activeInGroup = menu.querySelector(
+      `[data-produk-group="${group.id}"] [data-produk-pane].is-active`
+    );
+    const paneId =
+      activeInGroup?.getAttribute("data-produk-pane") || group.items[0]?.id || firstPaneId;
+    setActivePane(menu, paneId);
+  };
+
+  for (const menu of menus) {
+    const trigger = menu.querySelector("[data-produk-trigger]");
+    if (!trigger) continue;
+
+    trigger.addEventListener("click", (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      if (menu.classList.contains("is-open")) closeMenu(menu);
+      else openMenu(menu);
+    });
+
+    menu.addEventListener("click", (event) => {
+      const target = event.target;
+      if (!(target instanceof Element)) return;
+
+      const tabBtn = target.closest("[data-produk-tab]");
+      if (tabBtn && menu.contains(tabBtn)) {
+        event.preventDefault();
+        event.stopPropagation();
+        setActiveTab(menu, tabBtn.getAttribute("data-produk-tab") || groups[0]?.id);
+        return;
+      }
+
+      const paneBtn = target.closest("[data-produk-pane]");
+      if (paneBtn && menu.contains(paneBtn)) {
+        event.preventDefault();
+        event.stopPropagation();
+        setActivePane(menu, paneBtn.getAttribute("data-produk-pane") || firstPaneId);
+        return;
+      }
+
+      const closer = target.closest("[data-produk-close]");
+      if (closer && menu.contains(closer)) {
+        // biarkan handler demo berjalan dulu
+        requestAnimationFrame(() => closeMenu(menu));
+      }
+    });
+  }
+
+  scrim.addEventListener("click", () => closeAll());
+
+  document.addEventListener("click", (event) => {
+    const target = event.target;
+    if (!(target instanceof Element)) return;
+    if (target.closest("[data-produk-menu]")) return;
+    if (target.closest("[data-produk-scrim]")) return;
+    closeAll();
+  });
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") closeAll();
+  });
+
+  document.addEventListener("motovax:nav-menu-open", (event) => {
+    if (event.detail?.source !== "produk") closeAll();
+  });
+})();
+
+/**
+ * Mega menu Solusi — struktur Industri & Roles mengikuti qontak.com/Solusi.
+ * Industri ditambah Otomotif dan Property; role HR tidak ditampilkan.
+ */
+(function initSolusiMegaMenu() {
+  const solusiLinks = [...document.querySelectorAll('.nav > a[href*="#solusi"]')].filter(
+    (link) => link.textContent.trim() === "Solusi",
+  );
+  if (!solusiLinks.length) return;
+
+  const path = location.pathname.replace(/\/+$/, "") || "/";
+  const inNestedDir = path.includes("/fitur/") || path.includes("/solusi/") || /\/(fitur|solusi)$/.test(path);
+  const fiturPrefix = inNestedDir ? "../fitur/" : "./fitur/";
+  const solusiPrefix = path.includes("/solusi/") || /\/solusi$/.test(path) ? "./" : inNestedDir ? "../solusi/" : "./solusi/";
+  const home = inNestedDir ? "../index.html#" : path.endsWith("modul.html") ? "./index.html#" : "#";
+
+  const icon = (paths) =>
+    `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${paths}</svg>`;
+
+  const icons = {
+    education: icon('<path d="M4 5.5A3.5 3.5 0 0 1 7.5 2H20v17H7.5A3.5 3.5 0 0 0 4 22z"/><path d="M4 5.5v13A3.5 3.5 0 0 1 7.5 15H20"/>'),
+    finance: icon('<path d="m3 9 9-5 9 5"/><path d="M5 10v8m5-8v8m4-8v8m5-8v8M3 21h18"/>'),
+    health: icon('<path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8z"/><path d="M8 12h2l1-2 2 4 1-2h2"/>'),
+    travel: icon('<path d="m22 2-7 20-4-9-9-4z"/><path d="M22 2 11 13"/>'),
+    hotel: icon('<path d="M3 21V8l9-5 9 5v13"/><path d="M8 21v-5h8v5M8 10h.01M12 10h.01M16 10h.01"/>'),
+    logistics: icon('<path d="M3 6h11v11H3zM14 10h4l3 3v4h-7z"/><circle cx="7" cy="19" r="2"/><circle cx="18" cy="19" r="2"/>'),
+    fmcg: icon('<path d="m12 2 9 5-9 5-9-5z"/><path d="m3 7 9 5 9-5v10l-9 5-9-5z"/><path d="M12 12v10"/>'),
+    retail: icon('<path d="M4 10h16v11H4zM3 10l2-6h14l2 6"/><path d="M8 21v-6h8v6M7 10a2 2 0 0 0 4 0m0 0a2 2 0 0 0 4 0m0 0a2 2 0 0 0 4 0"/>'),
+    tech: icon('<path d="m8 9-4 3 4 3m8-6 4 3-4 3M14 5l-4 14"/>'),
+    outsourcing: icon('<path d="M4 14v-3a8 8 0 0 1 16 0v3"/><path d="M4 14a3 3 0 0 0 3 3h1v-6H7a3 3 0 0 0-3 3zm16 0a3 3 0 0 1-3 3h-1v-6h1a3 3 0 0 1 3 3zM16 19c-1 2-3 2-5 2"/>'),
+    automotive: icon('<path d="M5 16 3.5 14.5 5 10l2-4h10l2 4 1.5 4.5L19 16"/><path d="M5 10h14M6 16h12M7 19v2m10-2v2"/><circle cx="7.5" cy="14" r="1"/><circle cx="16.5" cy="14" r="1"/>'),
+    property: icon('<path d="m3 11 9-8 9 8"/><path d="M5 10v11h14V10M9 21v-7h6v7"/>'),
+    sales: icon('<path d="M4 19V9m6 10V5m6 14v-7m4 7H2"/><path d="m5 7 5-4 5 3 5-4"/>'),
+    service: icon('<path d="M12 3a8 8 0 0 0-8 8v3a3 3 0 0 0 3 3h1v-7H7a3 3 0 0 0-3 3m16 0a3 3 0 0 0-3-3h-1v7h1a3 3 0 0 0 3-3z"/><path d="M16 19c-1 2-3 2-5 2"/>'),
+    marketing: icon('<path d="M3 11v4h4l9 4V7l-9 4z"/><path d="M7 15l2 5h3M19 9c1 1 1 4 0 5"/>'),
+    operations: icon('<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1-2.8 2.8-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.6V21h-4v-.1a1.7 1.7 0 0 0-1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1L4.2 17l.1-.1a1.7 1.7 0 0 0 .3-1.9A1.7 1.7 0 0 0 3 14H3v-4h.1a1.7 1.7 0 0 0 1.6-1 1.7 1.7 0 0 0-.3-1.9L4.2 7 7 4.2l.1.1A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1-1.6V3h4v.1a1.7 1.7 0 0 0 1 1.6 1.7 1.7 0 0 0 1.9-.3l.1-.1L19.8 7l-.1.1a1.7 1.7 0 0 0-.3 1.9 1.7 1.7 0 0 0 1.6 1h.1v4H21a1.7 1.7 0 0 0-1.6 1z"/>'),
+  };
+
+  const groups = [
+    {
+      id: "industri",
+      title: "Industri",
+      items: [
+        { title: "Pendidikan", desc: "Fondasi inquiry dan admission", icon: "education", slug: "pendidikan", status: "adapt", statusLabel: "Adaptif", href: `${solusiPrefix}pendidikan.html` },
+        { title: "Keuangan", desc: "Fondasi engagement nasabah", icon: "finance", slug: "keuangan", status: "adapt", statusLabel: "Adaptif", href: `${solusiPrefix}keuangan.html` },
+        { title: "Kesehatan", desc: "Fondasi layanan dan inquiry pasien", icon: "health", slug: "kesehatan", status: "adapt", statusLabel: "Adaptif", href: `${solusiPrefix}kesehatan.html` },
+        { title: "Tour & Travel", desc: "Fondasi inquiry dan booking", icon: "travel", slug: "tour-travel", status: "adapt", statusLabel: "Adaptif", href: `${solusiPrefix}tour-travel.html` },
+        { title: "Perhotelan", desc: "Fondasi reservasi dan layanan tamu", icon: "hotel", slug: "perhotelan", status: "adapt", statusLabel: "Adaptif", href: `${solusiPrefix}perhotelan.html` },
+        { title: "Logistik", desc: "Fondasi customer service pengiriman", icon: "logistics", slug: "logistik", status: "adapt", statusLabel: "Adaptif", href: `${solusiPrefix}logistik.html` },
+        { title: "FMCG", desc: "Fondasi engagement channel partner", icon: "fmcg", slug: "fmcg", status: "adapt", statusLabel: "Adaptif", href: `${solusiPrefix}fmcg.html` },
+        { title: "Ritel", desc: "Fondasi conversational sales", icon: "retail", slug: "ritel", status: "adapt", statusLabel: "Adaptif", href: `${solusiPrefix}ritel.html` },
+        { title: "Teknologi Informasi", desc: "Fondasi B2B sales dan support", icon: "tech", slug: "teknologi-informasi", status: "adapt", statusLabel: "Adaptif", href: `${solusiPrefix}teknologi-informasi.html` },
+        { title: "Outsourcing", desc: "Fondasi operasi layanan multi-klien", icon: "outsourcing", slug: "outsourcing", status: "adapt", statusLabel: "Adaptif", href: `${solusiPrefix}outsourcing.html` },
+        { title: "Otomotif", desc: "Stok hingga closing terintegrasi", icon: "automotive", slug: "otomotif", status: "live", statusLabel: "Live", href: `${solusiPrefix}otomotif.html` },
+        { title: "Property", desc: "Fondasi lead hingga site visit", icon: "property", slug: "property", status: "adapt", statusLabel: "Adaptif", href: `${solusiPrefix}property.html` },
+      ],
+    },
+    {
+      id: "roles",
+      title: "Roles",
+      items: [
+        { title: "Sales", desc: "Lacak penjualan barang", icon: "sales", href: `${fiturPrefix}motovax-sales-suite.html` },
+        { title: "Customer Service", desc: "Kelola pelayanan pelanggan", icon: "service", href: `${fiturPrefix}motovax-service-suite.html` },
+        { title: "Marketing", desc: "Atur pemasaran produk", icon: "marketing", href: `${fiturPrefix}motovax-broadcast.html` },
+        { title: "Operasional", desc: "Otomatiskan proses operasional", icon: "operations", href: `${fiturPrefix}automasi-workflow.html` },
+      ],
+    },
+  ];
+
+  const renderItems = (group) => group.items
+    .map((item) => {
+      const isCurrent = Boolean(item.slug && (path.endsWith(`/solusi/${item.slug}`) || path.endsWith(`/solusi/${item.slug}.html`)));
+      return `
+      <a class="solusi-mega-item${isCurrent ? " is-current" : ""}" href="${item.href}"${isCurrent ? ' aria-current="page"' : ""} data-solusi-close>
+        <span class="solusi-mega-icon">${icons[item.icon]}</span>
+        <span class="solusi-mega-meta">
+          <span class="solusi-mega-title-row">
+            <strong>${item.title}</strong>
+            ${item.statusLabel ? `<span class="solusi-mega-status ${item.status}">${item.statusLabel}</span>` : ""}
+          </span>
+          <small>${item.desc}</small>
+        </span>
+        <svg class="solusi-mega-arrow" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>`;
+    })
+    .join("");
+
+  const renderMenu = (id) => `
+    <button type="button" class="nav-produk-trigger nav-solusi-trigger" aria-expanded="false" aria-haspopup="true" aria-controls="${id}" data-solusi-trigger>
+      Solusi
+      <svg class="nav-chevron" width="12" height="12" viewBox="0 0 12 12" aria-hidden="true">
+        <path d="M2.5 4.5 6 8l3.5-3.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+    <div class="produk-mega solusi-mega" id="${id}" role="region" aria-label="Menu solusi berdasarkan industri dan peran" hidden data-solusi-panel>
+      <div class="produk-mega-tabs">
+        <div class="produk-mega-tabs-inner" role="tablist" aria-label="Kategori solusi">
+          ${groups.map((group, index) => `
+            <button type="button" class="produk-mega-tab${index === 0 ? " is-active" : ""}" id="${id}-tab-${group.id}" role="tab" aria-selected="${index === 0 ? "true" : "false"}" aria-controls="${id}-panel-${group.id}" data-solusi-tab="${group.id}">${group.title}</button>`).join("")}
+        </div>
+      </div>
+      <div class="solusi-mega-content">
+        ${groups.map((group, index) => `
+          <section class="solusi-mega-panel${index === 0 ? " is-active" : ""}" id="${id}-panel-${group.id}" role="tabpanel" aria-labelledby="${id}-tab-${group.id}" data-solusi-panel-content="${group.id}" ${index === 0 ? "" : "hidden"}>
+            <div class="solusi-mega-heading">
+              <span>Solusi</span>
+              <h3>${group.title}</h3>
+            </div>
+            <div class="solusi-mega-grid solusi-mega-grid-${group.id}">${renderItems(group)}</div>
+            <a class="solusi-mega-contact" href="${home}kontak" data-solusi-close>
+              Belum menemukan yang Anda cari? <strong>Diskusikan kebutuhan bisnis Anda</strong>
+              <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </a>
+          </section>`).join("")}
+      </div>
+    </div>`;
+
+  solusiLinks.forEach((link, index) => {
+    const menu = document.createElement("div");
+    menu.className = "nav-item nav-item-produk nav-item-solusi";
+    menu.setAttribute("data-solusi-menu", "");
+    menu.innerHTML = renderMenu(`solusi-mega-menu-${index + 1}`);
+    link.replaceWith(menu);
+  });
+
+  const menus = document.querySelectorAll("[data-solusi-menu]");
+  let scrim = document.querySelector("[data-solusi-scrim]");
+  if (!scrim) {
+    scrim = document.createElement("div");
+    scrim.className = "produk-mega-scrim solusi-mega-scrim";
+    scrim.hidden = true;
+    scrim.setAttribute("data-solusi-scrim", "");
+    document.body.appendChild(scrim);
+  }
+
+  const closeAll = (except = null) => {
+    for (const menu of menus) {
+      if (menu === except) continue;
+      menu.classList.remove("is-open");
+      menu.querySelector("[data-solusi-trigger]")?.setAttribute("aria-expanded", "false");
+      const panel = menu.querySelector("[data-solusi-panel]");
+      if (panel) panel.hidden = true;
+    }
+    if (!except) {
+      scrim.hidden = true;
+      document.body.classList.remove("solusi-menu-open");
+    }
+  };
+
+  const openMenu = (menu) => {
+    closeAll(menu);
+    menu.classList.add("is-open");
+    menu.querySelector("[data-solusi-trigger]")?.setAttribute("aria-expanded", "true");
+    const panel = menu.querySelector("[data-solusi-panel]");
+    if (panel) panel.hidden = false;
+    scrim.hidden = false;
+    document.body.classList.add("solusi-menu-open");
+    document.dispatchEvent(new CustomEvent("motovax:nav-menu-open", { detail: { source: "solusi" } }));
+  };
+
+  const closeMenu = (menu) => {
+    menu.classList.remove("is-open");
+    menu.querySelector("[data-solusi-trigger]")?.setAttribute("aria-expanded", "false");
+    const panel = menu.querySelector("[data-solusi-panel]");
+    if (panel) panel.hidden = true;
+    scrim.hidden = true;
+    document.body.classList.remove("solusi-menu-open");
+  };
+
+  const setActiveTab = (menu, groupId) => {
+    for (const tab of menu.querySelectorAll("[data-solusi-tab]")) {
+      const active = tab.getAttribute("data-solusi-tab") === groupId;
+      tab.classList.toggle("is-active", active);
+      tab.setAttribute("aria-selected", active ? "true" : "false");
+    }
+    for (const panel of menu.querySelectorAll("[data-solusi-panel-content]")) {
+      const active = panel.getAttribute("data-solusi-panel-content") === groupId;
+      panel.classList.toggle("is-active", active);
+      panel.hidden = !active;
+    }
+  };
+
+  for (const menu of menus) {
+    const trigger = menu.querySelector("[data-solusi-trigger]");
+    trigger?.addEventListener("click", (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      if (menu.classList.contains("is-open")) closeMenu(menu);
+      else openMenu(menu);
+    });
+
+    menu.addEventListener("click", (event) => {
+      const target = event.target;
+      if (!(target instanceof Element)) return;
+      const tab = target.closest("[data-solusi-tab]");
+      if (tab) {
+        event.preventDefault();
+        event.stopPropagation();
+        setActiveTab(menu, tab.getAttribute("data-solusi-tab") || "industri");
+        return;
+      }
+      if (target.closest("[data-solusi-close]")) requestAnimationFrame(() => closeMenu(menu));
+    });
+  }
+
+  scrim.addEventListener("click", () => closeAll());
+  document.addEventListener("click", (event) => {
+    const target = event.target;
+    if (!(target instanceof Element)) return;
+    if (target.closest("[data-solusi-menu], [data-solusi-scrim]")) return;
+    closeAll();
+  });
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") closeAll();
+  });
+  document.addEventListener("motovax:nav-menu-open", (event) => {
+    if (event.detail?.source !== "solusi") closeAll();
+  });
+})();
+
+/** Navigasi mobile seluruh halaman — menjaga menu utama tetap dapat diakses. */
+(function initMobileNavigation() {
+  const header = document.querySelector(".site-header");
+  const headerInner = header?.querySelector(".header-inner");
+  if (!(header instanceof HTMLElement) || !(headerInner instanceof HTMLElement)) return;
+
+  let trigger = header.querySelector("[data-mobile-nav-trigger]");
+  let panel = header.querySelector("[data-mobile-nav-panel]");
+  let backdrop = header.querySelector("[data-mobile-nav-backdrop]");
+
+  /* Halaman selain beranda memakai header yang sama, tetapi markup menu mobile
+   * tidak diduplikasi ke puluhan file HTML. Bentuk menu di sini agar setiap
+   * halaman selalu mendapat navigasi mobile/tablet yang identik. */
+  if (!trigger || !panel || !backdrop) {
+    const path = location.pathname.replace(/\/+$/, "") || "/";
+    const nested = path.includes("/fitur/") || path.includes("/solusi/") || /\/(fitur|solusi)$/.test(path);
+    const root = nested ? "../" : "./";
+    const home = `${root}index.html`;
+    const industries = [
+      ["Otomotif", "Live", "otomotif"],
+      ["Property", "Adaptif", "property"],
+      ["Pendidikan", "Adaptif", "pendidikan"],
+      ["Keuangan", "Adaptif", "keuangan"],
+      ["Kesehatan", "Adaptif", "kesehatan"],
+      ["Tour & Travel", "Adaptif", "tour-travel"],
+      ["Perhotelan", "Adaptif", "perhotelan"],
+      ["Logistik", "Adaptif", "logistik"],
+      ["FMCG", "Adaptif", "fmcg"],
+      ["Ritel", "Adaptif", "ritel"],
+      ["Teknologi Informasi", "Adaptif", "teknologi-informasi"],
+      ["Outsourcing", "Adaptif", "outsourcing"],
+    ];
+
+    trigger = document.createElement("button");
+    trigger.className = "mobile-nav-trigger";
+    trigger.type = "button";
+    trigger.setAttribute("aria-expanded", "false");
+    trigger.setAttribute("aria-controls", "mobile-navigation");
+    trigger.setAttribute("aria-label", "Buka menu navigasi");
+    trigger.setAttribute("data-mobile-nav-trigger", "");
+    trigger.innerHTML = "<span></span><span></span><span></span>";
+
+    backdrop = document.createElement("button");
+    backdrop.className = "mobile-nav-backdrop";
+    backdrop.type = "button";
+    backdrop.hidden = true;
+    backdrop.setAttribute("aria-label", "Tutup menu navigasi");
+    backdrop.setAttribute("data-mobile-nav-backdrop", "");
+
+    panel = document.createElement("aside");
+    panel.className = "mobile-nav-panel";
+    panel.id = "mobile-navigation";
+    panel.hidden = true;
+    panel.setAttribute("aria-label", "Navigasi mobile");
+    panel.setAttribute("data-mobile-nav-panel", "");
+    panel.innerHTML = `
+      <nav class="mobile-nav-links">
+        <a href="${root}modul.html" data-mobile-nav-close>Produk <span>→</span></a>
+        <details>
+          <summary>Solusi berdasarkan industri <span>+</span></summary>
+          <div class="mobile-solutions-grid">
+            ${industries.map(([name, status, slug]) => `<a href="${root}solusi/${slug}.html" data-mobile-nav-close>${name} <small>${status}</small></a>`).join("")}
+          </div>
+        </details>
+        <a href="${home}#cara-kerja" data-mobile-nav-close>Cara Kerja <span>→</span></a>
+        <a href="${home}#keunggulan" data-mobile-nav-close>Keunggulan <span>→</span></a>
+        <a href="${root}harga.html" data-mobile-nav-close>Harga <span>→</span></a>
+        <a href="${root}hubungi-kami.html" data-mobile-nav-close>Hubungi Kami <span>→</span></a>
+      </nav>
+      <a class="btn btn-primary mobile-nav-cta" href="${root}hubungi-kami.html" data-mobile-nav-close>Diskusikan Bisnis Anda <span>→</span></a>`;
+
+    headerInner.appendChild(trigger);
+    header.append(backdrop, panel);
+  }
+
+  if (!(trigger instanceof HTMLButtonElement) || !(panel instanceof HTMLElement) || !(backdrop instanceof HTMLElement)) return;
+
+  const close = ({ restoreFocus = false } = {}) => {
+    panel.hidden = true;
+    backdrop.hidden = true;
+    trigger.setAttribute("aria-expanded", "false");
+    trigger.setAttribute("aria-label", "Buka menu navigasi");
+    trigger.classList.remove("is-open");
+    document.body.classList.remove("mobile-menu-open");
+    if (restoreFocus) trigger.focus();
+  };
+
+  const open = () => {
+    panel.hidden = false;
+    backdrop.hidden = false;
+    trigger.setAttribute("aria-expanded", "true");
+    trigger.setAttribute("aria-label", "Tutup menu navigasi");
+    trigger.classList.add("is-open");
+    document.body.classList.add("mobile-menu-open");
+    panel.querySelector("a, summary")?.focus();
+  };
+
+  trigger.addEventListener("click", () => {
+    if (trigger.getAttribute("aria-expanded") === "true") close();
+    else open();
+  });
+  backdrop.addEventListener("click", () => close({ restoreFocus: true }));
+  panel.addEventListener("click", (event) => {
+    const target = event.target;
+    if (target instanceof Element && target.closest("[data-mobile-nav-close]")) close();
+  });
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && trigger.getAttribute("aria-expanded") === "true") close({ restoreFocus: true });
+  });
+  window.addEventListener("resize", () => {
+    if (window.innerWidth > 1024 && trigger.getAttribute("aria-expanded") === "true") close();
+  });
+})();
+
 class PublicDemoDataBridge {
   constructor() {
     this.baseUrl = "https://mobix.motovax.com/api/public/demo/motovax-ai";
@@ -86,6 +827,303 @@ class PublicDemoDataBridge {
 }
 
 const publicDemoData = new PublicDemoDataBridge();
+
+/**
+ * Product-tour guide bersama (gaya IMS):
+ * spotlight cutout + tooltip biru menempel target + Kembali/Berikutnya/Selesai.
+ * Dipakai semua demo solusi agar flow & style seragam.
+ */
+class DemoProductTour {
+  /**
+   * @param {HTMLElement} root
+   * @param {{
+   *   ns: string,
+   *   anchorAttr?: string,
+   *   getSteps: () => Array<{title:string, body:string, anchor?:string, view?:string, label?:string, enter?:Function}>,
+   *   onSwitchView?: (view: string) => void,
+   *   getStepLabel?: (step: object, index: number, total: number) => string,
+   * }} opts
+   */
+  constructor(root, opts) {
+    this.root = root;
+    this.ns = opts.ns;
+    this.anchorAttr = opts.anchorAttr || `data-${opts.ns}-anchor`;
+    this.getSteps = opts.getSteps;
+    this.onSwitchView = opts.onSwitchView || null;
+    this.getStepLabel = opts.getStepLabel || null;
+    this.stepIndex = 0;
+    this._highlightEl = null;
+
+    this.guide = root.querySelector(`[data-${opts.ns}-guide-popover]`);
+    this.spotlight = root.querySelector(`[data-${opts.ns}-guide-spotlight]`);
+    this.stepLabelEl = this.guide?.querySelector(`[data-${opts.ns}-guide-step-label]`);
+    this.titleEl = this.guide?.querySelector(`[data-${opts.ns}-guide-title]`);
+    this.bodyEl = this.guide?.querySelector(`[data-${opts.ns}-guide-body]`);
+    this.prevBtn = this.guide?.querySelector(`[data-${opts.ns}-guide-prev]`);
+    this.nextBtn = this.guide?.querySelector(`[data-${opts.ns}-guide-next]`);
+    this.finishBtn = this.guide?.querySelector(`[data-${opts.ns}-guide-finish]`);
+    this.closeBtn = this.guide?.querySelector(`[data-close-${opts.ns}-guide]`);
+
+    this._onReposition = () => {
+      if (!this.guide || this.guide.hidden) return;
+      this.syncSpotlightRect();
+      this.positionGuide();
+    };
+
+    this.bindControls();
+  }
+
+  get isOpen() {
+    return Boolean(this.guide && !this.guide.hidden);
+  }
+
+  bindControls() {
+    if (!this.guide) return;
+    for (const btn of this.root.querySelectorAll(`[data-${this.ns}-guide]`)) {
+      btn.addEventListener("click", () => this.open(0));
+    }
+    this.closeBtn?.addEventListener("click", () => this.close());
+    this.nextBtn?.addEventListener("click", () => this.next());
+    this.prevBtn?.addEventListener("click", () => this.prev());
+    this.finishBtn?.addEventListener("click", () => this.close());
+
+    window.addEventListener("resize", this._onReposition);
+    const scrollParents = this.root.querySelectorAll(
+      ".demo-workspace, .demo-sidebar, .cc-shell, .cc-queue, .cc-chat, .cc-context, .dashboard-workspace, .insight-workspace",
+    );
+    for (const el of scrollParents) {
+      el.addEventListener("scroll", this._onReposition, { passive: true });
+    }
+  }
+
+  open(startIndex = 0) {
+    if (!this.guide) return;
+    const steps = this.getSteps() || [];
+    if (!steps.length) return;
+    this.stepIndex = Math.max(0, Math.min(startIndex, steps.length - 1));
+    this.guide.hidden = false;
+    this.renderStep();
+    const focusBtn =
+      this.guide.querySelector(`[data-${this.ns}-guide-next]:not([hidden])`) ||
+      this.guide.querySelector(`[data-${this.ns}-guide-finish]:not([hidden])`);
+    focusBtn?.focus();
+  }
+
+  close() {
+    if (!this.guide) return;
+    this.guide.hidden = true;
+    this.clearHighlight();
+    this.clearGuidePosition();
+  }
+
+  next() {
+    const steps = this.getSteps() || [];
+    if (this.stepIndex >= steps.length - 1) {
+      this.close();
+      return;
+    }
+    this.stepIndex += 1;
+    this.renderStep();
+  }
+
+  prev() {
+    if (this.stepIndex <= 0) return;
+    this.stepIndex -= 1;
+    this.renderStep();
+  }
+
+  clearGuidePosition() {
+    if (!this.guide) return;
+    this.guide.classList.remove("is-anchored", "is-falcon-anchor");
+    this.guide.style.top = "";
+    this.guide.style.left = "";
+    this.guide.style.right = "";
+    this.guide.style.bottom = "";
+    this.guide.style.maxWidth = "";
+  }
+
+  highlightAnchor(name) {
+    this.clearHighlight(false);
+    if (!name) {
+      this.syncSpotlightRect(null);
+      return;
+    }
+    const candidates = [...this.root.querySelectorAll(`[${this.anchorAttr}="${name}"]`)];
+    const el =
+      candidates.find((node) => {
+        const r = node.getBoundingClientRect();
+        const style = window.getComputedStyle(node);
+        return r.width > 1 && r.height > 1 && style.display !== "none" && style.visibility !== "hidden";
+      }) || candidates[0];
+    if (!el) {
+      this.syncSpotlightRect(null);
+      return;
+    }
+    this._highlightEl = el;
+    el.classList.add("demo-guide-highlight", "ims-guide-highlight");
+    try {
+      el.scrollIntoView({ block: "nearest", behavior: "smooth", inline: "nearest" });
+    } catch {
+      /* ignore */
+    }
+    this.syncSpotlightRect(el);
+  }
+
+  clearHighlight(hideSpotlight = true) {
+    for (const el of this.root.querySelectorAll(".demo-guide-highlight, .ims-guide-highlight, .crm-guide-highlight, .social-guide-highlight, .omni-guide-highlight")) {
+      el.classList.remove(
+        "demo-guide-highlight",
+        "ims-guide-highlight",
+        "crm-guide-highlight",
+        "social-guide-highlight",
+        "omni-guide-highlight",
+      );
+    }
+    this._highlightEl = null;
+    if (hideSpotlight) this.syncSpotlightRect(null);
+  }
+
+  syncSpotlightRect(el = this._highlightEl) {
+    const spot = this.spotlight;
+    if (!spot) return;
+    if (!el || !this.guide || this.guide.hidden) {
+      spot.hidden = true;
+      spot.style.top = "";
+      spot.style.left = "";
+      spot.style.width = "";
+      spot.style.height = "";
+      return;
+    }
+    const r = el.getBoundingClientRect();
+    if (r.width < 2 && r.height < 2) {
+      spot.hidden = true;
+      return;
+    }
+    const pad = 8;
+    const top = Math.max(4, r.top - pad);
+    const left = Math.max(4, r.left - pad);
+    const width = Math.min(window.innerWidth - left - 4, r.width + pad * 2);
+    const height = Math.min(window.innerHeight - top - 4, r.height + pad * 2);
+    spot.hidden = false;
+    spot.style.top = `${Math.round(top)}px`;
+    spot.style.left = `${Math.round(left)}px`;
+    spot.style.width = `${Math.round(width)}px`;
+    spot.style.height = `${Math.round(height)}px`;
+  }
+
+  positionGuide() {
+    if (!this.guide || this.guide.hidden) return;
+
+    const place = () => {
+      if (!this.guide || this.guide.hidden) return;
+      const target =
+        this._highlightEl && this._highlightEl.getBoundingClientRect().width > 0
+          ? this._highlightEl
+          : null;
+
+      this.guide.classList.add("is-anchored");
+
+      const gw = Math.min(320, window.innerWidth - 24);
+      const gh = this.guide.offsetHeight || 200;
+      const gap = 14;
+      const margin = 12;
+      const minTop = 64;
+
+      if (!target) {
+        this.guide.style.top = "92px";
+        this.guide.style.right = "24px";
+        this.guide.style.left = "auto";
+        this.guide.style.bottom = "auto";
+        this.guide.style.maxWidth = `${gw}px`;
+        return;
+      }
+
+      const rect = target.getBoundingClientRect();
+      let left = rect.right + gap;
+      let top = rect.top;
+
+      if (left + gw > window.innerWidth - margin) {
+        left = rect.left - gw - gap;
+      }
+      if (left < margin) {
+        left = Math.max(margin, Math.min(rect.left, window.innerWidth - gw - margin));
+        top = rect.bottom + gap;
+        if (top + gh > window.innerHeight - margin) {
+          top = Math.max(minTop, rect.top - gh - gap);
+        }
+      } else {
+        top = Math.max(minTop, Math.min(top, window.innerHeight - gh - margin));
+      }
+
+      left = Math.max(margin, Math.min(left, window.innerWidth - gw - margin));
+      top = Math.max(minTop, Math.min(top, window.innerHeight - gh - margin));
+
+      this.guide.style.top = `${Math.round(top)}px`;
+      this.guide.style.left = `${Math.round(left)}px`;
+      this.guide.style.right = "auto";
+      this.guide.style.bottom = "auto";
+      this.guide.style.maxWidth = `${gw}px`;
+    };
+
+    requestAnimationFrame(() => {
+      requestAnimationFrame(place);
+      window.setTimeout(place, 80);
+      window.setTimeout(() => {
+        this.syncSpotlightRect();
+        place();
+      }, 200);
+    });
+  }
+
+  renderStep() {
+    if (!this.guide) return;
+    const steps = this.getSteps() || [];
+    const step = steps[this.stepIndex] || steps[0];
+    if (!step) {
+      this.close();
+      return;
+    }
+    const total = steps.length;
+    const index = this.stepIndex + 1;
+
+    if (this.stepLabelEl) {
+      if (this.getStepLabel) {
+        this.stepLabelEl.textContent = this.getStepLabel(step, index, total);
+      } else {
+        const viewLabel = (step.label || step.view || "Panduan").toString().toUpperCase();
+        this.stepLabelEl.textContent =
+          total > 1 ? `${viewLabel} · LANGKAH ${index} DARI ${total}` : viewLabel;
+      }
+    }
+    if (this.titleEl) this.titleEl.textContent = step.title;
+    if (this.bodyEl) this.bodyEl.textContent = step.body;
+
+    const isLast = this.stepIndex >= total - 1;
+    const isFirst = this.stepIndex <= 0;
+    if (this.prevBtn) this.prevBtn.hidden = isFirst;
+    if (this.nextBtn) {
+      this.nextBtn.hidden = isLast;
+      this.nextBtn.textContent = "Berikutnya";
+    }
+    if (this.finishBtn) this.finishBtn.hidden = !isLast;
+
+    if (step.view && typeof this.onSwitchView === "function") {
+      this.onSwitchView(step.view);
+    }
+    if (typeof step.enter === "function") step.enter();
+
+    const applyHighlight = () => {
+      if (step.anchor) this.highlightAnchor(step.anchor);
+      else this.clearHighlight();
+      this.positionGuide();
+    };
+    requestAnimationFrame(() => {
+      applyHighlight();
+      window.setTimeout(applyHighlight, 100);
+    });
+  }
+}
+
 
 const inventoryDemoSeed = [
   {
@@ -487,10 +1525,11 @@ class InventoryProductDemo {
     this.selectedId = null;
     this.dataError = "";
     this.lastFocusedElement = null;
-    this.hasOpenedGuide = false;
     this.activeView = "units";
     this.activeUploadTab = "inventory";
     this.guideStepIndex = 0;
+    this.guideView = "units";
+    this._guideAutoShowing = false;
     this.falconRole = "sales"; // sales | management
     this.falconMessages = [];
     this.falconSalesDone = false;
@@ -500,6 +1539,15 @@ class InventoryProductDemo {
     /** tutorial = template demo; live = real Falcon API + Motovax knowledge */
     this.falconMode = "tutorial"; // tutorial | live | picking
     this.falconLiveBusy = false;
+    /** Rate-limit snapshot from /falcon-chat (session 30 / day 800 on backend). */
+    this.falconLiveQuota = {
+      sessionUsed: 0,
+      sessionLimit: 30,
+      sessionRemaining: 30,
+      dayUsed: 0,
+      dayLimit: 800,
+      dayRemaining: 800,
+    };
     this.advOpen = false;
     this.branchMenuOpen = false;
     this.advFilters = {
@@ -542,6 +1590,8 @@ class InventoryProductDemo {
     this.detailPanel = root.querySelector(".demo-detail-panel");
     this.detailBackdrop = root.querySelector("[data-demo-detail-backdrop]");
     this.guide = root.querySelector("[data-demo-guide-popover]");
+    this.guideSpotlight = root.querySelector("[data-demo-guide-spotlight]");
+    this._highlightEl = null;
     this.toast = root.querySelector("[data-demo-toast]");
     this.bookingButton = root.querySelector("[data-demo-book-unit]");
     this.bookingCopy = root.querySelector("[data-demo-booking-copy]");
@@ -570,198 +1620,152 @@ class InventoryProductDemo {
     this.loadTenantData();
   }
 
-  guideSteps() {
+  /**
+   * Panduan pendek per menu sidebar + spotlight (highlight area seperti product tour).
+   * Tiap tab punya langkah sendiri; `anchor` menunjuk elemen data-ims-anchor.
+   * Auto-aktif setiap kali user buka menu sidebar (bukan sekali-saja).
+   */
+  guideSteps(view = this.guideView || this.activeView) {
     const story = this.falconStoryLabel();
-    return [
-      {
-        view: "units",
-        title: "Tiga modul SMI seperti Mobix",
-        body: "Sidebar Sistem Manajemen Inventaris berisi Manajemen Unit, Unit per Cabang, dan Upload Data — sama dengan Mobix. Klik Lanjut untuk mencoba satu per satu.",
-      },
-      {
-        view: "units",
-        title: "Manajemen Unit",
-        body: "UI selaras Motovax App: cari plat/brand, filter Stok Aktif/Ready/Booked, Filter Lanjutan, lalu buka detail unit — layout detail mirip halaman Mobix (tanpa tombol booking).",
-      },
-      {
-        view: "per-cabang",
-        title: "Unit per Cabang",
-        body: "Lihat ringkasan stok Ready, Booked, dan foto per cabang. Klik kartu cabang untuk kembali ke Manajemen Unit dengan filter cabang itu.",
-      },
-      {
-        view: "uploads",
-        title: "Upload Data",
-        body: "Tab Import Inventory, Foto, Handover, dan MRP — alur yang sama dengan Mobix. Di demo, unggah bersifat simulasi.",
-      },
-      {
-        view: "falcon",
-        title: "Masuk AI Falcon",
-        body: "Mock WhatsApp. Mode Sales Agent — Falcon demo semua fitur sales Motovax (tanpa laporan management).",
-        enter: () => this.setFalconRole("sales", { greet: true }),
-      },
-      {
-        view: "falcon",
-        title: "Sales: cek stok unit",
-        body: `Tanya satu unit (unit_query). Contoh: “Halo, mau tanya ${story} dong, masih ready?”.`,
-        enter: () => {
-          this.setFalconRole("sales");
-          this.sendFalconUserMessage(
-            `Halo, mau tanya ${story} dong, masih ready?`,
-            { fromGuide: true },
-          );
+    const falconMessageStep = (title, body, message) => ({
+      view: "falcon",
+      anchor: "falcon-phone",
+      title,
+      body,
+      enter: () => this.sendFalconUserMessage(message, { fromGuide: true }),
+    });
+    const byView = {
+      units: [
+        {
+          view: "units",
+          anchor: "nav-units",
+          title: "Menu Manajemen Unit",
+          body: "Anda di menu stok unit (sama seperti Motovax App). Area sorot = item sidebar aktif. Berikutnya: cara mencari unit.",
         },
-      },
-      {
-        view: "falcon",
-        title: "Sales: minta foto unit",
-        body: `Lanjut unit yang sama — “Boleh minta fotonya?” (2–3 foto real unit).`,
-        enter: () =>
-          this.sendFalconUserMessage("Boleh minta fotonya?", {
-            fromGuide: true,
-          }),
-      },
-      {
-        view: "falcon",
-        title: "Sales: upload foto stok",
-        body: "📎 update galeri unit yang sama: +2 foto berbeda → total 5.",
-        enter: () => this.simulateFalconPhotoUpload({ fromGuide: true }),
-      },
-      {
-        view: "falcon",
-        title: "Sales: simulasi kredit",
-        body: `finance_simulation — “Simulasi kredit ${story} DP 20% tenor 48 bulan”.`,
-        enter: () =>
-          this.sendFalconUserMessage(
-            `Simulasi kredit ${story} DP 20% tenor 48 bulan`,
-            { fromGuide: true },
-          ),
-      },
-      {
-        view: "falcon",
-        title: "Sales: lokasi showroom",
-        body: "location_map — “Lokasi showroom” / map cabang.",
-        enter: () => this.sendFalconUserMessage("Lokasi showroom", { fromGuide: true }),
-      },
-      {
-        view: "falcon",
-        title: "Sales: catat lead",
-        body: "lead_own — catat lead minat unit yang sama (Serena).",
-        enter: () =>
-          this.sendFalconUserMessage(
-            `Catat lead Budi 08123456789 minat ${this.falconStoryLabel()}`,
-            { fromGuide: true },
-          ),
-      },
-      {
-        view: "falcon",
-        title: "Sales: handoff ke admin",
-        body: "handoff — “Hubungkan customer ke admin”.",
-        enter: () =>
-          this.sendFalconUserMessage("Hubungkan customer ke admin", { fromGuide: true }),
-      },
-      {
-        view: "falcon",
-        title: "Sales: generate konten",
-        body: "image_generation — “Buat caption promo unit”.",
-        enter: () =>
-          this.sendFalconUserMessage("Buat caption promo unit", { fromGuide: true }),
-      },
-      {
-        view: "falcon",
-        title: "Sales: performa sendiri",
-        body: "analytics:sales_performance (terbatas) — “Performa sales saya”. Bukan laporan management.",
-        enter: () =>
-          this.sendFalconUserMessage("Performa sales saya", { fromGuide: true }),
-      },
-      {
-        view: "falcon",
-        title: "Sales: ringkasan semua fitur",
-        body: "Falcon merangkum seluruh capability Sales Agent (bukan sekadar cek mode).",
-        enter: () =>
-          this.sendFalconUserMessage("Tampilkan semua fitur sales", { fromGuide: true }),
-      },
-      {
-        view: "falcon",
-        title: "Berganti ke Management Agent",
-        body: "Tutorial Sales selesai. Ganti ke Management — laporan, aging, GP, import, edit unit, dokumen, analytics.",
-        enter: () => this.setFalconRole("management", { greet: true, fromGuide: true }),
-      },
-      {
-        view: "falcon",
-        title: "Management: stok per cabang",
-        body: "Laporan stok agregat per cabang (mock demo).",
-        enter: () =>
-          this.sendFalconUserMessage("Laporan stok per cabang", { fromGuide: true }),
-      },
-      {
-        view: "falcon",
-        title: "Management: aging unit",
-        body: "Inventory analysis — “Laporan aging unit”.",
-        enter: () =>
-          this.sendFalconUserMessage("Laporan aging unit", { fromGuide: true }),
-      },
-      {
-        view: "falcon",
-        title: "Management: GP / margin",
-        body: "Insight GP & margin internal (hanya Management).",
-        enter: () =>
-          this.sendFalconUserMessage("Gross profit margin unit", { fromGuide: true }),
-      },
-      {
-        view: "falcon",
-        title: "Management: import Excel",
-        body: "excel_import — “Import inventory lewat WA”.",
-        enter: () =>
-          this.sendFalconUserMessage("Import inventory lewat WA", { fromGuide: true }),
-      },
-      {
-        view: "falcon",
-        title: "Management: edit unit",
-        body: "unit_edit — “Ubah status unit jadi Booked”.",
-        enter: () =>
-          this.sendFalconUserMessage("Ubah status unit jadi Booked", { fromGuide: true }),
-      },
-      {
-        view: "falcon",
-        title: "Management: dokumen",
-        body: "document_upload / review — “Upload dokumen unit”.",
-        enter: () =>
-          this.sendFalconUserMessage("Upload dokumen unit", { fromGuide: true }),
-      },
-      {
-        view: "falcon",
-        title: "Management: analisis stok",
-        body: "Rekomendasi inventory & perputaran stok.",
-        enter: () =>
-          this.sendFalconUserMessage("Analisis inventory dan rekomendasi stok", {
-            fromGuide: true,
-          }),
-      },
-      {
-        view: "falcon",
-        title: "Management: tren penjualan",
-        body: "analytics — “Tren penjualan bulan ini”.",
-        enter: () =>
-          this.sendFalconUserMessage("Tren penjualan bulan ini", { fromGuide: true }),
-      },
-      {
-        view: "falcon",
-        title: "Management: ringkasan fitur",
-        body: "Semua capability Management Agent dalam satu ringkasan demo.",
-        enter: () =>
-          this.sendFalconUserMessage("Tampilkan semua fitur management", {
-            fromGuide: true,
-          }),
-      },
-      {
-        view: "falcon",
-        title: "Panduan selesai — uji chat real",
-        body: "Tutorial template selesai. Klik “Uji chat real”, pilih Sales Agent atau Management Agent, lalu chat di mock iPhone — jawaban Falcon AI + stok Motovax (bukan skrip).",
-        enter: () => {
-          this.openFalconLiveRoleGate();
+        {
+          view: "units",
+          anchor: "units-search",
+          title: "Cari unit",
+          body: "Ketik plat, brand, tipe, atau tahun di kolom pencarian. Contoh: “Avanza” atau plat “B 1234”. Hasil tabel langsung menyusut.",
         },
-      },
-    ];
+        {
+          view: "units",
+          anchor: "units-filters",
+          title: "Filter cabang & status",
+          body: "Cabang, pill Ready/Booked, dan Filter Lanjutan menyaring stok. Export di kanan atas untuk unduh Excel/PDF (simulasi).",
+        },
+        {
+          view: "units",
+          anchor: "units-table",
+          title: "Tabel stok & detail",
+          body: "Klik satu baris unit untuk membuka detail (harga, odo, foto, dokumen) — layout mirip halaman Mobix. Lalu coba menu sidebar lain.",
+        },
+        {
+          view: "units",
+          anchor: "nav",
+          title: "Menu lain di sidebar",
+          body: "Unit per Cabang, Upload Data, dan AI Falcon masing-masing punya panduan sendiri. Klik menu kiri — panduan langsung aktif tanpa perlu tekan tombol dulu.",
+        },
+      ],
+      "per-cabang": [
+        {
+          view: "per-cabang",
+          anchor: "nav-per-cabang",
+          title: "Menu Unit per Cabang",
+          body: "Menu ini merangkum stok Ready, Booked, dan kelengkapan foto per cabang — setara modul cabang di Mobix.",
+        },
+        {
+          view: "per-cabang",
+          anchor: "branch-totals",
+          title: "Total agregat",
+          body: "Baris total di atas menampilkan ringkasan semua cabang (jumlah unit, Ready, Booked). Angka ikut data tenant demo.",
+        },
+        {
+          view: "per-cabang",
+          anchor: "branch-grid",
+          title: "Kartu cabang",
+          body: "Klik satu kartu cabang → kembali ke Manajemen Unit dengan filter cabang itu otomatis aktif. Tidak perlu set filter manual.",
+        },
+      ],
+      uploads: [
+        {
+          view: "uploads",
+          anchor: "nav-uploads",
+          title: "Menu Upload Data",
+          body: "Satu tempat untuk impor inventory, foto unit, handover sales, dan MRP — alur yang sama dengan Mobix.",
+        },
+        {
+          view: "uploads",
+          anchor: "upload-tabs",
+          title: "Empat jenis upload",
+          body: "Pilih tab: Import Inventory (Excel stok), Upload Foto, Handover Sales (unit terjual), atau Upload MRP (harga OTR massal).",
+        },
+        {
+          view: "uploads",
+          anchor: "upload-drop",
+          title: "Simulasi unggah",
+          body: "Di demo, tombol unggah hanya simulasi (file tidak dikirim). Di tenant asli, file divalidasi lalu masuk ke inventory Anda.",
+        },
+      ],
+      falcon: [
+        {
+          view: "falcon",
+          anchor: "nav-falcon",
+          title: "Menu AI Falcon",
+          body: "Panduan ini memperagakan seluruh capability Sales Agent, lalu capability tambahan Management Agent. Setiap langkah mengirim contoh pesan dan menampilkan hasilnya di WhatsApp mock.",
+          enter: () => {
+            this.falconTutorialDone = { sales: {}, management: {} };
+            this.falconSalesDone = false;
+            this.setFalconRole("sales", { greet: true, reset: true, fromGuide: true });
+          },
+        },
+        {
+          view: "falcon",
+          anchor: "falcon-badge",
+          title: "Sales Agent · 10 capability",
+          body: "Sales fokus pada layanan customer dan pipeline miliknya. Ikuti semua contoh sampai checklist Sales tercentang penuh; laporan internal Management tetap dibatasi.",
+        },
+        falconMessageStep("Sales 1/10 · Cek stok & detail", "Falcon mencari unit ready lalu menampilkan nopol, warna, odometer, cabang, posisi, dan harga OTR.", `Halo, mau tanya ${story} dong, masih ready?`),
+        falconMessageStep("Sales 2/10 · Minta foto unit", "Falcon menjaga konteks unit yang sama dan mengirim beberapa foto real unit di bubble chat.", "Boleh minta fotonya?"),
+        {
+          view: "falcon",
+          anchor: "falcon-phone",
+          title: "Sales 3/10 · Upload foto stok",
+          body: "Simulasi lampiran menambahkan dua foto ke unit yang sama, menautkan nopol, lalu memperbarui jumlah galeri stok.",
+          enter: () => this.simulateFalconPhotoUpload({ fromGuide: true }),
+        },
+        falconMessageStep("Sales 4/10 · Kredit & asuransi", "Falcon menghitung ilustrasi OTR, DP 20%, tenor 48 bulan, angsuran, serta dukungan skema asuransi.", `Simulasi kredit ${story} DP 20% tenor 48 bulan dan asuransi`),
+        falconMessageStep("Sales 5/10 · Lokasi showroom", "Falcon memberikan alamat, token peta, dan konteks jam operasional cabang tenant.", "Lokasi showroom dan map cabang"),
+        falconMessageStep("Sales 6/10 · Catat lead", "Falcon mencatat customer sebagai lead milik sales yang sedang chat, lengkap dengan HP dan unit minat.", `Catat lead Budi 08123456789 minat ${story}`),
+        falconMessageStep("Sales 7/10 · Handoff customer", "Falcon menampilkan PIC yang tersedia dan menyiapkan perpindahan percakapan customer ke admin.", "Hubungkan customer ke admin"),
+        falconMessageStep("Sales 8/10 · Konten promosi", "Falcon membuat draft caption promosi berdasarkan unit tenant; production juga mendukung visual sesuai permission.", `Buat caption promo ${story}`),
+        falconMessageStep("Sales 9/10 · Performa sendiri", "Sales hanya melihat metrik miliknya: lead, follow-up, closing, dan unit yang sering ditanyakan.", "Performa sales saya"),
+        falconMessageStep("Sales 10/10 · Ringkasan capability", "Falcon merangkum seluruh capability Sales beserta contoh perintah. Checklist Sales kini selesai.", "Tampilkan semua fitur sales"),
+        {
+          view: "falcon",
+          anchor: "falcon-badge",
+          title: "Management Agent · 9 capability tambahan",
+          body: "Management mewarisi capability Sales dan memperoleh laporan internal, import, edit unit, dokumen, analisis, serta analytics tenant.",
+          enter: () => this.setFalconRole("management", { greet: true, reset: true, fromGuide: true }),
+        },
+        falconMessageStep("Management 1/9 · Stok per cabang", "Falcon menyusun total Ready, Booked, Sold, dan total stok per cabang.", "Laporan stok per cabang"),
+        falconMessageStep("Management 2/9 · Aging unit", "Falcon mengurutkan unit dengan aging tertinggi dan memberi rekomendasi tindak lanjut.", "Laporan aging unit"),
+        falconMessageStep("Management 3/9 · GP & margin", "Angka GP/margin internal hanya tampil untuk Management dan diberi konteks risiko unit aging.", "Gross profit dan margin unit"),
+        falconMessageStep("Management 4/9 · Import inventory", "Falcon memperagakan validasi Excel, jumlah baris diproses, unit terbarui, dan warning data.", "Import inventory lewat Excel"),
+        falconMessageStep("Management 5/9 · Edit status unit", "Falcon memvalidasi permission lalu mensimulasikan perubahan status unit menjadi Booked.", "Ubah status unit jadi Booked"),
+        falconMessageStep("Management 6/9 · Dokumen unit", "Falcon memperagakan upload dan review STNK/BPKB yang tertaut ke inventory.", "Upload dan review dokumen STNK BPKB unit"),
+        falconMessageStep("Management 7/9 · Analisis inventory", "Falcon membaca distribusi stok, aging, dan kelengkapan foto lalu memberi rekomendasi operasional.", "Analisis inventory dan rekomendasi stok"),
+        falconMessageStep("Management 8/9 · Analytics penjualan", "Falcon merangkum tren lead, closing, conversion, channel, dan unit terlaris.", "Tren penjualan dan analytics bulan ini"),
+        falconMessageStep("Management 9/9 · Ringkasan capability", "Falcon merangkum seluruh capability Management. Checklist kedua role kini tercentang penuh.", "Tampilkan semua fitur management"),
+        {
+          view: "falcon",
+          anchor: "falcon-chat",
+          title: "Langsung chat real",
+          body: "Selesai panduan. Ketik pesan, tekan kirim, atau pilih “Coba langsung” — demo otomatis beralih ke Falcon AI real dengan stok Motovax. Ganti agent kapan saja di rail kiri.",
+        },
+      ],
+    };
+    return byView[view] || byView.units;
   }
 
   sampleUnitNames() {
@@ -851,7 +1855,14 @@ class InventoryProductDemo {
 
   bind() {
     for (const button of document.querySelectorAll("[data-open-inventory-demo]")) {
-      button.addEventListener("click", () => this.open(button));
+      button.addEventListener("click", () => this.open(button, { mode: "inventory" }));
+    }
+
+    for (const button of document.querySelectorAll("[data-open-falcon-demo]")) {
+      button.addEventListener("click", (event) => {
+        if (button instanceof HTMLAnchorElement) event.preventDefault();
+        this.open(button, { mode: "falcon" });
+      });
     }
 
     for (const button of this.root.querySelectorAll("[data-close-inventory-demo]")) {
@@ -860,7 +1871,7 @@ class InventoryProductDemo {
 
     for (const button of this.root.querySelectorAll("[data-ims-nav]")) {
       button.addEventListener("click", () => {
-        this.setView(button.dataset.imsNav || "units");
+        this.setView(button.dataset.imsNav || "units", { fromNav: true });
       });
     }
 
@@ -1021,7 +2032,7 @@ class InventoryProductDemo {
       if (status === "ALL") status = this.defaultStatus;
       this.setBranch(branch);
       this.status = status;
-      this.setView("units");
+      this.setView("units", { skipGuide: true });
       this.render();
     };
     this.branchTotals?.addEventListener("click", handleBranchFilterClick);
@@ -1051,7 +2062,7 @@ class InventoryProductDemo {
     }
 
     for (const button of this.root.querySelectorAll("[data-demo-guide]")) {
-      button.addEventListener("click", () => this.openGuide(0));
+      button.addEventListener("click", () => this.openGuide(0, this.activeView));
     }
     this.root.querySelector("[data-close-demo-guide]").addEventListener("click", () => this.closeGuide());
     this.root.querySelector("[data-demo-guide-next]")?.addEventListener("click", () => this.nextGuideStep());
@@ -1063,14 +2074,11 @@ class InventoryProductDemo {
 
     this.root.querySelector("[data-falcon-send]")?.addEventListener("click", () => this.handleFalconSend());
     this.root.querySelector("[data-falcon-attach]")?.addEventListener("click", () => {
-      if (this.falconMode === "live") {
-        this.showToast(
-          "Mode chat real",
-          "Lihat foto: ketik “mau lihat foto unit …”. Unggah/update foto stok tidak tersedia di uji chat real.",
-        );
-        return;
-      }
-      this.simulateFalconPhotoUpload();
+      if (this.falconMode !== "live") this.startFalconLiveMode(this.falconRole);
+      this.showToast(
+        "Chat real aktif",
+        "Untuk melihat foto, ketik “mau lihat foto unit …”. Unggah/update foto stok tidak tersedia di uji chat real.",
+      );
     });
     this.falconInput?.addEventListener("keydown", (event) => {
       if (event.key === "Enter") {
@@ -1090,20 +2098,36 @@ class InventoryProductDemo {
     this.root.querySelector("[data-falcon-cancel-live]")?.addEventListener("click", () =>
       this.cancelFalconLivePick(),
     );
-    this.root.querySelector("[data-falcon-exit-live]")?.addEventListener("click", () =>
-      this.exitFalconLiveMode(),
-    );
     this.falconRoleGate?.addEventListener("click", (event) => {
       const pick = event.target.closest("[data-falcon-pick-role]");
       if (!pick) return;
       this.startFalconLiveMode(pick.dataset.falconPickRole || "sales");
     });
 
+    // Left rail: pilih agent (Sales / Management)
+    this.root.querySelector(".falcon-picker-list")?.addEventListener("click", (event) => {
+      const card = event.target.closest("[data-falcon-set-role]");
+      if (!card) return;
+      const role = card.dataset.falconSetRole || "sales";
+      if (this.falconMode === "live") {
+        this.setFalconRole(role, { greet: true, reset: true });
+      } else if (this.falconMode === "picking") {
+        this.startFalconLiveMode(role);
+      } else {
+        this.setFalconRole(role, { greet: true, reset: true });
+      }
+    });
+
     this._onGuideReposition = () => {
-      if (!this.guide.hidden) this.positionGuide();
+      if (!this.guide || this.guide.hidden) return;
+      this.syncSpotlightRect();
+      this.positionGuide();
     };
     window.addEventListener("resize", this._onGuideReposition);
     this.root.querySelector(".demo-workspace")?.addEventListener("scroll", this._onGuideReposition, {
+      passive: true,
+    });
+    this.root.querySelector(".demo-sidebar")?.addEventListener("scroll", this._onGuideReposition, {
       passive: true,
     });
 
@@ -1121,8 +2145,9 @@ class InventoryProductDemo {
     });
   }
 
-  setView(view) {
+  setView(view, options = {}) {
     const next = ["units", "per-cabang", "uploads", "falcon"].includes(view) ? view : "units";
+    const prev = this.activeView;
     this.activeView = next;
 
     for (const button of this.root.querySelectorAll("[data-ims-nav]")) {
@@ -1153,7 +2178,7 @@ class InventoryProductDemo {
       },
       falcon: {
         title: "Chat AI Falcon",
-        body: "Tutorial semua fitur Falcon: Sales Agent (tanpa report) dulu, lalu Management Agent (laporan, import, edit, analytics).",
+        body: "Pilih agent di kiri, coba chat di iPhone tengah. Mode demo = template; Chat real = AI + stok Motovax.",
       },
     };
     const tip = tips[next] || tips.units;
@@ -1168,6 +2193,41 @@ class InventoryProductDemo {
       this.renderFalconTutorial();
       this.renderFalconQuickPrompts();
     }
+
+    // Tutup panduan tab lama saat pindah menu (kecuali langkah panduan sendiri yang set view).
+    if (
+      prev !== next &&
+      !options.fromGuide &&
+      this.guide &&
+      !this.guide.hidden &&
+      this.guideView !== next
+    ) {
+      this.closeGuide();
+    }
+
+    // Auto-panduan setiap kali user buka menu sidebar (atau open demo) — tidak perlu tombol Panduan dulu.
+    if (!options.fromGuide && !options.skipGuide) {
+      this.maybeShowViewGuide(next);
+    }
+  }
+
+  /**
+   * Tampilkan panduan demo untuk tab sidebar yang dibuka.
+   * Selalu aktif saat menu dibuka (tiap Unit / Cabang / Upload / Falcon punya tour sendiri).
+   */
+  maybeShowViewGuide(view) {
+    if (!this.root?.classList.contains("is-open")) return;
+    if (this._guideAutoShowing) return;
+    const key = ["units", "per-cabang", "uploads", "falcon"].includes(view) ? view : "units";
+
+    this._guideAutoShowing = true;
+    // Biarkan layout tab settle dulu (kartu cabang / panel upload ter-render).
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        this.openGuide(0, key);
+        this._guideAutoShowing = false;
+      });
+    });
   }
 
   setUploadTab(tab) {
@@ -1185,47 +2245,67 @@ class InventoryProductDemo {
     }
   }
 
-  open(trigger) {
+  open(trigger, options = {}) {
     this.lastFocusedElement = trigger;
+    const falconStandalone = options.mode === "falcon";
+    this.root.classList.toggle("is-falcon-standalone", falconStandalone);
+    const title = this.root.querySelector("[data-inventory-demo-title]");
+    const subtitle = this.root.querySelector("[data-inventory-demo-subtitle]");
+    if (title) title.textContent = falconStandalone ? "Agentic AI Falcon" : "Sistem Manajemen Inventaris";
+    if (subtitle) {
+      subtitle.textContent = falconStandalone
+        ? "WhatsApp AI · Sales & Management Agent"
+        : "IMS demo · Selaras menu Mobix";
+    }
+    this.setView(falconStandalone ? "falcon" : "units", { skipGuide: true });
     this.root.classList.add("is-open");
     this.root.setAttribute("aria-hidden", "false");
     document.body.classList.add("demo-open");
     this.root.querySelector("[data-close-inventory-demo]").focus();
-    if (!this.hasOpenedGuide) {
-      this.openGuide();
-      this.hasOpenedGuide = true;
-    }
+    // Panduan hanya untuk tab aktif (default: Manajemen Unit), bukan tour lintas semua menu.
+    this.maybeShowViewGuide(falconStandalone ? "falcon" : this.activeView || "units");
     this.loadTenantData(true);
   }
 
   close() {
+    const wasFalconStandalone = this.root.classList.contains("is-falcon-standalone");
     this.closeDetail();
     this.closeGuide();
     this.toast.hidden = true;
     this.root.classList.remove("is-open");
+    this.root.classList.remove("is-falcon-standalone");
     this.root.setAttribute("aria-hidden", "true");
     document.body.classList.remove("demo-open");
+    if (wasFalconStandalone) this.setView("units", { skipGuide: true });
     if (this.lastFocusedElement) this.lastFocusedElement.focus();
   }
 
-  openGuide(startIndex = 0) {
+  openGuide(startIndex = 0, view = this.activeView) {
+    const key = ["units", "per-cabang", "uploads", "falcon"].includes(view)
+      ? view
+      : this.activeView || "units";
+    this.guideView = key;
     this.guideStepIndex = Math.max(0, startIndex);
-    this.guide.hidden = false;
+    if (this.activeView !== key) {
+      this.setView(key, { fromGuide: true });
+    }
+    if (this.guide) this.guide.hidden = false;
     this.renderGuideStep();
     const focusBtn =
-      this.guide.querySelector("[data-demo-guide-next]:not([hidden])") ||
-      this.guide.querySelector("[data-demo-guide-finish]:not([hidden])");
+      this.guide?.querySelector("[data-demo-guide-next]:not([hidden])") ||
+      this.guide?.querySelector("[data-demo-guide-finish]:not([hidden])");
     focusBtn?.focus();
   }
 
   closeGuide() {
-    this.guide.hidden = true;
+    if (this.guide) this.guide.hidden = true;
+    this.clearHighlight();
     this.clearGuidePosition();
   }
 
   clearGuidePosition() {
     if (!this.guide) return;
-    this.guide.classList.remove("is-falcon-anchor");
+    this.guide.classList.remove("is-falcon-anchor", "is-anchored");
     this.guide.style.top = "";
     this.guide.style.left = "";
     this.guide.style.right = "";
@@ -1234,64 +2314,136 @@ class InventoryProductDemo {
   }
 
   /**
-   * Posisikan popover panduan agar tidak menutupi mockup iPhone di view AI Falcon.
-   * Langkah non-Falcon tetap di kanan atas (CSS default).
+   * Sorot elemen data-ims-anchor + gambar spotlight cutout (dim area lain).
+   * Pola product tour: highlight menu/kontrol yang sedang dijelaskan.
+   */
+  highlightAnchor(name) {
+    this.clearHighlight(false);
+    if (!name) {
+      this.syncSpotlightRect(null);
+      return;
+    }
+    // Prefer elemen yang terlihat (sidebar desktop vs mobile-nav)
+    const candidates = [...this.root.querySelectorAll(`[data-ims-anchor="${name}"]`)];
+    const el =
+      candidates.find((node) => {
+        const r = node.getBoundingClientRect();
+        const style = window.getComputedStyle(node);
+        return r.width > 1 && r.height > 1 && style.display !== "none" && style.visibility !== "hidden";
+      }) || candidates[0];
+    if (!el) {
+      this.syncSpotlightRect(null);
+      return;
+    }
+    this._highlightEl = el;
+    el.classList.add("ims-guide-highlight");
+    try {
+      el.scrollIntoView({ block: "nearest", behavior: "smooth", inline: "nearest" });
+    } catch {
+      /* ignore */
+    }
+    this.syncSpotlightRect(el);
+  }
+
+  clearHighlight(hideSpotlight = true) {
+    for (const el of this.root.querySelectorAll(".ims-guide-highlight")) {
+      el.classList.remove("ims-guide-highlight");
+    }
+    this._highlightEl = null;
+    if (hideSpotlight) this.syncSpotlightRect(null);
+  }
+
+  /**
+   * Hole spotlight fixed di atas target — box-shadow besar = dim overlay.
+   * Tidak terpengaruh overflow:hidden di .demo-app.
+   */
+  syncSpotlightRect(el = this._highlightEl) {
+    const spot = this.guideSpotlight;
+    if (!spot) return;
+    if (!el || !this.guide || this.guide.hidden) {
+      spot.hidden = true;
+      spot.style.top = "";
+      spot.style.left = "";
+      spot.style.width = "";
+      spot.style.height = "";
+      return;
+    }
+    const r = el.getBoundingClientRect();
+    if (r.width < 2 && r.height < 2) {
+      spot.hidden = true;
+      return;
+    }
+    const pad = 8;
+    const top = Math.max(4, r.top - pad);
+    const left = Math.max(4, r.left - pad);
+    const width = Math.min(window.innerWidth - left - 4, r.width + pad * 2);
+    const height = Math.min(window.innerHeight - top - 4, r.height + pad * 2);
+    spot.hidden = false;
+    spot.style.top = `${Math.round(top)}px`;
+    spot.style.left = `${Math.round(left)}px`;
+    spot.style.width = `${Math.round(width)}px`;
+    spot.style.height = `${Math.round(height)}px`;
+  }
+
+  /**
+   * Posisikan tooltip di samping area yang disorot (mirip callout product tour).
    */
   positionGuide() {
     if (!this.guide || this.guide.hidden) return;
 
-    const steps = this.guideSteps();
-    const step = steps[this.guideStepIndex] || steps[0];
-    const isFalcon = step?.view === "falcon";
-
-    if (!isFalcon) {
-      this.clearGuidePosition();
-      return;
-    }
-
-    this.guide.classList.add("is-falcon-anchor");
-
-    const rectIsVisible = (el) => {
-      const r = el.getBoundingClientRect();
-      return r.width > 0 && r.height > 0;
-    };
-
     const place = () => {
       if (!this.guide || this.guide.hidden) return;
-      const phone = this.root.querySelector(".iphone-frame");
-      if (!phone || !rectIsVisible(phone)) {
-        // Fallback: kiri area workspace, jauh dari mockup iPhone
+
+      const target =
+        this._highlightEl && this._highlightEl.getBoundingClientRect().width > 0
+          ? this._highlightEl
+          : this.root.querySelector(".iphone-frame");
+
+      this.guide.classList.add("is-anchored");
+      this.guide.classList.toggle(
+        "is-falcon-anchor",
+        (this.guideView || this.activeView) === "falcon",
+      );
+
+      const gw = Math.min(320, window.innerWidth - 24);
+      const gh = this.guide.offsetHeight || 200;
+      const gap = 14;
+      const margin = 12;
+      const minTop = 64;
+
+      if (!target) {
         this.guide.style.top = "92px";
-        this.guide.style.right = "auto";
-        this.guide.style.left = "16px";
+        this.guide.style.right = "24px";
+        this.guide.style.left = "auto";
         this.guide.style.bottom = "auto";
+        this.guide.style.maxWidth = `${gw}px`;
         return;
       }
 
-      const rect = phone.getBoundingClientRect();
-      const gw = Math.min(330, window.innerWidth - 32);
-      const gh = this.guide.offsetHeight || 200;
-      const gap = 16;
-      const minTop = 76;
-
-      let left = rect.left - gw - gap;
+      const rect = target.getBoundingClientRect();
+      let left = rect.right + gap;
       let top = rect.top;
 
-      if (left >= 12) {
-        // Cukup ruang di kiri iPhone — letakkan di samping (kolom role panel)
-        top = Math.max(minTop, Math.min(top, window.innerHeight - gh - 16));
-      } else {
-        // Layout sempit / stacked: di atas iPhone, atau di bawah jika tidak muat
-        left = Math.max(12, Math.min(rect.left, window.innerWidth - gw - 12));
-        top = rect.top - gh - gap;
-        if (top < minTop) {
-          top = Math.min(rect.bottom + gap, window.innerHeight - gh - 16);
-          left = Math.max(
-            12,
-            Math.min(rect.left + (rect.width - gw) / 2, window.innerWidth - gw - 12),
-          );
-        }
+      // Prefer kanan target; jika tidak muat, kiri; lalu atas/bawah.
+      if (left + gw > window.innerWidth - margin) {
+        left = rect.left - gw - gap;
       }
+      if (left < margin) {
+        left = Math.max(
+          margin,
+          Math.min(rect.left, window.innerWidth - gw - margin),
+        );
+        top = rect.bottom + gap;
+        if (top + gh > window.innerHeight - margin) {
+          top = Math.max(minTop, rect.top - gh - gap);
+        }
+      } else {
+        top = Math.max(minTop, Math.min(top, window.innerHeight - gh - margin));
+      }
+
+      // Clamp final
+      left = Math.max(margin, Math.min(left, window.innerWidth - gw - margin));
+      top = Math.max(minTop, Math.min(top, window.innerHeight - gh - margin));
 
       this.guide.style.top = `${Math.round(top)}px`;
       this.guide.style.left = `${Math.round(left)}px`;
@@ -1300,22 +2452,36 @@ class InventoryProductDemo {
       this.guide.style.maxWidth = `${gw}px`;
     };
 
-    // Tunggu layout view Falcon + bubble chat selesai
     requestAnimationFrame(() => {
       requestAnimationFrame(place);
-      // enter() bisa menambah bubble; reposisi sekali lagi setelah layout stabil
       window.setTimeout(place, 80);
+      window.setTimeout(() => {
+        this.syncSpotlightRect();
+        place();
+      }, 200);
     });
   }
 
   renderGuideStep() {
-    const steps = this.guideSteps();
+    const steps = this.guideSteps(this.guideView || this.activeView);
     const step = steps[this.guideStepIndex] || steps[0];
+    if (!step) {
+      this.closeGuide();
+      return;
+    }
     const total = steps.length;
     const index = this.guideStepIndex + 1;
+    const viewLabel = {
+      units: "Manajemen Unit",
+      "per-cabang": "Unit per Cabang",
+      uploads: "Upload Data",
+      falcon: "AI Falcon",
+    }[this.guideView || step.view] || "Panduan";
 
     this.guide.querySelector("[data-demo-guide-step-label]").textContent =
-      `LANGKAH ${index} DARI ${total}`;
+      total > 1
+        ? `${viewLabel.toUpperCase()} · LANGKAH ${index} DARI ${total}`
+        : viewLabel.toUpperCase();
     this.guide.querySelector("[data-demo-guide-title]").textContent = step.title;
     this.guide.querySelector("[data-demo-guide-body]").textContent = step.body;
 
@@ -1326,16 +2492,31 @@ class InventoryProductDemo {
     const isFirst = this.guideStepIndex <= 0;
 
     if (prev) prev.hidden = isFirst;
-    if (next) next.hidden = isLast;
+    if (next) {
+      next.hidden = isLast;
+      next.textContent = "Berikutnya";
+    }
     if (finish) finish.hidden = !isLast;
 
-    if (step.view) this.setView(step.view);
+    if (step.view && step.view !== this.activeView) {
+      this.setView(step.view, { fromGuide: true });
+    }
     if (typeof step.enter === "function") step.enter();
-    this.positionGuide();
+
+    // Highlight setelah view settle (enter bisa ganti role / bubble)
+    const applyHighlight = () => {
+      if (step.anchor) this.highlightAnchor(step.anchor);
+      else this.clearHighlight();
+      this.positionGuide();
+    };
+    requestAnimationFrame(() => {
+      applyHighlight();
+      window.setTimeout(applyHighlight, 100);
+    });
   }
 
   nextGuideStep() {
-    const steps = this.guideSteps();
+    const steps = this.guideSteps(this.guideView || this.activeView);
     if (this.guideStepIndex >= steps.length - 1) {
       this.closeGuide();
       return;
@@ -1688,8 +2869,16 @@ class InventoryProductDemo {
     this.falconFocus = null;
     this.falconMode = "tutorial";
     this.falconLiveBusy = false;
+    this.falconLiveQuota = {
+      sessionUsed: 0,
+      sessionLimit: 30,
+      sessionRemaining: 30,
+      dayUsed: 0,
+      dayLimit: 800,
+      dayRemaining: 800,
+    };
     this.setFalconRole("sales", { greet: true, reset: true });
-    this.setView("units");
+    this.setView("units", { skipGuide: true });
     this.setUploadTab("inventory");
     this.loadTenantData(true);
   }
@@ -1698,14 +2887,21 @@ class InventoryProductDemo {
     this.falconFocus = null;
     this.falconMode = "tutorial";
     this.falconLiveBusy = false;
+    this.falconLiveQuota = {
+      sessionUsed: 0,
+      sessionLimit: 30,
+      sessionRemaining: 30,
+      dayUsed: 0,
+      dayLimit: 800,
+      dayRemaining: 800,
+    };
     this.setFalconRole("sales", { greet: true, reset: true });
   }
 
   openFalconLiveRoleGate() {
-    this.setView("falcon");
-    this.falconMode = "picking";
-    if (this.falconRoleGate) this.falconRoleGate.hidden = false;
-    this.renderFalconChrome();
+    // Role sudah dipilih di rail kiri — langsung chat real (gate overlay jadi cadangan).
+    this.setView("falcon", { skipGuide: true });
+    this.startFalconLiveMode(this.falconRole || "sales");
   }
 
   cancelFalconLivePick() {
@@ -1724,6 +2920,15 @@ class InventoryProductDemo {
     if (next === "management") this.falconSalesDone = true;
     this.falconMessages = [];
     this.falconFocus = null;
+    // Soft reset of client quota display; server remains source of truth per session_id.
+    this.falconLiveQuota = {
+      sessionUsed: 0,
+      sessionLimit: 30,
+      sessionRemaining: 30,
+      dayUsed: 0,
+      dayLimit: 800,
+      dayRemaining: 800,
+    };
     if (this.falconRoleGate) this.falconRoleGate.hidden = true;
     this.closeGuide();
 
@@ -1732,9 +2937,9 @@ class InventoryProductDemo {
     this.renderFalconQuickPrompts();
 
     const label = next === "sales" ? "Sales Agent" : "Management Agent";
-    this.pushFalconSystem(`Mode live · ${label} · knowledge Motovax`);
+    this.pushFalconSystem(`Mode live · ${label} · knowledge Motovax · max 30 chat/sesi`);
     this.pushFalconBot(
-      `Halo! Saya Falcon (live) untuk ${label}.\n\nTanya apa saja tentang stok, unit, atau insight inventory — saya jawab dengan data Motovax, bukan skrip demo.\n\nContoh: “Ada Serena ready berapa unit?” atau “Rekomendasi MPV di bawah 350 juta”.`,
+      `Halo! Saya Falcon (live) untuk ${label}.\n\nTanya apa saja tentang stok, unit, atau insight inventory — saya jawab dengan data Motovax, bukan skrip demo.\n\nContoh: “Ada Serena ready berapa unit?” atau “Rekomendasi MPV di bawah 350 juta”.\n\nBatas uji: 30 pesan per sesi browser / 800 per hari (seluruh pengunjung demo).`,
     );
     this.renderFalconMessages();
     this.falconInput?.focus();
@@ -1745,6 +2950,25 @@ class InventoryProductDemo {
     this.falconLiveBusy = false;
     if (this.falconRoleGate) this.falconRoleGate.hidden = true;
     this.setFalconRole(this.falconRole, { greet: true, reset: true });
+  }
+
+  applyFalconLiveQuota(body = {}) {
+    const q = this.falconLiveQuota || {};
+    const num = (v, fallback) => {
+      const n = Number(v);
+      return Number.isFinite(n) ? n : fallback;
+    };
+    this.falconLiveQuota = {
+      sessionUsed: num(body.session_used ?? body.SessionUsed, q.sessionUsed ?? 0),
+      sessionLimit: num(body.session_limit ?? body.SessionLimit, q.sessionLimit ?? 30),
+      sessionRemaining: num(
+        body.session_remaining ?? body.SessionRemaining,
+        q.sessionRemaining ?? 30,
+      ),
+      dayUsed: num(body.day_used ?? body.DayUsed, q.dayUsed ?? 0),
+      dayLimit: num(body.day_limit ?? body.DayLimit, q.dayLimit ?? 800),
+      dayRemaining: num(body.day_remaining ?? body.DayRemaining, q.dayRemaining ?? 800),
+    };
   }
 
   setFalconRole(role, options = {}) {
@@ -1775,12 +2999,12 @@ class InventoryProductDemo {
         );
       } else if (next === "sales") {
         this.pushFalconBot(
-          "Halo! Saya Falcon untuk Sales Agent.\n\nSaya bisa bantu: cek stok/unit, foto, simulasi kredit, lokasi showroom, catat lead, handoff admin, generate konten, dan performa sales Anda.\n\nCoba chip di kiri, atau ketik “tampilkan semua fitur sales” untuk ringkasan + cara coba tiap fitur.\n\nSelesai panduan? Klik “Uji chat real” untuk Falcon sungguhan.",
+          "Halo! Saya Falcon untuk Sales Agent.\n\nSaya bisa bantu: cek stok/unit, foto, simulasi kredit, lokasi showroom, catat lead, handoff admin, generate konten, dan performa sales Anda.\n\nPilih “Coba langsung” di kiri atau ketik pesan sendiri. Pesan Anda otomatis dijawab Falcon AI real.",
         );
       } else {
         this.pushFalconSystem("Mode berganti ke Management Agent.");
         this.pushFalconBot(
-          "Halo! Saya Falcon untuk Management Agent.\n\nSaya bisa semua fitur Sales + laporan stok/cabang/aging, GP/margin, import Excel, edit unit, dokumen, analisis inventory, dan analytics tren.\n\nCoba “laporan stok per cabang” atau “tampilkan semua fitur management”.\n\nAtau “Uji chat real” untuk jawaban AI + data Motovax.",
+          "Halo! Saya Falcon untuk Management Agent.\n\nSaya bisa semua fitur Sales + laporan stok/cabang/aging, GP/margin, import Excel, edit unit, dokumen, analisis inventory, dan analytics tren.\n\nPilih “Coba langsung” di kiri atau ketik pesan sendiri. Pesan Anda otomatis dijawab Falcon AI real.",
         );
       }
     }
@@ -1802,30 +3026,55 @@ class InventoryProductDemo {
       this.falconRoleLabel.textContent = isSales ? "Sales Agent" : "Management Agent";
     }
     if (this.falconModeLabel) {
-      this.falconModeLabel.textContent = isLive ? "MODE LIVE · FALCON AI" : "MODE DEMO";
+      this.falconModeLabel.textContent = isLive ? "MODE LIVE · FALCON AI" : "PANDUAN TEMPLATE";
     }
     if (this.falconStatus) {
-      this.falconStatus.textContent = isLive
-        ? "live · knowledge Motovax"
-        : "online · Falcon AI";
+      if (isLive) {
+        const q = this.falconLiveQuota || {};
+        const used = Number(q.sessionUsed) || 0;
+        const limit = Number(q.sessionLimit) || 30;
+        const rem = Number.isFinite(Number(q.sessionRemaining))
+          ? Number(q.sessionRemaining)
+          : Math.max(0, limit - used);
+        this.falconStatus.textContent =
+          rem <= 0
+            ? `live · batas sesi ${used}/${limit}`
+            : `live · sisa ${rem}/${limit} chat`;
+        this.falconStatus.title =
+          rem <= 0
+            ? "Batas chat live sesi ini tercapai. Reset demo atau coba lagi besok."
+            : `Kuota chat live: ${used} terpakai dari ${limit} per sesi (hari ini bersama pengunjung lain: ${Number(q.dayUsed) || 0}/${Number(q.dayLimit) || 800}).`;
+      } else {
+        this.falconStatus.textContent = "online · Falcon AI";
+        this.falconStatus.title = "";
+      }
     }
     if (this.falconRoleHint) {
       if (isLive) {
+        const q = this.falconLiveQuota || {};
+        const rem = Number.isFinite(Number(q.sessionRemaining))
+          ? Number(q.sessionRemaining)
+          : 30;
         this.falconRoleHint.textContent = isSales
-          ? "Chat real: Falcon AI menjawab sebagai Sales Agent dengan stok Motovax (bukan template)."
-          : "Chat real: Falcon AI menjawab sebagai Management Agent dengan knowledge inventory Motovax.";
+          ? `Chat real: Falcon AI menjawab sebagai Sales Agent dengan stok Motovax. Sisa kuota sesi: ${rem} pesan.`
+          : `Chat real: Falcon AI sebagai Management Agent + knowledge inventory. Sisa kuota sesi: ${rem} pesan.`;
       } else {
         this.falconRoleHint.textContent = isSales
-          ? "Mode panduan (template). Setelah selesai, klik “Uji chat real” untuk Falcon sungguhan."
-          : "Mode panduan Management (template). Klik “Uji chat real” untuk jawaban AI live.";
+          ? "Panduan Sales aktif. Ketik atau pilih prompt untuk langsung memakai Falcon AI real."
+          : "Panduan Management aktif. Ketik atau pilih prompt untuk langsung memakai Falcon AI real.";
       }
     }
     const badge = this.root.querySelector("[data-falcon-role-badge]");
     badge?.classList.toggle("is-management", !isSales);
     badge?.classList.toggle("is-live", isLive);
 
-    if (this.falconLiveCta) this.falconLiveCta.hidden = isLive;
-    if (this.falconExitLive) this.falconExitLive.hidden = !isLive;
+    // Sync left-rail role cards
+    for (const card of this.root.querySelectorAll("[data-falcon-set-role]")) {
+      const active = (card.dataset.falconSetRole || "sales") === this.falconRole;
+      card.classList.toggle("is-selected", active);
+      card.setAttribute("aria-selected", active ? "true" : "false");
+    }
+    if (this.falconLiveCta) this.falconLiveCta.hidden = true;
     if (this.falconTutorialList) {
       this.falconTutorialList.hidden = isLive;
     }
@@ -1892,42 +3141,17 @@ class InventoryProductDemo {
     }
   }
 
-  markFalconTutorial(id) {
-    if (!this.falconTutorialDone[this.falconRole]) {
-      this.falconTutorialDone[this.falconRole] = {};
+  markFalconTutorial(id, role = this.falconRole) {
+    const targetRole = role === "management" ? "management" : "sales";
+    if (!this.falconTutorialDone[targetRole]) {
+      this.falconTutorialDone[targetRole] = {};
     }
-    this.falconTutorialDone[this.falconRole][id] = true;
+    this.falconTutorialDone[targetRole][id] = true;
     this.renderFalconTutorial();
   }
 
   renderFalconQuickPrompts() {
     if (!this.falconQuickPrompts) return;
-    const story = this.falconStoryLabel();
-    const salesTutorial = [
-      `Halo, mau tanya ${story} dong, masih ready?`,
-      "Boleh minta fotonya?",
-      `Simulasi kredit ${story} DP 20% tenor 48 bulan`,
-      "Lokasi showroom",
-      `Catat lead Budi 08123456789 minat ${story}`,
-      "Hubungkan customer ke admin",
-      `Buat caption promo ${story}`,
-      "Performa sales saya",
-      "Tampilkan semua fitur sales",
-      "Laporan aging stok",
-      "Ganti ke Management Agent",
-    ];
-    const managementTutorial = [
-      "Laporan stok per cabang",
-      "Laporan aging unit",
-      "Gross profit / margin unit",
-      "Import inventory lewat WA",
-      "Ubah status unit jadi Booked",
-      "Upload dokumen unit",
-      "Analisis inventory dan rekomendasi stok",
-      "Tren penjualan bulan ini",
-      "Tampilkan semua fitur management",
-      "Kembali ke Sales Agent",
-    ];
     const salesLive = [
       "Ada unit Serena ready berapa?",
       "Rekomendasi MPV di bawah 350 juta",
@@ -1942,14 +3166,7 @@ class InventoryProductDemo {
       "Cabang mana stoknya paling banyak?",
       "Rekomendasi unit yang perlu dipromosikan",
     ];
-    const list =
-      this.falconMode === "live"
-        ? this.falconRole === "sales"
-          ? salesLive
-          : managementLive
-        : this.falconRole === "sales"
-          ? salesTutorial
-          : managementTutorial;
+    const list = this.falconRole === "sales" ? salesLive : managementLive;
     this.falconQuickPrompts.innerHTML = list
       .map(
         (text) =>
@@ -2027,9 +3244,11 @@ class InventoryProductDemo {
   sendFalconUserMessage(text, options = {}) {
     const content = String(text || "").trim();
     if (!content) return;
+    const roleAtSend = this.falconRole;
 
-    // Live mode uses real Falcon API (skip during guided template steps).
-    if (this.falconMode === "live" && !options.fromGuide) {
+    // Interaksi user selalu memakai Falcon real; template hanya untuk langkah panduan otomatis.
+    if (!options.fromGuide) {
+      if (this.falconMode !== "live") this.startFalconLiveMode(this.falconRole);
       this.sendFalconLiveMessage(content);
       return;
     }
@@ -2046,7 +3265,7 @@ class InventoryProductDemo {
         photos: reply.photos,
         reportHtml: reply.reportHtml,
       });
-      if (reply.tutorialId) this.markFalconTutorial(reply.tutorialId);
+      if (reply.tutorialId) this.markFalconTutorial(reply.tutorialId, roleAtSend);
       this.renderFalconMessages();
     }, options.fromGuide ? 280 : 420);
   }
@@ -2075,6 +3294,17 @@ class InventoryProductDemo {
     const content = String(text || "").trim();
     if (!content) return;
 
+    const q = this.falconLiveQuota || {};
+    if (Number(q.sessionRemaining) === 0) {
+      this.pushFalconUser(content);
+      this.pushFalconBot(
+        `⚠️ Batas chat live sesi ini tercapai (${q.sessionUsed || 0}/${q.sessionLimit || 30}). Klik “Reset demo” atau coba lagi besok.`,
+      );
+      this.renderFalconMessages();
+      this.renderFalconChrome();
+      return;
+    }
+
     this.falconLiveBusy = true;
     this.renderFalconChrome();
     this.pushFalconUser(content);
@@ -2095,16 +3325,34 @@ class InventoryProductDemo {
       // Drop typing placeholder
       this.falconMessages = this.falconMessages.filter((m) => !m.typing);
       if (!response.ok) {
+        if (response.status === 429 || body.code === "resource_exhausted") {
+          // Optimistically mark session as exhausted for UI (server is source of truth).
+          this.falconLiveQuota = {
+            ...this.falconLiveQuota,
+            sessionRemaining: 0,
+            sessionUsed:
+              Number(this.falconLiveQuota?.sessionLimit) ||
+              Number(this.falconLiveQuota?.sessionUsed) ||
+              30,
+          };
+        } else if (
+          body.session_used != null ||
+          body.session_remaining != null ||
+          body.SessionUsed != null
+        ) {
+          this.applyFalconLiveQuota(body);
+        }
         const msg =
           body.message ||
           body.Message ||
           (response.status === 429
-            ? "Batas chat live tercapai. Coba lagi nanti."
+            ? "Batas chat live tercapai. Coba lagi nanti atau reset demo."
             : "Falcon live belum dapat merespons. Coba lagi sebentar.");
         this.pushFalconBot(`⚠️ ${msg}`);
         this.renderFalconMessages();
         return;
       }
+      this.applyFalconLiveQuota(body);
       const reply = String(body.reply || body.Reply || "").trim();
       const photos = this.normalizeFalconLivePhotos(body.photos || body.Photos || []);
       this.pushFalconBot(
@@ -2224,6 +3472,7 @@ class InventoryProductDemo {
   }
 
   simulateFalconPhotoUpload(options = {}) {
+    const roleAtUpload = this.falconRole;
     const unit = this.pickFocusUnit("");
     if (!unit) {
       this.pushFalconUser("📷 [Foto unit dari galeri]", { photo: true });
@@ -2271,7 +3520,7 @@ class InventoryProductDemo {
           `Kalau mau, bilang saja untuk simulasi kredit atau jadwal survey.`,
         { photos: this.falconFocus.gallery.slice() },
       );
-      this.markFalconTutorial(this.falconRole === "sales" ? "upload" : "import");
+      this.markFalconTutorial(roleAtUpload === "sales" ? "upload" : "import", roleAtUpload);
       this.renderFalconMessages();
     }, options.fromGuide ? 280 : 400);
   }
@@ -3527,7 +4776,6 @@ class AutopilotCRMDemo {
     this.view = "pipeline";
     this.selectedId = null;
     this.lastFocusedElement = null;
-    this.hasOpenedGuide = false;
     this.guideStepIndex = 0;
 
     this.board = root.querySelector("[data-crm-board]");
@@ -3543,6 +4791,25 @@ class AutopilotCRMDemo {
     this.messagePreview = root.querySelector("[data-crm-message-preview]");
     this.prepareButton = root.querySelector("[data-crm-prepare-followup]");
     this.closedList = root.querySelector("[data-crm-closed-list]");
+
+    this.tour = new DemoProductTour(root, {
+      ns: "crm",
+      anchorAttr: "data-crm-anchor",
+      getSteps: () => this.guideSteps(),
+      onSwitchView: (view) => this.switchView(view),
+      getStepLabel: (step, index, total) => {
+        const labels = {
+          pipeline: "Pipeline",
+          customer: "Customer",
+          "auto-follow": "Auto Follow",
+          panduan: "Panduan",
+        };
+        const viewLabel = labels[step.view] || step.label || "Autopilot CRM";
+        return total > 1
+          ? `${String(viewLabel).toUpperCase()} · LANGKAH ${index} DARI ${total}`
+          : String(viewLabel).toUpperCase();
+      },
+    });
 
     this.bind();
     this.switchView("pipeline");
@@ -3561,94 +4828,99 @@ class AutopilotCRMDemo {
   }
 
   guideSteps() {
-    return [
+    const steps = [
       {
         view: "pipeline",
+        anchor: "sidebar",
+        label: "Autopilot CRM",
         title: "Menu Autopilot CRM",
-        body: "Sidebar selaras Motovax: Customer, Pipeline, Auto Follow Customer, dan Panduan. Campaign diganti Auto Follow Customer.",
-        enter: () => this.highlightAnchor("sidebar"),
+        body: "Sidebar selaras Motovax: Customer, Pipeline, Auto Follow Customer, dan Panduan. Area sorot = navigasi aktif — pola sama dengan panduan Inventory.",
       },
       {
         view: "pipeline",
-        title: "Pipeline & filter",
+        anchor: "kpi-grid",
+        label: "Pipeline",
+        title: "Pipeline & KPI",
         body: "Lihat nilai pipeline, forecast, dan KPI. Filter Semua / Omnichannel / Excel Import seperti di produk.",
         enter: () => {
           this.source = "all";
           this.render();
-          this.highlightAnchor("kpi-grid");
         },
       },
       {
         view: "pipeline",
+        anchor: "board",
+        label: "Pipeline",
         title: "Lead prioritas Nadia",
-        body: "Buka kartu Nadia Demo bertanda “Coba ini” — Warm, stale ≥7 hari, siap follow-up AI.",
+        body: "Kartu Nadia Demo bertanda “Coba ini” — Warm, stale ≥7 hari, siap follow-up AI. Klik kartu setelah panduan untuk eksplor bebas.",
         enter: () => {
           this.closeDetail();
           this.source = "all";
           this.mobileStage = "warm";
           this.render();
-          this.highlightAnchor("board");
           requestAnimationFrame(() => {
             const card = this.root.querySelector('[data-lead-id="lead-nadia"]');
             card?.scrollIntoView({ block: "nearest", behavior: "smooth" });
-            card?.focus();
           });
         },
       },
       {
         view: "pipeline",
+        anchor: "unit-card",
+        label: "Detail Lead",
         title: "Unit = stok Motovax",
         body: "Detail lead menampilkan unit dari katalog inventory: plate, cabang, status, harga, dan fitur.",
-        enter: () => {
-          this.openDetail("lead-nadia", { keepGuide: true });
-          this.highlightAnchor("unit-card");
-        },
+        enter: () => this.openDetail("lead-nadia", { keepGuide: true }),
       },
       {
         view: "pipeline",
+        anchor: "ai-summary",
+        label: "Detail Lead",
         title: "AI Co-Pilot",
         body: "Baca ringkasan AI dan rekomendasi berikutnya — input untuk follow-up otomatis.",
-        enter: () => {
-          this.openDetail("lead-nadia", { keepGuide: true });
-          this.highlightAnchor("ai-summary");
-        },
+        enter: () => this.openDetail("lead-nadia", { keepGuide: true }),
       },
       {
         view: "pipeline",
+        anchor: "followup",
+        label: "Follow-up AI",
         title: "Simulasi follow-up AI",
         body: "Siapkan pesan WhatsApp buatan AI, lalu Kirim simulasi. Stage naik, skor naik — pesan tidak dikirim ke customer.",
         enter: () => {
           this.openDetail("lead-nadia", { keepGuide: true });
           this.prepareFollowup();
-          this.highlightAnchor("followup");
         },
       },
       {
         view: "auto-follow",
+        anchor: "auto-follow",
+        label: "Auto Follow",
         title: "Auto Follow Customer",
         body: "Program follow-up terjadwal (nurture, warm ≥7h, hot push). Ganti menu Campaign di Motovax.",
-        enter: () => {
-          this.closeDetail();
-          this.highlightAnchor("auto-follow");
-        },
+        enter: () => this.closeDetail(),
       },
       {
         view: "pipeline",
+        anchor: "board",
+        label: "Pipeline",
         title: "Dampak di pipeline",
-        body: "Setelah follow-up, lead pindah kolom dan forecast berubah. Siap ditutup sales. Selesai — silakan eksplor bebas.",
+        body: "Setelah follow-up, lead pindah kolom dan forecast berubah. Selesai — silakan eksplor bebas seperti di demo Inventory.",
         enter: () => {
           this.closeDetail();
           this.mobileStage = this.leads.find((l) => l.id === "lead-nadia")?.stage || "hot";
           this.render();
-          this.highlightAnchor("board");
         },
       },
     ];
+    return steps;
   }
 
   bind() {
     for (const button of document.querySelectorAll("[data-open-crm-demo]")) {
-      button.addEventListener("click", () => this.open(button));
+      button.addEventListener("click", (event) => {
+        if (button instanceof HTMLAnchorElement) event.preventDefault();
+        this.open(button);
+      });
     }
 
     for (const button of this.root.querySelectorAll("[data-close-crm-demo]")) {
@@ -3702,13 +4974,7 @@ class AutopilotCRMDemo {
     this.root.querySelector("[data-crm-send-followup]")?.addEventListener("click", () => this.sendFollowup());
     this.root.querySelector("[data-crm-reset]")?.addEventListener("click", () => this.reset());
 
-    for (const button of this.root.querySelectorAll("[data-crm-guide]")) {
-      button.addEventListener("click", () => this.openGuide(0));
-    }
-    this.root.querySelector("[data-close-crm-guide]")?.addEventListener("click", () => this.closeGuide());
-    this.root.querySelector("[data-crm-guide-next]")?.addEventListener("click", () => this.nextGuideStep());
-    this.root.querySelector("[data-crm-guide-prev]")?.addEventListener("click", () => this.prevGuideStep());
-    this.root.querySelector("[data-crm-guide-finish]")?.addEventListener("click", () => this.closeGuide());
+    // Panduan: DemoProductTour (bindControls di constructor)
 
     this.root.querySelector("[data-close-crm-toast]")?.addEventListener("click", () => {
       this.toast.hidden = true;
@@ -3728,7 +4994,7 @@ class AutopilotCRMDemo {
       if (event.key !== "Escape" || !this.root.classList.contains("is-open")) return;
       if (!this.toast.hidden) {
         this.toast.hidden = true;
-      } else if (this.guide && !this.guide.hidden) {
+      } else if (this.tour?.isOpen) {
         this.closeGuide();
       } else if (this.detailPanel.classList.contains("is-open")) {
         this.closeDetail();
@@ -3758,14 +5024,18 @@ class AutopilotCRMDemo {
 
   open(trigger) {
     this.lastFocusedElement = trigger;
+    this.closeDetail();
+    this.closeGuide();
+    this.switchView("pipeline");
     this.root.classList.add("is-open");
     this.root.setAttribute("aria-hidden", "false");
     document.body.classList.add("demo-open");
-    this.root.querySelector("[data-close-crm-demo]")?.focus();
-    if (!this.hasOpenedGuide) {
+    // Tunggu modal benar-benar ter-layout agar spotlight dan popover mendapat
+    // ukuran anchor yang valid. Panduan selalu dimulai saat demo CRM dibuka.
+    requestAnimationFrame(() => {
+      if (!this.root.classList.contains("is-open")) return;
       this.openGuide(0);
-      this.hasOpenedGuide = true;
-    }
+    });
   }
 
   close() {
@@ -3779,77 +5049,11 @@ class AutopilotCRMDemo {
   }
 
   openGuide(startIndex = 0) {
-    if (!this.guide) return;
-    this.guideStepIndex = Math.max(0, startIndex);
-    this.guide.hidden = false;
-    this.renderGuideStep();
-    const focusBtn =
-      this.guide.querySelector("[data-crm-guide-next]:not([hidden])") ||
-      this.guide.querySelector("[data-crm-guide-finish]:not([hidden])");
-    focusBtn?.focus();
+    this.tour?.open(startIndex);
   }
 
   closeGuide() {
-    if (!this.guide) return;
-    this.guide.hidden = true;
-    this.clearHighlight();
-  }
-
-  highlightAnchor(name) {
-    this.clearHighlight();
-    const el = this.root.querySelector(`[data-crm-anchor="${name}"]`);
-    if (el) {
-      el.classList.add("crm-guide-highlight");
-      el.scrollIntoView({ block: "nearest", behavior: "smooth" });
-    }
-  }
-
-  clearHighlight() {
-    for (const el of this.root.querySelectorAll(".crm-guide-highlight")) {
-      el.classList.remove("crm-guide-highlight");
-    }
-  }
-
-  renderGuideStep() {
-    if (!this.guide) return;
-    const steps = this.guideSteps();
-    const step = steps[this.guideStepIndex] || steps[0];
-    const total = steps.length;
-    const index = this.guideStepIndex + 1;
-
-    this.guide.querySelector("[data-crm-guide-step-label]").textContent =
-      `LANGKAH ${index} DARI ${total}`;
-    this.guide.querySelector("[data-crm-guide-title]").textContent = step.title;
-    this.guide.querySelector("[data-crm-guide-body]").textContent = step.body;
-
-    const prev = this.guide.querySelector("[data-crm-guide-prev]");
-    const next = this.guide.querySelector("[data-crm-guide-next]");
-    const finish = this.guide.querySelector("[data-crm-guide-finish]");
-    const isLast = this.guideStepIndex >= total - 1;
-    const isFirst = this.guideStepIndex <= 0;
-
-    if (prev) prev.hidden = isFirst;
-    if (next) next.hidden = isLast;
-    if (finish) finish.hidden = !isLast;
-
-    if (step.view) this.switchView(step.view);
-    if (typeof step.enter === "function") step.enter();
-  }
-
-  nextGuideStep() {
-    const steps = this.guideSteps();
-    if (this.guideStepIndex >= steps.length - 1) {
-      this.closeGuide();
-      return;
-    }
-    this.guideStepIndex += 1;
-    this.renderGuideStep();
-  }
-
-  prevGuideStep() {
-    if (this.guideStepIndex <= 0) return;
-    this.guideStepIndex -= 1;
-    this.renderGuideStep();
+    this.tour?.close();
   }
 
   reset() {
@@ -4303,6 +5507,7 @@ const omniDemoSeed = () => [
     channel: "whatsapp",
     tag: "hot",
     bucket: "ai",
+    aiAgeBucket: "under_12_hours",
     handlerName: "Jasmine AI",
     mrName: "",
     priority: "tinggi",
@@ -4338,6 +5543,7 @@ const omniDemoSeed = () => [
     channel: "instagram",
     tag: "warm",
     bucket: "ai",
+    aiAgeBucket: "under_3_days",
     handlerName: "Jasmine AI",
     mrName: "",
     priority: "normal",
@@ -4347,7 +5553,7 @@ const omniDemoSeed = () => [
     closed: false,
     pipelineStage: "warm",
     preview: "Mau test drive besok sore",
-    time: "10:18",
+    time: "Kemarin",
     location: "Jakarta Selatan",
     unit: "Suzuki Ertiga Hybrid",
     budget: "Cicilan ringan",
@@ -4465,12 +5671,75 @@ const omniDemoSeed = () => [
     ],
   },
   {
+    id: "omni-alya",
+    name: "Alya Putri",
+    phone: "62852****614",
+    channel: "instagram",
+    tag: "warm",
+    bucket: "call_center",
+    handlerName: "Agent Demo (Saya)",
+    mrName: "",
+    priority: "normal",
+    escalated: false,
+    mrUnanswered: false,
+    pinned: false,
+    closed: false,
+    pipelineStage: "warm",
+    preview: "Tanya promo dari Instagram",
+    time: "08:32",
+    location: "Jakarta Barat",
+    unit: "Honda City Hatchback",
+    budget: "Cicilan Rp 5–6 jt",
+    notes: "Percakapan Instagram ditangani Call Center",
+    messages: [
+      { role: "customer", content: "Saya lihat promo City Hatchback di Instagram. Cicilannya mulai berapa?", time: "08:25" },
+      { role: "assistant", content: "Saya teruskan ke Call Center agar simulasi cicilannya bisa disesuaikan.", time: "08:26" },
+      { role: "agent", content: "Halo Kak Alya, saya bantu dari Call Center. Boleh info target DP dan tenor yang diinginkan?", time: "08:32" },
+    ],
+    history: [
+      { label: "Lead masuk dari Instagram", time: "08:25" },
+      { label: "Takeover Agent Demo", time: "08:32" },
+    ],
+  },
+  {
+    id: "omni-yusuf",
+    name: "Yusuf Maulana",
+    phone: "62822****735",
+    channel: "messenger",
+    tag: "hot",
+    bucket: "call_center",
+    handlerName: "Agent Demo (Saya)",
+    mrName: "",
+    priority: "tinggi",
+    escalated: false,
+    mrUnanswered: false,
+    pinned: false,
+    closed: false,
+    pipelineStage: "hot",
+    preview: "Follow-up stok dari Facebook",
+    time: "08:18",
+    location: "Bogor",
+    unit: "Toyota Avanza G CVT",
+    budget: "Budget Rp 250 jt",
+    notes: "Percakapan Facebook ditangani Call Center",
+    messages: [
+      { role: "customer", content: "Saya chat dari Facebook. Avanza G CVT yang di posting masih tersedia?", time: "08:12" },
+      { role: "assistant", content: "Saya eskalasi ke Call Center untuk konfirmasi stok dan lokasi unit.", time: "08:13" },
+      { role: "agent", content: "Halo Kak Yusuf, unitnya masih tercatat tersedia. Saya bantu cek cabang terdekat dari Bogor ya.", time: "08:18" },
+    ],
+    history: [
+      { label: "Lead masuk dari Facebook", time: "08:12" },
+      { label: "Takeover Agent Demo", time: "08:18" },
+    ],
+  },
+  {
     id: "omni-farhan",
     name: "Farhan Rizki",
     phone: "62811****330",
     channel: "messenger",
     tag: "warm",
     bucket: "ai",
+    aiAgeBucket: "over_3_days",
     handlerName: "Jasmine AI",
     mrName: "",
     priority: "normal",
@@ -4480,7 +5749,7 @@ const omniDemoSeed = () => [
     closed: false,
     pipelineStage: "warm",
     preview: "Bandingkan HR-V dan Xpander",
-    time: "Kemarin",
+    time: "4 hari lalu",
     location: "Bandung",
     unit: "HR-V / Xpander",
     budget: "250–300 jt",
@@ -4569,15 +5838,15 @@ const omniTutorialSteps = [
     ctxTab: "detail",
   },
   {
-    title: "Role 1 — Call Center: faneling & bucket",
-    body: "Tab Saya Handle · AI · Semua meniru produksi. Group: Ditangani AI, Menunggu Agent, MR Belum/Sudah Balas, dan per agent. Pilih lead Nadia di bucket AI.",
+    title: "Role 1 — Bucket Call Center",
+    body: "Bucket Call Center, Marketing Representative, dan Ditangani AI mengikuti produksi. Klik header atau sub-bucket untuk buka/tutup daftar chat.",
     fanel: "ai",
     contactId: "omni-nadia",
     ctxTab: "detail",
   },
   {
     title: "Ambil alih dari AI",
-    body: "Ketik pesan atau aksi takeover memindahkan lead ke Call Center (Saya Handle). Banner status berubah; agent bisa pakai Aksi Cepat.",
+    body: "Ketik pesan atau aksi takeover memindahkan lead ke bucket Call Center. Banner status berubah; agent bisa pakai Aksi Cepat.",
     fanel: "ai",
     contactId: "omni-nadia",
     ctxTab: "detail",
@@ -4620,15 +5889,28 @@ class OmnichannelAIDemo {
     this.root = root;
     this.contacts = this.cloneSeed();
     this.activeContactId = "omni-nadia";
-    this.fanel = "ai";
+    this.fanel = "all";
     this.channel = "all";
     this.tagFilter = new Set();
     this.selectedIds = new Set();
+    this.mrFilter = "all";
+    this.collapsedBuckets = new Set([
+      "call_center",
+      "mr_pending",
+      "mr_done",
+      "ai_under_12",
+      "ai_under_3",
+      "ai_over_3",
+    ]);
+    this.bucketItems = new Map();
     this.contextOpen = true;
     this.ctxTab = "detail";
     this.lastFocusedElement = null;
     this.tutorialStep = 0;
     this.tutorialActive = false;
+    this.hasOpenedGuide = false;
+    this.entryContext = "call-center";
+    this.lastEntryContext = "";
     this.agentName = "Agent Demo";
 
     this.contactList = root.querySelector("[data-omni-contact-list]");
@@ -4656,8 +5938,189 @@ class OmnichannelAIDemo {
     };
     this.trace = { ...this.defaultTrace, assertions: [...this.defaultTrace.assertions] };
 
+    this.tour = new DemoProductTour(root, {
+      ns: "omni",
+      anchorAttr: "data-omni-anchor",
+      getSteps: () => this.guideSteps(),
+      getStepLabel: (step, index, total) => {
+        const viewLabel = step.label || "Call Center";
+        return total > 1
+          ? `${String(viewLabel).toUpperCase()} · LANGKAH ${index} DARI ${total}`
+          : String(viewLabel).toUpperCase();
+      },
+    });
+
     this.bind();
     this.render();
+  }
+
+  guideSteps() {
+    const entryCopy = {
+      omnichannel: {
+        label: "Omnichannel",
+        title: "Satu inbox untuk seluruh channel",
+        body: "WhatsApp, Facebook Messenger, dan Instagram masuk ke workspace yang sama. Filter channel, bucket AI/agent/MR, serta konteks lead tetap tersambung.",
+      },
+      "customer-support": {
+        label: "Customer Support",
+        title: "Dari antrian sampai resolusi",
+        body: "Mode Customer Support menyorot antrian, takeover, eskalasi, riwayat, dan penyelesaian lead. SLA multi-cabang lanjutan tetap ditandai sebagai pengembangan, bukan fitur penuh demo.",
+      },
+      "call-center": {
+        label: "Call Center",
+        title: "Workspace operator omnichannel",
+        body: "Demo meniru Call Center produksi (3 kolom): AI menangani baseload, agent takeover, memakai aksi cepat, lalu handoff ke MR tanpa kehilangan konteks.",
+      },
+    }[this.entryContext] || null;
+    const steps = [
+      {
+        anchor: "queue",
+        label: entryCopy?.label || "Call Center",
+        title: entryCopy?.title || "Selamat datang — 2 role omnichannel",
+        body: entryCopy?.body || "Demo meniru Call Center produksi (3 kolom). Dua role: Call Center (inbox) dan MR (sales). AI menangani dulu, lalu takeover & handoff.",
+        enter: () => {
+          this.fanel = "ai";
+          this.activeContactId = "omni-nadia";
+          this.ctxTab = "detail";
+          this.render();
+        },
+      },
+      {
+        anchor: "buckets",
+        label: "Bucket",
+        title: "Bucket Call Center produksi",
+        body: "Klik header Call Center, Marketing Representative, atau Ditangani AI untuk buka/tutup bucket. Sub-bucket MR dan umur penanganan AI juga interaktif seperti di Motovax.",
+        enter: () => {
+          this.fanel = "all";
+          this.collapsedBuckets.delete("ai");
+          this.collapsedBuckets.delete("ai_under_12");
+          this.activeContactId = "omni-nadia";
+          this.render();
+        },
+      },
+      {
+        anchor: "jasmine",
+        label: "Jasmine AI",
+        title: "AI Sales Consultant dari discovery sampai HOT",
+        body: "Jalankan empat tahap Jasmine: gali kebutuhan, cek stok terverifikasi, kualifikasi finance tanpa mengarang angka, lalu siapkan handoff kontekstual ke MR.",
+        enter: () => {
+          this.fanel = "ai";
+          this.activeContactId = "omni-nadia";
+          this.ctxTab = "trace";
+          this.render();
+        },
+      },
+      {
+        anchor: "chat",
+        label: "Percakapan",
+        title: "Ambil alih dari AI",
+        body: "Ketik pesan atau takeover memindahkan lead ke bucket Call Center. Banner status berubah; agent bisa pakai Aksi Cepat.",
+        enter: () => {
+          this.fanel = "ai";
+          this.activeContactId = "omni-nadia";
+          this.takeoverContact("omni-nadia");
+          this.render();
+        },
+      },
+      {
+        anchor: "aksi",
+        label: "Aksi Cepat",
+        title: "Aksi Cepat + Detail / Riwayat",
+        body: "Simulasi Kredit, Cek Inventori, Tanya Falcon — sama produksi. Panel kanan: Detail Lead, Pipeline COLD→BOOK, dan tab Riwayat.",
+        enter: () => {
+          this.fanel = "mine";
+          this.activeContactId = "omni-nadia";
+          this.ctxTab = "riwayat";
+          this.render();
+        },
+      },
+      {
+        anchor: "handoff",
+        label: "Handoff MR",
+        title: "Handoff ke MR",
+        body: "Tombol Handoff menyerahkan lead ke Marketing Representative. Bucket menjadi MR; badge MR BELUM BALAS sampai MR membalas.",
+        enter: () => {
+          this.fanel = "mine";
+          this.activeContactId = "omni-nadia";
+          this.ctxTab = "detail";
+          const c = this.activeContact();
+          if (c && c.bucket !== "mr") {
+            const mr = "Dimas Pratama";
+            c.bucket = "mr";
+            c.mrName = mr;
+            c.handlerName = `MR ${mr.split(" ")[0]}`;
+            c.mrUnanswered = true;
+            c.claimedByOther = false;
+            if (c.pipelineStage === "cold" || c.pipelineStage === "warm") {
+              c.pipelineStage = "hot";
+              c.tag = "hot";
+            }
+            c.notes = "Tutorial: HOT + test drive";
+            c.messages.push({
+              role: "system",
+              content: `Handoff oleh Agent Demo ke MR ${mr} · alasan: tutorial`,
+              time: "baru saja",
+            });
+            c.history.push({ label: `Handoff ke MR ${mr}`, time: "baru saja" });
+            c.preview = `Handoff → MR ${mr.split(" ")[0]}`;
+            this.fanel = "all";
+            this.collapsedBuckets.delete("mr");
+            this.collapsedBuckets.delete("mr_pending");
+          }
+          this.render();
+        },
+      },
+      {
+        anchor: "context",
+        label: "Detail Lead",
+        title: "Role MR (preview)",
+        body: "MR punya workspace Percakapan sendiri. Konteks lead terbawa. Di production: sales follow-up & closing. Buka preview UI MR dari kartu Role MR.",
+        enter: () => {
+          this.fanel = "all";
+          this.activeContactId = "omni-nadia";
+          this.ctxTab = "detail";
+          this.render();
+        },
+      },
+      {
+        anchor: "trace",
+        label: "AI Trace",
+        title: "AI Trace + CRM terpisah",
+        body: "Tab AI Trace menampilkan router, tool, grounding, dan guardrail. Pipeline CRM sales ada di demo Autopilot CRM terpisah. Selesai — eksplor bebas.",
+        enter: () => {
+          this.fanel = "all";
+          this.activeContactId = "omni-nadia";
+          this.ctxTab = "trace";
+          this.render();
+        },
+      },
+    ];
+
+    if (this.entryContext === "omnichannel") {
+      return [steps[0], steps[1], steps[2], steps[3], steps[5]];
+    }
+    if (this.entryContext === "customer-support") {
+      const supportSteps = [steps[0], steps[3], steps[4], steps[5], steps[7]];
+      supportSteps[2] = {
+        ...supportSteps[2],
+        label: "Resolusi",
+        title: "Riwayat, status, dan aksi penyelesaian",
+        body: "Panel kanan menyimpan Detail Lead dan Riwayat. Agent dapat memakai simulasi kredit/inventori, eskalasi, close lead, serta membaca jejak handoff sebagai dasar monitoring layanan.",
+      };
+      supportSteps[4] = {
+        ...supportSteps[4],
+        label: "Performa",
+        title: "Performa layanan yang terhubung",
+        body: "Data antrian dan hasil percakapan mengalir ke analytics serta Agent Scorecard. Routing SLA multi-cabang yang lebih lanjut tetap ditandai sebagai roadmap.",
+        enter: () => {
+          this.ctxTab = "riwayat";
+          this.contextOpen = true;
+          this.render();
+        },
+      };
+      return supportSteps;
+    }
+    return steps;
   }
 
   cloneSeed() {
@@ -4670,7 +6133,10 @@ class OmnichannelAIDemo {
 
   bind() {
     for (const button of document.querySelectorAll("[data-open-omni-demo]")) {
-      button.addEventListener("click", () => this.open(button));
+      button.addEventListener("click", (event) => {
+        if (button instanceof HTMLAnchorElement) event.preventDefault();
+        this.open(button);
+      });
     }
     for (const button of this.root.querySelectorAll("[data-close-omni-demo]")) {
       button.addEventListener("click", () => this.close());
@@ -4683,12 +6149,6 @@ class OmnichannelAIDemo {
 
     this.searchInput.addEventListener("input", () => this.render());
 
-    for (const button of this.root.querySelectorAll("[data-omni-fanel]")) {
-      button.addEventListener("click", () => {
-        this.fanel = button.dataset.omniFanel || "all";
-        this.render();
-      });
-    }
     for (const button of this.root.querySelectorAll("[data-omni-channel]")) {
       button.addEventListener("click", () => {
         this.channel = button.dataset.omniChannel || "all";
@@ -4719,6 +6179,22 @@ class OmnichannelAIDemo {
     });
 
     this.contactList.addEventListener("click", (event) => {
+      const bucketToggle = event.target.closest("[data-omni-toggle-bucket]");
+      if (bucketToggle) {
+        const key = bucketToggle.dataset.omniToggleBucket;
+        if (this.collapsedBuckets.has(key)) this.collapsedBuckets.delete(key);
+        else this.collapsedBuckets.add(key);
+        this.renderContacts();
+        return;
+      }
+      const selectGroup = event.target.closest("[data-omni-select-group]");
+      if (selectGroup) {
+        event.stopPropagation();
+        const items = this.bucketItems.get(selectGroup.dataset.omniSelectGroup) || [];
+        for (const contact of items) this.selectedIds.add(contact.id);
+        this.render();
+        return;
+      }
       const claim = event.target.closest("[data-omni-claim]");
       if (claim) {
         event.stopPropagation();
@@ -4747,9 +6223,18 @@ class OmnichannelAIDemo {
       this.activeContactId = row.dataset.omniContact;
       this.render();
     });
+    this.contactList.addEventListener("change", (event) => {
+      const filter = event.target.closest("[data-omni-mr-filter]");
+      if (!filter) return;
+      this.mrFilter = filter.value || "all";
+      this.render();
+    });
 
     for (const button of this.root.querySelectorAll("[data-omni-prompt]")) {
       button.addEventListener("click", () => this.runPrompt(button.dataset.omniPrompt || "", { asCustomer: true }));
+    }
+    for (const button of this.root.querySelectorAll("[data-omni-jasmine]")) {
+      button.addEventListener("click", () => this.runJasmineJourney(button.dataset.omniJasmine || "discovery"));
     }
 
     this.form.addEventListener("submit", (event) => {
@@ -4827,10 +6312,8 @@ class OmnichannelAIDemo {
     });
 
     this.root.querySelector("[data-omni-open-mr-preview]").addEventListener("click", () => this.openMrPreview());
-    this.root.querySelector("[data-omni-tutorial]").addEventListener("click", () => this.startTutorial());
-    this.root.querySelector("[data-omni-tutorial-close]").addEventListener("click", () => this.endTutorial());
-    this.root.querySelector("[data-omni-tutorial-skip]").addEventListener("click", () => this.endTutorial());
-    this.root.querySelector("[data-omni-tutorial-next]").addEventListener("click", () => this.nextTutorial());
+    // Tutorial diganti product-tour IMS-style (data-omni-guide via DemoProductTour)
+    this.root.querySelector("[data-omni-tutorial]")?.addEventListener("click", () => this.openGuide(0));
 
     for (const el of this.root.querySelectorAll("[data-close-modal]")) {
       el.addEventListener("click", () => this.closeModal(el.dataset.closeModal));
@@ -4849,6 +6332,10 @@ class OmnichannelAIDemo {
         this.toast.hidden = true;
         return;
       }
+      if (this.tour?.isOpen) {
+        this.closeGuide();
+        return;
+      }
       const openModal = this.root.querySelector(".cc-modal-backdrop:not([hidden])");
       if (openModal) {
         openModal.hidden = true;
@@ -4860,15 +6347,35 @@ class OmnichannelAIDemo {
 
   open(trigger) {
     this.lastFocusedElement = trigger;
+    const requestedFrom = new URLSearchParams(window.location.search).get("from") || "";
+    const rawContext = trigger?.dataset?.demoContext || requestedFrom;
+    this.entryContext = rawContext === "customer-support" || rawContext === "call-center"
+      ? rawContext
+      : "omnichannel";
+    const title = this.root.querySelector("[data-omni-demo-title]");
+    const subtitle = this.root.querySelector("[data-omni-demo-subtitle]");
+    const copy = {
+      omnichannel: ["AI Omnichannel", "WhatsApp · Facebook · Instagram · satu inbox"],
+      "customer-support": ["Customer Support & Ticketing", "Antrian · eskalasi · riwayat · performa layanan"],
+      "call-center": ["MotoVax Call Center", "Omnichannel · AI · agent · handoff MR"],
+    }[this.entryContext];
+    if (title) title.textContent = copy[0];
+    if (subtitle) subtitle.textContent = `${copy[1]} · DEMO`;
+    this.root.dataset.entryContext = this.entryContext;
     this.root.classList.add("is-open");
     this.root.setAttribute("aria-hidden", "false");
     document.body.classList.add("demo-open");
     this.root.querySelector("[data-close-omni-demo]").focus();
     this.render();
+    if (!this.hasOpenedGuide || this.lastEntryContext !== this.entryContext) {
+      this.openGuide(0);
+      this.hasOpenedGuide = true;
+      this.lastEntryContext = this.entryContext;
+    }
   }
 
   close() {
-    this.endTutorial(true);
+    this.closeGuide();
     this.toast.hidden = true;
     for (const modal of this.root.querySelectorAll(".cc-modal-backdrop")) modal.hidden = true;
     this.root.classList.remove("is-open");
@@ -4877,17 +6384,37 @@ class OmnichannelAIDemo {
     if (this.lastFocusedElement) this.lastFocusedElement.focus();
   }
 
+  openGuide(startIndex = 0) {
+    this.tour?.open(startIndex);
+  }
+
+  closeGuide() {
+    this.tour?.close();
+  }
+
   reset() {
     this.contacts = this.cloneSeed();
     this.activeContactId = "omni-nadia";
-    this.fanel = "ai";
+    this.fanel = "all";
     this.channel = "all";
     this.tagFilter.clear();
     this.selectedIds.clear();
+    this.mrFilter = "all";
+    this.collapsedBuckets = new Set([
+      "call_center",
+      "mr_pending",
+      "mr_done",
+      "ai_under_12",
+      "ai_under_3",
+      "ai_over_3",
+    ]);
     this.contextOpen = true;
     this.ctxTab = "detail";
     this.trace = { ...this.defaultTrace, assertions: [...this.defaultTrace.assertions] };
     this.input.value = "";
+    this.root.querySelector("[data-omni-jasmine-outcome]").textContent =
+      "Pilih tahap untuk melihat cara Jasmine menangani lead tanpa mengirim pesan nyata.";
+    for (const button of this.root.querySelectorAll("[data-omni-jasmine]")) button.classList.remove("active");
     this.toast.hidden = true;
     for (const modal of this.root.querySelectorAll(".cc-modal-backdrop")) modal.hidden = true;
     this.render();
@@ -4915,10 +6442,11 @@ class OmnichannelAIDemo {
       manual: "[data-omni-manual-modal]",
       simple: "[data-omni-simple-modal]",
       mr: "[data-omni-mr-modal]",
-      tutorial: "[data-omni-tutorial-modal]",
     };
     const sel = map[name];
-    if (sel) this.root.querySelector(sel).hidden = false;
+    if (!sel) return;
+    const el = this.root.querySelector(sel);
+    if (el) el.hidden = false;
   }
 
   closeModal(name) {
@@ -4951,17 +6479,11 @@ class OmnichannelAIDemo {
   }
 
   matchesFilters(c) {
-    if (c.closed && this.fanel !== "all") return false;
+    if (c.closed) return false;
     if (this.channel !== "all" && c.channel !== this.channel) return false;
     if (this.tagFilter.size && !this.tagFilter.has(c.tag)) return false;
     const q = (this.searchInput.value || "").trim().toLowerCase();
     if (q && !(`${c.name} ${c.phone} ${c.preview}`.toLowerCase().includes(q))) return false;
-    if (this.fanel === "mine") {
-      return c.bucket === "call_center" && !c.claimedByOther && !c.closed;
-    }
-    if (this.fanel === "ai") {
-      return (c.bucket === "ai" || c.bucket === "pending") && !c.closed;
-    }
     return true;
   }
 
@@ -4974,7 +6496,6 @@ class OmnichannelAIDemo {
 
   render() {
     this.ensureActiveVisible();
-    this.renderFanelTabs();
     this.renderChannelTabs();
     this.renderContacts();
     this.renderChat();
@@ -4987,20 +6508,6 @@ class OmnichannelAIDemo {
     this.root.querySelector("[data-omni-context-panel]").classList.toggle("is-hidden", !this.contextOpen);
   }
 
-  renderFanelTabs() {
-    const counts = {
-      mine: this.contacts.filter((c) => c.bucket === "call_center" && !c.claimedByOther && !c.closed).length,
-      ai: this.contacts.filter((c) => (c.bucket === "ai" || c.bucket === "pending") && !c.closed).length,
-      all: this.contacts.filter((c) => !c.closed).length,
-    };
-    this.root.querySelector("[data-omni-count-mine]").textContent = counts.mine;
-    this.root.querySelector("[data-omni-count-ai]").textContent = counts.ai;
-    this.root.querySelector("[data-omni-count-all]").textContent = counts.all;
-    for (const button of this.root.querySelectorAll("[data-omni-fanel]")) {
-      button.classList.toggle("active", button.dataset.omniFanel === this.fanel);
-    }
-  }
-
   renderChannelTabs() {
     const base = this.contacts.filter((c) => !c.closed);
     const count = (ch) => base.filter((c) => ch === "all" || c.channel === ch).length;
@@ -5009,7 +6516,9 @@ class OmnichannelAIDemo {
     this.root.querySelector("[data-omni-ch-fb]").textContent = count("messenger");
     this.root.querySelector("[data-omni-ch-ig]").textContent = count("instagram");
     for (const button of this.root.querySelectorAll("[data-omni-channel]")) {
-      button.classList.toggle("active", button.dataset.omniChannel === this.channel);
+      const isActive = button.dataset.omniChannel === this.channel;
+      button.classList.toggle("active", isActive);
+      button.setAttribute("aria-selected", String(isActive));
     }
   }
 
@@ -5019,43 +6528,50 @@ class OmnichannelAIDemo {
     this.root.querySelector("[data-omni-bulk-count]").textContent = `${this.selectedIds.size} dipilih`;
   }
 
-  groupContacts(list) {
-    const groups = [];
-    const push = (key, title, cls, items, opts = {}) => {
-      if (items.length) groups.push({ key, title, cls, items, ...opts });
-    };
-    push("mr_pending", "MR Belum Balas", "mr", list.filter((c) => c.bucket === "mr" && c.mrUnanswered && !c.closed));
-    push("mr_done", "MR Sudah Balas", "mr", list.filter((c) => c.bucket === "mr" && !c.mrUnanswered && !c.closed));
-    push("ai", "Ditangani AI", "ai", list.filter((c) => c.bucket === "ai" && !c.closed));
-    push("pending", "Menunggu Agent", "pending", list.filter((c) => c.bucket === "pending" && !c.closed));
-    const agents = {};
-    for (const c of list.filter((x) => x.bucket === "call_center" && !x.closed)) {
-      const key = c.claimedByOther ? c.handlerName : "Saya";
-      agents[key] = agents[key] || [];
-      agents[key].push(c);
-    }
-    for (const [name, items] of Object.entries(agents)) {
-      push("cc-" + name, name === "Saya" ? "Ditangani Agent (Saya)" : `Ditangani ${name}`, "cc", items);
-    }
-    push("closed", "Closed / Riwayat", "closed", list.filter((c) => c.closed));
-    return groups;
+  aiAgeBucket(contact) {
+    if (contact.aiAgeBucket) return contact.aiAgeBucket;
+    const label = String(contact.time || "").toLowerCase();
+    const days = Number(label.match(/(\d+)\s*hari/)?.[1] || 0);
+    if (days > 3 || label.includes("minggu")) return "over_3_days";
+    if (days || label.includes("kemarin")) return "under_3_days";
+    return "under_12_hours";
   }
 
-  renderContacts() {
-    let list = this.contacts.filter((c) => this.matchesFilters(c));
-    list = [...list].sort((a, b) => Number(b.pinned) - Number(a.pinned));
-    if (!list.length) {
-      this.contactList.innerHTML = '<div class="cc-empty">Tidak ada percakapan pada filter ini.</div>';
-      return;
-    }
-    const groups = this.fanel === "all" || this.fanel === "ai" ? this.groupContacts(list) : [{ key: "flat", title: "", cls: "", items: list }];
-    const html = [];
-    for (const group of groups) {
-      if (group.title) {
-        html.push(`<div class="cc-group-title ${group.cls}">${group.title}<span>${group.items.length}</span></div>`);
-        html.push(`<div class="cc-group-actions"><button type="button" data-omni-select-group="${group.key}">Select bucket</button></div>`);
-      }
-      for (const c of group.items) {
+  bucketIcon(kind) {
+    const icons = {
+      call_center: '<svg viewBox="0 0 24 24"><circle cx="12" cy="7" r="3"/><path d="M6 21v-2a6 6 0 0 1 12 0v2"/></svg>',
+      mr: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/></svg>',
+      done: '<svg viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></svg>',
+      ai: '<svg viewBox="0 0 24 24"><rect x="5" y="7" width="14" height="11" rx="2"/><path d="M9 3h6M12 3v4M9 12h.01M15 12h.01M9 16h6"/></svg>',
+      timer: '<svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><path d="M9 2h6M12 5v3M12 13l3-2"/></svg>',
+      list: '<svg viewBox="0 0 24 24"><path d="m3 6 1.5 1.5L7 5M10 6h11M3 12l1.5 1.5L7 11M10 12h11M3 18l1.5 1.5L7 17M10 18h11"/></svg>',
+    };
+    return icons[kind] || icons.mr;
+  }
+
+  renderBucketHeader({ key, title, tone, icon, items, nested = false }) {
+    const collapsed = this.collapsedBuckets.has(key);
+    this.bucketItems.set(key, items);
+    return `
+      <div class="cc-bucket-head ${tone}${nested ? " nested" : ""}">
+        <button type="button" class="cc-bucket-toggle" data-omni-toggle-bucket="${key}" aria-expanded="${!collapsed}" aria-controls="cc-bucket-${key}">
+          <span class="cc-bucket-icon" aria-hidden="true">${this.bucketIcon(icon)}</span>
+          <span class="cc-bucket-title">${title}</span>
+          <span class="cc-bucket-count">${items.length}</span>
+          <span class="cc-bucket-chevron${collapsed ? "" : " is-open"}" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
+          </span>
+        </button>
+        <button type="button" class="cc-bucket-select" data-omni-select-group="${key}" aria-label="Pilih chat di bucket ${title}" title="Select bucket">
+          ${this.bucketIcon("list")}
+        </button>
+      </div>`;
+  }
+
+  renderContactRows(items) {
+    if (!items.length) return '<div class="cc-empty cc-bucket-empty">Tidak ada chat di bucket ini.</div>';
+    return items
+      .map((c) => {
         const classes = ["cc-row"];
         if (c.id === this.activeContactId) classes.push("active");
         if (c.escalated) classes.push("escalated");
@@ -5064,9 +6580,10 @@ class OmnichannelAIDemo {
         const badges = [];
         if (c.escalated) badges.push('<span class="cc-badge-sm es">ESKALASI</span>');
         if (c.mrUnanswered) badges.push('<span class="cc-badge-sm mr">MR BELUM BALAS</span>');
-        if (c.bucket === "pending")
+        if (c.bucket === "pending") {
           badges.push(`<button type="button" class="cc-badge-sm claim" data-omni-claim="${c.id}">Ambil</button>`);
-        html.push(`
+        }
+        return `
           <div class="${classes.join(" ")}" data-omni-contact="${c.id}" role="button" tabindex="0">
             <input type="checkbox" data-omni-select="${c.id}" ${this.selectedIds.has(c.id) ? "checked" : ""} aria-label="Pilih ${c.name}" />
             <span class="cc-avatar ${c.channel}">${this.initials(c.name)}<i class="dot ${c.channel}"></i></span>
@@ -5076,23 +6593,78 @@ class OmnichannelAIDemo {
               ${badges.join(" ")}
             </span>
             <span class="cc-row-side">
-              <div>${c.time}</div>
+              <span>${c.time}</span>
               <button type="button" class="cc-pin ${c.pinned ? "on" : ""}" data-omni-pin="${c.id}" title="Pin">📌</button>
             </span>
+          </div>`;
+      })
+      .join("");
+  }
+
+  renderContacts() {
+    let list = this.contacts.filter((c) => this.matchesFilters(c));
+    list = [...list].sort((a, b) => Number(b.pinned) - Number(a.pinned));
+    this.bucketItems = new Map();
+    if (!list.length) {
+      this.contactList.innerHTML = '<div class="cc-empty">Tidak ada percakapan pada filter ini.</div>';
+      return;
+    }
+
+    const callCenter = list.filter((c) => c.bucket === "call_center" || c.bucket === "pending");
+    const allMR = list.filter((c) => c.bucket === "mr");
+    const mrNames = [...new Set(allMR.map((c) => c.mrName).filter(Boolean))].sort();
+    if (this.mrFilter !== "all" && !mrNames.includes(this.mrFilter)) this.mrFilter = "all";
+    const visibleMR = this.mrFilter === "all" ? allMR : allMR.filter((c) => c.mrName === this.mrFilter);
+    const mrPending = visibleMR.filter((c) => c.mrUnanswered);
+    const mrDone = visibleMR.filter((c) => !c.mrUnanswered);
+    const ai = list.filter((c) => c.bucket === "ai");
+    const aiUnder12 = ai.filter((c) => this.aiAgeBucket(c) === "under_12_hours");
+    const aiUnder3 = ai.filter((c) => this.aiAgeBucket(c) === "under_3_days");
+    const aiOver3 = ai.filter((c) => this.aiAgeBucket(c) === "over_3_days");
+    const html = [];
+
+    if (callCenter.length) {
+      html.push(this.renderBucketHeader({ key: "call_center", title: "Call Center", tone: "call-center", icon: "call_center", items: callCenter }));
+      html.push(`<section class="cc-bucket-content" id="cc-bucket-call_center"${this.collapsedBuckets.has("call_center") ? " hidden" : ""}>${this.renderContactRows(callCenter)}</section>`);
+    }
+
+    if (allMR.length) {
+      html.push(this.renderBucketHeader({ key: "mr", title: "Marketing Representative", tone: "mr", icon: "mr", items: visibleMR }));
+      const options = mrNames.map((name) => `<option value="${name}"${name === this.mrFilter ? " selected" : ""}>${name}</option>`).join("");
+      html.push(`
+        <section class="cc-bucket-content" id="cc-bucket-mr"${this.collapsedBuckets.has("mr") ? " hidden" : ""}>
+          <label class="cc-mr-filter">
+            <span class="cc-visually-hidden">Filter Marketing Representative</span>
+            <select data-omni-mr-filter aria-label="Filter Marketing Representative">
+              <option value="all">Semua MR</option>${options}
+            </select>
+            <span aria-hidden="true">⌄</span>
+          </label>
+          <div class="cc-bucket-nested">
+            ${this.renderBucketHeader({ key: "mr_pending", title: "MR Belum Balas", tone: "mr-pending", icon: "mr", items: mrPending, nested: true })}
+            <section class="cc-bucket-content" id="cc-bucket-mr_pending"${this.collapsedBuckets.has("mr_pending") ? " hidden" : ""}>${this.renderContactRows(mrPending)}</section>
+            ${this.renderBucketHeader({ key: "mr_done", title: "MR Sudah Balas", tone: "mr-done", icon: "done", items: mrDone, nested: true })}
+            <section class="cc-bucket-content" id="cc-bucket-mr_done"${this.collapsedBuckets.has("mr_done") ? " hidden" : ""}>${this.renderContactRows(mrDone)}</section>
           </div>
-        `);
-      }
+        </section>`);
     }
-    this.contactList.innerHTML = html.join("");
-    for (const btn of this.contactList.querySelectorAll("[data-omni-select-group]")) {
-      btn.addEventListener("click", (e) => {
-        e.stopPropagation();
-        const g = groups.find((x) => x.key === btn.dataset.omniSelectGroup);
-        if (!g) return;
-        for (const c of g.items) this.selectedIds.add(c.id);
-        this.render();
-      });
+
+    if (ai.length) {
+      html.push(this.renderBucketHeader({ key: "ai", title: "Ditangani AI", tone: "ai", icon: "ai", items: ai }));
+      html.push(`
+        <section class="cc-bucket-content" id="cc-bucket-ai"${this.collapsedBuckets.has("ai") ? " hidden" : ""}>
+          <div class="cc-bucket-nested ai">
+            ${this.renderBucketHeader({ key: "ai_under_12", title: "Ditangani kurang dari 12 jam", tone: "ai-fresh", icon: "timer", items: aiUnder12, nested: true })}
+            <section class="cc-bucket-content" id="cc-bucket-ai_under_12"${this.collapsedBuckets.has("ai_under_12") ? " hidden" : ""}>${this.renderContactRows(aiUnder12)}</section>
+            ${this.renderBucketHeader({ key: "ai_under_3", title: "Ditangani kurang dari 3 hari", tone: "ai-aging", icon: "mr", items: aiUnder3, nested: true })}
+            <section class="cc-bucket-content" id="cc-bucket-ai_under_3"${this.collapsedBuckets.has("ai_under_3") ? " hidden" : ""}>${this.renderContactRows(aiUnder3)}</section>
+            ${this.renderBucketHeader({ key: "ai_over_3", title: "Ditangani lebih dari 3 hari", tone: "ai-old", icon: "mr", items: aiOver3, nested: true })}
+            <section class="cc-bucket-content" id="cc-bucket-ai_over_3"${this.collapsedBuckets.has("ai_over_3") ? " hidden" : ""}>${this.renderContactRows(aiOver3)}</section>
+          </div>
+        </section>`);
     }
+
+    this.contactList.innerHTML = html.join("") || '<div class="cc-empty">Tidak ada percakapan pada filter ini.</div>';
   }
 
   renderChat() {
@@ -5279,14 +6851,16 @@ class OmnichannelAIDemo {
     c.time = "baru";
     this.activeContactId = c.id;
     this.fanel = "mine";
+    this.collapsedBuckets.delete("call_center");
     this.render();
-    this.showToast("Takeover", `${c.name} sekarang di Saya Handle.`);
+    this.showToast("Takeover", `${c.name} sekarang di bucket Call Center.`);
   }
 
   releaseToAI() {
     const c = this.activeContact();
     if (c.closed) return;
     c.bucket = "ai";
+    c.aiAgeBucket = "under_12_hours";
     c.handlerName = "Jasmine AI";
     c.claimedByOther = false;
     c.mrName = "";
@@ -5299,6 +6873,8 @@ class OmnichannelAIDemo {
     c.history.push({ label: "Release ke AI", time: "baru saja" });
     c.preview = "Kembali ke AI";
     this.fanel = "ai";
+    this.collapsedBuckets.delete("ai");
+    this.collapsedBuckets.delete("ai_under_12");
     this.render();
     this.showToast("AI aktif", "Lead dikembalikan ke bucket Ditangani AI.");
   }
@@ -5316,6 +6892,7 @@ class OmnichannelAIDemo {
     });
     c.history.push({ label: "Takeover dari MR", time: "baru saja" });
     this.fanel = "mine";
+    this.collapsedBuckets.delete("call_center");
     this.render();
     this.showToast("Takeover dari MR", "Lead kembali ke Call Center.");
   }
@@ -5344,6 +6921,8 @@ class OmnichannelAIDemo {
     c.preview = `Handoff → MR ${mr.split(" ")[0]}`;
     this.closeModal("handoff");
     this.fanel = "all";
+    this.collapsedBuckets.delete("mr");
+    this.collapsedBuckets.delete("mr_pending");
     this.render();
     this.showToast("Handoff ke MR", `${c.name} diserahkan ke ${mr}. Lanjut preview role MR.`);
   }
@@ -5363,7 +6942,10 @@ class OmnichannelAIDemo {
   submitEscalate() {
     const c = this.activeContact();
     c.escalated = true;
-    if (c.bucket === "ai") c.bucket = "pending";
+    if (c.bucket === "ai") {
+      c.bucket = "pending";
+      this.collapsedBuckets.delete("call_center");
+    }
     c.history.push({ label: "Eskalasi ditandai", time: "baru saja" });
     this.closeModal("escalate");
     this.render();
@@ -5400,9 +6982,10 @@ class OmnichannelAIDemo {
     });
     this.activeContactId = id;
     this.fanel = "mine";
+    this.collapsedBuckets.delete("call_center");
     this.closeModal("manual");
     this.render();
-    this.showToast("Lead manual", `${name} ditambahkan ke Saya Handle.`);
+    this.showToast("Lead manual", `${name} ditambahkan ke bucket Call Center.`);
   }
 
   openCredit() {
@@ -5490,51 +7073,12 @@ class OmnichannelAIDemo {
   }
 
   startTutorial() {
-    this.tutorialActive = true;
-    this.tutorialStep = 0;
-    this.showTutorialStep();
+    this.openGuide(0);
   }
 
   endTutorial(silent) {
-    this.tutorialActive = false;
-    this.root.querySelector("[data-omni-tutorial-modal]").hidden = true;
+    this.closeGuide();
     if (!silent) this.showToast("Tutorial selesai", "Silakan eksplorasi bebas semua aksi Call Center.");
-  }
-
-  nextTutorial() {
-    if (this.tutorialStep >= omniTutorialSteps.length - 1) {
-      this.endTutorial();
-      return;
-    }
-    this.tutorialStep += 1;
-    this.showTutorialStep();
-  }
-
-  showTutorialStep() {
-    const step = omniTutorialSteps[this.tutorialStep];
-    if (step.fanel) this.fanel = step.fanel;
-    if (step.contactId) this.activeContactId = step.contactId;
-    if (step.ctxTab) this.ctxTab = step.ctxTab;
-    if (step.action === "takeover") this.takeoverContact(step.contactId);
-    if (step.action === "handoff") {
-      const c = this.activeContact();
-      if (c.bucket !== "mr") {
-        this.root.querySelector("[data-omni-handoff-mr]").value = "Dimas Pratama";
-        this.root.querySelector("[data-omni-handoff-notes]").value = "Tutorial: HOT + test drive";
-        this.submitHandoff();
-      }
-    }
-    this.render();
-    if (step.action === "mr_preview") this.openMrPreview();
-    this.root.querySelector("[data-omni-tutorial-title]").textContent = `Langkah ${this.tutorialStep + 1}/${omniTutorialSteps.length}: ${step.title}`;
-    this.root.querySelector("[data-omni-tutorial-body]").textContent = step.body;
-    const stepsEl = this.root.querySelector("[data-omni-tutorial-steps]");
-    stepsEl.innerHTML = omniTutorialSteps
-      .map((_, i) => `<span class="${i === this.tutorialStep ? "on" : ""}">${i + 1}</span>`)
-      .join("");
-    this.root.querySelector("[data-omni-tutorial-next]").textContent =
-      this.tutorialStep >= omniTutorialSteps.length - 1 ? "Selesai" : "Lanjut";
-    this.openModal("tutorial");
   }
 
   async runPrompt(message, { asCustomer = true } = {}) {
@@ -5593,6 +7137,7 @@ class OmnichannelAIDemo {
       contact.claimedByOther = false;
       contact.history.push({ label: "Takeover via kirim pesan", time: "baru saja" });
       this.fanel = "mine";
+      this.collapsedBuckets.delete("call_center");
     }
     if (contact.claimedByOther) {
       contact.claimedByOther = false;
@@ -5604,6 +7149,92 @@ class OmnichannelAIDemo {
     contact.time = "baru";
     contact.history.push({ label: "Balasan Call Center", time: "baru saja" });
     this.render();
+  }
+
+  runJasmineJourney(stage) {
+    const contact = this.contacts.find((item) => item.id === "omni-nadia");
+    if (!contact) return;
+
+    const journeys = {
+      discovery: {
+        customer: "Saya cari mobil keluarga, tapi belum tahu model yang cocok.",
+        response: "Siap, Kak. Biar rekomendasinya tepat: biasanya dipakai berapa orang, lebih sering dalam kota atau luar kota, dan kisaran budgetnya berapa?",
+        outcome: "Discovery kebutuhan · Jasmine menggali use case sebelum menawarkan unit.",
+        tag: "cold",
+        pipelineStage: "cold",
+        trace: { domain: "qualification", effect: "read_only", tool: "conversation.context · read_only" },
+      },
+      inventory: {
+        customer: "Untuk keluarga 4 orang, budget sekitar 250 juta. Stok yang cocok apa?",
+        response: "Dari stok demo yang terverifikasi, ada Honda BR-V Prestige 2021 Rp255 jt dan Toyota Rush G AT 2022 Rp190 jt. Kakak lebih prioritas kabin luas atau cicilan ringan?",
+        outcome: "Stok ter-grounding · Harga dan unit hanya berasal dari hasil inventori demo.",
+        tag: "warm",
+        pipelineStage: "warm",
+        unit: "Honda BR-V / Toyota Rush",
+        budget: "Budget customer ~Rp 250 jt",
+        trace: { domain: "inventory", effect: "read_only", tool: "inventory.search · read_only" },
+      },
+      finance: {
+        customer: "BR-V menarik. Kalau kredit, saya siap DP 50 juta dengan tenor 5 tahun.",
+        response: "DP Rp50 juta dan tenor 5 tahun saya catat sebagai preferensi. Saya tidak akan mengarang cicilan; nominal simulasi harus dihitung dari kalkulator pembiayaan resmi. Apakah BR-V ini yang ingin diproses, Kak?",
+        outcome: "Lead WARM · Preferensi finance dicatat tanpa mengarang angka cicilan.",
+        tag: "warm",
+        pipelineStage: "warm",
+        unit: "Honda BR-V Prestige 2021",
+        budget: "DP Rp 50 jt · tenor 5 tahun",
+        trace: { domain: "finance", effect: "read_only", tool: "finance.simulate · parameterized" },
+      },
+      handoff: {
+        customer: "Ya, saya mau test drive BR-V besok sore dan lanjut kalau cocok.",
+        response: "Siap, Kak. Minat test drive besok sore saya tandai HOT. Konteks unit, budget, dan jadwal sudah dirangkum agar MR dapat melanjutkan tanpa mengulang pertanyaan.",
+        outcome: "Lead HOT · Siap handoff kontekstual ke MR, tanpa kehilangan riwayat.",
+        tag: "hot",
+        pipelineStage: "hot",
+        unit: "Honda BR-V Prestige 2021",
+        budget: "DP Rp 50 jt · tenor 5 tahun",
+        trace: { domain: "handoff", effect: "simulated_write", tool: "lead.assign_sales_rep · tenant demo" },
+      },
+    };
+    const journey = journeys[stage] || journeys.discovery;
+    contact.bucket = "ai";
+    contact.aiAgeBucket = "under_12_hours";
+    contact.handlerName = "Jasmine AI";
+    contact.mrName = "";
+    contact.mrUnanswered = false;
+    contact.closed = false;
+    contact.tag = journey.tag;
+    contact.pipelineStage = journey.pipelineStage;
+    if (journey.unit) contact.unit = journey.unit;
+    if (journey.budget) contact.budget = journey.budget;
+    contact.messages.push(
+      { role: "customer", content: journey.customer, time: "baru saja" },
+      { role: "assistant", content: journey.response, time: "baru saja" },
+    );
+    contact.preview = journey.response;
+    contact.time = "baru";
+    contact.history.push({ label: `Jasmine · ${journey.outcome.split(" · ")[0]}`, time: "baru saja" });
+    this.trace = {
+      ...this.defaultTrace,
+      ...journey.trace,
+      router: `Jasmine memilih domain ${journey.trace.domain} dari konteks percakapan dan status lead.`,
+      grounding: stage === "inventory"
+        ? "Unit dan harga berasal dari inventori tenant demo."
+        : "Respons memakai konteks lead dan guardrail sesuai tahap perjalanan.",
+      evalTitle: `Jasmine journey · ${stage}`,
+      blocked: false,
+      assertions: ["Konteks percakapan dipertahankan", "Status lead sesuai intent", "Tidak mengarang data", "External send = 0"],
+    };
+    this.activeContactId = contact.id;
+    this.fanel = "ai";
+    this.collapsedBuckets.delete("ai");
+    this.collapsedBuckets.delete("ai_under_12");
+    this.ctxTab = stage === "handoff" ? "detail" : "trace";
+    this.root.querySelector("[data-omni-jasmine-outcome]").textContent = journey.outcome;
+    for (const button of this.root.querySelectorAll("[data-omni-jasmine]")) {
+      button.classList.toggle("active", button.dataset.omniJasmine === stage);
+    }
+    this.render();
+    this.showToast("Jasmine AI", journey.outcome);
   }
 
   extractUnitInterest(message) {
@@ -6553,6 +8184,19 @@ class OneDashboardDemo {
     this.changeBusinessBtn = root.querySelector("[data-dashboard-change-business]");
     this.businessDescInput = root.querySelector("[data-dashboard-business-desc]");
     this.highlightEditors = root.querySelector("[data-dashboard-highlight-editors]");
+    this.hasOpenedGuide = false;
+
+    this.tour = new DemoProductTour(root, {
+      ns: "dashboard",
+      anchorAttr: "data-dashboard-anchor",
+      getSteps: () => this.guideSteps(),
+      getStepLabel: (step, index, total) => {
+        const viewLabel = step.label || "One Dashboard";
+        return total > 1
+          ? `${String(viewLabel).toUpperCase()} · LANGKAH ${index} DARI ${total}`
+          : String(viewLabel).toUpperCase();
+      },
+    });
 
     this.bind();
     publicDemoData
@@ -6562,6 +8206,47 @@ class OneDashboardDemo {
         if (this.verticalId) this.render();
       })
       .catch(() => {});
+  }
+
+  guideSteps() {
+    return [
+      {
+        anchor: "sidebar",
+        label: "One Dashboard",
+        title: "Command Center eksekutif",
+        body: "Satu dashboard untuk Direktur, Sales Manager, dan Kepala Cabang. Navigasi kiri memilih view — pola panduan sama dengan Inventory Management.",
+      },
+      {
+        anchor: "heading",
+        label: "Filter",
+        title: "Periode & lokasi",
+        body: "Pilih cabang dan periode MTD/QTD/YTD. KPI dan chart langsung menyesuaikan data tenant demo.",
+      },
+      {
+        anchor: "kpi",
+        label: "KPI",
+        title: "KPI utama",
+        body: "Kartu KPI menampilkan revenue, pipeline, conversion, dan metrik prioritas sesuai industri yang dipilih di onboarding.",
+      },
+      {
+        anchor: "revenue",
+        label: "Tren",
+        title: "Tren pendapatan + forecast",
+        body: "Grafik aktual vs forecast membantu melihat momentum bulanan lintas cabang.",
+      },
+      {
+        anchor: "pipeline",
+        label: "Pipeline",
+        title: "Corong konversi",
+        body: "Pipeline sales menunjukkan volume lead di setiap tahap hingga closing.",
+      },
+      {
+        anchor: "customize",
+        label: "Personalisasi",
+        title: "Sesuaikan dashboard",
+        body: "Tombol Sesuaikan membuka panel peran + widget. Selesai — silakan atur layout atau ganti industri lewat Ganti bisnis.",
+      },
+    ];
   }
 
   bind() {
@@ -6662,6 +8347,8 @@ class OneDashboardDemo {
       if (event.key !== "Escape" || !this.root.classList.contains("is-open")) return;
       if (!this.toast.hidden) {
         this.toast.hidden = true;
+      } else if (this.tour?.isOpen) {
+        this.closeGuide();
       } else if (this.customizer.classList.contains("is-open")) {
         this.closeCustomizer();
       } else if (this.onboarding && !this.onboarding.hidden && this.verticalId) {
@@ -6686,19 +8373,29 @@ class OneDashboardDemo {
 
     this.hideOnboarding();
     this.root.querySelector("[data-close-dashboard-demo]").focus();
-    if (!this.hasOpenedCustomizer) {
-      this.openCustomizer();
-      this.hasOpenedCustomizer = true;
+    if (!this.hasOpenedGuide) {
+      this.openGuide(0);
+      this.hasOpenedGuide = true;
     }
   }
 
   close() {
+    this.closeGuide();
     this.closeCustomizer();
     this.toast.hidden = true;
     this.root.classList.remove("is-open");
     this.root.setAttribute("aria-hidden", "true");
     document.body.classList.remove("demo-open");
     if (this.lastFocusedElement) this.lastFocusedElement.focus();
+  }
+
+  openGuide(startIndex = 0) {
+    this.closeCustomizer();
+    this.tour?.open(startIndex);
+  }
+
+  closeGuide() {
+    this.tour?.close();
   }
 
   showOnboarding(keepWorkspace) {
@@ -6756,9 +8453,9 @@ class OneDashboardDemo {
     }
     this.changeBusinessBtn.hidden = false;
 
-    if (!this.hasOpenedCustomizer) {
-      this.openCustomizer();
-      this.hasOpenedCustomizer = true;
+    if (!this.hasOpenedGuide) {
+      this.openGuide(0);
+      this.hasOpenedGuide = true;
     }
   }
 
@@ -7660,6 +9357,9 @@ class SocialGrowthDemo {
     this.posts = this.defaultPosts();
     this.guideStepIndex = 0;
     this.hasOpenedGuide = false;
+    this.entryContext = "social";
+    this.lastEntryContext = "";
+    this.broadcastSegment = "hot";
 
     this.vehicleOptions = root.querySelector("[data-social-vehicle-options]");
     this.captionInput = root.querySelector("[data-social-caption]");
@@ -7670,6 +9370,24 @@ class SocialGrowthDemo {
     this.toast = root.querySelector("[data-social-toast]");
     this.campaignSelect = root.querySelector("[data-social-campaign]");
     this.guide = root.querySelector("[data-social-guide-popover]");
+
+    this.tour = new DemoProductTour(root, {
+      ns: "social",
+      anchorAttr: "data-social-anchor",
+      getSteps: () => this.guideSteps(),
+      onSwitchView: (view) => this.switchView(view),
+      getStepLabel: (step, index, total) => {
+        const labels = {
+          studio: "Content Studio",
+          calendar: "Kalender",
+          insight: "Campaign Insight",
+        };
+        const viewLabel = labels[step.view] || step.label || "Social Growth";
+        return total > 1
+          ? `${String(viewLabel).toUpperCase()} · LANGKAH ${index} DARI ${total}`
+          : String(viewLabel).toUpperCase();
+      },
+    });
 
     this.bind();
     this.reset();
@@ -7713,78 +9431,96 @@ class SocialGrowthDemo {
   }
 
   guideSteps() {
+    if (this.entryContext === "broadcast") {
+      return [
+        {
+          view: "broadcast",
+          anchor: "broadcast-segment",
+          label: "Broadcast",
+          title: "Pilih audiens dari CRM",
+          body: "Pilih segmen Lead Hot, Customer Service, atau Stock Match. Angka memakai data mock dan hanya kontak eligible yang masuk antrean.",
+        },
+        {
+          view: "broadcast",
+          anchor: "broadcast-message",
+          label: "Template",
+          title: "Pesan personal berbasis data",
+          body: "Variabel nama, unit minat, cabang, dan PIC mengambil konteks CRM/inventory. Template dan status approval di demo hanya simulasi.",
+        },
+        {
+          view: "broadcast",
+          anchor: "broadcast-result",
+          label: "Hasil",
+          title: "Delivery sampai lead CRM",
+          body: "Jadwalkan broadcast demo untuk melihat queued, delivered, replies, dan lead CRM—tanpa mengirim pesan nyata.",
+        },
+      ];
+    }
     return [
       {
         view: "studio",
+        anchor: "vehicles",
+        label: "Content Studio",
         title: "Social Growth Studio",
-        body: "Demo Social Media & Ads Automation: alur Konten → Jadwal → Insight lead. Data mock aman, tidak terkirim ke Meta asli.",
+        body: "Demo Social Media & Ads Automation: alur Konten → Jadwal → Insight. Spotlight + tooltip sama seperti panduan Inventory — area sorot adalah kontrol aktif.",
       },
       {
         view: "studio",
+        anchor: "vehicles",
+        label: "Content Studio",
         title: "Pilih unit dari inventory",
-        body: "Delapan unit ready siap jadi materi iklan. Klik kartu unit untuk mengganti preview, harga, dan caption otomatis.",
+        body: "Unit ready siap jadi materi iklan. Klik kartu unit untuk mengganti preview, harga, dan caption otomatis.",
         enter: () => {
           this.vehicleId = "zenix";
           this.offerInput.value = this.vehicle().offer;
           this.captionInput.value = this.vehicle().caption;
           this.renderStudio();
-          this.highlightAnchor("vehicles");
         },
       },
       {
         view: "studio",
-        title: "Cek fitur mobil di creative",
-        body: "Setiap unit membawa spesifikasi Motovax: bodi, BBM, mesin, kapasitas, dan fitur unggulan yang ikut ke caption & preview.",
-        enter: () => {
-          this.vehicleId = "brv";
-          this.offerInput.value = this.vehicle().offer;
-          this.captionInput.value = this.vehicle().caption;
-          this.renderStudio();
-          this.highlightAnchor("vehicles");
-        },
-      },
-      {
-        view: "studio",
+        anchor: "design",
+        label: "Content Studio",
         title: "Desain & format konten",
         body: "Pilih format Post 1:1, Feed 4:5, atau Story 9:16. Edit headline dan penawaran—preview langsung berubah.",
         enter: () => {
           this.format = "portrait";
           this.renderStudio();
-          this.highlightAnchor("design");
         },
       },
       {
         view: "studio",
+        anchor: "caption",
+        label: "Content Studio",
         title: "Platform & generate caption",
         body: "Aktifkan Instagram/Facebook, lalu Generate Ulang untuk 3 varian caption berbasis unit + penawaran.",
-        enter: () => {
-          this.highlightAnchor("caption");
-          this.root.querySelector("[data-social-generate]")?.focus();
-        },
       },
       {
         view: "studio",
+        anchor: "schedule",
+        label: "Content Studio",
         title: "Jadwalkan ke tenant demo",
         body: "Atur tanggal/waktu lalu Jadwalkan. Posting tersimpan di tenant demo (tidak publish ke akun Meta).",
         enter: () => {
           this.root.querySelector(".social-progress span:last-child")?.classList.add("active");
-          this.highlightAnchor("schedule");
         },
       },
       {
         view: "calendar",
+        anchor: "calendar",
+        label: "Kalender",
         title: "Kalender konten",
         body: "Lihat draft, terjadwal, dan terbit. Setelah schedule, unit masuk sebagai posting planned di kalender.",
-        enter: () => this.highlightAnchor("calendar"),
       },
       {
         view: "insight",
+        anchor: "insight",
+        label: "Campaign Insight",
         title: "Campaign Insight → CRM",
-        body: "Ganti campaign untuk melihat klik, lead, UTM, ranking produk, dan lead terbaru yang masuk pipeline CRM.",
+        body: "Ganti campaign untuk melihat klik, lead, UTM, ranking produk, dan lead terbaru yang masuk pipeline CRM. Selesai — eksplor bebas.",
         enter: () => {
           this.campaignSelect.value = "zenix";
           this.renderInsight();
-          this.highlightAnchor("insight");
         },
       },
     ];
@@ -7803,13 +9539,7 @@ class SocialGrowthDemo {
       this.toast.hidden = true;
     });
 
-    for (const button of this.root.querySelectorAll("[data-social-guide]")) {
-      button.addEventListener("click", () => this.openGuide(0));
-    }
-    this.root.querySelector("[data-close-social-guide]")?.addEventListener("click", () => this.closeGuide());
-    this.root.querySelector("[data-social-guide-next]")?.addEventListener("click", () => this.nextGuideStep());
-    this.root.querySelector("[data-social-guide-prev]")?.addEventListener("click", () => this.prevGuideStep());
-    this.root.querySelector("[data-social-guide-finish]")?.addEventListener("click", () => this.closeGuide());
+    // Panduan: DemoProductTour (bindControls di constructor)
 
     for (const button of this.root.querySelectorAll("[data-social-nav]")) {
       button.addEventListener("click", () => this.switchView(button.dataset.socialNav || "studio"));
@@ -7872,25 +9602,49 @@ class SocialGrowthDemo {
       this.renderCalendar();
     });
     this.campaignSelect.addEventListener("change", () => this.renderInsight());
+    this.root.querySelector("[data-social-view-panel=\"broadcast\"]")?.addEventListener("click", (event) => {
+      const segment = event.target.closest("[data-broadcast-segment]");
+      if (segment) {
+        this.broadcastSegment = segment.dataset.broadcastSegment || "hot";
+        this.renderBroadcast();
+        return;
+      }
+      if (event.target.closest("[data-broadcast-send]")) {
+        const result = this.root.querySelector("[data-broadcast-result]");
+        const date = this.root.querySelector("[data-broadcast-date]")?.value || "";
+        const time = this.root.querySelector("[data-broadcast-time]")?.value || "";
+        const eligible = this.root.querySelector("[data-broadcast-eligible]")?.textContent || "0";
+        if (result) result.hidden = false;
+        const copy = this.root.querySelector("[data-broadcast-result-copy]");
+        if (copy) copy.textContent = `${eligible} pesan dijadwalkan ${this.formatDate(date)} pukul ${time} WIB di tenant demo.`;
+      }
+    });
+    this.root.querySelector("[data-broadcast-message]")?.addEventListener("input", () => this.renderBroadcast());
 
     document.addEventListener("keydown", (event) => {
       if (event.key !== "Escape" || !this.root.classList.contains("is-open")) return;
       if (!this.toast.hidden) this.toast.hidden = true;
-      else if (this.guide && !this.guide.hidden) this.closeGuide();
+      else if (this.tour?.isOpen) this.closeGuide();
       else this.close();
     });
   }
 
   open(trigger) {
     this.lastFocusedElement = trigger;
+    const requestedFrom = new URLSearchParams(window.location.search).get("from") || "";
+    const rawContext = trigger?.dataset?.demoContext || requestedFrom;
+    this.entryContext = rawContext === "broadcast" ? "broadcast" : "social";
+    this.root.dataset.entryContext = this.entryContext;
     this.root.classList.add("is-open");
     this.root.setAttribute("aria-hidden", "false");
     document.body.classList.add("demo-open");
     this.root.querySelector("[data-close-social-demo]").focus();
+    this.switchView(this.entryContext === "broadcast" ? "broadcast" : "studio");
     this.loadTenantPosts(true);
-    if (!this.hasOpenedGuide) {
+    if (!this.hasOpenedGuide || this.lastEntryContext !== this.entryContext) {
       this.openGuide(0);
       this.hasOpenedGuide = true;
+      this.lastEntryContext = this.entryContext;
     }
   }
 
@@ -7904,74 +9658,11 @@ class SocialGrowthDemo {
   }
 
   openGuide(startIndex = 0) {
-    if (!this.guide) return;
-    this.guideStepIndex = Math.max(0, startIndex);
-    this.guide.hidden = false;
-    this.renderGuideStep();
-    const focusBtn =
-      this.guide.querySelector("[data-social-guide-next]:not([hidden])") ||
-      this.guide.querySelector("[data-social-guide-finish]:not([hidden])");
-    focusBtn?.focus();
+    this.tour?.open(startIndex);
   }
 
   closeGuide() {
-    if (!this.guide) return;
-    this.guide.hidden = true;
-    this.clearHighlight();
-  }
-
-  highlightAnchor(name) {
-    this.clearHighlight();
-    const el = this.root.querySelector(`[data-social-anchor="${name}"]`);
-    if (el) el.classList.add("social-guide-highlight");
-  }
-
-  clearHighlight() {
-    for (const el of this.root.querySelectorAll(".social-guide-highlight")) {
-      el.classList.remove("social-guide-highlight");
-    }
-  }
-
-  renderGuideStep() {
-    if (!this.guide) return;
-    const steps = this.guideSteps();
-    const step = steps[this.guideStepIndex] || steps[0];
-    const total = steps.length;
-    const index = this.guideStepIndex + 1;
-
-    this.guide.querySelector("[data-social-guide-step-label]").textContent =
-      `LANGKAH ${index} DARI ${total}`;
-    this.guide.querySelector("[data-social-guide-title]").textContent = step.title;
-    this.guide.querySelector("[data-social-guide-body]").textContent = step.body;
-
-    const prev = this.guide.querySelector("[data-social-guide-prev]");
-    const next = this.guide.querySelector("[data-social-guide-next]");
-    const finish = this.guide.querySelector("[data-social-guide-finish]");
-    const isLast = this.guideStepIndex >= total - 1;
-    const isFirst = this.guideStepIndex <= 0;
-
-    if (prev) prev.hidden = isFirst;
-    if (next) next.hidden = isLast;
-    if (finish) finish.hidden = !isLast;
-
-    if (step.view) this.switchView(step.view);
-    if (typeof step.enter === "function") step.enter();
-  }
-
-  nextGuideStep() {
-    const steps = this.guideSteps();
-    if (this.guideStepIndex >= steps.length - 1) {
-      this.closeGuide();
-      return;
-    }
-    this.guideStepIndex += 1;
-    this.renderGuideStep();
-  }
-
-  prevGuideStep() {
-    if (this.guideStepIndex <= 0) return;
-    this.guideStepIndex -= 1;
-    this.renderGuideStep();
+    this.tour?.close();
   }
 
   reset() {
@@ -7981,6 +9672,7 @@ class SocialGrowthDemo {
     this.platforms = new Set(["instagram", "facebook"]);
     this.captionVariant = 0;
     this.monthOffset = 0;
+    this.broadcastSegment = "hot";
     this.posts = this.defaultPosts();
     this.headlineInput.value = "Drive Your Dream Today";
     this.offerInput.value = this.vehicle().offer;
@@ -7991,6 +9683,8 @@ class SocialGrowthDemo {
     this.toast.hidden = true;
     this.closeGuide();
     this.root.querySelector(".social-progress span:last-child").classList.remove("active");
+    const broadcastResult = this.root.querySelector("[data-broadcast-result]");
+    if (broadcastResult) broadcastResult.hidden = true;
     this.renderAll();
     this.switchView("studio");
   }
@@ -8031,6 +9725,11 @@ class SocialGrowthDemo {
         title: "Campaign Insight",
         description: "Hubungkan setiap klik campaign dengan lead dan status CRM yang dihasilkan.",
       },
+      broadcast: {
+        breadcrumb: "Campaign / WhatsApp Broadcast",
+        title: "WhatsApp Broadcast Terukur",
+        description: "Pilih segmen, personalisasi pesan, jadwalkan, lalu lihat alurnya sampai reply dan lead CRM.",
+      },
     };
     const heading = headings[view] || headings.studio;
 
@@ -8048,6 +9747,7 @@ class SocialGrowthDemo {
     this.root.querySelector("[data-social-page-title]").textContent = heading.title;
     this.root.querySelector("[data-social-page-description]").textContent = heading.description;
     if (view === "calendar") this.renderCalendar();
+    if (view === "broadcast") this.renderBroadcast();
     if (view === "insight") this.renderInsight();
     this.root.querySelector(".social-workspace").scrollTop = 0;
   }
@@ -8056,7 +9756,33 @@ class SocialGrowthDemo {
     this.renderVehicles();
     this.renderStudio();
     this.renderCalendar();
+    this.renderBroadcast();
     this.renderInsight();
+  }
+
+  renderBroadcast() {
+    const configs = {
+      hot: { target: 186, eligible: 179, optout: 7, name: "Nadia", unit: "Innova Zenix Hybrid", branch: "Pondok Bambu" },
+      service: { target: 94, eligible: 90, optout: 4, name: "Rizky", unit: "jadwal layanan berkala", branch: "Cinere" },
+      stock: { target: 128, eligible: 121, optout: 7, name: "Dewi", unit: "Honda BR-V Prestige", branch: "Cibubur" },
+    };
+    const config = configs[this.broadcastSegment] || configs.hot;
+    for (const button of this.root.querySelectorAll("[data-broadcast-segment]")) {
+      const active = button.dataset.broadcastSegment === this.broadcastSegment;
+      button.classList.toggle("active", active);
+      button.setAttribute("aria-checked", String(active));
+    }
+    const template = this.root.querySelector("[data-broadcast-message]")?.value || "";
+    const preview = template
+      .replaceAll("{{nama}}", config.name)
+      .replaceAll("{{unit_minat}}", config.unit)
+      .replaceAll("{{cabang}}", config.branch)
+      .replaceAll("{{sales_pic}}", "Dimas");
+    const previewEl = this.root.querySelector("[data-broadcast-preview]");
+    if (previewEl) previewEl.textContent = preview;
+    this.root.querySelector("[data-broadcast-target]").textContent = String(config.target);
+    this.root.querySelector("[data-broadcast-eligible]").textContent = String(config.eligible);
+    this.root.querySelector("[data-broadcast-optout]").textContent = String(config.optout);
   }
 
   applyInventoryPhotos(units) {
@@ -8372,6 +10098,317 @@ if (socialDemoMount) {
   };
 }
 
+class CapabilityProductDemo {
+  constructor(root) {
+    this.root = root;
+    this.mode = "whatsapp";
+    this.role = "sales";
+    this.aiPaused = false;
+    this.rule = "followup";
+    this.lastFocusedElement = null;
+    this.waLogs = [
+      { time: "10:42", title: "Health check normal", copy: "Falcon · session connected" },
+      { time: "10:39", title: "Meta sync selesai", copy: "Messenger + Instagram aktif" },
+      { time: "10:31", title: "Nomor Call Center diperiksa", copy: "2 nomor · multi-branch" },
+    ];
+    this.automationLogs = [
+      { time: "10:34", title: "Auto-follow CRM", copy: "12 lead stale → task MR" },
+      { time: "09:00", title: "Email report worker", copy: "Rekap harian terkirim" },
+    ];
+    this.tour = new DemoProductTour(root, {
+      ns: "capability",
+      anchorAttr: "data-capability-anchor",
+      getSteps: () => this.guideSteps(),
+      getStepLabel: (_step, index, total) => `AUTOMASI · LANGKAH ${index} DARI ${total}`,
+    });
+    this.bind();
+    this.render();
+  }
+
+  guideSteps() {
+    return [
+      {
+        anchor: "automation-status",
+        title: "Mulai dari status automasi",
+        body: "Ringkasan ini membedakan automasi yang aktif di produk dari workflow builder visual yang masih berstatus roadmap.",
+      },
+      {
+        anchor: "automation-rules",
+        title: "Pilih rule yang ingin diuji",
+        body: "Klik salah satu rule aktif. Diagram event di sebelahnya akan berubah mengikuti Auto-follow CRM, routing, report worker, atau photo maintenance.",
+      },
+      {
+        anchor: "automation-simulator",
+        title: "Jalankan event demo",
+        body: "Tekan “Jalankan event demo” untuk memproses simulasi aman. Hasilnya muncul di panel ini tanpa menghubungi customer atau mengubah data produksi.",
+      },
+      {
+        anchor: "automation-log",
+        title: "Periksa jejak eksekusi",
+        body: "Setiap simulasi menambahkan event terbaru ke log. Coba rule lain, jalankan kembali, atau gunakan Clear demo untuk mengosongkan jejak.",
+      },
+    ];
+  }
+
+  roleConfigs() {
+    return {
+      sales: {
+        title: "Sales · Falcon",
+        avatar: "FA",
+        profile: "Motovax Sales AI",
+        number: "+62 811-2345-001",
+        routing: "Lead sales & inventory",
+        tools: "Stok, foto, kredit, handoff",
+      },
+      "call-center": {
+        title: "Call Center · Jasmine",
+        avatar: "JA",
+        profile: "Motovax Customer AI",
+        number: "2 nomor Call Center",
+        routing: "Inquiry, komplain, handoff MR",
+        tools: "Inbox, kredit, inventori, eskalasi",
+      },
+      meta: {
+        title: "Meta Channels",
+        avatar: "ME",
+        profile: "Messenger + Instagram",
+        number: "Meta Business · Connected",
+        routing: "DM ke inbox omnichannel",
+        tools: "DM, media, atribusi source",
+      },
+    };
+  }
+
+  automationConfigs() {
+    return {
+      followup: {
+        title: "Auto-follow CRM",
+        steps: ["Lead stale terdeteksi", "Cek program & guideline", "Buat reminder / task MR", "Catat aktivitas CRM"],
+        result: "12 lead stale diproses; 9 reminder dan 3 task MR dibuat di tenant demo.",
+      },
+      routing: {
+        title: "Jasmine routing",
+        steps: ["Intent customer dibaca", "Kualifikasi status HOT", "Pilih MR sesuai routing", "Fallback ke Call Center"],
+        result: "Lead HOT diarahkan ke MR Dimas; SLA acknowledgement mulai dihitung.",
+      },
+      report: {
+        title: "Email report worker",
+        steps: ["Jadwal report aktif", "Ambil metrik tenant", "Susun rekap per role", "Kirim & simpan log"],
+        result: "Laporan performa harian disusun dan dicatat sebagai simulasi pengiriman.",
+      },
+      photo: {
+        title: "Photo maintenance",
+        steps: ["Foto unit diunggah", "Validasi identitas unit", "Optimasi media", "Sinkron ke inventory"],
+        result: "8 foto tervalidasi dan disinkronkan ke 2 unit pada tenant demo.",
+      },
+    };
+  }
+
+  bind() {
+    for (const button of document.querySelectorAll("[data-open-whatsapp-demo]")) {
+      button.addEventListener("click", (event) => {
+        if (button instanceof HTMLAnchorElement) event.preventDefault();
+        this.open(button, "whatsapp");
+      });
+    }
+    for (const button of document.querySelectorAll("[data-open-automation-demo]")) {
+      button.addEventListener("click", (event) => {
+        if (button instanceof HTMLAnchorElement) event.preventDefault();
+        this.open(button, "automation");
+      });
+    }
+    this.root.querySelector("[data-close-capability-demo]")?.addEventListener("click", () => this.close());
+    this.root.querySelector("[data-capability-reset]")?.addEventListener("click", () => this.reset());
+    for (const button of this.root.querySelectorAll("[data-capability-nav]")) {
+      button.addEventListener("click", () => this.switchMode(button.dataset.capabilityNav || "whatsapp"));
+    }
+    this.root.addEventListener("click", (event) => {
+      const role = event.target.closest("[data-wa-demo-role]");
+      if (role) {
+        this.role = role.dataset.waDemoRole || "sales";
+        this.renderWhatsApp();
+        return;
+      }
+      const action = event.target.closest("[data-wa-demo-action]");
+      if (action) {
+        this.handleWhatsAppAction(action.dataset.waDemoAction || "test");
+        return;
+      }
+      if (event.target.closest("[data-wa-demo-refresh]")) {
+        this.waLogs.unshift({ time: "baru", title: "Status diperbarui", copy: "Semua session normal" });
+        this.renderWhatsApp();
+        return;
+      }
+      const rule = event.target.closest("[data-automation-rule]");
+      if (rule) {
+        this.rule = rule.dataset.automationRule || "followup";
+        const result = this.root.querySelector("[data-automation-result]");
+        if (result) result.hidden = true;
+        this.renderAutomation();
+        return;
+      }
+      if (event.target.closest("[data-automation-run]")) {
+        this.runAutomation();
+        return;
+      }
+      if (event.target.closest("[data-automation-clear]")) {
+        this.automationLogs = [];
+        this.renderAutomation();
+      }
+    });
+    document.addEventListener("keydown", (event) => {
+      if (event.key !== "Escape" || !this.root.classList.contains("is-open")) return;
+      if (this.tour.isOpen) this.tour.close();
+      else this.close();
+    });
+  }
+
+  open(trigger, mode) {
+    this.lastFocusedElement = trigger;
+    this.switchMode(mode);
+    this.root.classList.add("is-open");
+    this.root.setAttribute("aria-hidden", "false");
+    document.body.classList.add("demo-open");
+    if (this.mode === "automation") this.tour.open(0);
+    else this.root.querySelector("[data-close-capability-demo]")?.focus();
+  }
+
+  close() {
+    this.tour.close();
+    this.root.classList.remove("is-open");
+    this.root.setAttribute("aria-hidden", "true");
+    document.body.classList.remove("demo-open");
+    this.lastFocusedElement?.focus();
+  }
+
+  reset() {
+    this.role = "sales";
+    this.aiPaused = false;
+    this.rule = "followup";
+    this.waLogs = [
+      { time: "10:42", title: "Health check normal", copy: "Falcon · session connected" },
+      { time: "10:39", title: "Meta sync selesai", copy: "Messenger + Instagram aktif" },
+    ];
+    this.automationLogs = [{ time: "10:34", title: "Auto-follow CRM", copy: "12 lead stale → task MR" }];
+    const result = this.root.querySelector("[data-automation-result]");
+    if (result) result.hidden = true;
+    this.render();
+  }
+
+  switchMode(mode) {
+    this.mode = mode === "automation" ? "automation" : "whatsapp";
+    if (this.mode !== "automation" && this.tour?.isOpen) this.tour.close();
+    const copy = this.mode === "automation"
+      ? {
+          title: "Automasi Operasional",
+          subtitle: "Agent tools · routing · worker · tenant demo",
+          breadcrumb: "Operasional / Automasi Aktif",
+          heading: "Automation Control Center",
+          description: "Pantau automasi yang benar-benar tercermin di produk tanpa menampilkan workflow builder sebagai fitur live.",
+        }
+      : {
+          title: "WhatsApp API & Integration",
+          subtitle: "Channel Control Center · tenant demo",
+          breadcrumb: "Settings / Integrations / WhatsApp",
+          heading: "Channel Control Center",
+          description: "Hubungkan channel per role, pantau status session, dan kendalikan AI tenant dari satu workspace.",
+        };
+    this.root.querySelector("[data-capability-title]").textContent = copy.title;
+    this.root.querySelector("[data-capability-subtitle]").textContent = copy.subtitle;
+    this.root.querySelector("[data-capability-breadcrumb]").textContent = copy.breadcrumb;
+    this.root.querySelector("[data-capability-heading]").textContent = copy.heading;
+    this.root.querySelector("[data-capability-description]").textContent = copy.description;
+    const guideTrigger = this.root.querySelector("[data-capability-guide-trigger]");
+    if (guideTrigger) guideTrigger.hidden = this.mode !== "automation";
+    for (const button of this.root.querySelectorAll("[data-capability-nav]")) {
+      const active = button.dataset.capabilityNav === this.mode;
+      button.classList.toggle("active", active);
+      button.setAttribute("aria-current", active ? "page" : "false");
+    }
+    for (const view of this.root.querySelectorAll("[data-capability-view]")) {
+      const active = view.dataset.capabilityView === this.mode;
+      view.hidden = !active;
+      view.classList.toggle("is-active", active);
+    }
+    this.render();
+  }
+
+  handleWhatsAppAction(action) {
+    const config = this.roleConfigs()[this.role];
+    if (action === "toggle") {
+      this.aiPaused = !this.aiPaused;
+      this.waLogs.unshift({
+        time: "baru",
+        title: this.aiPaused ? "AI dipause" : "AI diaktifkan",
+        copy: config.title,
+      });
+    } else if (action === "history") {
+      this.waLogs.unshift({ time: "baru", title: "Riwayat session dibuka", copy: `${config.title} · 24 jam terakhir` });
+    } else {
+      this.waLogs.unshift({ time: "baru", title: "Tes koneksi berhasil", copy: `${config.title} · latency 84 ms` });
+      const sync = this.root.querySelector("[data-wa-demo-sync]");
+      if (sync) sync.textContent = "sekarang";
+    }
+    this.renderWhatsApp();
+  }
+
+  runAutomation() {
+    const config = this.automationConfigs()[this.rule];
+    this.automationLogs.unshift({ time: "baru", title: config.title, copy: config.result });
+    const result = this.root.querySelector("[data-automation-result]");
+    if (result) result.hidden = false;
+    this.root.querySelector("[data-automation-result-copy]").textContent = config.result;
+    this.renderAutomation();
+  }
+
+  render() {
+    this.renderWhatsApp();
+    this.renderAutomation();
+  }
+
+  renderWhatsApp() {
+    const config = this.roleConfigs()[this.role] || this.roleConfigs().sales;
+    for (const button of this.root.querySelectorAll("[data-wa-demo-role]")) {
+      const active = button.dataset.waDemoRole === this.role;
+      button.classList.toggle("active", active);
+      button.setAttribute("aria-selected", String(active));
+    }
+    this.root.querySelector("[data-wa-demo-role-title]").textContent = config.title;
+    this.root.querySelector("[data-wa-demo-role-state]").textContent = this.aiPaused ? "AI dipause" : "AI aktif";
+    this.root.querySelector("[data-wa-demo-avatar]").textContent = config.avatar;
+    this.root.querySelector("[data-wa-demo-profile]").textContent = config.profile;
+    this.root.querySelector("[data-wa-demo-number]").textContent = config.number;
+    this.root.querySelector("[data-wa-demo-routing]").textContent = config.routing;
+    this.root.querySelector("[data-wa-demo-tools]").textContent = config.tools;
+    const toggle = this.root.querySelector('[data-wa-demo-action="toggle"]');
+    if (toggle) toggle.textContent = this.aiPaused ? "Aktifkan AI" : "Pause AI";
+    this.root.querySelector("[data-wa-demo-log]").innerHTML = this.waLogs
+      .slice(0, 6)
+      .map((item) => `<li><time>${item.time}</time><span><b>${item.title}</b><small>${item.copy}</small></span><i></i></li>`)
+      .join("");
+  }
+
+  renderAutomation() {
+    const config = this.automationConfigs()[this.rule] || this.automationConfigs().followup;
+    for (const button of this.root.querySelectorAll("[data-automation-rule]")) {
+      const active = button.dataset.automationRule === this.rule;
+      button.classList.toggle("active", active);
+      button.setAttribute("aria-selected", String(active));
+    }
+    this.root.querySelector("[data-automation-title]").textContent = config.title;
+    this.root.querySelector("[data-automation-flow]").innerHTML = config.steps
+      .map((step, index) => `<div><span>${index + 1}</span><b>${step}</b>${index < config.steps.length - 1 ? "<i>→</i>" : ""}</div>`)
+      .join("");
+    const log = this.root.querySelector("[data-automation-log]");
+    log.innerHTML = this.automationLogs.length
+      ? this.automationLogs.slice(0, 6).map((item) => `<li><time>${item.time}</time><span><b>${item.title}</b><small>${item.copy}</small></span><em>Selesai</em></li>`).join("")
+      : '<li class="empty">Belum ada event demo.</li>';
+  }
+}
+
+const capabilityDemoMount = document.getElementById("capabilityDemo");
+if (capabilityDemoMount) new CapabilityProductDemo(capabilityDemoMount);
+
 const insightDemoSources = [
   {
     id: "whatsapp",
@@ -8479,10 +10516,64 @@ class ConversionInsightDemo {
     this.heatmap = root.querySelector("[data-insight-heatmap]");
     this.actionList = root.querySelector("[data-insight-action-list]");
     this.runActionButton = root.querySelector("[data-insight-run-action]");
+    this.hasOpenedGuide = false;
+
+    this.tour = new DemoProductTour(root, {
+      ns: "insight",
+      anchorAttr: "data-insight-anchor",
+      getSteps: () => this.guideSteps(),
+      getStepLabel: (step, index, total) => {
+        const viewLabel = step.label || "Conversion Insight";
+        return total > 1
+          ? `${String(viewLabel).toUpperCase()} · LANGKAH ${index} DARI ${total}`
+          : String(viewLabel).toUpperCase();
+      },
+    });
 
     this.bind();
     this.reset();
     this.loadTenantMetrics();
+  }
+
+  guideSteps() {
+    return [
+      {
+        anchor: "sidebar",
+        label: "Conversion Insight",
+        title: "Conversion Intelligence",
+        body: "Modul insight menemukan kebocoran funnel dan peluang closing. Panduan memakai spotlight + tooltip seperti Inventory Management.",
+      },
+      {
+        anchor: "kpi",
+        label: "KPI",
+        title: "KPI konversi",
+        body: "Pantau lead masuk, HOT, response time, dan conversion rate sesuai periode yang dipilih.",
+      },
+      {
+        anchor: "funnel",
+        label: "Funnel",
+        title: "Diagnostik funnel",
+        body: "Corong Lead → Closing menampilkan tahap dengan drop-off terbesar (bottleneck).",
+      },
+      {
+        anchor: "opportunity",
+        label: "Opportunity",
+        title: "Prioritas berdampak tinggi",
+        body: "Kartu opportunity mengestimasi uplift konversi bila rekomendasi dijalankan di tenant demo.",
+      },
+      {
+        anchor: "sources",
+        label: "Sumber",
+        title: "Performa sumber lead",
+        body: "Bandingkan WhatsApp, Instagram, Facebook, dan Website berdasarkan volume dan konversi.",
+      },
+      {
+        anchor: "actions",
+        label: "Next Best Action",
+        title: "Rekomendasi untuk tim",
+        body: "Daftar aksi prioritas. Tombol Jalankan Rekomendasi Demo mencatat aktivitas di tenant demo. Selesai — sesuaikan fokus lewat panel personalisasi.",
+      },
+    ];
   }
 
   async loadTenantMetrics(force = false) {
@@ -8605,6 +10696,7 @@ class ConversionInsightDemo {
     document.addEventListener("keydown", (event) => {
       if (event.key !== "Escape" || !this.root.classList.contains("is-open")) return;
       if (!this.toast.hidden) this.toast.hidden = true;
+      else if (this.tour?.isOpen) this.closeGuide();
       else if (this.customizer.classList.contains("is-open")) this.closeCustomizer();
       else this.close();
     });
@@ -8616,19 +10708,29 @@ class ConversionInsightDemo {
     this.root.setAttribute("aria-hidden", "false");
     document.body.classList.add("demo-open");
     this.root.querySelector("[data-close-insight-demo]").focus();
-    if (!this.hasOpened) {
-      this.openCustomizer();
-      this.hasOpened = true;
+    if (!this.hasOpenedGuide) {
+      this.openGuide(0);
+      this.hasOpenedGuide = true;
     }
   }
 
   close() {
+    this.closeGuide();
     this.closeCustomizer();
     this.toast.hidden = true;
     this.root.classList.remove("is-open");
     this.root.setAttribute("aria-hidden", "true");
     document.body.classList.remove("demo-open");
     if (this.lastFocusedElement) this.lastFocusedElement.focus();
+  }
+
+  openGuide(startIndex = 0) {
+    this.closeCustomizer();
+    this.tour?.open(startIndex);
+  }
+
+  closeGuide() {
+    this.tour?.close();
   }
 
   openCustomizer() {
@@ -9049,3 +11151,48 @@ const asciiIndonesiaMount = document.getElementById("asciiIndonesiaBg");
 if (asciiIndonesiaMount) {
   new AsciiIndonesiaBackground(asciiIndonesiaMount);
 }
+
+/**
+ * Deep-link demo dari halaman detail fitur.
+ * Contoh: index.html?demo=omni&from=instagram-api#omniDemo akan membuka modal omnichannel
+ * yang sama seperti tombol pada kartu Solusi, termasuk tutorial pertamanya.
+ * Hash lama (#omniDemo, #crmDemo, dst.) tetap didukung.
+ */
+(function openRequestedSharedDemo() {
+  const demos = {
+    inventory: { hash: "inventoryDemo", selector: "[data-open-inventory-demo]" },
+    omni: { hash: "omniDemo", selector: "[data-open-omni-demo]" },
+    crm: { hash: "crmDemo", selector: "[data-open-crm-demo]" },
+    social: { hash: "socialDemo", selector: "[data-open-social-demo]" },
+    dashboard: { hash: "dashboardDemo", selector: "[data-open-dashboard-demo]" },
+    insight: { hash: "insightDemo", selector: "[data-open-insight-demo]" },
+    falcon: { hash: "falconDemo", selector: "[data-open-falcon-demo]" },
+    whatsapp: { hash: "capabilityDemo", selector: "[data-open-whatsapp-demo]" },
+    automation: { hash: "capabilityDemo", selector: "[data-open-automation-demo]" },
+  };
+  const params = new URLSearchParams(window.location.search);
+  const requestedByQuery = params.get("demo");
+  const requestedByHash = Object.entries(demos).find(
+    ([, config]) => window.location.hash === `#${config.hash}`,
+  )?.[0];
+  const requestedDemo = demos[requestedByQuery] ? requestedByQuery : requestedByHash;
+  if (!requestedDemo) return;
+
+  const opener = document.querySelector(demos[requestedDemo].selector);
+  if (!(opener instanceof HTMLElement)) return;
+
+  const requestedFrom = params.get("from") || "";
+  let context = requestedFrom;
+  if (requestedDemo === "omni") {
+    context = /customer|service|ticket|sla|scorecard/i.test(requestedFrom)
+      ? "customer-support"
+      : /call-center/i.test(requestedFrom)
+        ? "call-center"
+        : "omnichannel";
+  } else if (requestedDemo === "social") {
+    context = /broadcast|blast|bulk|campaign/i.test(requestedFrom) ? "broadcast" : "social";
+  }
+  if (context) opener.dataset.demoContext = context;
+
+  window.requestAnimationFrame(() => opener.click());
+})();
