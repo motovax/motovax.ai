@@ -18021,6 +18021,12 @@ body.feature-image-open { overflow: hidden; }
   gap: 14px;
 }
 
+/* Wordmark header onboarding: tanpa garis biru (swoosh) di bawah logo */
+.onboarding-header .brand:not(:has(.brand-logo))::after,
+.onboarding-header .mini-brand:not(:has(.brand-logo))::after {
+  content: none;
+}
+
 .onboarding-link-muted {
   color: var(--muted);
   font-size: 13px;
@@ -18247,6 +18253,77 @@ body.feature-image-open { overflow: hidden; }
   color: #fff;
   background: linear-gradient(135deg, var(--blue), #0b4ccb);
   box-shadow: 0 8px 18px rgba(18, 103, 245, 0.2);
+}
+
+.onboarding-auth-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 18px 0 14px;
+  color: #94a3b8;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.onboarding-auth-divider::before,
+.onboarding-auth-divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--line);
+}
+
+.onboarding-google-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 46px;
+  padding: 10px 16px;
+  border: 1px solid #d7e2ef;
+  border-radius: 10px;
+  background: #fff;
+  color: var(--ink);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: border-color 0.16s ease, box-shadow 0.16s ease;
+}
+
+.onboarding-google-btn:hover {
+  border-color: rgba(18, 103, 245, 0.45);
+  box-shadow: 0 8px 20px rgba(18, 103, 245, 0.12);
+}
+
+.onboarding-google-icon {
+  width: 18px;
+  height: 18px;
+  flex: none;
+}
+
+.onboarding-google-panel {
+  display: grid;
+  gap: 12px;
+  margin-top: 14px;
+  padding: 14px;
+  border: 1px dashed rgba(18, 103, 245, 0.4);
+  border-radius: 12px;
+  background: rgba(18, 103, 245, 0.05);
+}
+
+.onboarding-google-panel[hidden] {
+  display: none !important;
+}
+
+.onboarding-google-note {
+  margin: 0;
+  color: #526074;
+  font-size: 12.5px;
+  line-height: 1.5;
 }
 
 .onboarding-form {

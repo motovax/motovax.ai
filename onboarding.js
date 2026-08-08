@@ -134,6 +134,22 @@
       });
     }
 
+    var googleBtn = qs("[data-google-login]");
+    var googleForm = qs("[data-google-form]");
+    if (googleBtn && googleForm) {
+      googleBtn.addEventListener("click", function () {
+        googleForm.hidden = !googleForm.hidden;
+        if (!googleForm.hidden) {
+          var googleInput = qs("[data-google-email]", googleForm);
+          if (googleInput) googleInput.focus();
+        }
+      });
+      googleForm.addEventListener("submit", function (e) {
+        e.preventDefault();
+        self.submitGoogle();
+      });
+    }
+
     if (this.businessForm) {
       this.businessForm.addEventListener("submit", function (e) {
         e.preventDefault();
@@ -328,6 +344,37 @@
     this.goTo(this.state.business.businessName ? 3 : 2);
   };
 
+  OnboardingApp.prototype.submitGoogle = function () {
+    var form = qs("[data-google-form]");
+    var input = qs("[data-google-email]");
+    var email = input ? String(input.value || "").trim().toLowerCase() : "";
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      this.showError(form, "Masukkan alamat Gmail yang valid.");
+      return;
+    }
+
+    this.clearErrors();
+    var keepName = this.state.account && this.state.account.fullName;
+    this.state.account = {
+      fullName: keepName || email.split("@")[0],
+      email: email,
+      password: "",
+      provider: "google",
+    };
+    this.state.authMode = "login";
+    saveState(this.state);
+
+    if (this.state.completed) {
+      this.showToast("Login Google berhasil (demo)", "Melanjutkan ke ringkasan workspace.");
+      this.goTo(4);
+      return;
+    }
+
+    this.showToast("Login Google berhasil (demo)", "Lanjut lengkapi onboarding.");
+    this.goTo(this.state.business.businessName ? 3 : 2);
+  };
+
   OnboardingApp.prototype.submitBusiness = function () {
     var form = this.businessForm;
     var fd = new FormData(form);
@@ -389,6 +436,10 @@
     }
     if (this.loginForm && this.loginForm.email) {
       this.loginForm.email.value = acc.email || "";
+    }
+    var googlePrefill = qs("[data-google-email]");
+    if (googlePrefill && acc.provider === "google") {
+      googlePrefill.value = acc.email || "";
     }
     if (this.businessForm) {
       if (this.businessForm.businessName) this.businessForm.businessName.value = biz.businessName || "";
