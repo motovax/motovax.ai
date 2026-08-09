@@ -49,14 +49,14 @@ const template = (industry) => {
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="../styles.css" />
+    <link rel="stylesheet" href="../styles.css?v=logo-20260809" />
     <link rel="stylesheet" href="./industry.css" />
   </head>
   <body class="industry-detail-page">
     <header class="site-header">
       <div class="container header-inner">
         <a class="brand" href="../index.html#top" aria-label="MOTOVAX home">
-          <img class="brand-logo" src="../icons/logo-motovax.png" width="160" height="55" alt="MOTOVAX" />
+          <span>MOTO</span><strong>VAX</strong>
         </a>
         <nav class="nav" aria-label="Navigasi utama">
           <div class="nav-item nav-item-produk" data-produk-menu>
@@ -84,7 +84,7 @@ const template = (industry) => {
       <div class="container footer-grid">
         <div>
           <a class="brand footer-brand" href="../index.html#top" aria-label="MOTOVAX home">
-            <img class="brand-logo" src="../icons/logo-motovax.png" width="140" height="48" alt="MOTOVAX" />
+            <span>MOTO</span><strong>VAX</strong>
           </a>
           <p>Agentic AI ERP — integrasikan operasional bisnis dengan agen AI.</p>
         </div>

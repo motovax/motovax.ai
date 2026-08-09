@@ -77,7 +77,7 @@ a {
   font-size: 28px;
 }
 
-/* Logo resmi MOTOVAX (wordmark) — dipakai header, footer, favicon */
+/* Dukungan aset wordmark lama. Brand utama kini memakai wordmark teks seperti onboarding. */
 .brand-logo {
   display: block;
   width: auto;
@@ -95,29 +95,15 @@ a {
   color: #e31825;
 }
 
-/* Underline CSS hanya untuk wordmark teks (fallback); logo PNG sudah punya swoosh */
+/* Wordmark MOTOVAX tanpa swoosh/garis biru, konsisten dengan halaman onboarding. */
 .brand:not(:has(.brand-logo))::after,
 .mini-brand:not(:has(.brand-logo))::after {
-  content: "";
-  position: absolute;
-  left: 3px;
-  right: 2px;
-  bottom: -7px;
-  height: 8px;
-  border-bottom: 4px solid var(--blue);
-  border-radius: 50%;
-  transform: skewX(-18deg);
+  content: none;
 }
 
 .mini-brand {
   font-size: 16px;
   margin-bottom: 22px;
-}
-
-.mini-brand:not(:has(.brand-logo))::after {
-  bottom: -5px;
-  height: 5px;
-  border-bottom-width: 2px;
 }
 
 .nav {
