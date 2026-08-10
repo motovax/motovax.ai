@@ -575,11 +575,14 @@
 
     const stem = pathname.replace(/\.png$/i, "");
     const variantBase = `../assets/feature-previews/${escapeHtml(stem)}`;
+    const variantVersion = file.includes("?")
+      ? escapeHtml(file.slice(file.indexOf("?")))
+      : "?v=20260810-img-3";
     const sizes = hero ? "(max-width: 900px) calc(100vw - 36px), 540px" : "(max-width: 900px) calc(100vw - 36px), 560px";
     return `<picture>
               <source
                 type="image/webp"
-                srcset="${variantBase}-720.webp?v=20260810-img-3 720w, ${variantBase}-1200.webp?v=20260810-img-3 1200w"
+                srcset="${variantBase}-720.webp${variantVersion} 720w, ${variantBase}-1200.webp${variantVersion} 1200w"
                 sizes="${sizes}"
               >
               ${image}
@@ -665,7 +668,7 @@
       );
     } else if (slug === "automasi-workflow" && index === 1) {
       preview = captured(
-        "workflow-auto-follow-public.png?v=20260810-workflow-3",
+        "workflow-auto-follow-public.png?v=20260810-workflow-sidebar-1",
         "Sales Agent · Auto Follow",
         "Lead aktif, butuh follow-up, dan overdue terlihat bersama interaksi terakhir agar peluang berikutnya mudah diprioritaskan.",
       );
