@@ -24,25 +24,28 @@ function libraryDirectories(root) {
 }
 
 before(async () => {
-  const app = createApp({
-    config: {
-      nodeEnv: "test",
-      port: 0,
-      publicDir: process.cwd(),
-      publicBaseUrl: "http://127.0.0.1",
-      oauthSuccessUrl: "http://127.0.0.1/onboarding.html",
-      googleClientId: "",
-      googleClientSecret: "",
-      googleRedirectUri: "http://127.0.0.1/api/auth/google/callback",
-      sessionSecret: "",
-      databaseUrl: "",
-      trustProxy: false,
-    },
-  });
-  await new Promise((resolve) => {
-    server = app.listen(0, "127.0.0.1", resolve);
-  });
-  baseUrl = `http://127.0.0.1:${server.address().port}`;
+  baseUrl = process.env.MOTOVAX_UI_BASE_URL || "";
+  if (!baseUrl) {
+    const app = createApp({
+      config: {
+        nodeEnv: "test",
+        port: 0,
+        publicDir: process.cwd(),
+        publicBaseUrl: "http://127.0.0.1",
+        oauthSuccessUrl: "http://127.0.0.1/onboarding.html",
+        googleClientId: "",
+        googleClientSecret: "",
+        googleRedirectUri: "http://127.0.0.1/api/auth/google/callback",
+        sessionSecret: "",
+        databaseUrl: "",
+        trustProxy: false,
+      },
+    });
+    await new Promise((resolve) => {
+      server = app.listen(0, "127.0.0.1", resolve);
+    });
+    baseUrl = `http://127.0.0.1:${server.address().port}`;
+  }
   const chromiumRoot = path.join(homedir(), ".local/chromium-root");
   const chromiumPath = path.join(chromiumRoot, "usr/lib/chromium/chromium");
   const useAlpineChromium = existsSync(chromiumPath);
@@ -84,7 +87,7 @@ for (const viewport of viewports) {
   test(`onboarding OAuth responsif pada ${viewport.name}`, async () => {
     const context = await browser.newContext({ viewport });
     const page = await context.newPage();
-    await page.route(/^https:\/\//, (route) => route.abort());
+    await page.route(/https:\/\/fonts\.(?:googleapis|gstatic)\.com\//, (route) => route.abort());
     await page.goto(`${baseUrl}/onboarding.html`, { waitUntil: "load" });
 
     const result = await page.evaluate(() => {
