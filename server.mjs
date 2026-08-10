@@ -329,8 +329,14 @@ export function createApp({ config = readConfig(), store = null, oauthClient = n
   app.get("/health", async (_req, res) => {
     const missing = missingOAuthConfig(config, store);
     try {
+      if (config.databaseUrl && !store) {
+        return res.status(503).json({
+          status: "database_unavailable",
+          oauthReady: false,
+        });
+      }
       if (store) await store.healthcheck();
-      res.status(missing.length ? 503 : 200).json({
+      return res.status(200).json({
         status: missing.length ? "configuration_required" : "ok",
         oauthReady: missing.length === 0,
         missing,
