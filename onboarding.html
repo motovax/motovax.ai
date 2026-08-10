@@ -15,6 +15,7 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="./styles.css?v=logo-20260809" />
+    <link rel="stylesheet" href="./onboarding-auth.css?v=oauth-20260810" />
   </head>
   <body class="onboarding-body">
     <header class="site-header onboarding-header">
@@ -202,7 +203,11 @@
 
             <div class="onboarding-auth-divider" aria-hidden="true"><span>atau</span></div>
 
-            <button type="button" class="onboarding-google-btn" data-google-login>
+            <a
+              class="onboarding-google-btn"
+              data-google-login
+              href="https://onboard.motovax.com/api/auth/google/start?mode=signup"
+            >
               <svg
                 class="onboarding-google-icon"
                 viewBox="0 0 48 48"
@@ -227,28 +232,7 @@
                 />
               </svg>
               Lanjutkan dengan Google
-            </button>
-
-            <form class="onboarding-form onboarding-google-panel" data-google-form hidden novalidate>
-              <p class="onboarding-google-note">
-                Mode demo: masuk dengan alamat Gmail Anda tanpa password (simulasi Google Sign-In).
-              </p>
-              <label>
-                <span>Alamat Gmail</span>
-                <input
-                  type="email"
-                  name="googleEmail"
-                  data-google-email
-                  autocomplete="email"
-                  placeholder="nama@gmail.com"
-                  required
-                />
-              </label>
-              <p class="onboarding-form-error" data-form-error hidden></p>
-              <div class="onboarding-step-actions">
-                <button type="submit" class="btn btn-primary">Login dengan Gmail <span>→</span></button>
-              </div>
-            </form>
+            </a>
           </div>
 
           <!-- STEP 2: Business -->
@@ -336,7 +320,6 @@
                   <span class="onboarding-module-icon">IM</span>
                   <b>Inventory Management</b>
                   <small>Stok live multi-lokasi, reservasi, upload data</small>
-                </label>
                 <label class="onboarding-module-card">
                   <input type="checkbox" name="modules" value="omni" checked />
                   <span class="onboarding-module-check" aria-hidden="true"></span>
@@ -465,6 +448,6 @@
     </div>
 
     <script src="./script.js?v=onb-20260808b"></script>
-    <script src="./onboarding.js?v=onb-20260808b"></script>
+    <script src="./onboarding.js?v=oauth-20260810"></script>
   </body>
 </html>

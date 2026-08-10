@@ -1,0 +1,9 @@
+.onboarding-google-btn {
+  text-decoration: none;
+}
+
+.onboarding-google-btn.is-loading {
+  pointer-events: none;
+  cursor: wait;
+  opacity: 0.72;
+}
