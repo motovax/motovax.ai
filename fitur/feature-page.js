@@ -668,9 +668,9 @@
       );
     } else if (slug === "automasi-workflow" && index === 1) {
       preview = captured(
-        "workflow-auto-follow-public.png?v=20260810-workflow-sidebar-1",
-        "Sales Agent · Auto Follow",
-        "Lead aktif, butuh follow-up, dan overdue terlihat bersama interaksi terakhir agar peluang berikutnya mudah diprioritaskan.",
+        "workflow-auto-follow-public.png?v=20260810-workflow-campaign-1",
+        "Autopilot CRM · Campaign",
+        "Campaign follow-up memperlihatkan status, penerima, jadwal aktif, dan waktu eksekusi terakhir dalam satu halaman.",
       );
     } else if (slug === "automasi-workflow" && index === 2) {
       preview = captured(
