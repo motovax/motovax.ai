@@ -547,7 +547,7 @@
     }
 
     if (id === "automasi-workflow") {
-      return preview("product-falcon-sales.png?v=20260806-workflow-1", "Automation · Chat, CRM & Stock");
+      return preview("product-falcon-sales.png?v=20260810-workflow-2", "Automation · Chat, CRM & Stock");
     }
 
     return previewSetFor(id, preview)[0];
@@ -579,7 +579,7 @@
     return `<picture>
               <source
                 type="image/webp"
-                srcset="${variantBase}-720.webp?v=20260806-img-2 720w, ${variantBase}-1200.webp?v=20260806-img-2 1200w"
+                srcset="${variantBase}-720.webp?v=20260810-img-3 720w, ${variantBase}-1200.webp?v=20260810-img-3 1200w"
                 sizes="${sizes}"
               >
               ${image}
