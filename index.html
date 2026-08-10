@@ -27,13 +27,13 @@
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="./styles.css" />
+    <link rel="stylesheet" href="./styles.css?v=logo-20260809" />
   </head>
   <body>
     <header class="site-header">
       <div class="container header-inner">
         <a class="brand" href="#top" aria-label="MOTOVAX home">
-          <img class="brand-logo" src="./icons/logo-motovax.png" width="160" height="55" alt="MOTOVAX" />
+          <span>MOTO</span><strong>VAX</strong>
         </a>
         <nav class="nav" aria-label="Navigasi utama">
           <div class="nav-item nav-item-produk" data-produk-menu>
@@ -58,17 +58,10 @@
           <a href="./harga.html">Harga</a>
           <a href="./hubungi-kami.html">Hubungi Kami</a>
         </nav>
-        <a class="btn btn-primary header-cta" href="./hubungi-kami.html">Jadwalkan Demo <span>-></span></a>
-        <button
-          class="mobile-nav-trigger"
-          type="button"
-          aria-expanded="false"
-          aria-controls="mobile-navigation"
-          aria-label="Buka menu navigasi"
-          data-mobile-nav-trigger
-        >
-          <span></span><span></span><span></span>
-        </button>
+        <div class="header-actions">
+          <a class="btn btn-secondary header-login" href="./onboarding.html?mode=login">Login</a>
+          <a class="btn btn-primary header-cta" href="./onboarding.html">Mulai Coba Sekarang <span>-></span></a>
+        </div>
       </div>
       <button class="mobile-nav-backdrop" type="button" aria-label="Tutup menu navigasi" data-mobile-nav-backdrop hidden></button>
       <aside class="mobile-nav-panel" id="mobile-navigation" aria-label="Navigasi mobile" data-mobile-nav-panel hidden>
@@ -122,8 +115,9 @@
               dikonfigurasi sesuai kebutuhan bisnis.
             </p>
             <div class="hero-actions">
-              <a class="btn btn-primary" href="./hubungi-kami.html">Jadwalkan Demo <span>-></span></a>
-              <a class="btn btn-secondary" href="./modul.html"><span class="play-icon">→</span>Jelajahi Produk</a>
+              <a class="btn btn-primary" href="./onboarding.html">Mulai Coba Sekarang <span>-></span></a>
+              <a class="btn btn-secondary" href="#kontak">Jadwalkan Demo</a>
+              <a class="btn btn-secondary" href="#fitur"><span class="play-icon">></span>Lihat Fitur</a>
             </div>
             <div class="positioning-proof" aria-label="Cakupan solusi Motovax">
               <span class="proof-live"><i></i> Otomotif · vertical live</span>
@@ -531,6 +525,12 @@
             <article><strong>03</strong><b>Handoff AI ke Manusia</b><span>Tim dapat mengambil alih atau menerima eskalasi tanpa kehilangan riwayat percakapan.</span></article>
             <article><strong>04</strong><b>Modular &amp; Role-based</b><span>Fitur, akses, dashboard, dan workflow dapat disesuaikan per tenant, role, dan vertical.</span></article>
           </div>
+          <div class="closing-actions">
+            <a class="btn btn-light" href="./onboarding.html">Mulai Coba Sekarang <span>-></span></a>
+            <a class="btn btn-secondary" href="./onboarding.html?mode=login">Login</a>
+            <a class="btn btn-secondary" href="#" data-wa>Hubungi Tim</a>
+          </div>
+          <div class="road-car" aria-hidden="true"></div>
         </div>
       </section>
 
@@ -540,7 +540,7 @@
       <div class="container footer-grid">
         <div>
           <a class="brand footer-brand" href="#top" aria-label="MOTOVAX home">
-            <img class="brand-logo" src="./icons/logo-motovax.png" width="140" height="48" alt="MOTOVAX" />
+            <span>MOTO</span><strong>VAX</strong>
           </a>
           <p>Platform AI sales &amp; customer engagement untuk tim dan bisnis lintas industri.</p>
           <div class="socials" aria-hidden="true"><span>f</span><span>ig</span><span>in</span><span>yt</span></div>
@@ -549,6 +549,9 @@
           <h3>Produk</h3>
           <a href="./modul.html">Semua produk</a>
           <a href="#solusi">Solusi</a>
+          <a href="./modul.html">Modul</a>
+          <a href="./onboarding.html">Mulai Coba</a>
+          <a href="#fitur">Fitur</a>
           <a href="#cara-kerja">Cara Kerja</a>
           <a href="./harga.html">Harga</a>
         </div>

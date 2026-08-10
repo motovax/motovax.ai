@@ -11,6 +11,7 @@ python -m http.server 5179
 Open `http://localhost:5179/`.
 
 - Home: `index.html` (solusi + interactive demos)
+- Onboarding user baru: `onboarding.html` (+ `onboarding.js`) — daftar/login, profil, modul
 - Modul breakdown: `modul.html`
 - Product map (markdown): `docs/product/modul-fitur-breakdown.md`
 
