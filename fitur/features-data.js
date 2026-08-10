@@ -758,27 +758,50 @@ window.MOTOVAX_FEATURES = {
 
   "automasi-workflow": {
     slug: "automasi-workflow",
-    title: "Workflow",
-    heroTitle: "Otomasi alur kerja lintas chat, CRM, dan stok",
+    title: "Automasi Workflow",
+    heroTitle: "Automasi yang bekerja sampai tugas selesai",
     heroDesc:
-      "Motovax mengotomasi lewat agent tools, faneling, auto follow CRM, workers (foto, email report), dan integrasi. Workflow builder event-driven ada di roadmap P1.",
-    status: "Live · partial builder",
-    module: "M2–M5 + platform workers",
+      "Motovax menghubungkan percakapan, CRM, inventori, laporan, dan publishing lewat agent AI, scheduler, serta worker. Tim tetap memegang kendali saat keputusan manusia dibutuhkan; builder visual no-code masih dalam roadmap.",
+    status: "Live",
+    module: "M2–M5 + platform scheduler & workers",
     demo: "automation",
     demoHash: "capabilityDemo",
     category: "Automasi Operasional & Workflow",
-    breadcrumbs: ["Produk", "Fitur", "Workflow"],
+    breadcrumbs: ["Produk", "Fitur", "Automasi Workflow"],
     capabilities: [
-      { title: "Auto follow CRM", desc: "Nudge lead stale otomatis." },
-      { title: "Workers backend", desc: "Perawatan foto, laporan, job async." },
-      { title: "Tool chains", desc: "AI merangkai beberapa aksi dalam satu percakapan." },
+      {
+        title: "Agent AI yang mengeksekusi aksi",
+        desc: "Falcon dan Jasmine tidak berhenti pada jawaban. Agent dapat mencari stok, mengirim foto, menghitung simulasi kredit, memperbarui lead, dan menjalankan tool bisnis sesuai konteks serta permission.",
+      },
+      {
+        title: "Follow-up yang berjalan otomatis",
+        desc: "Lead yang perlu ditindaklanjuti dapat masuk ke jadwal follow-up AI, sementara status aktif, overdue, dan interaksi terakhir membantu tim memusatkan perhatian pada peluang yang tepat.",
+      },
+      {
+        title: "Routing AI ke tim yang tepat",
+        desc: "Percakapan dapat berpindah dari AI ke Call Center lalu ke Marketing Representative dengan konteks, status, dan jejak handoff yang tetap tersimpan.",
+      },
+      {
+        title: "Laporan terjadwal tanpa rekap manual",
+        desc: "Jadwalkan email report beserta penerima dan attachment. Log pengiriman memberi visibilitas atas laporan yang diproses scheduler.",
+      },
+      {
+        title: "Publishing konten yang terjadwal",
+        desc: "Tim marketing dapat menyiapkan materi dari inventori, menyusun kalender posting, dan menjalankan publishing terjadwal tanpa memutus alur dari sumber data produk.",
+      },
     ],
     howItWorks: [
-      { title: "Trigger", desc: "Event chat, jadwal, atau status deal." },
-      { title: "Aksi", desc: "Tool AI / worker / notifikasi." },
-      { title: "Hasil", desc: "Update data & jejak di app." },
+      { title: "Sinyal masuk", desc: "Percakapan, jadwal, status lead, atau aktivitas operasional memulai alur." },
+      { title: "Konteks diperiksa", desc: "Agent dan layanan Motovax membaca data tenant, role, serta kondisi terbaru." },
+      { title: "Aksi dijalankan", desc: "Tool AI, scheduler, atau worker mengeksekusi tugas yang sesuai." },
+      { title: "Hasil tercatat", desc: "Data diperbarui dan pekerjaan diteruskan ke manusia saat judgement dibutuhkan." },
     ],
-    benefits: ["Kurangi kerja repetitif", "Proses lebih konsisten", "Fondasi workflow builder"],
+    benefits: [
+      "Pekerjaan rutin bergerak tanpa menunggu proses manual",
+      "AI bekerja dengan data operasional yang sama",
+      "Handoff tetap jelas dan dapat ditindaklanjuti",
+      "Jadwal dan hasil kerja lebih konsisten",
+    ],
     related: ["knowledge-base", "agentic-ai", "manajemen-deal"],
   },
 
