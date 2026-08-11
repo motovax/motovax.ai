@@ -162,6 +162,11 @@ for (const viewport of viewports) {
     const context = await browser.newContext({ viewport });
     const page = await context.newPage();
     await page.route(/https:\/\/fonts\.(?:googleapis|gstatic)\.com\//, (route) => route.abort());
+    await page.route("**/api/auth/me", (route) => route.fulfill({
+      status: 401,
+      contentType: "application/json",
+      body: JSON.stringify({ authenticated: false }),
+    }));
     await page.route("**/api/auth/signup", (route) => route.fulfill({
       status: 201,
       contentType: "application/json",
@@ -200,7 +205,9 @@ for (const viewport of viewports) {
       }),
     }));
 
+    const sessionResponse = page.waitForResponse((response) => response.url().endsWith("/api/auth/me"));
     await page.goto(`${baseUrl}/onboarding.html`, { waitUntil: "load" });
+    await sessionResponse;
     await page.fill('[data-auth-form="signup"] input[name="fullName"]', "Owner Test");
     await page.fill('[data-auth-form="signup"] input[name="email"]', "owner@example.com");
     await page.fill('[data-auth-form="signup"] input[name="password"]', "rahasia123");
