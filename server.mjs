@@ -167,6 +167,7 @@ async function ensureProductDomain(config, domain) {
     Accept: "application/json",
     "Content-Type": "application/json",
   };
+  let added = false;
   for (let attempt = 0; attempt < 3; attempt += 1) {
     const currentResponse = await fetch(endpoint, { headers });
     if (!currentResponse.ok) throw new Error("Tidak dapat membaca konfigurasi domain aplikasi.");
@@ -176,20 +177,48 @@ async function ensureProductDomain(config, domain) {
       .map((item) => item.trim())
       .filter(Boolean);
     const target = `https://${domain}`;
-    if (domains.some((item) => item.toLowerCase() === target.toLowerCase())) return;
-    domains.push(target);
-    const updateResponse = await fetch(endpoint, {
-      method: "PATCH",
-      headers,
-      body: JSON.stringify({ domains: domains.join(",") }),
-    });
-    if (updateResponse.ok) return;
-    if (updateResponse.status !== 409 || attempt === 2) {
-      const error = new Error("Domain tenant belum dapat dipasang ke aplikasi.");
+    if (!domains.some((item) => item.toLowerCase() === target.toLowerCase())) {
+      domains.push(target);
+      const updateResponse = await fetch(endpoint, {
+        method: "PATCH",
+        headers,
+        body: JSON.stringify({ domains: domains.join(",") }),
+      });
+      if (updateResponse.ok) {
+        added = true;
+      } else if (updateResponse.status === 409 && attempt < 2) {
+        continue;
+      } else {
+        const error = new Error("Domain tenant belum dapat dipasang ke aplikasi.");
+        error.code = "domain_provisioning_failed";
+        throw error;
+      }
+    }
+    break;
+  }
+  if (added) {
+    const restartResponse = await fetch(`${endpoint}/restart`, { method: "POST", headers });
+    if (!restartResponse.ok) {
+      const error = new Error("Konfigurasi domain tersimpan, tetapi aplikasi belum dapat memuat ulang routing.");
       error.code = "domain_provisioning_failed";
       throw error;
     }
   }
+  for (let attempt = 0; attempt < 30; attempt += 1) {
+    try {
+      const response = await fetch(`https://${domain}/api/tenant/public-info`, {
+        headers: { Accept: "application/json" },
+        signal: AbortSignal.timeout(3_000),
+      });
+      if (response.ok) return;
+    } catch {
+      // Proxy restart and certificate issuance are asynchronous.
+    }
+    await new Promise((resolve) => setTimeout(resolve, 2_000));
+  }
+  const error = new Error("Domain tenant sedang disiapkan. Coba selesaikan setup kembali dalam satu menit.");
+  error.code = "domain_provisioning_failed";
+  throw error;
 }
 
 function safeEqual(left, right) {
@@ -632,14 +661,8 @@ export async function createPostgresStore(connectionString) {
           : { rows: [] };
         if (existingMembership.rows[0]) {
           const workspace = existingMembership.rows[0];
-          const handoffToken = randomToken(32);
-          await client.query(
-            `INSERT INTO auth_tokens (user_id, token, expires_at, is_magic_link)
-             VALUES ($1, $2, $3, TRUE)`,
-            [workspace.app_user_id, handoffToken, new Date(Date.now() + HANDOFF_TTL_MS)],
-          );
           await client.query("COMMIT");
-          return { workspace, handoffToken };
+          return { workspace };
         }
 
         const slug = normalizeSlug(profile.workspace_slug);
@@ -726,16 +749,9 @@ export async function createPostgresStore(connectionString) {
            WHERE user_id = $1`,
           [userId, tenantId],
         );
-        const handoffToken = randomToken(32);
-        await client.query(
-          `INSERT INTO auth_tokens (user_id, token, expires_at, is_magic_link)
-           VALUES ($1, $2, $3, TRUE)`,
-          [appUserId, handoffToken, new Date(Date.now() + HANDOFF_TTL_MS)],
-        );
         await client.query("COMMIT");
         return {
           workspace: { id: tenantId, name: profile.business_name, domain, app_user_id: appUserId },
-          handoffToken,
         };
       } catch (error) {
         await client.query("ROLLBACK");
@@ -1112,7 +1128,9 @@ export function createApp({ config = readConfig(), store = null, oauthClient = n
       }
       const result = await store.provisionWorkspace({ userId: user.id, suffix: config.tenantDomainSuffix });
       await ensureProductDomain(config, result.workspace.domain);
-      const redirectUrl = `https://${result.workspace.domain}/magic-login?token=${encodeURIComponent(result.handoffToken)}`;
+      const handoff = await store.createWorkspaceHandoff(user.id, result.workspace.id);
+      if (!handoff) throw new Error("Workspace selesai dibuat tetapi sesi owner tidak ditemukan.");
+      const redirectUrl = `https://${result.workspace.domain}/magic-login?token=${encodeURIComponent(handoff.handoffToken)}`;
       return res.status(201).json({
         workspace: {
           id: result.workspace.id,
