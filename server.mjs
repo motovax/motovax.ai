@@ -196,7 +196,19 @@ async function ensureProductDomain(config, domain) {
     }
     break;
   }
-  if (added) {
+  async function domainReady() {
+    try {
+      const response = await fetch(`https://${domain}/api/tenant/public-info`, {
+        headers: { Accept: "application/json" },
+        signal: AbortSignal.timeout(3_000),
+      });
+      return response.ok;
+    } catch {
+      return false;
+    }
+  }
+  if (await domainReady()) return;
+  if (added || !(await domainReady())) {
     const restartResponse = await fetch(`${endpoint}/restart`, { method: "POST", headers });
     if (!restartResponse.ok) {
       const error = new Error("Konfigurasi domain tersimpan, tetapi aplikasi belum dapat memuat ulang routing.");
@@ -205,15 +217,7 @@ async function ensureProductDomain(config, domain) {
     }
   }
   for (let attempt = 0; attempt < 30; attempt += 1) {
-    try {
-      const response = await fetch(`https://${domain}/api/tenant/public-info`, {
-        headers: { Accept: "application/json" },
-        signal: AbortSignal.timeout(3_000),
-      });
-      if (response.ok) return;
-    } catch {
-      // Proxy restart and certificate issuance are asynchronous.
-    }
+    if (await domainReady()) return;
     await new Promise((resolve) => setTimeout(resolve, 2_000));
   }
   const error = new Error("Domain tenant sedang disiapkan. Coba selesaikan setup kembali dalam satu menit.");
