@@ -100,6 +100,9 @@ for (const viewport of viewports) {
         googleHeight: rect.height,
         googleVisible: rect.width > 0 && rect.height > 0,
         hasDemoGoogleForm: document.body.textContent.includes("simulasi Google Sign-In"),
+        hasLoginForm: Boolean(document.querySelector("#authFormLogin")),
+        hasLoginTab: Boolean(document.querySelector('[data-auth-mode="login"]')),
+        title: document.querySelector("#onboardingPanelTitle")?.textContent.trim(),
       };
     });
 
@@ -112,6 +115,9 @@ for (const viewport of viewports) {
       "https://onboard.motovax.com/api/auth/google/start?mode=signup",
     );
     assert.equal(result.hasDemoGoogleForm, false);
+    assert.equal(result.hasLoginForm, false);
+    assert.equal(result.hasLoginTab, false);
+    assert.equal(result.title, "Buat akun baru");
 
     await page.screenshot({
       path: `/tmp/motovax-oauth-${viewport.name}.png`,

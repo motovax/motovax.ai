@@ -6,7 +6,7 @@
     <title>Mulai Coba MOTOVAX — Onboarding User Baru</title>
     <meta
       name="description"
-      content="Daftar atau login, isi profil bisnis, pilih modul prioritas, dan mulai coba MOTOVAX dalam hitungan menit."
+      content="Daftar akun, isi profil bisnis, pilih modul prioritas, dan mulai coba MOTOVAX dalam hitungan menit."
     />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -37,7 +37,7 @@
             Siapkan ruang kerja bisnis Anda
           </h1>
           <p>
-            Satu alur untuk daftar/login, profil bisnis, dan modul prioritas — selaras dengan
+            Satu alur untuk daftar akun, profil bisnis, dan modul prioritas — selaras dengan
             Command Center MOTOVAX. Progress tersimpan aman pada akun Anda.
           </p>
 
@@ -46,7 +46,7 @@
               <i>1</i>
               <div>
                 <b>Akun</b>
-                <small>Daftar atau login</small>
+                <small>Daftar akun</small>
               </div>
             </li>
             <li data-rail-step="2">
@@ -106,42 +106,16 @@
           <div class="onboarding-step is-active" data-step="1">
             <header class="onboarding-step-head">
               <span>LANGKAH 1 · AKUN</span>
-              <h2 id="onboardingPanelTitle">Masuk atau buat akun baru</h2>
+              <h2 id="onboardingPanelTitle">Buat akun baru</h2>
               <p data-auth-lead>
                 Buat akun Motovax menggunakan email kerja atau akun Google Anda.
               </p>
             </header>
 
-            <div class="onboarding-auth-tabs" role="tablist" aria-label="Mode akun">
-              <button
-                type="button"
-                class="is-active"
-                role="tab"
-                id="authTabSignup"
-                aria-selected="true"
-                aria-controls="authFormSignup"
-                data-auth-mode="signup"
-              >
-                Daftar
-              </button>
-              <button
-                type="button"
-                role="tab"
-                id="authTabLogin"
-                aria-selected="false"
-                aria-controls="authFormLogin"
-                data-auth-mode="login"
-              >
-                Login
-              </button>
-            </div>
-
             <form
               class="onboarding-form"
               id="authFormSignup"
               data-auth-form="signup"
-              role="tabpanel"
-              aria-labelledby="authTabSignup"
               novalidate
             >
               <label>
@@ -172,30 +146,6 @@
               </div>
             </form>
 
-            <form
-              class="onboarding-form"
-              id="authFormLogin"
-              data-auth-form="login"
-              role="tabpanel"
-              aria-labelledby="authTabLogin"
-              hidden
-              novalidate
-            >
-              <label>
-                <span>Email</span>
-                <input type="email" name="email" autocomplete="email" placeholder="nama@perusahaan.com" required />
-              </label>
-              <label>
-                <span>Password</span>
-                <input type="password" name="password" autocomplete="current-password" placeholder="Password Anda" required />
-              </label>
-              <p class="onboarding-form-error" data-form-error hidden></p>
-              <div class="onboarding-step-actions">
-                <button type="button" class="btn btn-secondary" data-auth-forgot>Lupa password?</button>
-                <button type="submit" class="btn btn-primary">Login &amp; lanjut <span>→</span></button>
-              </div>
-            </form>
-
             <form class="onboarding-form" data-reset-form hidden novalidate>
               <label>
                 <span>Password baru</span>
@@ -207,7 +157,7 @@
               </label>
               <p class="onboarding-form-error" data-form-error hidden></p>
               <div class="onboarding-step-actions">
-                <a class="btn btn-secondary" href="./onboarding.html?mode=login">Batal</a>
+                <a class="btn btn-secondary" href="./onboarding.html">Batal</a>
                 <button type="submit" class="btn btn-primary">Simpan password <span>→</span></button>
               </div>
             </form>
@@ -242,7 +192,7 @@
                   d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"
                 />
               </svg>
-              Lanjutkan dengan Google
+              Daftar dengan Google
             </a>
           </div>
 
@@ -470,6 +420,6 @@
     </div>
 
     <script src="./script.js?v=onb-20260808b"></script>
-    <script src="./onboarding.js?v=tenant-20260811"></script>
+    <script src="./onboarding.js?v=signup-only-20260811"></script>
   </body>
 </html>

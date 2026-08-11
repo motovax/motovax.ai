@@ -23,10 +23,7 @@
     inventory: "Kontrol stok & aging",
     scale: "Scale multi-lokasi",
   };
-  var AUTH_LEAD = {
-    signup: "Buat akun Motovax menggunakan email kerja atau akun Google Anda.",
-    login: "Masuk untuk melanjutkan onboarding atau membuka workspace Anda.",
-  };
+  var AUTH_LEAD = "Buat akun Motovax menggunakan email kerja atau akun Google Anda.";
   var GOOGLE_AUTH_ORIGIN = "https://onboard.motovax.com";
   var DEMO_ANCHORS = {
     ims: "#inventoryDemo",
@@ -132,9 +129,7 @@
     this.progressBar = qs("[data-onboarding-progress]");
     this.toast = qs("[data-onboarding-toast]");
 
-    this.authTabs = qsa("[data-auth-mode]");
     this.signupForm = qs('[data-auth-form="signup"]');
-    this.loginForm = qs('[data-auth-form="login"]');
     this.resetForm = qs("[data-reset-form]");
     this.businessForm = qs("[data-business-form]");
     this.modulesForm = qs("[data-modules-form]");
@@ -154,46 +149,10 @@
   OnboardingApp.prototype.bind = function () {
     var self = this;
 
-    this.authTabs.forEach(function (tab) {
-      tab.addEventListener("click", function () {
-        self.setAuthMode(tab.getAttribute("data-auth-mode"));
-      });
-    });
-
     if (this.signupForm) {
       this.signupForm.addEventListener("submit", function (e) {
         e.preventDefault();
         self.submitSignup();
-      });
-    }
-
-    if (this.loginForm) {
-      this.loginForm.addEventListener("submit", function (e) {
-        e.preventDefault();
-        self.submitLogin();
-      });
-    }
-
-    var forgot = qs("[data-auth-forgot]");
-    if (forgot) {
-      forgot.addEventListener("click", async function () {
-        var email = String(self.loginForm?.email?.value || "").trim().toLowerCase();
-        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-          self.showError(self.loginForm, "Isi email yang terdaftar terlebih dahulu.");
-          return;
-        }
-        forgot.disabled = true;
-        try {
-          var result = await api("/api/auth/forgot-password", {
-            method: "POST",
-            body: JSON.stringify({ email: email }),
-          });
-          self.showToast("Periksa email Anda", result.message);
-        } catch (error) {
-          self.showError(self.loginForm, error.message);
-        } finally {
-          forgot.disabled = false;
-        }
       });
     }
 
@@ -283,13 +242,10 @@
       });
     }
 
-    // Deep-link: ?mode=login | ?step=2
+    // Deep-link: ?step=2. Parameter mode lama diabaikan karena portal ini signup-only.
     var params = new URLSearchParams(window.location.search);
     if (params.get("reset") === "1" && params.get("token")) {
       this.showResetForm();
-    }
-    if (params.get("mode") === "login") {
-      this.setAuthMode("login");
     }
     var stepParam = parseInt(params.get("step"), 10);
     if (stepParam >= 1 && stepParam <= 4) {
@@ -297,27 +253,13 @@
     }
   };
 
-  OnboardingApp.prototype.setAuthMode = function (mode) {
-    this.state.authMode = mode === "login" ? "login" : "signup";
-    var isLogin = this.state.authMode === "login";
+  OnboardingApp.prototype.setAuthMode = function () {
+    this.state.authMode = "signup";
 
-    this.authTabs.forEach(function (tab) {
-      var active = tab.getAttribute("data-auth-mode") === this.state.authMode;
-      tab.classList.toggle("is-active", active);
-      tab.setAttribute("aria-selected", active ? "true" : "false");
-      tab.setAttribute("tabindex", active ? "0" : "-1");
-    }, this);
-
-    // Pakai hidden + display agar UI pasti berganti (display:grid menimpa UA [hidden])
     if (this.signupForm) {
-      this.signupForm.hidden = isLogin;
-      this.signupForm.style.display = isLogin ? "none" : "";
-      this.signupForm.setAttribute("aria-hidden", isLogin ? "true" : "false");
-    }
-    if (this.loginForm) {
-      this.loginForm.hidden = !isLogin;
-      this.loginForm.style.display = isLogin ? "" : "none";
-      this.loginForm.setAttribute("aria-hidden", isLogin ? "false" : "true");
+      this.signupForm.hidden = false;
+      this.signupForm.style.display = "";
+      this.signupForm.setAttribute("aria-hidden", "false");
     }
     if (this.resetForm) this.resetForm.hidden = true;
     var divider = qs(".onboarding-auth-divider");
@@ -326,15 +268,14 @@
     if (googleButton) googleButton.hidden = false;
 
     var lead = qs("[data-auth-lead]");
-    if (lead) lead.textContent = AUTH_LEAD[this.state.authMode] || AUTH_LEAD.signup;
+    if (lead) lead.textContent = AUTH_LEAD;
 
     var googleBtn = qs("[data-google-login]");
     if (googleBtn) {
       googleBtn.setAttribute(
         "href",
         GOOGLE_AUTH_ORIGIN +
-          "/api/auth/google/start?mode=" +
-          encodeURIComponent(this.state.authMode),
+          "/api/auth/google/start?mode=signup",
       );
     }
 
@@ -345,8 +286,6 @@
   OnboardingApp.prototype.showResetForm = function () {
     if (!this.resetForm) return;
     if (this.signupForm) this.signupForm.hidden = true;
-    if (this.loginForm) this.loginForm.hidden = true;
-    this.authTabs.forEach(function (tab) { tab.hidden = true; });
     this.resetForm.hidden = false;
     var divider = qs(".onboarding-auth-divider");
     var googleButton = qs("[data-google-login]");
@@ -376,10 +315,9 @@
         method: "POST",
         body: JSON.stringify({ token: params.get("token"), password: password }),
       });
-      window.history.replaceState({}, "", window.location.pathname + "?mode=login");
-      this.authTabs.forEach(function (tab) { tab.hidden = false; });
-      this.setAuthMode("login");
-      this.showToast("Password berhasil diperbarui", "Silakan login menggunakan password baru.");
+      window.history.replaceState({}, "", window.location.pathname);
+      this.setAuthMode();
+      this.showToast("Password berhasil diperbarui", "Masuk melalui domain workspace Anda.");
     } catch (error) {
       this.showError(form, error.message);
     } finally {
@@ -468,45 +406,6 @@
     }
   };
 
-  OnboardingApp.prototype.submitLogin = async function () {
-    var form = this.loginForm;
-    var fd = new FormData(form);
-    var email = String(fd.get("email") || "").trim().toLowerCase();
-    var password = String(fd.get("password") || "");
-
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      this.showError(form, "Format email tidak valid.");
-      return;
-    }
-    if (!password) {
-      this.showError(form, "Password wajib diisi.");
-      return;
-    }
-
-    setFormLoading(form, true);
-    try {
-      var payload = await api("/api/auth/login", {
-        method: "POST",
-        body: JSON.stringify({ email: email, password: password }),
-      });
-      this.applyAccountPayload(payload);
-      this.state.authMode = "login";
-      saveState(this.state);
-      if (this.state.workspace) {
-        this.state.completed = true;
-        this.showToast("Login berhasil", "Workspace Anda siap dibuka.");
-        this.goTo(4);
-      } else {
-        this.showToast("Login berhasil", "Lanjut lengkapi onboarding.");
-        this.goTo(this.state.business.businessName ? 3 : 2);
-      }
-    } catch (error) {
-      this.showError(form, error.message);
-    } finally {
-      setFormLoading(form, false);
-    }
-  };
-
   OnboardingApp.prototype.applyAccountPayload = function (payload) {
     if (!payload || !payload.user) return;
     this.state.account = {
@@ -543,11 +442,11 @@
 
     if (!isAuthHost && !isLocal) return;
     if (oauthStatus === "denied") {
-      this.showToast("Login Google dibatalkan", "Silakan coba lagi jika Anda ingin melanjutkan.");
+      this.showToast("Pendaftaran Google dibatalkan", "Silakan coba lagi jika Anda ingin melanjutkan.");
       return;
     }
     if (oauthStatus === "failed") {
-      this.showToast("Login Google belum berhasil", "Silakan coba lagi atau hubungi tim MOTOVAX.");
+      this.showToast("Pendaftaran Google belum berhasil", "Silakan coba lagi atau hubungi tim MOTOVAX.");
       return;
     }
     if (emailStatus === "invalid") {
@@ -565,7 +464,7 @@
       .then(function (payload) {
         if (!payload || !payload.authenticated || !payload.user) return;
         self.applyAccountPayload(payload);
-        self.state.authMode = "login";
+        self.state.authMode = "signup";
         saveState(self.state);
 
         if (self.state.workspace) {
@@ -574,7 +473,7 @@
           self.goTo(self.state.business.businessName ? 3 : 2);
         }
         if (oauthStatus === "success") {
-          self.showToast("Login Google berhasil", "Lanjut lengkapi onboarding Anda.");
+          self.showToast("Akun Google berhasil didaftarkan", "Lanjut lengkapi onboarding Anda.");
           params.delete("oauth");
           params.delete("reason");
           var query = params.toString();
@@ -588,7 +487,7 @@
       })
       .catch(function () {
         if (oauthStatus === "success") {
-          self.showToast("Session belum dapat dimuat", "Muat ulang halaman atau coba login kembali.");
+          self.showToast("Session belum dapat dimuat", "Muat ulang halaman atau coba daftar kembali.");
         }
       });
   };
@@ -751,9 +650,6 @@
       if (this.signupForm.fullName) this.signupForm.fullName.value = acc.fullName || "";
       if (this.signupForm.email) this.signupForm.email.value = acc.email || "";
     }
-    if (this.loginForm && this.loginForm.email) {
-      this.loginForm.email.value = acc.email || "";
-    }
     if (this.businessForm) {
       if (this.businessForm.businessName) this.businessForm.businessName.value = biz.businessName || "";
       if (this.businessForm.workspaceSlug) this.businessForm.workspaceSlug.value = biz.workspaceSlug || "";
@@ -766,7 +662,7 @@
     if (industry === "other") industry = "general";
     this.selectIndustry(industry);
     this.selectGoal(this.state.goal || "conversion");
-    this.setAuthMode(this.state.authMode || "signup");
+    this.setAuthMode();
 
     var selected = this.state.modules || [];
     qsa('input[name="modules"]').forEach(function (input) {
