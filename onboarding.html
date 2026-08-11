@@ -15,7 +15,7 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="./styles.css?v=logo-20260809" />
-    <link rel="stylesheet" href="./onboarding-auth.css?v=cta-20260811" />
+    <link rel="stylesheet" href="./onboarding-auth.css?v=actions-20260811b" />
   </head>
   <body class="onboarding-body">
     <header class="site-header onboarding-header">
@@ -226,6 +226,10 @@
               </button>
             </div>
 
+            <div class="onboarding-step-actions onboarding-path-actions" data-path-actions>
+              <button type="button" class="btn btn-secondary" data-path-back-account>← Kembali</button>
+            </div>
+
             <form class="onboarding-form onboarding-meeting-form" data-meeting-form hidden novalidate>
               <div class="onboarding-meeting-head">
                 <div>
@@ -253,6 +257,7 @@
               </div>
               <p class="onboarding-form-error" data-form-error hidden></p>
               <div class="onboarding-step-actions">
+                <button type="button" class="btn btn-secondary" data-meeting-back-account>← Kembali</button>
                 <small class="onboarding-hint">Tim Motovax akan mengirim konfirmasi dan detail meeting ke email akun Anda.</small>
                 <button type="submit" class="btn btn-primary">Ajukan jadwal meeting <span>→</span></button>
               </div>
@@ -521,6 +526,6 @@
     </div>
 
     <script src="./script.js?v=onb-20260808b"></script>
-    <script src="./onboarding.js?v=onboarding-path-20260811"></script>
+    <script src="./onboarding.js?v=actions-20260811b"></script>
   </body>
 </html>

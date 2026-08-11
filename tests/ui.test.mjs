@@ -240,9 +240,13 @@ for (const viewport of viewports) {
     const pathChoice = await page.evaluate(() => ({
       overflow: document.documentElement.scrollWidth > document.documentElement.clientWidth,
       choices: document.querySelectorAll("[data-onboarding-choice]").length,
+      backVisible: Boolean(document.querySelector("[data-path-back-account]")?.getBoundingClientRect().height),
     }));
-    assert.deepEqual(pathChoice, { overflow: false, choices: 2 });
+    assert.deepEqual(pathChoice, { overflow: false, choices: 2, backVisible: true });
     await page.screenshot({ path: `/tmp/motovax-onboarding-path-${viewport.name}.png`, fullPage: false });
+    await page.click("[data-path-back-account]");
+    await page.waitForSelector('[data-step="1"].is-active');
+    await page.evaluate(() => window.motovaxOnboarding.goTo(2));
     await page.click('[data-onboarding-choice="self"]');
     await page.waitForSelector('[data-step="3"].is-active');
     await page.fill('[data-business-form] input[name="businessName"]', "Dealer Test");
@@ -271,6 +275,7 @@ for (const viewport of viewports) {
         buttonVisible: Boolean(button?.getBoundingClientRect().height),
         heightDelta: Math.abs((buttonRect?.height || 0) - (backRect?.height || 0)),
         bottomDelta: Math.abs((buttonRect?.bottom || 0) - (backRect?.bottom || 0)),
+        horizontalGap: (buttonRect?.left || 0) - (backRect?.right || 0),
         borderRadius: getComputedStyle(button).borderRadius,
         arrowSize: document.querySelector(".onboarding-finish-button i")?.getBoundingClientRect().width,
       };
@@ -279,7 +284,10 @@ for (const viewport of viewports) {
     assert.equal(recaptchaStep.hintVisible, true);
     assert.equal(recaptchaStep.buttonVisible, true);
     assert.ok(recaptchaStep.heightDelta <= 0.1, JSON.stringify(recaptchaStep));
-    if (viewport.width > 640) assert.ok(recaptchaStep.bottomDelta <= 0.1, JSON.stringify(recaptchaStep));
+    if (viewport.width > 720) {
+      assert.ok(recaptchaStep.bottomDelta <= 0.1, JSON.stringify(recaptchaStep));
+      assert.ok(recaptchaStep.horizontalGap >= 64, JSON.stringify(recaptchaStep));
+    }
     assert.equal(recaptchaStep.borderRadius, "12px");
     assert.equal(recaptchaStep.arrowSize, 30);
     await page.screenshot({ path: `/tmp/motovax-recaptcha-${viewport.name}.png`, fullPage: false });
@@ -360,6 +368,12 @@ for (const viewport of viewports) {
     await page.click('[data-onboarding-choice="team"]');
     await page.waitForSelector('[data-meeting-form]:not([hidden])');
     assert.equal(await page.locator(".onboarding-path-grid").evaluate((element) => element.getBoundingClientRect().height), 0);
+    assert.equal(await page.locator("[data-meeting-back-account]").isVisible(), true);
+    await page.click("[data-meeting-back-account]");
+    await page.waitForSelector('[data-step="1"].is-active');
+    await page.evaluate(() => window.motovaxOnboarding.goTo(2));
+    await page.click('[data-onboarding-choice="team"]');
+    await page.waitForSelector('[data-meeting-form]:not([hidden])');
     const meetingDate = await page.evaluate(() => {
       const value = new Date();
       value.setDate(value.getDate() + 3);

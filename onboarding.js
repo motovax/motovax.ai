@@ -277,6 +277,11 @@
       });
     });
 
+    var pathBackAccount = qs("[data-path-back-account]");
+    if (pathBackAccount) pathBackAccount.addEventListener("click", function () {
+      self.goTo(1);
+    });
+
     if (this.meetingForm) {
       this.meetingForm.addEventListener("submit", function (event) {
         event.preventDefault();
@@ -285,6 +290,11 @@
     }
     var meetingCancel = qs("[data-meeting-cancel]");
     if (meetingCancel) meetingCancel.addEventListener("click", function () { self.hideMeetingForm(); });
+    var meetingBackAccount = qs("[data-meeting-back-account]");
+    if (meetingBackAccount) meetingBackAccount.addEventListener("click", function () {
+      self.hideMeetingForm();
+      self.goTo(1);
+    });
     var changeMeeting = qs("[data-change-meeting]");
     if (changeMeeting) changeMeeting.addEventListener("click", function () {
       self.goTo(2);
@@ -422,13 +432,17 @@
 
   OnboardingApp.prototype.showMeetingForm = function () {
     var pathGrid = qs(".onboarding-path-grid");
+    var pathActions = qs("[data-path-actions]");
     if (pathGrid) pathGrid.hidden = true;
+    if (pathActions) pathActions.hidden = true;
     if (this.meetingForm) this.meetingForm.hidden = false;
   };
 
   OnboardingApp.prototype.hideMeetingForm = function () {
     var pathGrid = qs(".onboarding-path-grid");
+    var pathActions = qs("[data-path-actions]");
     if (pathGrid) pathGrid.hidden = false;
+    if (pathActions) pathActions.hidden = false;
     if (this.meetingForm) this.meetingForm.hidden = true;
     this.state.onboardingMode = "";
     saveState(this.state);
