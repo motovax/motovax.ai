@@ -151,6 +151,18 @@ for (const viewport of viewports) {
       contentType: "application/json",
       body: JSON.stringify({ profile: {}, domain: "dealer-test.motovax.com" }),
     }));
+    await page.route("**/api/onboarding/slug?**", (route) => {
+      const slug = new URL(route.request().url()).searchParams.get("slug");
+      route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          slug,
+          available: slug !== "workspace-terpakai",
+          domain: `${slug}.motovax.com`,
+        }),
+      });
+    });
     await page.route("**/api/onboarding/complete", (route) => route.fulfill({
       status: 201,
       contentType: "application/json",
@@ -171,8 +183,17 @@ for (const viewport of viewports) {
     await page.fill('[data-auth-form="signup"] input[name="passwordConfirm"]', "rahasia123");
     await page.click('[data-auth-form="signup"] button[type="submit"]');
     await page.fill('[data-business-form] input[name="businessName"]', "Dealer Test");
-    await page.fill('[data-business-form] input[name="workspaceSlug"]', "dealer-test");
+    assert.equal(await page.inputValue('[data-business-form] input[name="workspaceSlug"]'), "");
+    await page.fill('[data-business-form] input[name="workspaceSlug"]', "workspace-terpakai");
     await page.fill('[data-business-form] input[name="region"]', "Jakarta");
+    await page.locator('[data-business-form] input[name="workspaceSlug"]').blur();
+    await page.waitForSelector('[data-slug-status][data-state="unavailable"]');
+    await page.screenshot({ path: `/tmp/motovax-workspace-${viewport.name}.png`, fullPage: false });
+    await page.click('[data-business-form] button[type="submit"]');
+    await page.waitForSelector('[data-step="2"].is-active');
+    await page.fill('[data-business-form] input[name="workspaceSlug"]', "dealer-test");
+    await page.locator('[data-business-form] input[name="workspaceSlug"]').blur();
+    await page.waitForSelector('[data-slug-status][data-state="available"]');
     await page.click('[data-business-form] button[type="submit"]');
     await page.click('[data-modules-form] button[type="submit"]');
     await page.waitForSelector('[data-step="4"].is-active');

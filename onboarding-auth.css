@@ -51,6 +51,20 @@
   font-size: 0.78rem;
 }
 
+.onboarding-field-help[data-state="checking"] {
+  color: #64748b;
+}
+
+.onboarding-field-help[data-state="available"] {
+  color: #047857;
+  font-weight: 700;
+}
+
+.onboarding-field-help[data-state="unavailable"] {
+  color: #b91c1c;
+  font-weight: 700;
+}
+
 @media (max-width: 480px) {
   .onboarding-header .header-inner,
   .onboarding-header-inner {

@@ -125,6 +125,8 @@
     this.state = loadState();
     this.toastTimer = null;
     this.workspacePollTimer = null;
+    this.slugCheckTimer = null;
+    this.slugAvailability = { slug: "", available: null };
 
     this.steps = qsa("[data-step]");
     this.railItems = qsa("[data-rail-step]");
@@ -178,22 +180,29 @@
         e.preventDefault();
         self.submitBusiness();
       });
-      var businessNameInput = this.businessForm.businessName;
       var slugInput = this.businessForm.workspaceSlug;
-      if (businessNameInput && slugInput) {
-        businessNameInput.addEventListener("input", function () {
-          if (slugInput.dataset.edited === "true") return;
-          slugInput.value = String(businessNameInput.value || "")
-            .normalize("NFKD")
-            .replace(/[\u0300-\u036f]/g, "")
-            .toLowerCase()
-            .replace(/[^a-z0-9]+/g, "-")
-            .replace(/^-+|-+$/g, "")
-            .slice(0, 40);
-        });
+      if (slugInput) {
         slugInput.addEventListener("input", function () {
-          slugInput.dataset.edited = "true";
           slugInput.value = slugInput.value.toLowerCase().replace(/[^a-z0-9-]/g, "");
+          var formError = qs("[data-form-error]", self.businessForm);
+          if (formError) {
+            formError.hidden = true;
+            formError.textContent = "";
+          }
+          self.slugAvailability = { slug: "", available: null };
+          window.clearTimeout(self.slugCheckTimer);
+          if (!self.validWorkspaceSlug(slugInput.value)) {
+            self.setSlugStatus("idle", "Isi sendiri 3–40 karakter: huruf kecil, angka, dan tanda hubung.");
+            return;
+          }
+          self.setSlugStatus("checking", "Memeriksa ketersediaan workspace…");
+          self.slugCheckTimer = window.setTimeout(function () {
+            self.checkWorkspaceAvailability();
+          }, 400);
+        });
+        slugInput.addEventListener("blur", function () {
+          window.clearTimeout(self.slugCheckTimer);
+          if (self.validWorkspaceSlug(slugInput.value)) self.checkWorkspaceAvailability();
         });
       }
     }
@@ -426,10 +435,18 @@
       };
       this.state.modules = payload.profile.modules || this.state.modules;
       this.state.goal = payload.profile.goal || this.state.goal;
+    } else {
+      var clean = defaultState();
+      this.state.business = clean.business;
+      this.state.modules = clean.modules;
+      this.state.goal = clean.goal;
     }
     if (payload.workspaces && payload.workspaces.length) {
       this.state.workspace = Object.assign({ ready: true }, payload.workspaces[0]);
       this.state.completed = true;
+    } else {
+      this.state.workspace = null;
+      this.state.completed = false;
     }
     this.hydrate();
   };
@@ -511,23 +528,28 @@
       this.showError(form, "Isi kota / wilayah utama.");
       return;
     }
-    if (!/^[a-z0-9](?:[a-z0-9-]{1,38}[a-z0-9])?$/.test(workspaceSlug)) {
+    if (!this.validWorkspaceSlug(workspaceSlug)) {
       this.showError(form, "Subdomain harus 3–40 karakter, berisi huruf kecil, angka, atau tanda hubung.");
       return;
     }
 
     var industry = this.state.business.industry || "general";
     if (industry === "other") industry = "general";
-    this.state.business = {
-      businessName: businessName,
-      workspaceSlug: workspaceSlug,
-      branchCount: branchCount,
-      region: region,
-      industry: industry,
-      description: description,
-    };
     setFormLoading(form, true);
     try {
+      var available = await this.checkWorkspaceAvailability();
+      if (!available) {
+        this.showError(form, "Nama workspace tidak tersedia. Pilih nama lain.");
+        return;
+      }
+      this.state.business = {
+        businessName: businessName,
+        workspaceSlug: workspaceSlug,
+        branchCount: branchCount,
+        region: region,
+        industry: industry,
+        description: description,
+      };
       await this.saveProfile();
       saveState(this.state);
       this.showToast("Profil disimpan", "Pilih modul yang ingin diaktifkan.");
@@ -536,6 +558,48 @@
       this.showError(form, error.message);
     } finally {
       setFormLoading(form, false);
+    }
+  };
+
+  OnboardingApp.prototype.validWorkspaceSlug = function (slug) {
+    return /^[a-z0-9](?:[a-z0-9-]{1,38}[a-z0-9])?$/.test(String(slug || ""));
+  };
+
+  OnboardingApp.prototype.setSlugStatus = function (state, message) {
+    var status = qs("[data-slug-status]");
+    if (!status) return;
+    status.dataset.state = state;
+    status.textContent = message;
+  };
+
+  OnboardingApp.prototype.checkWorkspaceAvailability = async function () {
+    var input = this.businessForm && this.businessForm.workspaceSlug;
+    var slug = String(input && input.value || "").trim();
+    if (!this.validWorkspaceSlug(slug)) {
+      this.slugAvailability = { slug: slug, available: false };
+      this.setSlugStatus("unavailable", "Nama workspace belum valid.");
+      return false;
+    }
+    if (this.slugAvailability.slug === slug && this.slugAvailability.available === true) {
+      return true;
+    }
+
+    this.setSlugStatus("checking", "Memeriksa ketersediaan workspace…");
+    try {
+      var result = await api("/api/onboarding/slug?slug=" + encodeURIComponent(slug));
+      if (String(input.value || "").trim() !== slug) return false;
+      this.slugAvailability = { slug: slug, available: result.available === true };
+      if (result.available) {
+        this.setSlugStatus("available", "Tersedia: " + result.domain);
+        return true;
+      }
+      this.setSlugStatus("unavailable", "Sudah digunakan atau tidak dapat dipakai. Pilih nama lain.");
+      return false;
+    } catch (error) {
+      if (String(input.value || "").trim() !== slug) return false;
+      this.slugAvailability = { slug: slug, available: false };
+      this.setSlugStatus("unavailable", "Ketersediaan belum dapat diperiksa. Coba lagi.");
+      return false;
     }
   };
 

@@ -11,6 +11,7 @@ const actionTokens = new Map();
 const sentEmails = [];
 let server;
 let baseUrl;
+let authenticatedCookie = "";
 
 const config = {
   nodeEnv: "test",
@@ -23,6 +24,7 @@ const config = {
   googleRedirectUri: "http://127.0.0.1/api/auth/google/callback",
   sessionSecret: "test-session-secret-with-at-least-32-characters",
   databaseUrl: "postgres://test",
+  tenantDomainSuffix: "motovax.com",
   trustProxy: false,
 };
 
@@ -101,6 +103,9 @@ const store = {
   },
   async getAccountState() {
     return { profile: null, workspaces: [] };
+  },
+  async isSlugAvailable(slug) {
+    return slug !== "workspace-terpakai";
   },
   async revokeSession(digest) {
     sessions.delete(digest);
@@ -266,6 +271,7 @@ test("callback membuat session dan endpoint me mengembalikan user", async () => 
     "motovax_session",
   );
   assert.ok(sessionToken);
+  authenticatedCookie = `motovax_session=${encodeURIComponent(sessionToken)}`;
   assert.ok(sessions.has(digest(sessionToken)));
 
   const me = await fetch(`${baseUrl}/api/auth/me`, {
@@ -284,4 +290,20 @@ test("callback membuat session dan endpoint me mengembalikan user", async () => 
     profile: null,
     workspaces: [],
   });
+});
+
+test("availability workspace menolak nama yang sudah dipakai", async () => {
+  const unavailable = await fetch(`${baseUrl}/api/onboarding/slug?slug=workspace-terpakai`, {
+    headers: { cookie: authenticatedCookie },
+  });
+  assert.equal(unavailable.status, 200);
+  assert.equal((await unavailable.json()).available, false);
+
+  const available = await fetch(`${baseUrl}/api/onboarding/slug?slug=workspace-baru`, {
+    headers: { cookie: authenticatedCookie },
+  });
+  assert.equal(available.status, 200);
+  const payload = await available.json();
+  assert.equal(payload.available, true);
+  assert.equal(payload.domain, "workspace-baru.motovax.com");
 });

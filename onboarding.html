@@ -211,12 +211,14 @@
               </label>
 
               <label>
-                <span>Alamat workspace</span>
+                <span>Nama workspace</span>
                 <div class="onboarding-domain-input">
-                  <input type="text" name="workspaceSlug" minlength="3" maxlength="40" pattern="[a-z0-9-]+" placeholder="nusantara-motor" required />
+                  <input type="text" name="workspaceSlug" minlength="3" maxlength="40" pattern="[a-z0-9-]+" placeholder="pilih-nama-workspace" aria-describedby="workspaceSlugStatus" required />
                   <span>.motovax.com</span>
                 </div>
-                <small class="onboarding-field-help">Gunakan 3–40 karakter: huruf kecil, angka, dan tanda hubung.</small>
+                <small class="onboarding-field-help" id="workspaceSlugStatus" data-slug-status aria-live="polite">
+                  Isi sendiri 3–40 karakter: huruf kecil, angka, dan tanda hubung.
+                </small>
               </label>
 
               <div class="onboarding-form-row">
@@ -420,6 +422,6 @@
     </div>
 
     <script src="./script.js?v=onb-20260808b"></script>
-    <script src="./onboarding.js?v=signup-links-20260811"></script>
+    <script src="./onboarding.js?v=workspace-availability-20260811"></script>
   </body>
 </html>
