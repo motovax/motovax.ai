@@ -79,6 +79,7 @@ after(async () => {
 
 const viewports = [
   { name: "desktop", width: 1440, height: 1000 },
+  { name: "reported-1068", width: 1068, height: 693 },
   { name: "tablet", width: 834, height: 1112 },
   { name: "mobile", width: 390, height: 844 },
 ];
@@ -261,13 +262,26 @@ for (const viewport of viewports) {
     const recaptchaStep = await page.evaluate(() => {
       const hint = document.querySelector(".onboarding-complete-action .onboarding-hint");
       const button = document.querySelector('[data-modules-form] button[type="submit"]');
+      const back = document.querySelector(".onboarding-module-back");
+      const buttonRect = button?.getBoundingClientRect();
+      const backRect = back?.getBoundingClientRect();
       return {
         overflow: document.documentElement.scrollWidth > document.documentElement.clientWidth,
         hintVisible: Boolean(hint?.getBoundingClientRect().height),
         buttonVisible: Boolean(button?.getBoundingClientRect().height),
+        heightDelta: Math.abs((buttonRect?.height || 0) - (backRect?.height || 0)),
+        bottomDelta: Math.abs((buttonRect?.bottom || 0) - (backRect?.bottom || 0)),
+        borderRadius: getComputedStyle(button).borderRadius,
+        arrowSize: document.querySelector(".onboarding-finish-button i")?.getBoundingClientRect().width,
       };
     });
-    assert.deepEqual(recaptchaStep, { overflow: false, hintVisible: true, buttonVisible: true });
+    assert.equal(recaptchaStep.overflow, false);
+    assert.equal(recaptchaStep.hintVisible, true);
+    assert.equal(recaptchaStep.buttonVisible, true);
+    assert.ok(recaptchaStep.heightDelta <= 0.1, JSON.stringify(recaptchaStep));
+    if (viewport.width > 640) assert.ok(recaptchaStep.bottomDelta <= 0.1, JSON.stringify(recaptchaStep));
+    assert.equal(recaptchaStep.borderRadius, "12px");
+    assert.equal(recaptchaStep.arrowSize, 30);
     await page.screenshot({ path: `/tmp/motovax-recaptcha-${viewport.name}.png`, fullPage: false });
     await page.click('[data-modules-form] button[type="submit"]');
     await page.waitForSelector('[data-step="5"].is-active');

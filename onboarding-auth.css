@@ -103,6 +103,72 @@
   text-align: right;
 }
 
+.onboarding-module-actions {
+  display: grid;
+  grid-template-columns: 148px minmax(238px, 340px);
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.onboarding-module-actions .onboarding-complete-action {
+  width: 100%;
+  min-width: 0;
+}
+
+.onboarding-module-back,
+.onboarding-finish-button {
+  min-height: 54px;
+  border-radius: 12px;
+}
+
+.onboarding-module-back {
+  min-width: 148px;
+}
+
+.onboarding-finish-button {
+  min-width: 238px;
+  padding: 0 12px 0 22px;
+  justify-content: space-between;
+  border: 1px solid rgba(7, 76, 194, 0.22);
+  background: linear-gradient(135deg, #1670f8 0%, #0756da 58%, #064bc2 100%);
+  box-shadow: 0 14px 30px rgba(9, 86, 218, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  margin-left: auto;
+}
+
+.onboarding-finish-button i {
+  display: grid;
+  width: 30px;
+  height: 30px;
+  flex: 0 0 30px;
+  place-items: center;
+  border-radius: 9px;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.16);
+  font-style: normal;
+  font-size: 1.05rem;
+  transition: transform 160ms ease, background 160ms ease;
+}
+
+.onboarding-finish-button:hover {
+  transform: none;
+  box-shadow: 0 18px 36px rgba(9, 86, 218, 0.34), inset 0 1px 0 rgba(255, 255, 255, 0.24);
+}
+
+.onboarding-module-back:hover {
+  transform: none;
+}
+
+.onboarding-finish-button:hover i {
+  background: rgba(255, 255, 255, 0.24);
+  transform: translateX(2px);
+}
+
+.onboarding-finish-button:focus-visible {
+  outline: 3px solid rgba(37, 99, 235, 0.24);
+  outline-offset: 3px;
+}
+
 .onboarding-path-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -214,7 +280,20 @@
   display: none !important;
 }
 
-@media (max-width: 640px) {
+@media (max-width: 720px) {
+  .onboarding-module-actions {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .onboarding-module-actions .onboarding-complete-action {
+    grid-row: 1;
+  }
+
+  .onboarding-module-actions .onboarding-module-back {
+    grid-row: 2;
+  }
+
   .onboarding-complete-action {
     width: 100%;
     align-items: stretch;
@@ -223,6 +302,12 @@
   .onboarding-complete-action .onboarding-hint {
     max-width: none;
     text-align: center;
+  }
+
+  .onboarding-module-back,
+  .onboarding-finish-button {
+    width: 100%;
+    min-width: 0;
   }
 
   .onboarding-path-grid {

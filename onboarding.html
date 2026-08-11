@@ -15,7 +15,7 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="./styles.css?v=logo-20260809" />
-    <link rel="stylesheet" href="./onboarding-auth.css?v=tenant-20260811" />
+    <link rel="stylesheet" href="./onboarding-auth.css?v=cta-20260811" />
   </head>
   <body class="onboarding-body">
     <header class="site-header onboarding-header">
@@ -404,11 +404,14 @@
               </fieldset>
 
               <p class="onboarding-form-error" data-form-error hidden></p>
-              <div class="onboarding-step-actions">
-                <button type="button" class="btn btn-secondary" data-step-back>← Kembali</button>
+              <div class="onboarding-step-actions onboarding-module-actions">
+                <button type="button" class="btn btn-secondary onboarding-module-back" data-step-back>← Kembali</button>
                 <div class="onboarding-complete-action">
                   <small class="onboarding-hint">Dilindungi oleh Google reCAPTCHA untuk mencegah pendaftaran otomatis.</small>
-                  <button type="submit" class="btn btn-primary">Selesaikan setup <span>→</span></button>
+                  <button type="submit" class="btn btn-primary onboarding-finish-button">
+                    <span>Selesaikan setup</span>
+                    <i aria-hidden="true">→</i>
+                  </button>
                 </div>
               </div>
             </form>
