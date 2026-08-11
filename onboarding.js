@@ -125,6 +125,7 @@
     this.root = document.body;
     this.state = loadState();
     this.toastTimer = null;
+    this.workspacePollTimer = null;
 
     this.steps = qsa("[data-step]");
     this.railItems = qsa("[data-rail-step]");
@@ -147,6 +148,7 @@
     var initialParams = new URLSearchParams(window.location.search);
     if (initialParams.get("reset") === "1" && initialParams.get("token")) this.showResetForm();
     this.hydrateGoogleSession();
+    if (this.state.workspace && !this.state.workspace.ready) this.waitForWorkspace();
   }
 
   OnboardingApp.prototype.bind = function () {
@@ -525,7 +527,7 @@
       this.state.goal = payload.profile.goal || this.state.goal;
     }
     if (payload.workspaces && payload.workspaces.length) {
-      this.state.workspace = payload.workspaces[0];
+      this.state.workspace = Object.assign({ ready: true }, payload.workspaces[0]);
       this.state.completed = true;
     }
     this.hydrate();
@@ -676,8 +678,9 @@
       this.state.step = 4;
       saveState(this.state);
       this.renderSummary();
-      this.showToast("Workspace berhasil dibuat", payload.workspace.domain + " siap digunakan.");
+      this.showToast("Tenant berhasil dibuat", "Domain aplikasi sedang disiapkan. Halaman ini akan memperbarui status otomatis.");
       this.goTo(4);
+      this.waitForWorkspace();
     } catch (error) {
       this.showError(form, error.message);
     } finally {
@@ -688,6 +691,11 @@
   OnboardingApp.prototype.enterWorkspace = async function () {
     var workspace = this.state.workspace;
     if (!workspace) return;
+    if (!workspace.ready) {
+      this.showToast("Workspace sedang disiapkan", "Tunggu sampai domain HTTPS aktif sebelum masuk.");
+      this.waitForWorkspace();
+      return;
+    }
     if (workspace.redirectUrl) {
       window.location.assign(workspace.redirectUrl);
       return;
@@ -703,6 +711,36 @@
       this.showToast("Workspace belum dapat dibuka", error.message);
       this.openWorkspace.disabled = false;
     }
+  };
+
+  OnboardingApp.prototype.waitForWorkspace = function () {
+    var self = this;
+    var workspace = this.state.workspace;
+    if (!workspace || workspace.ready || this.workspacePollTimer) return;
+    var startedAt = Date.now();
+    var poll = function () {
+      api("/api/workspaces/" + encodeURIComponent(workspace.id) + "/status")
+        .then(function (payload) {
+          if (payload.ready) {
+            self.state.workspace = Object.assign({}, workspace, payload.workspace, { ready: true });
+            saveState(self.state);
+            self.workspacePollTimer = null;
+            self.renderSummary();
+            self.showToast("Workspace siap digunakan", self.state.workspace.domain + " sudah aktif.");
+            return;
+          }
+          if (Date.now() - startedAt > 8 * 60 * 1000) {
+            self.workspacePollTimer = null;
+            self.showToast("Provisioning masih berjalan", "Muat ulang halaman beberapa saat lagi untuk memeriksa status.");
+            return;
+          }
+          self.workspacePollTimer = window.setTimeout(poll, 5000);
+        })
+        .catch(function () {
+          self.workspacePollTimer = window.setTimeout(poll, 7000);
+        });
+    };
+    this.workspacePollTimer = window.setTimeout(poll, 2000);
   };
 
   OnboardingApp.prototype.hydrate = function () {
@@ -749,6 +787,7 @@
     var regionEl = qs("[data-summary-region]");
     var goalEl = qs("[data-summary-goal]");
     var modulesEl = qs("[data-summary-modules]");
+    var statusEl = qs("[data-workspace-status]");
 
     if (nameEl) nameEl.textContent = biz.businessName || "Bisnis Anda";
     if (userEl) {
@@ -773,6 +812,13 @@
     var domainEl = qs("[data-summary-domain]");
     if (domainEl) {
       domainEl.textContent = this.state.workspace?.domain || (biz.workspaceSlug ? biz.workspaceSlug + ".motovax.com" : "—");
+    }
+    if (statusEl) statusEl.textContent = this.state.workspace?.ready ? "Tenant aktif" : "Menyiapkan domain";
+    if (this.openWorkspace) {
+      this.openWorkspace.disabled = !this.state.workspace?.ready;
+      this.openWorkspace.innerHTML = this.state.workspace?.ready
+        ? "Masuk ke workspace <span>→</span>"
+        : "Menyiapkan workspace…";
     }
   };
 

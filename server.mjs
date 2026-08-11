@@ -196,19 +196,8 @@ async function ensureProductDomain(config, domain) {
     }
     break;
   }
-  async function domainReady() {
-    try {
-      const response = await fetch(`https://${domain}/api/tenant/public-info`, {
-        headers: { Accept: "application/json" },
-        signal: AbortSignal.timeout(3_000),
-      });
-      return response.ok;
-    } catch {
-      return false;
-    }
-  }
-  if (await domainReady()) return;
-  if (added || !(await domainReady())) {
+  if (await tenantDomainReady(domain)) return;
+  if (added || !(await tenantDomainReady(domain))) {
     const restartResponse = await fetch(`${endpoint}/restart`, { method: "POST", headers });
     if (!restartResponse.ok) {
       const error = new Error("Konfigurasi domain tersimpan, tetapi aplikasi belum dapat memuat ulang routing.");
@@ -216,13 +205,18 @@ async function ensureProductDomain(config, domain) {
       throw error;
     }
   }
-  for (let attempt = 0; attempt < 30; attempt += 1) {
-    if (await domainReady()) return;
-    await new Promise((resolve) => setTimeout(resolve, 2_000));
+}
+
+async function tenantDomainReady(domain) {
+  try {
+    const response = await fetch(`https://${domain}/api/tenant/public-info`, {
+      headers: { Accept: "application/json" },
+      signal: AbortSignal.timeout(3_000),
+    });
+    return response.ok;
+  } catch {
+    return false;
   }
-  const error = new Error("Domain tenant sedang disiapkan. Coba selesaikan setup kembali dalam satu menit.");
-  error.code = "domain_provisioning_failed";
-  throw error;
 }
 
 function safeEqual(left, right) {
@@ -1132,15 +1126,12 @@ export function createApp({ config = readConfig(), store = null, oauthClient = n
       }
       const result = await store.provisionWorkspace({ userId: user.id, suffix: config.tenantDomainSuffix });
       await ensureProductDomain(config, result.workspace.domain);
-      const handoff = await store.createWorkspaceHandoff(user.id, result.workspace.id);
-      if (!handoff) throw new Error("Workspace selesai dibuat tetapi sesi owner tidak ditemukan.");
-      const redirectUrl = `https://${result.workspace.domain}/magic-login?token=${encodeURIComponent(handoff.handoffToken)}`;
-      return res.status(201).json({
+      return res.status(202).json({
         workspace: {
           id: result.workspace.id,
           name: result.workspace.name,
           domain: result.workspace.domain,
-          redirectUrl,
+          ready: false,
         },
       });
     } catch (error) {
@@ -1154,11 +1145,31 @@ export function createApp({ config = readConfig(), store = null, oauthClient = n
     }
   });
 
+  app.get("/api/workspaces/:tenantId/status", async (req, res, next) => {
+    try {
+      const user = await authenticatedUser(req);
+      if (!user) return res.status(401).json({ error: "not_authenticated" });
+      const state = await store.getAccountState(user.id);
+      const workspace = state.workspaces.find((item) => item.id === req.params.tenantId);
+      if (!workspace) return res.status(404).json({ error: "workspace_not_found" });
+      const ready = await tenantDomainReady(workspace.domain);
+      return res.json({ ready, workspace: { ...workspace, ready } });
+    } catch (error) {
+      return next(error);
+    }
+  });
+
   app.post("/api/workspaces/:tenantId/enter", async (req, res, next) => {
     try {
       if (!assertSameOrigin(req, res)) return;
       const user = await authenticatedUser(req);
       if (!user) return res.status(401).json({ error: "not_authenticated" });
+      const state = await store.getAccountState(user.id);
+      const selected = state.workspaces.find((item) => item.id === req.params.tenantId);
+      if (!selected) return res.status(404).json({ error: "workspace_not_found" });
+      if (!(await tenantDomainReady(selected.domain))) {
+        return res.status(409).json({ error: "workspace_provisioning", message: "Workspace masih menyiapkan domain HTTPS." });
+      }
       const result = await store.createWorkspaceHandoff(user.id, req.params.tenantId);
       if (!result) return res.status(404).json({ error: "workspace_not_found" });
       return res.json({
