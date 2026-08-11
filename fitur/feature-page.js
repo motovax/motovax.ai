@@ -547,7 +547,7 @@
     }
 
     if (id === "automasi-workflow") {
-      return preview("product-falcon-sales.png?v=20260806-workflow-1", "Automation · Chat, CRM & Stock");
+      return preview("core-platform-native-ai-tools-public.png?v=20260810-workflow-3", "Agent AI · Chat, CRM & Inventory");
     }
 
     return previewSetFor(id, preview)[0];
@@ -575,11 +575,14 @@
 
     const stem = pathname.replace(/\.png$/i, "");
     const variantBase = `../assets/feature-previews/${escapeHtml(stem)}`;
+    const variantVersion = file.includes("?")
+      ? escapeHtml(file.slice(file.indexOf("?")))
+      : "?v=20260810-img-3";
     const sizes = hero ? "(max-width: 900px) calc(100vw - 36px), 540px" : "(max-width: 900px) calc(100vw - 36px), 560px";
     return `<picture>
               <source
                 type="image/webp"
-                srcset="${variantBase}-720.webp?v=20260806-img-2 720w, ${variantBase}-1200.webp?v=20260806-img-2 1200w"
+                srcset="${variantBase}-720.webp${variantVersion} 720w, ${variantBase}-1200.webp${variantVersion} 1200w"
                 sizes="${sizes}"
               >
               ${image}
@@ -659,21 +662,33 @@
     // semantik dan tidak bergantung pada nomor kartu/rotasi screenshot umum.
     if (slug === "automasi-workflow" && index === 0) {
       preview = captured(
-        "workflow-auto-follow-public.png?v=20260806-workflow-1",
-        "Sales Agent · Auto Follow",
-        "Lead aktif, butuh follow-up, dan overdue terlihat bersama waktu interaksi terakhir agar prioritas tindak lanjut lebih jelas.",
+        "core-platform-native-ai-tools-public.png?v=20260810-workflow-3",
+        "Jasmine · Native AI Tools",
+        "Agent AI memakai data inventori tenant untuk menjawab kebutuhan unit dan membawa percakapan menuju aksi operasional berikutnya.",
       );
     } else if (slug === "automasi-workflow" && index === 1) {
       preview = captured(
-        "report-email-scheduler-public.png?v=20260806-workflow-1",
-        "Platform · Email Report Scheduler",
-        "Worker laporan menjalankan jadwal harian dengan attachment dan daftar penerima yang sudah dikonfigurasi.",
+        "workflow-auto-follow-public.png?v=20260810-workflow-data-agent-1",
+        "Sales Agent · Data Agent Falcon",
+        "Data Agent Falcon memperlihatkan lead aktif, kebutuhan follow-up, status overdue, dan interaksi terakhir dalam satu halaman.",
       );
     } else if (slug === "automasi-workflow" && index === 2) {
       preview = captured(
-        "omnichannel-inventory-public.png?v=20260806-workflow-1",
-        "Call Center · Inventory Tool Chain",
-        "Dari percakapan, agent mencari unit ready lalu melanjutkan ke hitung kredit atau membagikan hasil tanpa berpindah workspace.",
+        "omnichannel-faneling-public.png?v=20260810-workflow-3",
+        "Call Center · AI → Agent → MR",
+        "Jejak respons AI, takeover Call Center, dan handoff ke Marketing Representative tetap terlihat dalam satu percakapan.",
+      );
+    } else if (slug === "automasi-workflow" && index === 3) {
+      preview = captured(
+        "report-email-scheduler-public.png?v=20260810-workflow-3",
+        "Platform · Email Report Scheduler",
+        "Scheduler menjalankan laporan dengan frekuensi, attachment, dan daftar penerima yang sudah dikonfigurasi.",
+      );
+    } else if (slug === "automasi-workflow" && index === 4) {
+      preview = captured(
+        "product-social-calendar.png?v=20260810-workflow-3",
+        "Social Media · Kalender Posting",
+        "Materi yang disiapkan dari inventori tersusun dalam kalender agar publishing tim berjalan sesuai jadwal.",
       );
     } else if (slug === "personalisasi-report-sales" && index === 0) {
       preview = captured(

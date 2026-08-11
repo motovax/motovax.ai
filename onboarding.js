@@ -27,6 +27,7 @@
     signup: "Gunakan email kerja Anda. Mode demo — tidak mengirim email verifikasi nyata.",
     login: "Masuk dengan email yang sudah terdaftar. Mode demo — terima kredensial apa pun.",
   };
+  var GOOGLE_AUTH_ORIGIN = "https://onboard.motovax.com";
   var DEMO_ANCHORS = {
     ims: "#inventoryDemo",
     omni: "#omniDemo",
@@ -102,6 +103,7 @@
     this.bind();
     this.hydrate();
     this.goTo(this.state.completed ? 4 : this.state.step || 1, { silent: true });
+    this.hydrateGoogleSession();
   }
 
   OnboardingApp.prototype.bind = function () {
@@ -135,18 +137,10 @@
     }
 
     var googleBtn = qs("[data-google-login]");
-    var googleForm = qs("[data-google-form]");
-    if (googleBtn && googleForm) {
+    if (googleBtn) {
       googleBtn.addEventListener("click", function () {
-        googleForm.hidden = !googleForm.hidden;
-        if (!googleForm.hidden) {
-          var googleInput = qs("[data-google-email]", googleForm);
-          if (googleInput) googleInput.focus();
-        }
-      });
-      googleForm.addEventListener("submit", function (e) {
-        e.preventDefault();
-        self.submitGoogle();
+        googleBtn.classList.add("is-loading");
+        googleBtn.setAttribute("aria-label", "Mengalihkan ke Google");
       });
     }
 
@@ -233,6 +227,16 @@
 
     var lead = qs("[data-auth-lead]");
     if (lead) lead.textContent = AUTH_LEAD[this.state.authMode] || AUTH_LEAD.signup;
+
+    var googleBtn = qs("[data-google-login]");
+    if (googleBtn) {
+      googleBtn.setAttribute(
+        "href",
+        GOOGLE_AUTH_ORIGIN +
+          "/api/auth/google/start?mode=" +
+          encodeURIComponent(this.state.authMode),
+      );
+    }
 
     this.clearErrors();
     saveState(this.state);
@@ -344,35 +348,61 @@
     this.goTo(this.state.business.businessName ? 3 : 2);
   };
 
-  OnboardingApp.prototype.submitGoogle = function () {
-    var form = qs("[data-google-form]");
-    var input = qs("[data-google-email]");
-    var email = input ? String(input.value || "").trim().toLowerCase() : "";
+  OnboardingApp.prototype.hydrateGoogleSession = function () {
+    var self = this;
+    var params = new URLSearchParams(window.location.search);
+    var oauthStatus = params.get("oauth");
+    var isAuthHost = window.location.origin === GOOGLE_AUTH_ORIGIN;
+    var isLocal = window.location.hostname === "127.0.0.1" || window.location.hostname === "localhost";
 
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      this.showError(form, "Masukkan alamat Gmail yang valid.");
+    if (!isAuthHost && !isLocal) return;
+    if (oauthStatus === "denied") {
+      this.showToast("Login Google dibatalkan", "Silakan coba lagi jika Anda ingin melanjutkan.");
+      return;
+    }
+    if (oauthStatus === "failed") {
+      this.showToast("Login Google belum berhasil", "Silakan coba lagi atau hubungi tim MOTOVAX.");
       return;
     }
 
-    this.clearErrors();
-    var keepName = this.state.account && this.state.account.fullName;
-    this.state.account = {
-      fullName: keepName || email.split("@")[0],
-      email: email,
-      password: "",
-      provider: "google",
-    };
-    this.state.authMode = "login";
-    saveState(this.state);
+    fetch("/api/auth/me", {
+      credentials: "same-origin",
+      headers: { Accept: "application/json" },
+    })
+      .then(function (response) {
+        if (!response.ok) return null;
+        return response.json();
+      })
+      .then(function (payload) {
+        if (!payload || !payload.authenticated || !payload.user) return;
+        self.state.account = {
+          fullName: payload.user.fullName || payload.user.email.split("@")[0],
+          email: payload.user.email,
+          password: "",
+          provider: "google",
+        };
+        self.state.authMode = "login";
+        saveState(self.state);
+        self.hydrate();
 
-    if (this.state.completed) {
-      this.showToast("Login Google berhasil (demo)", "Melanjutkan ke ringkasan workspace.");
-      this.goTo(4);
-      return;
-    }
-
-    this.showToast("Login Google berhasil (demo)", "Lanjut lengkapi onboarding.");
-    this.goTo(this.state.business.businessName ? 3 : 2);
+        if (self.state.completed) {
+          self.goTo(4);
+        } else {
+          self.goTo(self.state.business.businessName ? 3 : 2);
+        }
+        if (oauthStatus === "success") {
+          self.showToast("Login Google berhasil", "Lanjut lengkapi onboarding Anda.");
+          params.delete("oauth");
+          params.delete("reason");
+          var query = params.toString();
+          window.history.replaceState({}, "", window.location.pathname + (query ? "?" + query : ""));
+        }
+      })
+      .catch(function () {
+        if (oauthStatus === "success") {
+          self.showToast("Session belum dapat dimuat", "Muat ulang halaman atau coba login kembali.");
+        }
+      });
   };
 
   OnboardingApp.prototype.submitBusiness = function () {
@@ -436,10 +466,6 @@
     }
     if (this.loginForm && this.loginForm.email) {
       this.loginForm.email.value = acc.email || "";
-    }
-    var googlePrefill = qs("[data-google-email]");
-    if (googlePrefill && acc.provider === "google") {
-      googlePrefill.value = acc.email || "";
     }
     if (this.businessForm) {
       if (this.businessForm.businessName) this.businessForm.businessName.value = biz.businessName || "";
@@ -558,4 +584,3 @@
     bootOnboarding();
   }
 })();
-

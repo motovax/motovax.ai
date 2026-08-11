@@ -3,13 +3,20 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "dev": "python -m http.server 5179",
-    "start": "python -m http.server 5179",
+    "dev": "PORT=5179 node server.mjs",
+    "start": "node server.mjs",
+    "test": "node --test tests/*.test.mjs",
     "generate:feature-images": "node scripts/generate-feature-image-variants.mjs",
     "generate:fitur": "node scripts/generate-fitur-pages.mjs",
     "generate:solusi": "node scripts/generate-solusi-pages.mjs"
   },
   "devDependencies": {
+    "playwright": "^1.62.1",
     "sharp": "^0.35.3"
+  },
+  "dependencies": {
+    "express": "^5.2.1",
+    "google-auth-library": "^10.9.1",
+    "pg": "^8.23.0"
   }
 }
