@@ -34,6 +34,8 @@
 .industry-readiness { gap: 7px; padding: 0 12px; border: 1px solid rgba(255,255,255,.2); color: #d9efff; background: rgba(255,255,255,.08); }
 .industry-readiness i { width: 7px; height: 7px; border-radius: 50%; background: #fbbf24; box-shadow: 0 0 0 4px rgba(251,191,36,.13); }
 .industry-readiness.live i { background: #34d399; box-shadow: 0 0 0 4px rgba(52,211,153,.13); }
+.industry-readiness-text { margin: 0 0 16px; color: #d9efff; font-size: 13px; font-weight: 700; }
+.industry-readiness-text.live { color: #9ff0d0; }
 .industry-hero-copy h1 { max-width: 650px; margin: 24px 0 20px; font-size: clamp(42px,4.1vw,66px); line-height: 1.03; letter-spacing: -.055em; }
 .industry-hero-copy > p { max-width: 620px; margin: 0; color: #c7daef; font-size: 17px; line-height: 1.72; }
 .industry-hero-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; margin-top: 30px; }

@@ -47,7 +47,7 @@ const template = (slug, title, description) => `<!doctype html>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="../styles.css?v=logo-20260809" />
+    <link rel="stylesheet" href="../styles.css?v=copy-20260811" />
   </head>
   <body class="feature-detail-page">
     <header class="site-header">
@@ -100,7 +100,7 @@ const template = (slug, title, description) => `<!doctype html>
 
     <script>window.__FEATURE_SLUG__ = ${JSON.stringify(slug)};</script>
     <script src="./features-data.js"></script>
-    <script src="./feature-page.js?v=20260806-image-performance-2"></script>
+    <script src="./feature-page.js?v=copy-20260811"></script>
     <script src="../script.js?v=20260806-2"></script>
   </body>
 </html>
@@ -145,7 +145,7 @@ fs.writeFileSync(
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Semua Fitur — MOTOVAX</title>
   <meta name="description" content="Jelajahi katalog fitur Motovax untuk sales, customer service, CRM, omnichannel, dan automasi bisnis." />
-  <link rel="stylesheet" href="../styles.css?v=logo-20260809" />
+  <link rel="stylesheet" href="../styles.css?v=copy-20260811" />
   <link rel="icon" href="../favicon.ico" />
 </head>
 <body class="feature-detail-page">

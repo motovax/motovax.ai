@@ -190,10 +190,7 @@
         <p class="feature-breadcrumb">${crumbs}</p>
         <div class="feature-hero-grid">
           <div class="feature-hero-copy">
-            <div class="feature-hero-badges">
-              <span class="feature-badge">${escapeHtml(profile.eyebrow)}</span>
-              <span class="feature-badge ${availability.tone}">${escapeHtml(availability.label)}</span>
-            </div>
+            <p class="feature-availability ${availability.tone}">${escapeHtml(availability.label)}</p>
             <h1>${escapeHtml(data.heroTitle)}</h1>
             <p class="feature-hero-desc">${escapeHtml(data.heroDesc)}</p>
             ${heroBenefits ? `<ul class="feature-hero-list">${heroBenefits}</ul>` : ""}
@@ -214,7 +211,6 @@
     <section class="feature-page-section feature-intro-section">
       <div class="container">
         <div class="feature-section-heading centered">
-          <span>${escapeHtml(profile.sectionLabel)}</span>
           <h2>${escapeHtml(data.title)} untuk operasional yang lebih cepat dan terhubung</h2>
           <p>${escapeHtml(profile.intro)}</p>
         </div>
@@ -225,7 +221,6 @@
     <section class="feature-page-section feature-showcase-section" id="kemampuan">
       <div class="container">
         <div class="feature-section-heading centered">
-          <span>FITUR UNGGULAN</span>
           <h2>Kemampuan yang dapat dipakai tim Anda</h2>
           <p>Setiap bagian di bawah menggambarkan capability Motovax dan alur kerja yang didukungnya.</p>
         </div>
@@ -236,7 +231,6 @@
     <section class="feature-page-section feature-foundation-section">
       <div class="container">
         <div class="feature-section-heading centered light">
-          <span>MENGAPA MOTOVAX</span>
           <h2>Satu platform untuk data, tim, dan agen AI</h2>
           <p>Fondasi yang sama dipakai lintas modul agar aktivitas pelanggan dan operasional tidak terpecah.</p>
         </div>
@@ -252,7 +246,6 @@
     <section class="feature-page-section feature-process-section">
       <div class="container feature-process-grid">
         <div class="feature-section-heading">
-          <span>CARA KERJA</span>
           <h2>Dari aktivitas masuk hingga tindak lanjut</h2>
           <p>${escapeHtml(availability.detail)}</p>
           <a class="btn btn-primary" href="https://motovax.ai/hubungi-kami.html">Diskusikan kebutuhan Anda</a>
@@ -266,7 +259,6 @@
         ? `<section class="feature-page-section feature-related-section">
       <div class="container">
         <div class="feature-section-heading">
-          <span>TERHUBUNG</span>
           <h2>Fitur dan solusi terkait</h2>
           <p>Bangun alur kerja end-to-end dengan capability Motovax lainnya.</p>
         </div>
@@ -279,7 +271,6 @@
     <section class="feature-page-section feature-faq-section">
       <div class="container feature-faq-layout">
         <div class="feature-section-heading">
-          <span>FAQ</span>
           <h2>Pertanyaan tentang ${escapeHtml(data.title)}</h2>
           <p>Informasi singkat untuk membantu Anda memahami fungsi, ketersediaan, dan keterhubungan fiturnya.</p>
         </div>
@@ -290,7 +281,6 @@
     <section class="feature-page-cta">
       <div class="container feature-page-cta-inner">
         <div>
-          <span>POWER YOUR OPERATION</span>
           <h2>Siap melihat ${escapeHtml(data.title)} untuk bisnis Anda?</h2>
           <p>Jadwalkan sesi bersama tim Motovax untuk melihat alur yang paling relevan.</p>
         </div>

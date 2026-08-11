@@ -974,6 +974,17 @@ body.solusi-menu-open {
   min-width: 0;
 }
 
+.feature-availability {
+  margin: 0 0 18px;
+  color: #52657c;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.feature-availability.live { color: #087458; }
+.feature-availability.partial { color: #9a5a05; }
+.feature-availability.roadmap { color: #6444b7; }
+
 .feature-hero-badges {
   margin-bottom: 20px;
 }
