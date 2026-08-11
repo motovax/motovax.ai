@@ -134,6 +134,62 @@ function normalizeEmail(value) {
   return String(value || "").trim().toLowerCase();
 }
 
+export function buildIsolatedTenantConfig({ tenantId, profile }) {
+  const modules = Array.isArray(profile?.modules) ? [...profile.modules] : [];
+  const region = String(profile?.region || "").trim();
+  const motosocialProfile = `motovax_${String(tenantId || "").replace(/[^a-zA-Z0-9_-]+/g, "_")}`;
+  const features = {
+    inventory_management: modules.includes("ims"),
+    whatsapp_ai: modules.includes("omni"),
+    social_media_automation: modules.includes("social"),
+    crm_autopilot: modules.includes("crm"),
+  };
+
+  return {
+    max_users: 25,
+    max_listings: 1000,
+    whatsapp_enabled: modules.includes("omni"),
+    branches: region ? [region] : [],
+    branding: { logo_url: "", primary_color: "#000000", favicon_url: "" },
+    finance: { enabled: false, provider: "" },
+    ai: {
+      additional_prompt: "",
+      eval_schedule: { auto_run_enabled: false, schedule_time: "09:00" },
+    },
+    social_media: { design_templates: [] },
+    features,
+    whatsapp: {
+      sales_default_role_id: "",
+      handoff_role_ids: [],
+      call_center_contact_role_ids: [],
+      call_center_handoff_role_ids: [],
+      auto_reply_groups: [],
+      area_branch_map: {},
+      // Jasmine tidak boleh melakukan assignment sebelum role dan routing tenant dikonfigurasi.
+      jasmine_auto_assign_enabled: false,
+      lead_source_templates: [],
+    },
+    email_report: { recipients: [], emails: [], logs: [] },
+    // Nama profile berasal dari tenant UUID sehingga session channel tidak pernah berbagi dengan Mobix.
+    messenger: { motosocial_profile: motosocialProfile },
+    instagram_private: { motosocial_profile: motosocialProfile, disconnected: true },
+    demo: { public_enabled: false, public_slug: "", allow_writes: false },
+    motosocial_api_key: "",
+    onboarding: {
+      industry: profile?.industry || "general",
+      branch_count: profile?.branch_count || "1",
+      modules,
+      goal: profile?.goal || "conversion",
+    },
+    isolation: {
+      schema_version: 1,
+      ai_config_scope: "tenant",
+      channel_profile_scope: "tenant",
+      integration_config_scope: "tenant",
+    },
+  };
+}
+
 function normalizeSlug(value) {
   return String(value || "")
     .normalize("NFKD")
@@ -678,30 +734,11 @@ export async function createPostgresStore(connectionString) {
 
         const tenantId = crypto.randomUUID();
         const appUserId = crypto.randomUUID();
-        const features = {
-          inventory_management: profile.modules.includes("ims"),
-          whatsapp_ai: profile.modules.includes("omni"),
-          social_media_automation: profile.modules.includes("social"),
-          crm_autopilot: profile.modules.includes("crm"),
-        };
-        const tenantConfig = {
-          max_users: 25,
-          max_listings: 1000,
-          whatsapp_enabled: profile.modules.includes("omni"),
-          branches: [profile.region],
-          branding: { logo_url: "", primary_color: "#000000", favicon_url: "" },
-          features,
-          onboarding: {
-            industry: profile.industry,
-            branch_count: profile.branch_count,
-            modules: profile.modules,
-            goal: profile.goal,
-          },
-        };
+        const tenantConfig = buildIsolatedTenantConfig({ tenantId, profile });
         await client.query(
           `INSERT INTO tenants
-            (id, name, slug, description, status, config, created_by, created_at, updated_at)
-           VALUES ($1, $2, $3, $4, 'active', $5::jsonb, $6, NOW(), NOW())`,
+            (id, name, slug, description, status, config, default_ai_engine_key, created_by, created_at, updated_at)
+           VALUES ($1, $2, $3, $4, 'active', $5::jsonb, 'falcon', $6, NOW(), NOW())`,
           [tenantId, profile.business_name, slug, profile.description, JSON.stringify(tenantConfig), userId],
         );
         await client.query(
@@ -727,9 +764,15 @@ export async function createPostgresStore(connectionString) {
         username = username.slice(0, 80);
         await client.query(
           `INSERT INTO users
-            (id, tenant_id, username, display_name, email, password_hash, branch, created_at, updated_at)
-           VALUES ($1, $2, $3, $4, $5, '', $6, NOW(), NOW())`,
+            (id, tenant_id, username, display_name, email, password_hash, branch, ai_engine_key, created_at, updated_at)
+           VALUES ($1, $2, $3, $4, $5, '', $6, 'falcon', NOW(), NOW())`,
           [appUserId, tenantId, username, profile.full_name, profile.email, profile.region],
+        );
+        // UUID tenant baru seharusnya belum punya allocation. DELETE defensif ini
+        // memastikan trigger/seed eksternal tidak mewariskan endpoint LLM tenant lain.
+        await client.query(
+          "DELETE FROM tenant_llm_allocations WHERE tenant_id = $1",
+          [tenantId],
         );
         await client.query(
           "INSERT INTO user_roles (user_id, role_id) VALUES ($1, $2)",
