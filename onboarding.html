@@ -52,22 +52,29 @@
             <li data-rail-step="2">
               <i>2</i>
               <div>
-                <b>Profil bisnis</b>
-                <small>Organisasi &amp; cabang</small>
+                <b>Cara onboarding</b>
+                <small>Mandiri atau bersama tim</small>
               </div>
             </li>
             <li data-rail-step="3">
               <i>3</i>
               <div>
-                <b>Modul prioritas</b>
-                <small>Fokus first value</small>
+                <b>Profil bisnis</b>
+                <small>Organisasi &amp; cabang</small>
               </div>
             </li>
             <li data-rail-step="4">
               <i>4</i>
               <div>
+                <b>Modul prioritas</b>
+                <small>Fokus first value</small>
+              </div>
+            </li>
+            <li data-rail-step="5">
+              <i>5</i>
+              <div>
                 <b>Siap coba</b>
-                <small>Masuk ke platform</small>
+                <small>Workspace atau meeting</small>
               </div>
             </li>
           </ol>
@@ -196,10 +203,66 @@
             </a>
           </div>
 
-          <!-- STEP 2: Business -->
+          <!-- STEP 2: Onboarding path -->
           <div class="onboarding-step" data-step="2" hidden>
             <header class="onboarding-step-head">
-              <span>LANGKAH 2 · PROFIL BISNIS</span>
+              <span>LANGKAH 2 · CARA ONBOARDING</span>
+              <h2>Pilih cara memulai Motovax</h2>
+              <p>Lanjutkan sendiri sekarang atau jadwalkan sesi bersama tim Motovax.</p>
+            </header>
+
+            <div class="onboarding-path-grid">
+              <button type="button" class="onboarding-path-card" data-onboarding-choice="self">
+                <span class="onboarding-path-icon">01</span>
+                <strong>Onboarding sendiri</strong>
+                <small>Isi profil, pilih modul, dan buat workspace langsung dari portal ini.</small>
+                <b>Lanjutkan mandiri →</b>
+              </button>
+              <button type="button" class="onboarding-path-card" data-onboarding-choice="team">
+                <span class="onboarding-path-icon">02</span>
+                <strong>Bersama tim Motovax</strong>
+                <small>Pilih jadwal untuk membahas kebutuhan, modul, dan konfigurasi awal.</small>
+                <b>Pilih jadwal →</b>
+              </button>
+            </div>
+
+            <form class="onboarding-form onboarding-meeting-form" data-meeting-form hidden novalidate>
+              <div class="onboarding-meeting-head">
+                <div>
+                  <span>JADWALKAN MEETING</span>
+                  <h3>Pilih waktu yang nyaman</h3>
+                  <p>Pilih hari Senin–Jumat dalam zona waktu WIB.</p>
+                </div>
+                <button type="button" class="onboarding-link-button" data-meeting-cancel>Ganti pilihan</button>
+              </div>
+              <div class="onboarding-form-row">
+                <label>
+                  <span>Tanggal meeting</span>
+                  <input type="date" name="date" required />
+                </label>
+                <label>
+                  <span>Waktu (WIB)</span>
+                  <select name="time" required>
+                    <option value="">Pilih waktu</option>
+                    <option value="09:00">09.00 WIB</option>
+                    <option value="10:30">10.30 WIB</option>
+                    <option value="13:30">13.30 WIB</option>
+                    <option value="15:00">15.00 WIB</option>
+                  </select>
+                </label>
+              </div>
+              <p class="onboarding-form-error" data-form-error hidden></p>
+              <div class="onboarding-step-actions">
+                <small class="onboarding-hint">Tim Motovax akan mengirim konfirmasi dan detail meeting ke email akun Anda.</small>
+                <button type="submit" class="btn btn-primary">Ajukan jadwal meeting <span>→</span></button>
+              </div>
+            </form>
+          </div>
+
+          <!-- STEP 3: Business -->
+          <div class="onboarding-step" data-step="3" hidden>
+            <header class="onboarding-step-head">
+              <span>LANGKAH 3 · PROFIL BISNIS</span>
               <h2>Ceritakan bisnis Anda</h2>
               <p>Data ini digunakan untuk membuat workspace dan konfigurasi awal tenant Anda.</p>
             </header>
@@ -276,10 +339,10 @@
             </form>
           </div>
 
-          <!-- STEP 3: Modules -->
-          <div class="onboarding-step" data-step="3" hidden>
+          <!-- STEP 4: Modules -->
+          <div class="onboarding-step" data-step="4" hidden>
             <header class="onboarding-step-head">
-              <span>LANGKAH 3 · MODUL PRIORITAS</span>
+              <span>LANGKAH 4 · MODUL PRIORITAS</span>
               <h2>Apa yang ingin Anda coba dulu?</h2>
               <p>Pilih minimal satu. Pilihan ini menjadi konfigurasi awal workspace Anda.</p>
             </header>
@@ -351,15 +414,15 @@
             </form>
           </div>
 
-          <!-- STEP 4: Ready -->
-          <div class="onboarding-step" data-step="4" hidden>
+          <!-- STEP 5: Ready -->
+          <div class="onboarding-step" data-step="5" hidden>
             <header class="onboarding-step-head">
-              <span>LANGKAH 4 · SIAP</span>
-              <h2>Workspace Anda siap digunakan</h2>
-              <p>Tenant, domain, akun owner, dan konfigurasi awal berhasil dibuat.</p>
+              <span>LANGKAH 5 · SIAP</span>
+              <h2 data-ready-title>Workspace Anda siap digunakan</h2>
+              <p data-ready-copy>Tenant, domain, akun owner, dan konfigurasi awal berhasil dibuat.</p>
             </header>
 
-            <div class="onboarding-success-card" data-success-summary>
+            <div class="onboarding-success-card" data-workspace-summary>
               <div class="onboarding-success-hero">
                 <span class="onboarding-success-badge" data-workspace-status>Menyiapkan domain</span>
                 <h3 data-summary-name>Bisnis Anda</h3>
@@ -393,12 +456,42 @@
               </div>
             </div>
 
-            <div class="onboarding-ready-actions">
+            <div class="onboarding-success-card onboarding-meeting-summary" data-meeting-summary hidden>
+              <div class="onboarding-success-hero">
+                <span class="onboarding-success-badge">MENUNGGU KONFIRMASI TIM</span>
+                <h3>Jadwal pilihan Anda sudah diterima</h3>
+                <p data-meeting-user>Konfirmasi akan dikirim melalui email.</p>
+              </div>
+              <dl class="onboarding-summary-grid">
+                <div>
+                  <dt>Tanggal &amp; waktu</dt>
+                  <dd data-meeting-datetime>—</dd>
+                </div>
+                <div>
+                  <dt>Zona waktu</dt>
+                  <dd>WIB · Asia/Jakarta</dd>
+                </div>
+                <div>
+                  <dt>Status</dt>
+                  <dd>Menunggu konfirmasi tim Motovax</dd>
+                </div>
+              </dl>
+            </div>
+
+            <div class="onboarding-ready-actions" data-workspace-actions>
               <button class="btn btn-primary" type="button" data-open-workspace>
                 Masuk ke workspace <span>→</span>
               </button>
               <a class="btn btn-secondary" href="https://motovax.ai/#kontak">
                 Jadwalkan demo live
+              </a>
+            </div>
+            <div class="onboarding-ready-actions" data-meeting-actions hidden>
+              <button class="btn btn-primary" type="button" data-change-meeting>
+                Ubah jadwal pilihan
+              </button>
+              <a class="btn btn-secondary" href="https://motovax.ai/">
+                Kembali ke motovax.ai
               </a>
             </div>
           </div>
@@ -425,6 +518,6 @@
     </div>
 
     <script src="./script.js?v=onb-20260808b"></script>
-    <script src="./onboarding.js?v=recaptcha-20260811"></script>
+    <script src="./onboarding.js?v=onboarding-path-20260811"></script>
   </body>
 </html>

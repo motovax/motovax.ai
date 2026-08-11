@@ -103,6 +103,117 @@
   text-align: right;
 }
 
+.onboarding-path-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.onboarding-path-card {
+  display: flex;
+  min-width: 0;
+  min-height: 230px;
+  padding: 24px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  border: 1px solid #dbe5f3;
+  border-radius: 18px;
+  color: #172033;
+  background: linear-gradient(145deg, #fff 20%, #f5f9ff 100%);
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+}
+
+.onboarding-path-card:hover,
+.onboarding-path-card:focus-visible {
+  border-color: #2563eb;
+  box-shadow: 0 14px 30px rgba(37, 99, 235, 0.12);
+  transform: translateY(-2px);
+  outline: none;
+}
+
+.onboarding-path-card strong {
+  font-size: 1.15rem;
+}
+
+.onboarding-path-card small {
+  color: #64748b;
+  line-height: 1.6;
+}
+
+.onboarding-path-card b {
+  margin-top: auto;
+  color: #0b57d0;
+  font-size: 0.88rem;
+}
+
+.onboarding-path-icon {
+  display: grid;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  border-radius: 12px;
+  color: #0756d8;
+  background: #e8f0ff;
+  font-size: 0.78rem;
+  font-weight: 900;
+}
+
+.onboarding-meeting-form {
+  margin-top: 20px;
+  padding: 22px;
+  border: 1px solid #dbe5f3;
+  border-radius: 18px;
+  background: #f8fbff;
+}
+
+.onboarding-meeting-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.onboarding-meeting-head span {
+  color: #0964e8;
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+}
+
+.onboarding-meeting-head h3 {
+  margin: 5px 0 4px;
+  font-size: 1.2rem;
+}
+
+.onboarding-meeting-head p {
+  margin: 0;
+  color: #64748b;
+  font-size: 0.85rem;
+}
+
+.onboarding-link-button {
+  padding: 0;
+  border: 0;
+  color: #0b57d0;
+  background: transparent;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.onboarding-meeting-summary .onboarding-summary-grid > div:first-child {
+  grid-column: 1 / -1;
+}
+
+.onboarding-path-grid[hidden],
+.onboarding-meeting-form[hidden],
+.onboarding-success-card[hidden],
+.onboarding-ready-actions[hidden] {
+  display: none !important;
+}
+
 @media (max-width: 640px) {
   .onboarding-complete-action {
     width: 100%;
@@ -112,5 +223,22 @@
   .onboarding-complete-action .onboarding-hint {
     max-width: none;
     text-align: center;
+  }
+
+  .onboarding-path-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .onboarding-path-card {
+    min-height: 190px;
+    padding: 20px;
+  }
+
+  .onboarding-meeting-form {
+    padding: 18px;
+  }
+
+  .onboarding-meeting-head {
+    flex-direction: column;
   }
 }

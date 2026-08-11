@@ -33,6 +33,7 @@ const config = {
   recaptchaAction: "complete_onboarding",
   recaptchaScoreThreshold: 0.5,
   recaptchaExpectedHostname: "127.0.0.1",
+  onboardingTeamEmail: "team@motovax.com",
   trustProxy: false,
 };
 
@@ -114,6 +115,16 @@ const store = {
   },
   async isSlugAvailable(slug) {
     return slug !== "workspace-terpakai";
+  },
+  async saveMeetingRequest({ scheduledFor, timezone }) {
+    const meeting = {
+      id: "meeting-1",
+      scheduled_for: scheduledFor,
+      timezone,
+      status: "requested",
+    };
+    accountState = { profile: null, workspaces: [], meeting };
+    return meeting;
   },
   async revokeSession(digest) {
     sessions.delete(digest);
@@ -387,4 +398,32 @@ test("penyelesaian onboarding ditolak sebelum provisioning tanpa token reCAPTCHA
   assert.equal(response.status, 400);
   assert.equal((await response.json()).error, "recaptcha_invalid");
   assert.deepEqual(recaptchaTokens, [""]);
+});
+
+test("jalur bersama tim menyimpan jadwal meeting dan mengirim notifikasi", async () => {
+  const date = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000);
+  while ([0, 6].includes(date.getUTCDay())) date.setUTCDate(date.getUTCDate() + 1);
+  const dateText = date.toISOString().slice(0, 10);
+  const response = await fetch(`${baseUrl}/api/onboarding/meeting`, {
+    method: "POST",
+    headers: {
+      cookie: authenticatedCookie,
+      origin: "http://127.0.0.1",
+      "content-type": "application/json",
+    },
+    body: JSON.stringify({
+      date: dateText,
+      time: "10:30",
+      timezone: "Asia/Jakarta",
+      recaptchaToken: "valid-recaptcha-token",
+    }),
+  });
+  assert.equal(response.status, 201);
+  const payload = await response.json();
+  assert.equal(payload.meeting.id, "meeting-1");
+  assert.equal(payload.meeting.timezone, "Asia/Jakarta");
+  assert.equal(payload.meeting.status, "requested");
+  assert.equal(recaptchaTokens.at(-1), "valid-recaptcha-token");
+  assert.equal(sentEmails.at(-2).to, "team@motovax.com");
+  assert.equal(sentEmails.at(-1).to, "user@example.com");
 });

@@ -235,6 +235,15 @@ for (const viewport of viewports) {
     await page.fill('[data-auth-form="signup"] input[name="password"]', "rahasia123");
     await page.fill('[data-auth-form="signup"] input[name="passwordConfirm"]', "rahasia123");
     await page.click('[data-auth-form="signup"] button[type="submit"]');
+    await page.waitForSelector('[data-step="2"].is-active');
+    const pathChoice = await page.evaluate(() => ({
+      overflow: document.documentElement.scrollWidth > document.documentElement.clientWidth,
+      choices: document.querySelectorAll("[data-onboarding-choice]").length,
+    }));
+    assert.deepEqual(pathChoice, { overflow: false, choices: 2 });
+    await page.screenshot({ path: `/tmp/motovax-onboarding-path-${viewport.name}.png`, fullPage: false });
+    await page.click('[data-onboarding-choice="self"]');
+    await page.waitForSelector('[data-step="3"].is-active');
     await page.fill('[data-business-form] input[name="businessName"]', "Dealer Test");
     assert.equal(await page.inputValue('[data-business-form] input[name="workspaceSlug"]'), "");
     await page.fill('[data-business-form] input[name="workspaceSlug"]', "workspace-terpakai");
@@ -243,12 +252,12 @@ for (const viewport of viewports) {
     await page.waitForSelector('[data-slug-status][data-state="unavailable"]');
     await page.screenshot({ path: `/tmp/motovax-workspace-${viewport.name}.png`, fullPage: false });
     await page.click('[data-business-form] button[type="submit"]');
-    await page.waitForSelector('[data-step="2"].is-active');
+    await page.waitForSelector('[data-step="3"].is-active');
     await page.fill('[data-business-form] input[name="workspaceSlug"]', "dealer-test");
     await page.locator('[data-business-form] input[name="workspaceSlug"]').blur();
     await page.waitForSelector('[data-slug-status][data-state="available"]');
     await page.click('[data-business-form] button[type="submit"]');
-    await page.waitForSelector('[data-step="3"].is-active');
+    await page.waitForSelector('[data-step="4"].is-active');
     const recaptchaStep = await page.evaluate(() => {
       const hint = document.querySelector(".onboarding-complete-action .onboarding-hint");
       const button = document.querySelector('[data-modules-form] button[type="submit"]');
@@ -261,7 +270,7 @@ for (const viewport of viewports) {
     assert.deepEqual(recaptchaStep, { overflow: false, hintVisible: true, buttonVisible: true });
     await page.screenshot({ path: `/tmp/motovax-recaptcha-${viewport.name}.png`, fullPage: false });
     await page.click('[data-modules-form] button[type="submit"]');
-    await page.waitForSelector('[data-step="4"].is-active');
+    await page.waitForSelector('[data-step="5"].is-active');
 
     const result = await page.evaluate(() => ({
       overflow: document.documentElement.scrollWidth > document.documentElement.clientWidth,
@@ -272,6 +281,97 @@ for (const viewport of viewports) {
     assert.equal(result.domain, "dealer-test.motovax.com");
     assert.equal(result.enterVisible, true);
     await page.screenshot({ path: `/tmp/motovax-tenant-${viewport.name}.png`, fullPage: false });
+    await context.close();
+  });
+
+  test(`flow onboarding bersama tim responsif pada ${viewport.name}`, async () => {
+    const context = await browser.newContext({ viewport });
+    await context.addInitScript(() => {
+      window.grecaptcha = {
+        enterprise: {
+          ready(callback) { callback(); },
+          execute() { return Promise.resolve("team-recaptcha-token"); },
+        },
+      };
+    });
+    const page = await context.newPage();
+    await page.route(/https:\/\/fonts\.(?:googleapis|gstatic)\.com\//, (route) => route.abort());
+    await page.route("**/api/auth/me", (route) => route.fulfill({
+      status: 401,
+      contentType: "application/json",
+      body: JSON.stringify({ authenticated: false }),
+    }));
+    await page.route("**/api/auth/signup", (route) => route.fulfill({
+      status: 201,
+      contentType: "application/json",
+      body: JSON.stringify({
+        authenticated: true,
+        user: { id: "account-team", email: "team-owner@example.com", fullName: "Team Owner", provider: "password" },
+      }),
+    }));
+    await page.route("**/api/config", (route) => route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({
+        recaptcha: { enabled: true, siteKey: "test-site-key", action: "complete_onboarding" },
+      }),
+    }));
+    await page.route("**/api/onboarding/meeting", (route) => {
+      const request = route.request().postDataJSON();
+      assert.equal(request.recaptchaToken, "team-recaptcha-token");
+      assert.equal(request.timezone, "Asia/Jakarta");
+      return route.fulfill({
+        status: 201,
+        contentType: "application/json",
+        body: JSON.stringify({
+          meeting: {
+            id: "meeting-1",
+            scheduledFor: `${request.date}T03:30:00.000Z`,
+            timezone: "Asia/Jakarta",
+            status: "requested",
+          },
+        }),
+      });
+    });
+
+    const sessionResponse = page.waitForResponse((response) => response.url().endsWith("/api/auth/me"));
+    await page.goto(`${baseUrl}/onboarding.html`, { waitUntil: "load" });
+    await sessionResponse;
+    await page.fill('[data-auth-form="signup"] input[name="fullName"]', "Team Owner");
+    await page.fill('[data-auth-form="signup"] input[name="email"]', "team-owner@example.com");
+    await page.fill('[data-auth-form="signup"] input[name="password"]', "rahasia123");
+    await page.fill('[data-auth-form="signup"] input[name="passwordConfirm"]', "rahasia123");
+    await page.click('[data-auth-form="signup"] button[type="submit"]');
+    await page.waitForSelector('[data-step="2"].is-active');
+    await page.click('[data-onboarding-choice="team"]');
+    await page.waitForSelector('[data-meeting-form]:not([hidden])');
+    assert.equal(await page.locator(".onboarding-path-grid").evaluate((element) => element.getBoundingClientRect().height), 0);
+    const meetingDate = await page.evaluate(() => {
+      const value = new Date();
+      value.setDate(value.getDate() + 3);
+      while ([0, 6].includes(value.getDay())) value.setDate(value.getDate() + 1);
+      return value.toISOString().slice(0, 10);
+    });
+    await page.fill('[data-meeting-form] input[name="date"]', meetingDate);
+    await page.selectOption('[data-meeting-form] select[name="time"]', "10:30");
+    await page.screenshot({ path: `/tmp/motovax-team-schedule-${viewport.name}.png`, fullPage: false });
+    await page.click('[data-meeting-form] button[type="submit"]');
+    await page.waitForSelector('[data-step="5"].is-active [data-meeting-summary]:not([hidden])');
+    const result = await page.evaluate(() => ({
+      overflow: document.documentElement.scrollWidth > document.documentElement.clientWidth,
+      workspaceHidden: document.querySelector("[data-workspace-summary]")?.hidden,
+      workspaceHeight: document.querySelector("[data-workspace-summary]")?.getBoundingClientRect().height,
+      meetingVisible: Boolean(document.querySelector("[data-meeting-summary]")?.getBoundingClientRect().height),
+      title: document.querySelector("[data-ready-title]")?.textContent,
+    }));
+    assert.deepEqual(result, {
+      overflow: false,
+      workspaceHidden: true,
+      workspaceHeight: 0,
+      meetingVisible: true,
+      title: "Jadwal onboarding telah diajukan",
+    });
+    await page.screenshot({ path: `/tmp/motovax-team-confirmation-${viewport.name}.png`, fullPage: false });
     await context.close();
   });
 }

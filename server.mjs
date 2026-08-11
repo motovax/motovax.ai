@@ -20,6 +20,7 @@ const ALLOWED_INDUSTRIES = new Set(["general", "automotive", "property", "retail
 const RESERVED_SLUGS = new Set([
   "api", "app", "assets", "auth", "dss", "internal", "motovax-ai", "onboard", "status", "support", "www",
 ]);
+const ONBOARDING_MEETING_TIMES = new Set(["09:00", "10:30", "13:30", "15:00"]);
 
 const FULL_TENANT_PERMISSIONS = [
   "tenant:read", "tenant:update", "user:create", "user:read", "user:update", "user:delete",
@@ -66,6 +67,7 @@ function readConfig(env = process.env) {
     smtpUser: env.PLUNK_SMTP_USER || env.SMTP_USER || "",
     smtpPassword: env.PLUNK_SMTP_PASSWORD || env.SMTP_PASSWORD || "",
     authEmailFrom: env.AUTH_EMAIL_FROM || "support@motovax.com",
+    onboardingTeamEmail: env.ONBOARDING_TEAM_EMAIL || "support@motovax.com",
     recaptchaProjectId: env.RECAPTCHA_PROJECT_ID || "",
     recaptchaSiteKey: env.RECAPTCHA_SITE_KEY || "",
     recaptchaApiKey: env.RECAPTCHA_API_KEY || "",
@@ -502,6 +504,16 @@ export async function createPostgresStore(connectionString) {
       UNIQUE (tenant_id, app_user_id)
     );
 
+    CREATE TABLE IF NOT EXISTS onboarding_meeting_requests (
+      id UUID PRIMARY KEY,
+      user_id UUID NOT NULL UNIQUE REFERENCES onboarding_users(id) ON DELETE CASCADE,
+      scheduled_for TIMESTAMPTZ NOT NULL,
+      timezone TEXT NOT NULL DEFAULT 'Asia/Jakarta',
+      status TEXT NOT NULL DEFAULT 'requested',
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    );
+
     CREATE INDEX IF NOT EXISTS onboarding_auth_sessions_user_idx
       ON onboarding_auth_sessions(user_id);
     CREATE INDEX IF NOT EXISTS onboarding_auth_sessions_expiry_idx
@@ -512,6 +524,8 @@ export async function createPostgresStore(connectionString) {
       ON onboarding_action_tokens(user_id, action_type);
     CREATE INDEX IF NOT EXISTS onboarding_memberships_user_idx
       ON onboarding_memberships(user_id);
+    CREATE INDEX IF NOT EXISTS onboarding_meeting_requests_schedule_idx
+      ON onboarding_meeting_requests(scheduled_for, status);
   `);
 
   return {
@@ -705,7 +719,7 @@ export async function createPostgresStore(connectionString) {
     },
 
     async getAccountState(userId) {
-      const [profileResult, workspaceResult] = await Promise.all([
+      const [profileResult, workspaceResult, meetingResult] = await Promise.all([
         pool.query(
           `SELECT business_name, workspace_slug, branch_count, region, industry,
                   description, modules, goal, tenant_id, completed_at
@@ -721,6 +735,12 @@ export async function createPostgresStore(connectionString) {
            ORDER BY t.name`,
           [userId],
         ),
+        pool.query(
+          `SELECT id, scheduled_for, timezone, status
+           FROM onboarding_meeting_requests
+           WHERE user_id = $1`,
+          [userId],
+        ),
       ]);
       return {
         profile: profileResult.rows[0] || null,
@@ -731,7 +751,24 @@ export async function createPostgresStore(connectionString) {
           domain: row.domain,
           role: row.membership_role,
         })),
+        meeting: meetingResult.rows[0] || null,
       };
+    },
+
+    async saveMeetingRequest({ userId, scheduledFor, timezone }) {
+      const result = await pool.query(
+        `INSERT INTO onboarding_meeting_requests
+          (id, user_id, scheduled_for, timezone, status)
+         VALUES ($1, $2, $3, $4, 'requested')
+         ON CONFLICT (user_id) DO UPDATE SET
+           scheduled_for = EXCLUDED.scheduled_for,
+           timezone = EXCLUDED.timezone,
+           status = 'requested',
+           updated_at = NOW()
+         RETURNING id, scheduled_for, timezone, status`,
+        [crypto.randomUUID(), userId, scheduledFor, timezone],
+      );
+      return result.rows[0];
     },
 
     async isSlugAvailable(slug, suffix) {
@@ -1217,6 +1254,73 @@ export function createApp({
       const available = await store.isSlugAvailable(slug, config.tenantDomainSuffix);
       return res.json({ slug, available, domain: `${slug}.${config.tenantDomainSuffix}` });
     } catch (error) {
+      return next(error);
+    }
+  });
+
+  app.post("/api/onboarding/meeting", async (req, res, next) => {
+    try {
+      if (!assertSameOrigin(req, res)) return;
+      const user = await authenticatedUser(req);
+      if (!user) return res.status(401).json({ error: "not_authenticated" });
+
+      const date = String(req.body?.date || "");
+      const time = String(req.body?.time || "");
+      const timezone = String(req.body?.timezone || "Asia/Jakarta");
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || !ONBOARDING_MEETING_TIMES.has(time) || timezone !== "Asia/Jakarta") {
+        return res.status(400).json({ error: "invalid_meeting_schedule", message: "Pilih tanggal dan waktu meeting yang tersedia." });
+      }
+      const day = new Date(`${date}T00:00:00Z`).getUTCDay();
+      const scheduledFor = new Date(`${date}T${time}:00+07:00`);
+      const delay = scheduledFor.getTime() - Date.now();
+      if (!Number.isFinite(scheduledFor.getTime()) || day === 0 || day === 6 || delay < 12 * 60 * 60 * 1000 || delay > 90 * 24 * 60 * 60 * 1000) {
+        return res.status(400).json({ error: "invalid_meeting_schedule", message: "Meeting harus dipilih pada hari kerja dalam 90 hari ke depan." });
+      }
+
+      await recaptchaVerifier(config, String(req.body?.recaptchaToken || ""));
+      const meeting = await store.saveMeetingRequest({ userId: user.id, scheduledFor, timezone });
+      if (emailClient) {
+        const formatted = new Intl.DateTimeFormat("id-ID", {
+          dateStyle: "full",
+          timeStyle: "short",
+          timeZone: timezone,
+        }).format(scheduledFor);
+        const notification = await Promise.allSettled([
+          emailClient.sendMail({
+            from: `MOTOVAX <${config.authEmailFrom}>`,
+            to: config.onboardingTeamEmail,
+            replyTo: user.email,
+            subject: `Permintaan onboarding bersama tim — ${user.full_name || user.email}`,
+            text: `Pengguna: ${user.full_name || "-"}\nEmail: ${user.email}\nJadwal pilihan: ${formatted} WIB\n\nSilakan konfirmasi detail meeting kepada pengguna.`,
+            html: `<p>Permintaan onboarding bersama tim baru.</p><ul><li>Pengguna: ${escapeHtml(user.full_name || "-")}</li><li>Email: ${escapeHtml(user.email)}</li><li>Jadwal pilihan: ${escapeHtml(formatted)} WIB</li></ul><p>Silakan konfirmasi detail meeting kepada pengguna.</p>`,
+          }),
+          emailClient.sendMail({
+            from: `MOTOVAX <${config.authEmailFrom}>`,
+            to: user.email,
+            subject: "Jadwal onboarding bersama tim MOTOVAX diterima",
+            text: `Pilihan jadwal Anda: ${formatted} WIB. Tim MOTOVAX akan mengirim konfirmasi dan detail meeting ke email ini.`,
+            html: `<p>Halo ${escapeHtml(user.full_name || user.email)},</p><p>Pilihan jadwal Anda: <strong>${escapeHtml(formatted)} WIB</strong>.</p><p>Tim MOTOVAX akan mengirim konfirmasi dan detail meeting ke email ini.</p>`,
+          }),
+        ]);
+        if (notification.some((result) => result.status === "rejected")) {
+          console.error("meeting_notification_failed", { userId: user.id });
+        }
+      }
+      return res.status(201).json({
+        meeting: {
+          id: meeting.id,
+          scheduledFor: meeting.scheduled_for,
+          timezone: meeting.timezone,
+          status: meeting.status,
+        },
+      });
+    } catch (error) {
+      if (["recaptcha_invalid", "recaptcha_low_score"].includes(error?.code)) {
+        return res.status(400).json({ error: error.code, message: error.message });
+      }
+      if (error?.code === "recaptcha_unavailable") {
+        return res.status(503).json({ error: error.code, message: error.message });
+      }
       return next(error);
     }
   });

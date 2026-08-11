@@ -41,6 +41,7 @@
     return {
       step: 1,
       authMode: "signup",
+      onboardingMode: "",
       account: { fullName: "", email: "", password: "" },
       business: {
         businessName: "",
@@ -54,6 +55,7 @@
       goal: "conversion",
       completed: false,
       workspace: null,
+      meeting: null,
     };
   }
 
@@ -161,6 +163,7 @@
     this.resetForm = qs("[data-reset-form]");
     this.businessForm = qs("[data-business-form]");
     this.modulesForm = qs("[data-modules-form]");
+    this.meetingForm = qs("[data-meeting-form]");
     this.industryGrid = qs("[data-industry-grid]");
     this.goalGrid = qs("[data-goal-grid]");
     this.openWorkspace = qs("[data-open-workspace]");
@@ -261,6 +264,33 @@
       }
     }
 
+    qsa("[data-onboarding-choice]").forEach(function (choice) {
+      choice.addEventListener("click", function () {
+        var mode = choice.getAttribute("data-onboarding-choice");
+        self.state.onboardingMode = mode;
+        saveState(self.state);
+        if (mode === "self") {
+          self.goTo(3);
+          return;
+        }
+        self.showMeetingForm();
+      });
+    });
+
+    if (this.meetingForm) {
+      this.meetingForm.addEventListener("submit", function (event) {
+        event.preventDefault();
+        self.submitMeeting();
+      });
+    }
+    var meetingCancel = qs("[data-meeting-cancel]");
+    if (meetingCancel) meetingCancel.addEventListener("click", function () { self.hideMeetingForm(); });
+    var changeMeeting = qs("[data-change-meeting]");
+    if (changeMeeting) changeMeeting.addEventListener("click", function () {
+      self.goTo(2);
+      self.showMeetingForm();
+    });
+
     if (this.modulesForm) {
       this.modulesForm.addEventListener("submit", function (e) {
         e.preventDefault();
@@ -313,7 +343,7 @@
       this.showResetForm();
     }
     var stepParam = parseInt(params.get("step"), 10);
-    if (stepParam >= 1 && stepParam <= 4) {
+    if (stepParam >= 1 && stepParam <= 5) {
       this.state.step = stepParam;
     }
   };
@@ -383,6 +413,61 @@
       window.history.replaceState({}, "", window.location.pathname);
       this.setAuthMode();
       this.showToast("Password berhasil diperbarui", "Masuk melalui domain workspace Anda.");
+    } catch (error) {
+      this.showError(form, error.message);
+    } finally {
+      setFormLoading(form, false);
+    }
+  };
+
+  OnboardingApp.prototype.showMeetingForm = function () {
+    var pathGrid = qs(".onboarding-path-grid");
+    if (pathGrid) pathGrid.hidden = true;
+    if (this.meetingForm) this.meetingForm.hidden = false;
+  };
+
+  OnboardingApp.prototype.hideMeetingForm = function () {
+    var pathGrid = qs(".onboarding-path-grid");
+    if (pathGrid) pathGrid.hidden = false;
+    if (this.meetingForm) this.meetingForm.hidden = true;
+    this.state.onboardingMode = "";
+    saveState(this.state);
+  };
+
+  OnboardingApp.prototype.submitMeeting = async function () {
+    var form = this.meetingForm;
+    var data = new FormData(form);
+    var date = String(data.get("date") || "");
+    var time = String(data.get("time") || "");
+    if (!date || !time) {
+      this.showError(form, "Pilih tanggal dan waktu meeting.");
+      return;
+    }
+    var day = new Date(date + "T00:00:00Z").getUTCDay();
+    if (day === 0 || day === 6) {
+      this.showError(form, "Meeting tersedia pada hari Senin sampai Jumat.");
+      return;
+    }
+    setFormLoading(form, true);
+    try {
+      var recaptchaToken = await this.getRecaptchaToken();
+      var payload = await api("/api/onboarding/meeting", {
+        method: "POST",
+        body: JSON.stringify({
+          date: date,
+          time: time,
+          timezone: "Asia/Jakarta",
+          recaptchaToken: recaptchaToken,
+        }),
+      });
+      this.state.onboardingMode = "team";
+      this.state.meeting = payload.meeting;
+      this.state.workspace = null;
+      this.state.completed = true;
+      saveState(this.state);
+      this.renderSummary();
+      this.goTo(5);
+      this.showToast("Jadwal pilihan diterima", "Tim Motovax akan mengirim detail meeting melalui email.");
     } catch (error) {
       this.showError(form, error.message);
     } finally {
@@ -497,9 +582,22 @@
     }
     if (payload.workspaces && payload.workspaces.length) {
       this.state.workspace = Object.assign({ ready: true }, payload.workspaces[0]);
+      this.state.meeting = null;
+      this.state.onboardingMode = "self";
+      this.state.completed = true;
+    } else if (payload.meeting) {
+      this.state.workspace = null;
+      this.state.meeting = {
+        id: payload.meeting.id,
+        scheduledFor: payload.meeting.scheduled_for || payload.meeting.scheduledFor,
+        timezone: payload.meeting.timezone,
+        status: payload.meeting.status,
+      };
+      this.state.onboardingMode = "team";
       this.state.completed = true;
     } else {
       this.state.workspace = null;
+      this.state.meeting = null;
       this.state.completed = false;
     }
     this.hydrate();
@@ -548,10 +646,10 @@
         self.state.authMode = "signup";
         saveState(self.state);
 
-        if (self.state.workspace) {
-          self.goTo(4);
+        if (self.state.workspace || self.state.meeting) {
+          self.goTo(5);
         } else {
-          self.goTo(self.state.business.businessName ? 3 : 2);
+          self.goTo(self.state.business.businessName ? 4 : 2);
         }
         if (oauthStatus === "success") {
           self.showToast("Akun Google berhasil didaftarkan", "Lanjut lengkapi onboarding Anda.");
@@ -615,7 +713,7 @@
       await this.saveProfile();
       saveState(this.state);
       this.showToast("Profil disimpan", "Pilih modul yang ingin diaktifkan.");
-      this.goTo(3);
+      this.goTo(4);
     } catch (error) {
       this.showError(form, error.message);
     } finally {
@@ -702,12 +800,14 @@
         body: JSON.stringify({ recaptchaToken: recaptchaToken }),
       });
       this.state.workspace = payload.workspace;
+      this.state.meeting = null;
+      this.state.onboardingMode = "self";
       this.state.completed = true;
-      this.state.step = 4;
+      this.state.step = 5;
       saveState(this.state);
       this.renderSummary();
       this.showToast("Tenant berhasil dibuat", "Domain aplikasi sedang disiapkan. Halaman ini akan memperbarui status otomatis.");
-      this.goTo(4);
+      this.goTo(5);
       this.waitForWorkspace();
     } catch (error) {
       this.showError(form, error.message);
@@ -786,6 +886,14 @@
       if (this.businessForm.region) this.businessForm.region.value = biz.region || "";
       if (this.businessForm.description) this.businessForm.description.value = biz.description || "";
     }
+    if (this.meetingForm && this.meetingForm.date) {
+      var tomorrow = new Date();
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      var maximum = new Date();
+      maximum.setDate(maximum.getDate() + 90);
+      this.meetingForm.date.min = tomorrow.toISOString().slice(0, 10);
+      this.meetingForm.date.max = maximum.toISOString().slice(0, 10);
+    }
 
     var industry = biz.industry || "general";
     if (industry === "other") industry = "general";
@@ -813,6 +921,31 @@
     var goalEl = qs("[data-summary-goal]");
     var modulesEl = qs("[data-summary-modules]");
     var statusEl = qs("[data-workspace-status]");
+    var meetingMode = Boolean(this.state.meeting && !this.state.workspace);
+    var workspaceSummary = qs("[data-workspace-summary]");
+    var meetingSummary = qs("[data-meeting-summary]");
+    var workspaceActions = qs("[data-workspace-actions]");
+    var meetingActions = qs("[data-meeting-actions]");
+    var readyTitle = qs("[data-ready-title]");
+    var readyCopy = qs("[data-ready-copy]");
+    if (workspaceSummary) workspaceSummary.hidden = meetingMode;
+    if (meetingSummary) meetingSummary.hidden = !meetingMode;
+    if (workspaceActions) workspaceActions.hidden = meetingMode;
+    if (meetingActions) meetingActions.hidden = !meetingMode;
+    if (readyTitle) readyTitle.textContent = meetingMode ? "Jadwal onboarding telah diajukan" : "Workspace Anda siap digunakan";
+    if (readyCopy) readyCopy.textContent = meetingMode
+      ? "Tim Motovax akan mengonfirmasi jadwal dan mengirim detail meeting melalui email."
+      : "Tenant, domain, akun owner, dan konfigurasi awal berhasil dibuat.";
+    var meetingUser = qs("[data-meeting-user]");
+    if (meetingUser && meetingMode) meetingUser.textContent = "Konfirmasi akan dikirim ke " + (acc.email || "email akun Anda") + ".";
+    var meetingDatetime = qs("[data-meeting-datetime]");
+    if (meetingDatetime && meetingMode) {
+      meetingDatetime.textContent = new Intl.DateTimeFormat("id-ID", {
+        dateStyle: "full",
+        timeStyle: "short",
+        timeZone: "Asia/Jakarta",
+      }).format(new Date(this.state.meeting.scheduledFor)) + " WIB";
+    }
 
     if (nameEl) nameEl.textContent = biz.businessName || "Bisnis Anda";
     if (userEl) {
@@ -849,7 +982,7 @@
 
   OnboardingApp.prototype.goTo = function (step, opts) {
     opts = opts || {};
-    step = Math.min(4, Math.max(1, step));
+    step = Math.min(5, Math.max(1, step));
     this.state.step = step;
     if (!opts.silent) saveState(this.state);
 
@@ -860,17 +993,26 @@
       panel.classList.toggle("is-active", active);
     });
 
+    var teamCompletion = this.state.onboardingMode === "team" && step === 5;
+    var railCopies = {
+      3: "Organisasi & cabang",
+      4: "Fokus first value",
+    };
     this.railItems.forEach(function (item) {
       var n = parseInt(item.getAttribute("data-rail-step"), 10);
+      var skipped = teamCompletion && (n === 3 || n === 4);
       item.classList.toggle("is-active", n === step);
-      item.classList.toggle("is-done", n < step);
+      item.classList.toggle("is-done", n < step && !skipped);
+      item.classList.toggle("is-skipped", skipped);
+      var copy = qs("small", item);
+      if (copy && railCopies[n]) copy.textContent = skipped ? "Dibahas bersama tim" : railCopies[n];
     });
 
     if (this.progressBar) {
-      this.progressBar.style.setProperty("--p", step * 25 + "%");
+      this.progressBar.style.setProperty("--p", step * 20 + "%");
     }
 
-    if (step === 4) this.renderSummary();
+    if (step === 5) this.renderSummary();
 
     if (!opts.silent) {
       var panel = qs('.onboarding-panel');
