@@ -6,6 +6,9 @@ import { createApp } from "../server.mjs";
 
 const oauthStates = new Map();
 const sessions = new Map();
+const passwordUsers = new Map();
+const actionTokens = new Map();
+const sentEmails = [];
 let server;
 let baseUrl;
 
@@ -46,6 +49,45 @@ const store = {
       avatar_url: profile.picture,
     };
   },
+  async createPasswordUser({ email, fullName, passwordHash }) {
+    if (passwordUsers.has(email)) {
+      const error = new Error("Akun dengan email tersebut sudah terdaftar.");
+      error.code = "account_exists";
+      throw error;
+    }
+    const user = {
+      id: crypto.randomUUID(),
+      email,
+      full_name: fullName,
+      avatar_url: "",
+      password_hash: passwordHash,
+      email_verified: false,
+    };
+    passwordUsers.set(email, user);
+    return user;
+  },
+  async findPasswordUser(email) {
+    return passwordUsers.get(email) || null;
+  },
+  async saveActionToken(record) {
+    actionTokens.set(`${record.actionType}:${record.digest}`, record.userId);
+  },
+  async takeActionToken({ digest, actionType }) {
+    const key = `${actionType}:${digest}`;
+    const userId = actionTokens.get(key);
+    actionTokens.delete(key);
+    if (userId && actionType === "verify_email") {
+      for (const user of passwordUsers.values()) {
+        if (user.id === userId) user.email_verified = true;
+      }
+    }
+    return userId || null;
+  },
+  async updatePassword(userId, passwordHash) {
+    for (const user of passwordUsers.values()) {
+      if (user.id === userId) user.password_hash = passwordHash;
+    }
+  },
   async createSession(record) {
     sessions.set(record.sessionDigest, {
       id: record.userId,
@@ -56,6 +98,9 @@ const store = {
   },
   async findSession(digest) {
     return sessions.get(digest) || null;
+  },
+  async getAccountState() {
+    return { profile: null, workspaces: [] };
   },
   async revokeSession(digest) {
     sessions.delete(digest);
@@ -106,7 +151,12 @@ function digest(value) {
 }
 
 before(async () => {
-  const app = createApp({ config, store, oauthClient });
+  const app = createApp({
+    config,
+    store,
+    oauthClient,
+    mailer: { async sendMail(message) { sentEmails.push(message); } },
+  });
   await new Promise((resolve) => {
     server = app.listen(0, "127.0.0.1", resolve);
   });
@@ -141,6 +191,44 @@ test("start membuat state, nonce, PKCE, dan cookie HttpOnly", async () => {
   assert.ok(location.searchParams.get("nonce"));
   assert.match(response.headers.get("set-cookie"), /HttpOnly/i);
   assert.match(response.headers.get("set-cookie"), /SameSite=Lax/i);
+});
+
+test("daftar dan login email/password memakai kredensial nyata", async () => {
+  const signup = await fetch(`${baseUrl}/api/auth/signup`, {
+    method: "POST",
+    headers: { "content-type": "application/json", origin: "http://127.0.0.1" },
+    body: JSON.stringify({
+      fullName: "Password User",
+      email: "password@example.com",
+      password: "rahasia123",
+    }),
+  });
+  assert.equal(signup.status, 202);
+  const signupBody = await signup.json();
+  assert.equal(signupBody.email, "password@example.com");
+  assert.equal(signupBody.verificationRequired, true);
+  assert.equal(sentEmails.length, 1);
+
+  const verificationUrl = sentEmails[0].text.match(/http:\/\/127\.0\.0\.1\/api\/auth\/verify-email\?token=[^\s]+/)[0];
+  const verificationTarget = new URL(verificationUrl);
+  const verification = await fetch(`${baseUrl}${verificationTarget.pathname}${verificationTarget.search}`, { redirect: "manual" });
+  assert.equal(verification.status, 302);
+  assert.match(verification.headers.get("location"), /email=verified/);
+
+  const invalid = await fetch(`${baseUrl}/api/auth/login`, {
+    method: "POST",
+    headers: { "content-type": "application/json", origin: "http://127.0.0.1" },
+    body: JSON.stringify({ email: "password@example.com", password: "salah123" }),
+  });
+  assert.equal(invalid.status, 401);
+
+  const login = await fetch(`${baseUrl}/api/auth/login`, {
+    method: "POST",
+    headers: { "content-type": "application/json", origin: "http://127.0.0.1" },
+    body: JSON.stringify({ email: "password@example.com", password: "rahasia123" }),
+  });
+  assert.equal(login.status, 200);
+  assert.equal((await login.json()).authenticated, true);
 });
 
 test("callback menolak state yang tidak cocok", async () => {
@@ -193,5 +281,7 @@ test("callback membuat session dan endpoint me mengembalikan user", async () => 
       avatarUrl: "https://example.com/avatar.png",
       provider: "google",
     },
+    profile: null,
+    workspaces: [],
   });
 });

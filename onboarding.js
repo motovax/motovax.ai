@@ -24,8 +24,8 @@
     scale: "Scale multi-lokasi",
   };
   var AUTH_LEAD = {
-    signup: "Gunakan email kerja Anda. Mode demo — tidak mengirim email verifikasi nyata.",
-    login: "Masuk dengan email yang sudah terdaftar. Mode demo — terima kredensial apa pun.",
+    signup: "Buat akun Motovax menggunakan email kerja atau akun Google Anda.",
+    login: "Masuk untuk melanjutkan onboarding atau membuka workspace Anda.",
   };
   var GOOGLE_AUTH_ORIGIN = "https://onboard.motovax.com";
   var DEMO_ANCHORS = {
@@ -41,7 +41,9 @@
     try {
       var raw = localStorage.getItem(STORAGE_KEY);
       if (!raw) return defaultState();
-      return Object.assign(defaultState(), JSON.parse(raw));
+      var loaded = Object.assign(defaultState(), JSON.parse(raw));
+      if (loaded.account) delete loaded.account.password;
+      return loaded;
     } catch (e) {
       return defaultState();
     }
@@ -54,6 +56,7 @@
       account: { fullName: "", email: "", password: "" },
       business: {
         businessName: "",
+        workspaceSlug: "",
         branchCount: "4-10",
         region: "",
         industry: "general",
@@ -62,6 +65,7 @@
       modules: ["ims", "omni", "crm"],
       goal: "conversion",
       completed: false,
+      workspace: null,
     };
   }
 
@@ -77,11 +81,47 @@
     return (root || document).querySelector(sel);
   }
 
+  function api(path, options) {
+    options = options || {};
+    options.credentials = "same-origin";
+    options.headers = Object.assign(
+      { Accept: "application/json", "Content-Type": "application/json" },
+      options.headers || {},
+    );
+    return fetch(path, options).then(function (response) {
+      if (response.status === 204) return null;
+      return response.json().catch(function () { return {}; }).then(function (payload) {
+        if (!response.ok) {
+          var error = new Error(payload.message || "Permintaan belum berhasil. Silakan coba lagi.");
+          error.status = response.status;
+          error.code = payload.error;
+          throw error;
+        }
+        return payload;
+      });
+    });
+  }
+
+  function setFormLoading(form, loading) {
+    if (!form) return;
+    qsa("button, input, select, textarea", form).forEach(function (element) {
+      element.disabled = loading;
+    });
+    form.classList.toggle("is-loading", loading);
+  }
+
   function qsa(sel, root) {
     return Array.prototype.slice.call((root || document).querySelectorAll(sel));
   }
 
   function OnboardingApp() {
+    var isLocal = window.location.hostname === "127.0.0.1" || window.location.hostname === "localhost";
+    if (window.location.origin !== GOOGLE_AUTH_ORIGIN && !isLocal) {
+      window.location.replace(GOOGLE_AUTH_ORIGIN + "/onboarding.html" + window.location.search + window.location.hash);
+      return;
+    }
+    var mobileTrigger = qs("[data-mobile-nav-trigger]");
+    if (mobileTrigger) mobileTrigger.remove();
     this.root = document.body;
     this.state = loadState();
     this.toastTimer = null;
@@ -94,15 +134,18 @@
     this.authTabs = qsa("[data-auth-mode]");
     this.signupForm = qs('[data-auth-form="signup"]');
     this.loginForm = qs('[data-auth-form="login"]');
+    this.resetForm = qs("[data-reset-form]");
     this.businessForm = qs("[data-business-form]");
     this.modulesForm = qs("[data-modules-form]");
     this.industryGrid = qs("[data-industry-grid]");
     this.goalGrid = qs("[data-goal-grid]");
-    this.openDemo = qs("[data-open-demo]");
+    this.openWorkspace = qs("[data-open-workspace]");
 
     this.bind();
     this.hydrate();
     this.goTo(this.state.completed ? 4 : this.state.step || 1, { silent: true });
+    var initialParams = new URLSearchParams(window.location.search);
+    if (initialParams.get("reset") === "1" && initialParams.get("token")) this.showResetForm();
     this.hydrateGoogleSession();
   }
 
@@ -131,8 +174,31 @@
 
     var forgot = qs("[data-auth-forgot]");
     if (forgot) {
-      forgot.addEventListener("click", function () {
-        self.showToast("Reset password (demo)", "Di produksi, tautan reset dikirim ke email. Untuk demo, gunakan Login dengan email apa pun.");
+      forgot.addEventListener("click", async function () {
+        var email = String(self.loginForm?.email?.value || "").trim().toLowerCase();
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+          self.showError(self.loginForm, "Isi email yang terdaftar terlebih dahulu.");
+          return;
+        }
+        forgot.disabled = true;
+        try {
+          var result = await api("/api/auth/forgot-password", {
+            method: "POST",
+            body: JSON.stringify({ email: email }),
+          });
+          self.showToast("Periksa email Anda", result.message);
+        } catch (error) {
+          self.showError(self.loginForm, error.message);
+        } finally {
+          forgot.disabled = false;
+        }
+      });
+    }
+
+    if (this.resetForm) {
+      this.resetForm.addEventListener("submit", function (event) {
+        event.preventDefault();
+        self.submitResetPassword();
       });
     }
 
@@ -149,6 +215,24 @@
         e.preventDefault();
         self.submitBusiness();
       });
+      var businessNameInput = this.businessForm.businessName;
+      var slugInput = this.businessForm.workspaceSlug;
+      if (businessNameInput && slugInput) {
+        businessNameInput.addEventListener("input", function () {
+          if (slugInput.dataset.edited === "true") return;
+          slugInput.value = String(businessNameInput.value || "")
+            .normalize("NFKD")
+            .replace(/[\u0300-\u036f]/g, "")
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, "-")
+            .replace(/^-+|-+$/g, "")
+            .slice(0, 40);
+        });
+        slugInput.addEventListener("input", function () {
+          slugInput.dataset.edited = "true";
+          slugInput.value = slugInput.value.toLowerCase().replace(/[^a-z0-9-]/g, "");
+        });
+      }
     }
 
     if (this.modulesForm) {
@@ -191,8 +275,17 @@
       });
     }
 
+    if (this.openWorkspace) {
+      this.openWorkspace.addEventListener("click", function () {
+        self.enterWorkspace();
+      });
+    }
+
     // Deep-link: ?mode=login | ?step=2
     var params = new URLSearchParams(window.location.search);
+    if (params.get("reset") === "1" && params.get("token")) {
+      this.showResetForm();
+    }
     if (params.get("mode") === "login") {
       this.setAuthMode("login");
     }
@@ -224,6 +317,11 @@
       this.loginForm.style.display = isLogin ? "" : "none";
       this.loginForm.setAttribute("aria-hidden", isLogin ? "false" : "true");
     }
+    if (this.resetForm) this.resetForm.hidden = true;
+    var divider = qs(".onboarding-auth-divider");
+    var googleButton = qs("[data-google-login]");
+    if (divider) divider.hidden = false;
+    if (googleButton) googleButton.hidden = false;
 
     var lead = qs("[data-auth-lead]");
     if (lead) lead.textContent = AUTH_LEAD[this.state.authMode] || AUTH_LEAD.signup;
@@ -240,6 +338,51 @@
 
     this.clearErrors();
     saveState(this.state);
+  };
+
+  OnboardingApp.prototype.showResetForm = function () {
+    if (!this.resetForm) return;
+    if (this.signupForm) this.signupForm.hidden = true;
+    if (this.loginForm) this.loginForm.hidden = true;
+    this.authTabs.forEach(function (tab) { tab.hidden = true; });
+    this.resetForm.hidden = false;
+    var divider = qs(".onboarding-auth-divider");
+    var googleButton = qs("[data-google-login]");
+    if (divider) divider.hidden = true;
+    if (googleButton) googleButton.hidden = true;
+    var lead = qs("[data-auth-lead]");
+    if (lead) lead.textContent = "Buat password baru untuk akun Motovax Anda.";
+  };
+
+  OnboardingApp.prototype.submitResetPassword = async function () {
+    var form = this.resetForm;
+    var data = new FormData(form);
+    var password = String(data.get("password") || "");
+    var confirmation = String(data.get("passwordConfirm") || "");
+    if (password.length < 8 || !/[A-Za-z]/.test(password) || !/\d/.test(password)) {
+      this.showError(form, "Password minimal 8 karakter dan harus berisi huruf serta angka.");
+      return;
+    }
+    if (password !== confirmation) {
+      this.showError(form, "Konfirmasi password tidak cocok.");
+      return;
+    }
+    setFormLoading(form, true);
+    try {
+      var params = new URLSearchParams(window.location.search);
+      await api("/api/auth/reset-password", {
+        method: "POST",
+        body: JSON.stringify({ token: params.get("token"), password: password }),
+      });
+      window.history.replaceState({}, "", window.location.pathname + "?mode=login");
+      this.authTabs.forEach(function (tab) { tab.hidden = false; });
+      this.setAuthMode("login");
+      this.showToast("Password berhasil diperbarui", "Silakan login menggunakan password baru.");
+    } catch (error) {
+      this.showError(form, error.message);
+    } finally {
+      setFormLoading(form, false);
+    }
   };
 
   OnboardingApp.prototype.selectIndustry = function (id) {
@@ -274,7 +417,7 @@
     err.textContent = message;
   };
 
-  OnboardingApp.prototype.submitSignup = function () {
+  OnboardingApp.prototype.submitSignup = async function () {
     var form = this.signupForm;
     var fd = new FormData(form);
     var fullName = String(fd.get("fullName") || "").trim();
@@ -290,8 +433,8 @@
       this.showError(form, "Format email tidak valid.");
       return;
     }
-    if (password.length < 8) {
-      this.showError(form, "Password minimal 8 karakter.");
+    if (password.length < 8 || !/[A-Za-z]/.test(password) || !/\d/.test(password)) {
+      this.showError(form, "Password minimal 8 karakter dan harus berisi huruf serta angka.");
       return;
     }
     if (password !== confirm) {
@@ -299,14 +442,31 @@
       return;
     }
 
-    this.state.account = { fullName: fullName, email: email, password: password };
-    this.state.authMode = "signup";
-    saveState(this.state);
-    this.showToast("Akun demo dibuat", "Lanjut isi profil bisnis Anda.");
-    this.goTo(2);
+    setFormLoading(form, true);
+    try {
+      var payload = await api("/api/auth/signup", {
+        method: "POST",
+        body: JSON.stringify({ fullName: fullName, email: email, password: password }),
+      });
+      if (payload.verificationRequired) {
+        this.showToast("Periksa email Anda", "Klik tautan verifikasi untuk melanjutkan onboarding.");
+        form.password.value = "";
+        form.passwordConfirm.value = "";
+        return;
+      }
+      this.applyAccountPayload(payload);
+      this.state.authMode = "signup";
+      saveState(this.state);
+      this.showToast("Akun berhasil dibuat", "Lanjut isi profil bisnis Anda.");
+      this.goTo(2);
+    } catch (error) {
+      this.showError(form, error.message);
+    } finally {
+      setFormLoading(form, false);
+    }
   };
 
-  OnboardingApp.prototype.submitLogin = function () {
+  OnboardingApp.prototype.submitLogin = async function () {
     var form = this.loginForm;
     var fd = new FormData(form);
     var email = String(fd.get("email") || "").trim().toLowerCase();
@@ -321,37 +481,61 @@
       return;
     }
 
-    // Demo: accept any credentials; prefer existing saved account
-    if (this.state.account && this.state.account.email && this.state.account.email !== email) {
-      this.state.account.email = email;
-      if (!this.state.account.fullName) {
-        this.state.account.fullName = email.split("@")[0];
+    setFormLoading(form, true);
+    try {
+      var payload = await api("/api/auth/login", {
+        method: "POST",
+        body: JSON.stringify({ email: email, password: password }),
+      });
+      this.applyAccountPayload(payload);
+      this.state.authMode = "login";
+      saveState(this.state);
+      if (this.state.workspace) {
+        this.state.completed = true;
+        this.showToast("Login berhasil", "Workspace Anda siap dibuka.");
+        this.goTo(4);
+      } else {
+        this.showToast("Login berhasil", "Lanjut lengkapi onboarding.");
+        this.goTo(this.state.business.businessName ? 3 : 2);
       }
-    } else if (!this.state.account || !this.state.account.email) {
-      this.state.account = {
-        fullName: email.split("@")[0],
-        email: email,
-        password: password,
+    } catch (error) {
+      this.showError(form, error.message);
+    } finally {
+      setFormLoading(form, false);
+    }
+  };
+
+  OnboardingApp.prototype.applyAccountPayload = function (payload) {
+    if (!payload || !payload.user) return;
+    this.state.account = {
+      fullName: payload.user.fullName || payload.user.email.split("@")[0],
+      email: payload.user.email,
+      provider: payload.user.provider || "password",
+    };
+    if (payload.profile) {
+      this.state.business = {
+        businessName: payload.profile.business_name || "",
+        workspaceSlug: payload.profile.workspace_slug || "",
+        branchCount: payload.profile.branch_count || "1",
+        region: payload.profile.region || "",
+        industry: payload.profile.industry || "general",
+        description: payload.profile.description || "",
       };
+      this.state.modules = payload.profile.modules || this.state.modules;
+      this.state.goal = payload.profile.goal || this.state.goal;
     }
-
-    this.state.authMode = "login";
-    saveState(this.state);
-
-    if (this.state.completed) {
-      this.showToast("Login berhasil", "Melanjutkan ke ringkasan workspace.");
-      this.goTo(4);
-      return;
+    if (payload.workspaces && payload.workspaces.length) {
+      this.state.workspace = payload.workspaces[0];
+      this.state.completed = true;
     }
-
-    this.showToast("Login berhasil", "Lanjut lengkapi onboarding.");
-    this.goTo(this.state.business.businessName ? 3 : 2);
+    this.hydrate();
   };
 
   OnboardingApp.prototype.hydrateGoogleSession = function () {
     var self = this;
     var params = new URLSearchParams(window.location.search);
     var oauthStatus = params.get("oauth");
+    var emailStatus = params.get("email");
     var isAuthHost = window.location.origin === GOOGLE_AUTH_ORIGIN;
     var isLocal = window.location.hostname === "127.0.0.1" || window.location.hostname === "localhost";
 
@@ -364,6 +548,9 @@
       this.showToast("Login Google belum berhasil", "Silakan coba lagi atau hubungi tim MOTOVAX.");
       return;
     }
+    if (emailStatus === "invalid") {
+      this.showToast("Tautan verifikasi tidak valid", "Minta tautan baru dengan mengulangi proses daftar.");
+    }
 
     fetch("/api/auth/me", {
       credentials: "same-origin",
@@ -375,17 +562,11 @@
       })
       .then(function (payload) {
         if (!payload || !payload.authenticated || !payload.user) return;
-        self.state.account = {
-          fullName: payload.user.fullName || payload.user.email.split("@")[0],
-          email: payload.user.email,
-          password: "",
-          provider: "google",
-        };
+        self.applyAccountPayload(payload);
         self.state.authMode = "login";
         saveState(self.state);
-        self.hydrate();
 
-        if (self.state.completed) {
+        if (self.state.workspace) {
           self.goTo(4);
         } else {
           self.goTo(self.state.business.businessName ? 3 : 2);
@@ -396,6 +577,11 @@
           params.delete("reason");
           var query = params.toString();
           window.history.replaceState({}, "", window.location.pathname + (query ? "?" + query : ""));
+        } else if (emailStatus === "verified") {
+          self.showToast("Email berhasil diverifikasi", "Lanjut lengkapi profil bisnis Anda.");
+          params.delete("email");
+          var emailQuery = params.toString();
+          window.history.replaceState({}, "", window.location.pathname + (emailQuery ? "?" + emailQuery : ""));
         }
       })
       .catch(function () {
@@ -405,10 +591,11 @@
       });
   };
 
-  OnboardingApp.prototype.submitBusiness = function () {
+  OnboardingApp.prototype.submitBusiness = async function () {
     var form = this.businessForm;
     var fd = new FormData(form);
     var businessName = String(fd.get("businessName") || "").trim();
+    var workspaceSlug = String(fd.get("workspaceSlug") || "").trim();
     var branchCount = String(fd.get("branchCount") || "1");
     var region = String(fd.get("region") || "").trim();
     var description = String(fd.get("description") || "").trim();
@@ -421,22 +608,51 @@
       this.showError(form, "Isi kota / wilayah utama.");
       return;
     }
+    if (!/^[a-z0-9](?:[a-z0-9-]{1,38}[a-z0-9])?$/.test(workspaceSlug)) {
+      this.showError(form, "Subdomain harus 3–40 karakter, berisi huruf kecil, angka, atau tanda hubung.");
+      return;
+    }
 
     var industry = this.state.business.industry || "general";
     if (industry === "other") industry = "general";
     this.state.business = {
       businessName: businessName,
+      workspaceSlug: workspaceSlug,
       branchCount: branchCount,
       region: region,
       industry: industry,
       description: description,
     };
-    saveState(this.state);
-    this.showToast("Profil disimpan", "Pilih modul yang ingin dicoba dulu.");
-    this.goTo(3);
+    setFormLoading(form, true);
+    try {
+      await this.saveProfile();
+      saveState(this.state);
+      this.showToast("Profil disimpan", "Pilih modul yang ingin diaktifkan.");
+      this.goTo(3);
+    } catch (error) {
+      this.showError(form, error.message);
+    } finally {
+      setFormLoading(form, false);
+    }
   };
 
-  OnboardingApp.prototype.submitModules = function () {
+  OnboardingApp.prototype.saveProfile = function () {
+    return api("/api/onboarding/profile", {
+      method: "POST",
+      body: JSON.stringify({
+        businessName: this.state.business.businessName,
+        workspaceSlug: this.state.business.workspaceSlug,
+        branchCount: this.state.business.branchCount,
+        region: this.state.business.region,
+        industry: this.state.business.industry,
+        description: this.state.business.description,
+        modules: this.state.modules,
+        goal: this.state.goal,
+      }),
+    });
+  };
+
+  OnboardingApp.prototype.submitModules = async function () {
     var form = this.modulesForm;
     var checked = qsa('input[name="modules"]:checked', form).map(function (el) {
       return el.value;
@@ -448,12 +664,45 @@
     }
 
     this.state.modules = checked;
-    this.state.completed = true;
-    this.state.step = 4;
-    saveState(this.state);
-    this.renderSummary();
-    this.showToast("Setup selesai", "Workspace demo siap digunakan.");
-    this.goTo(4);
+    setFormLoading(form, true);
+    try {
+      await this.saveProfile();
+      var payload = await api("/api/onboarding/complete", {
+        method: "POST",
+        body: "{}",
+      });
+      this.state.workspace = payload.workspace;
+      this.state.completed = true;
+      this.state.step = 4;
+      saveState(this.state);
+      this.renderSummary();
+      this.showToast("Workspace berhasil dibuat", payload.workspace.domain + " siap digunakan.");
+      this.goTo(4);
+    } catch (error) {
+      this.showError(form, error.message);
+    } finally {
+      setFormLoading(form, false);
+    }
+  };
+
+  OnboardingApp.prototype.enterWorkspace = async function () {
+    var workspace = this.state.workspace;
+    if (!workspace) return;
+    if (workspace.redirectUrl) {
+      window.location.assign(workspace.redirectUrl);
+      return;
+    }
+    this.openWorkspace.disabled = true;
+    try {
+      var payload = await api("/api/workspaces/" + encodeURIComponent(workspace.id) + "/enter", {
+        method: "POST",
+        body: "{}",
+      });
+      window.location.assign(payload.redirectUrl);
+    } catch (error) {
+      this.showToast("Workspace belum dapat dibuka", error.message);
+      this.openWorkspace.disabled = false;
+    }
   };
 
   OnboardingApp.prototype.hydrate = function () {
@@ -469,6 +718,7 @@
     }
     if (this.businessForm) {
       if (this.businessForm.businessName) this.businessForm.businessName.value = biz.businessName || "";
+      if (this.businessForm.workspaceSlug) this.businessForm.workspaceSlug.value = biz.workspaceSlug || "";
       if (this.businessForm.branchCount) this.businessForm.branchCount.value = biz.branchCount || "4-10";
       if (this.businessForm.region) this.businessForm.region.value = biz.region || "";
       if (this.businessForm.description) this.businessForm.description.value = biz.description || "";
@@ -520,10 +770,9 @@
       });
     }
 
-    if (this.openDemo) {
-      var first = (this.state.modules && this.state.modules[0]) || "dashboard";
-      var anchor = DEMO_ANCHORS[first] || "#solusi";
-      this.openDemo.setAttribute("href", "./index.html" + anchor);
+    var domainEl = qs("[data-summary-domain]");
+    if (domainEl) {
+      domainEl.textContent = this.state.workspace?.domain || (biz.workspaceSlug ? biz.workspaceSlug + ".motovax.com" : "—");
     }
   };
 

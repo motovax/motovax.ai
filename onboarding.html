@@ -15,7 +15,7 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="./styles.css?v=logo-20260809" />
-    <link rel="stylesheet" href="./onboarding-auth.css?v=oauth-20260810" />
+    <link rel="stylesheet" href="./onboarding-auth.css?v=tenant-20260811" />
   </head>
   <body class="onboarding-body">
     <header class="site-header onboarding-header">
@@ -43,7 +43,7 @@
           </h1>
           <p>
             Satu alur untuk daftar/login, profil bisnis, dan modul prioritas — selaras dengan
-            Command Center MOTOVAX. Data demo disimpan di browser Anda.
+            Command Center MOTOVAX. Progress tersimpan aman pada akun Anda.
           </p>
 
           <ol class="onboarding-rail" data-onboarding-rail aria-label="Progress langkah">
@@ -96,7 +96,7 @@
               <span>✓</span>
               <div>
                 <b>Bisa dilanjutkan nanti</b>
-                <small>Progress tersimpan di perangkat ini (localStorage).</small>
+                <small>Progress tersimpan pada akun dan dapat dilanjutkan kembali.</small>
               </div>
             </li>
           </ul>
@@ -113,7 +113,7 @@
               <span>LANGKAH 1 · AKUN</span>
               <h2 id="onboardingPanelTitle">Masuk atau buat akun baru</h2>
               <p data-auth-lead>
-                Gunakan email kerja Anda. Mode demo — tidak mengirim email verifikasi nyata.
+                Buat akun Motovax menggunakan email kerja atau akun Google Anda.
               </p>
             </header>
 
@@ -160,7 +160,7 @@
               <div class="onboarding-form-row">
                 <label>
                   <span>Password</span>
-                  <input type="password" name="password" autocomplete="new-password" placeholder="Min. 8 karakter" minlength="8" required />
+                  <input type="password" name="password" autocomplete="new-password" placeholder="Min. 8 karakter + angka" minlength="8" required />
                 </label>
                 <label>
                   <span>Konfirmasi</span>
@@ -198,6 +198,22 @@
               <div class="onboarding-step-actions">
                 <button type="button" class="btn btn-secondary" data-auth-forgot>Lupa password?</button>
                 <button type="submit" class="btn btn-primary">Login &amp; lanjut <span>→</span></button>
+              </div>
+            </form>
+
+            <form class="onboarding-form" data-reset-form hidden novalidate>
+              <label>
+                <span>Password baru</span>
+                <input type="password" name="password" autocomplete="new-password" placeholder="Min. 8 karakter + angka" minlength="8" required />
+              </label>
+              <label>
+                <span>Konfirmasi password baru</span>
+                <input type="password" name="passwordConfirm" autocomplete="new-password" placeholder="Ulangi password" minlength="8" required />
+              </label>
+              <p class="onboarding-form-error" data-form-error hidden></p>
+              <div class="onboarding-step-actions">
+                <a class="btn btn-secondary" href="./onboarding.html?mode=login">Batal</a>
+                <button type="submit" class="btn btn-primary">Simpan password <span>→</span></button>
               </div>
             </form>
 
@@ -240,13 +256,22 @@
             <header class="onboarding-step-head">
               <span>LANGKAH 2 · PROFIL BISNIS</span>
               <h2>Ceritakan bisnis Anda</h2>
-              <p>Data ini menyesuaikan label KPI, funnel, dan modul di workspace demo.</p>
+              <p>Data ini digunakan untuk membuat workspace dan konfigurasi awal tenant Anda.</p>
             </header>
 
             <form class="onboarding-form" data-business-form novalidate>
               <label>
                 <span>Nama bisnis / brand</span>
                 <input type="text" name="businessName" placeholder="Contoh: PT Nusantara Digital" required />
+              </label>
+
+              <label>
+                <span>Alamat workspace</span>
+                <div class="onboarding-domain-input">
+                  <input type="text" name="workspaceSlug" minlength="3" maxlength="40" pattern="[a-z0-9-]+" placeholder="nusantara-motor" required />
+                  <span>.motovax.com</span>
+                </div>
+                <small class="onboarding-field-help">Gunakan 3–40 karakter: huruf kecil, angka, dan tanda hubung.</small>
               </label>
 
               <div class="onboarding-form-row">
@@ -309,7 +334,7 @@
             <header class="onboarding-step-head">
               <span>LANGKAH 3 · MODUL PRIORITAS</span>
               <h2>Apa yang ingin Anda coba dulu?</h2>
-              <p>Pilih minimal satu. Anda bisa mengubahnya kapan saja di dashboard demo.</p>
+              <p>Pilih minimal satu. Pilihan ini menjadi konfigurasi awal workspace Anda.</p>
             </header>
 
             <form class="onboarding-form" data-modules-form novalidate>
@@ -320,6 +345,7 @@
                   <span class="onboarding-module-icon">IM</span>
                   <b>Inventory Management</b>
                   <small>Stok live multi-lokasi, reservasi, upload data</small>
+                </label>
                 <label class="onboarding-module-card">
                   <input type="checkbox" name="modules" value="omni" checked />
                   <span class="onboarding-module-check" aria-hidden="true"></span>
@@ -379,15 +405,15 @@
           <div class="onboarding-step" data-step="4" hidden>
             <header class="onboarding-step-head">
               <span>LANGKAH 4 · SIAP</span>
-              <h2>Workspace Anda siap dicoba</h2>
-              <p>Ringkasan preferensi. Lanjut ke demo interaktif di landing atau hubungi tim kami.</p>
+              <h2>Workspace Anda siap digunakan</h2>
+              <p>Tenant, domain, akun owner, dan konfigurasi awal berhasil dibuat.</p>
             </header>
 
             <div class="onboarding-success-card" data-success-summary>
               <div class="onboarding-success-hero">
-                <span class="onboarding-success-badge">Demo ready</span>
+                <span class="onboarding-success-badge">Tenant aktif</span>
                 <h3 data-summary-name>Bisnis Anda</h3>
-                <p data-summary-user>Siap masuk sebagai user demo</p>
+                <p data-summary-user>Siap masuk sebagai owner</p>
               </div>
               <dl class="onboarding-summary-grid">
                 <div>
@@ -406,6 +432,10 @@
                   <dt>Target</dt>
                   <dd data-summary-goal>Tingkatkan konversi</dd>
                 </div>
+                <div>
+                  <dt>Workspace</dt>
+                  <dd data-summary-domain>—</dd>
+                </div>
               </dl>
               <div>
                 <span class="onboarding-summary-label">Modul aktif</span>
@@ -414,15 +444,12 @@
             </div>
 
             <div class="onboarding-ready-actions">
-              <a class="btn btn-primary" href="./index.html#solusi" data-open-demo>
-                Mulai coba di dashboard <span>→</span>
-              </a>
+              <button class="btn btn-primary" type="button" data-open-workspace>
+                Masuk ke workspace <span>→</span>
+              </button>
               <a class="btn btn-secondary" href="./index.html#kontak" data-wa>
                 Jadwalkan demo live
               </a>
-              <button type="button" class="onboarding-reset-link" data-onboarding-reset>
-                Ulangi onboarding
-              </button>
             </div>
           </div>
         </section>
@@ -448,6 +475,6 @@
     </div>
 
     <script src="./script.js?v=onb-20260808b"></script>
-    <script src="./onboarding.js?v=oauth-20260810"></script>
+    <script src="./onboarding.js?v=tenant-20260811"></script>
   </body>
 </html>

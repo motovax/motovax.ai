@@ -119,4 +119,59 @@ for (const viewport of viewports) {
     });
     await context.close();
   });
+
+  test(`flow onboarding tenant responsif pada ${viewport.name}`, async () => {
+    const context = await browser.newContext({ viewport });
+    const page = await context.newPage();
+    await page.route(/https:\/\/fonts\.(?:googleapis|gstatic)\.com\//, (route) => route.abort());
+    await page.route("**/api/auth/signup", (route) => route.fulfill({
+      status: 201,
+      contentType: "application/json",
+      body: JSON.stringify({
+        authenticated: true,
+        user: { id: "account-1", email: "owner@example.com", fullName: "Owner Test", provider: "password" },
+      }),
+    }));
+    await page.route("**/api/onboarding/profile", (route) => route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({ profile: {}, domain: "dealer-test.motovax.com" }),
+    }));
+    await page.route("**/api/onboarding/complete", (route) => route.fulfill({
+      status: 201,
+      contentType: "application/json",
+      body: JSON.stringify({
+        workspace: {
+          id: "tenant-1",
+          name: "Dealer Test",
+          domain: "dealer-test.motovax.com",
+          redirectUrl: "https://dealer-test.motovax.com/magic-login?token=test",
+        },
+      }),
+    }));
+
+    await page.goto(`${baseUrl}/onboarding.html`, { waitUntil: "load" });
+    await page.fill('[data-auth-form="signup"] input[name="fullName"]', "Owner Test");
+    await page.fill('[data-auth-form="signup"] input[name="email"]', "owner@example.com");
+    await page.fill('[data-auth-form="signup"] input[name="password"]', "rahasia123");
+    await page.fill('[data-auth-form="signup"] input[name="passwordConfirm"]', "rahasia123");
+    await page.click('[data-auth-form="signup"] button[type="submit"]');
+    await page.fill('[data-business-form] input[name="businessName"]', "Dealer Test");
+    await page.fill('[data-business-form] input[name="workspaceSlug"]', "dealer-test");
+    await page.fill('[data-business-form] input[name="region"]', "Jakarta");
+    await page.click('[data-business-form] button[type="submit"]');
+    await page.click('[data-modules-form] button[type="submit"]');
+    await page.waitForSelector('[data-step="4"].is-active');
+
+    const result = await page.evaluate(() => ({
+      overflow: document.documentElement.scrollWidth > document.documentElement.clientWidth,
+      domain: document.querySelector("[data-summary-domain]")?.textContent,
+      enterVisible: Boolean(document.querySelector("[data-open-workspace]")?.getBoundingClientRect().height),
+    }));
+    assert.equal(result.overflow, false);
+    assert.equal(result.domain, "dealer-test.motovax.com");
+    assert.equal(result.enterVisible, true);
+    await page.screenshot({ path: `/tmp/motovax-tenant-${viewport.name}.png`, fullPage: false });
+    await context.close();
+  });
 }

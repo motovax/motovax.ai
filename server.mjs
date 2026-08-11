@@ -1,14 +1,43 @@
 import crypto from "node:crypto";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
+import { promisify } from "node:util";
 
 import express from "express";
 import { OAuth2Client } from "google-auth-library";
+import nodemailer from "nodemailer";
 import pg from "pg";
 
 const { Pool } = pg;
 const MODULE_PATH = fileURLToPath(import.meta.url);
 const MODULE_DIR = path.dirname(MODULE_PATH);
+const scryptAsync = promisify(crypto.scrypt);
+const SESSION_TTL_MS = 30 * 24 * 60 * 60 * 1000;
+const HANDOFF_TTL_MS = 60 * 1000;
+const ALLOWED_MODULES = new Set(["ims", "omni", "social", "crm", "dashboard", "insight"]);
+const ALLOWED_GOALS = new Set(["conversion", "response", "inventory", "scale"]);
+const ALLOWED_INDUSTRIES = new Set(["general", "automotive", "property", "retail"]);
+const RESERVED_SLUGS = new Set([
+  "api", "app", "assets", "auth", "dss", "internal", "motovax-ai", "onboard", "status", "support", "www",
+]);
+
+const FULL_TENANT_PERMISSIONS = [
+  "tenant:read", "tenant:update", "user:create", "user:read", "user:update", "user:delete",
+  "role:create", "role:read", "role:update", "role:delete", "whatsapp:configure",
+  "whatsapp:media_upload", "whatsapp:excel_import", "whatsapp:unit_query", "whatsapp:unit_edit",
+  "whatsapp:finance_simulation", "whatsapp:photo_send", "whatsapp:document_upload",
+  "whatsapp:document_review", "whatsapp:image_generation", "whatsapp:analytics_query",
+  "whatsapp:handoff", "whatsapp:lead_own", "analytics:sales_trend",
+  "analytics:sales_performance", "analytics:management",
+];
+const TENANT_ROLE_TEMPLATES = [
+  ["Admin", FULL_TENANT_PERMISSIONS],
+  ["Salesperson", ["whatsapp:unit_query", "whatsapp:finance_simulation", "whatsapp:image_generation", "whatsapp:photo_send", "whatsapp:lead_own", "whatsapp:handoff", "analytics:sales_performance"]],
+  ["Marketing Representative", ["whatsapp:unit_query", "whatsapp:finance_simulation", "whatsapp:image_generation", "whatsapp:photo_send", "whatsapp:lead_own", "whatsapp:handoff", "analytics:sales_performance"]],
+  ["Management", FULL_TENANT_PERMISSIONS],
+  ["President Director", FULL_TENANT_PERMISSIONS],
+  ["PIC Agent Officer", FULL_TENANT_PERMISSIONS],
+];
 
 function readConfig(env = process.env) {
   const publicBaseUrl = env.PUBLIC_BASE_URL || "https://onboard.motovax.com";
@@ -28,8 +57,35 @@ function readConfig(env = process.env) {
     googleRedirectUri: redirectUri,
     sessionSecret: env.SESSION_SECRET || "",
     databaseUrl: env.EXTERNAL_DATABASE_URL || env.DATABASE_URL || "",
+    tenantDomainSuffix: (env.TENANT_DOMAIN_SUFFIX || "motovax.com").toLowerCase(),
+    coolifyBaseUrl: String(env.COOLIFY_BASE_URL || "").replace(/\/$/, ""),
+    coolifyToken: env.COOLIFY_DEPLOY_TOKEN || "",
+    coolifyProductAppUuid: env.COOLIFY_PRODUCT_APP_UUID || "",
+    smtpHost: env.PLUNK_SMTP_HOST || env.SMTP_HOST || "",
+    smtpPort: Number(env.PLUNK_SMTP_PORT || env.SMTP_PORT || 2587),
+    smtpUser: env.PLUNK_SMTP_USER || env.SMTP_USER || "",
+    smtpPassword: env.PLUNK_SMTP_PASSWORD || env.SMTP_PASSWORD || "",
+    authEmailFrom: env.AUTH_EMAIL_FROM || "support@motovax.com",
     trustProxy: env.TRUST_PROXY !== "false",
   };
+}
+
+function createMailer(config) {
+  if (!config.smtpHost || !config.smtpUser || !config.smtpPassword) return null;
+  return nodemailer.createTransport({
+    host: config.smtpHost,
+    port: config.smtpPort,
+    secure: config.smtpPort === 465,
+    auth: { user: config.smtpUser, pass: config.smtpPassword },
+    disableFileAccess: true,
+    disableUrlAccess: true,
+  });
+}
+
+function escapeHtml(value) {
+  return String(value || "").replace(/[&<>"']/g, (character) => ({
+    "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;",
+  })[character]);
 }
 
 function validateConfig(config) {
@@ -55,6 +111,85 @@ function sha256(value) {
 
 function tokenDigest(value, secret) {
   return crypto.createHmac("sha256", secret).update(value).digest("hex");
+}
+
+async function hashPassword(password) {
+  const salt = crypto.randomBytes(16);
+  const derived = await scryptAsync(password, salt, 64, { N: 16384, r: 8, p: 1, maxmem: 64 * 1024 * 1024 });
+  return `scrypt$16384$8$1$${salt.toString("base64url")}$${Buffer.from(derived).toString("base64url")}`;
+}
+
+async function verifyPassword(password, encoded) {
+  const parts = String(encoded || "").split("$");
+  if (parts.length !== 6 || parts[0] !== "scrypt") return false;
+  const [, n, r, p, saltText, expectedText] = parts;
+  const expected = Buffer.from(expectedText, "base64url");
+  const derived = await scryptAsync(password, Buffer.from(saltText, "base64url"), expected.length, {
+    N: Number(n), r: Number(r), p: Number(p), maxmem: 64 * 1024 * 1024,
+  });
+  return expected.length === derived.length && crypto.timingSafeEqual(expected, derived);
+}
+
+function normalizeEmail(value) {
+  return String(value || "").trim().toLowerCase();
+}
+
+function normalizeSlug(value) {
+  return String(value || "")
+    .normalize("NFKD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 40)
+    .replace(/-+$/g, "");
+}
+
+function publicUser(row) {
+  return {
+    id: row.id,
+    email: row.email,
+    fullName: row.full_name,
+    avatarUrl: row.avatar_url,
+    provider: row.provider || (row.password_hash ? "password" : "google"),
+  };
+}
+
+async function ensureProductDomain(config, domain) {
+  if (!config.coolifyBaseUrl || !config.coolifyToken || !config.coolifyProductAppUuid) {
+    const error = new Error("Provisioning domain aplikasi belum dikonfigurasi.");
+    error.code = "domain_provisioning_unavailable";
+    throw error;
+  }
+  const endpoint = `${config.coolifyBaseUrl}/api/v1/applications/${encodeURIComponent(config.coolifyProductAppUuid)}`;
+  const headers = {
+    Authorization: `Bearer ${config.coolifyToken}`,
+    Accept: "application/json",
+    "Content-Type": "application/json",
+  };
+  for (let attempt = 0; attempt < 3; attempt += 1) {
+    const currentResponse = await fetch(endpoint, { headers });
+    if (!currentResponse.ok) throw new Error("Tidak dapat membaca konfigurasi domain aplikasi.");
+    const current = await currentResponse.json();
+    const domains = String(current.fqdn || current.domains || "")
+      .split(",")
+      .map((item) => item.trim())
+      .filter(Boolean);
+    const target = `https://${domain}`;
+    if (domains.some((item) => item.toLowerCase() === target.toLowerCase())) return;
+    domains.push(target);
+    const updateResponse = await fetch(endpoint, {
+      method: "PATCH",
+      headers,
+      body: JSON.stringify({ domains: domains.join(",") }),
+    });
+    if (updateResponse.ok) return;
+    if (updateResponse.status !== 409 || attempt === 2) {
+      const error = new Error("Domain tenant belum dapat dipasang ke aplikasi.");
+      error.code = "domain_provisioning_failed";
+      throw error;
+    }
+  }
 }
 
 function safeEqual(left, right) {
@@ -127,9 +262,13 @@ export async function createPostgresStore(connectionString) {
       email_verified BOOLEAN NOT NULL DEFAULT FALSE,
       full_name TEXT NOT NULL DEFAULT '',
       avatar_url TEXT NOT NULL DEFAULT '',
+      password_hash TEXT NOT NULL DEFAULT '',
       created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
       updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
     );
+
+    ALTER TABLE onboarding_users
+      ADD COLUMN IF NOT EXISTS password_hash TEXT NOT NULL DEFAULT '';
 
     CREATE TABLE IF NOT EXISTS onboarding_oauth_accounts (
       id UUID PRIMARY KEY,
@@ -161,12 +300,52 @@ export async function createPostgresStore(connectionString) {
       created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
     );
 
+    CREATE TABLE IF NOT EXISTS onboarding_action_tokens (
+      token_digest CHAR(64) PRIMARY KEY,
+      user_id UUID NOT NULL REFERENCES onboarding_users(id) ON DELETE CASCADE,
+      action_type TEXT NOT NULL,
+      expires_at TIMESTAMPTZ NOT NULL,
+      used_at TIMESTAMPTZ,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    );
+
+    CREATE TABLE IF NOT EXISTS onboarding_profiles (
+      user_id UUID PRIMARY KEY REFERENCES onboarding_users(id) ON DELETE CASCADE,
+      business_name TEXT NOT NULL DEFAULT '',
+      workspace_slug TEXT NOT NULL DEFAULT '',
+      branch_count TEXT NOT NULL DEFAULT '1',
+      region TEXT NOT NULL DEFAULT '',
+      industry TEXT NOT NULL DEFAULT 'general',
+      description TEXT NOT NULL DEFAULT '',
+      modules JSONB NOT NULL DEFAULT '[]'::jsonb,
+      goal TEXT NOT NULL DEFAULT 'conversion',
+      tenant_id UUID REFERENCES tenants(id) ON DELETE SET NULL,
+      completed_at TIMESTAMPTZ,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    );
+
+    CREATE TABLE IF NOT EXISTS onboarding_memberships (
+      id UUID PRIMARY KEY,
+      user_id UUID NOT NULL REFERENCES onboarding_users(id) ON DELETE CASCADE,
+      tenant_id UUID NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
+      app_user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      membership_role TEXT NOT NULL DEFAULT 'owner',
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      UNIQUE (user_id, tenant_id),
+      UNIQUE (tenant_id, app_user_id)
+    );
+
     CREATE INDEX IF NOT EXISTS onboarding_auth_sessions_user_idx
       ON onboarding_auth_sessions(user_id);
     CREATE INDEX IF NOT EXISTS onboarding_auth_sessions_expiry_idx
       ON onboarding_auth_sessions(expires_at);
     CREATE INDEX IF NOT EXISTS onboarding_oauth_states_expiry_idx
       ON onboarding_oauth_states(expires_at);
+    CREATE INDEX IF NOT EXISTS onboarding_action_tokens_user_idx
+      ON onboarding_action_tokens(user_id, action_type);
+    CREATE INDEX IF NOT EXISTS onboarding_memberships_user_idx
+      ON onboarding_memberships(user_id);
   `);
 
   return {
@@ -259,6 +438,333 @@ export async function createPostgresStore(connectionString) {
       }
     },
 
+    async createPasswordUser({ email, fullName, passwordHash }) {
+      const client = await pool.connect();
+      try {
+        await client.query("BEGIN");
+        const existing = await client.query(
+          "SELECT * FROM onboarding_users WHERE email = $1 FOR UPDATE",
+          [email],
+        );
+        let user = existing.rows[0];
+        if (user?.password_hash && user.email_verified) {
+          const conflict = new Error("Akun dengan email tersebut sudah terdaftar.");
+          conflict.code = "account_exists";
+          throw conflict;
+        }
+        if (user) {
+          const updated = await client.query(
+            `UPDATE onboarding_users
+             SET full_name = $2, password_hash = $3, updated_at = NOW()
+             WHERE id = $1 RETURNING *`,
+            [user.id, fullName, passwordHash],
+          );
+          user = updated.rows[0];
+        } else {
+          const inserted = await client.query(
+            `INSERT INTO onboarding_users
+              (id, email, email_verified, full_name, password_hash)
+             VALUES ($1, $2, FALSE, $3, $4)
+             RETURNING *`,
+            [crypto.randomUUID(), email, fullName, passwordHash],
+          );
+          user = inserted.rows[0];
+        }
+        await client.query("COMMIT");
+        return user;
+      } catch (error) {
+        await client.query("ROLLBACK");
+        throw error;
+      } finally {
+        client.release();
+      }
+    },
+
+    async findPasswordUser(email) {
+      const result = await pool.query(
+        "SELECT * FROM onboarding_users WHERE email = $1 LIMIT 1",
+        [email],
+      );
+      return result.rows[0] || null;
+    },
+
+    async saveActionToken({ userId, actionType, digest, expiresAt }) {
+      await pool.query(
+        `UPDATE onboarding_action_tokens
+         SET used_at = COALESCE(used_at, NOW())
+         WHERE user_id = $1 AND action_type = $2 AND used_at IS NULL`,
+        [userId, actionType],
+      );
+      await pool.query(
+        `INSERT INTO onboarding_action_tokens (token_digest, user_id, action_type, expires_at)
+         VALUES ($1, $2, $3, $4)`,
+        [digest, userId, actionType, expiresAt],
+      );
+    },
+
+    async takeActionToken({ digest, actionType }) {
+      const client = await pool.connect();
+      try {
+        await client.query("BEGIN");
+        const result = await client.query(
+          `UPDATE onboarding_action_tokens
+           SET used_at = NOW()
+           WHERE token_digest = $1 AND action_type = $2
+             AND used_at IS NULL AND expires_at > NOW()
+           RETURNING user_id`,
+          [digest, actionType],
+        );
+        const userId = result.rows[0]?.user_id;
+        if (userId && actionType === "verify_email") {
+          await client.query(
+            "UPDATE onboarding_users SET email_verified = TRUE, updated_at = NOW() WHERE id = $1",
+            [userId],
+          );
+        }
+        await client.query("COMMIT");
+        return userId || null;
+      } catch (error) {
+        await client.query("ROLLBACK");
+        throw error;
+      } finally {
+        client.release();
+      }
+    },
+
+    async updatePassword(userId, passwordHash) {
+      await pool.query(
+        "UPDATE onboarding_users SET password_hash = $2, updated_at = NOW() WHERE id = $1",
+        [userId, passwordHash],
+      );
+    },
+
+    async getAccountState(userId) {
+      const [profileResult, workspaceResult] = await Promise.all([
+        pool.query(
+          `SELECT business_name, workspace_slug, branch_count, region, industry,
+                  description, modules, goal, tenant_id, completed_at
+           FROM onboarding_profiles WHERE user_id = $1`,
+          [userId],
+        ),
+        pool.query(
+          `SELECT t.id, t.name, t.status, d.domain, m.membership_role
+           FROM onboarding_memberships m
+           JOIN tenants t ON t.id = m.tenant_id
+           JOIN tenant_domains d ON d.tenant_id = t.id AND d.is_primary = TRUE
+           WHERE m.user_id = $1
+           ORDER BY t.name`,
+          [userId],
+        ),
+      ]);
+      return {
+        profile: profileResult.rows[0] || null,
+        workspaces: workspaceResult.rows.map((row) => ({
+          id: row.id,
+          name: row.name,
+          status: row.status,
+          domain: row.domain,
+          role: row.membership_role,
+        })),
+      };
+    },
+
+    async isSlugAvailable(slug, suffix) {
+      const domain = `${slug}.${suffix}`;
+      const result = await pool.query(
+        "SELECT NOT EXISTS (SELECT 1 FROM tenant_domains WHERE LOWER(domain) = LOWER($1)) AS available",
+        [domain],
+      );
+      return Boolean(result.rows[0]?.available);
+    },
+
+    async saveProfile(userId, profile) {
+      const result = await pool.query(
+        `INSERT INTO onboarding_profiles
+          (user_id, business_name, workspace_slug, branch_count, region, industry, description, modules, goal)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8::jsonb, $9)
+         ON CONFLICT (user_id) DO UPDATE SET
+           business_name = EXCLUDED.business_name,
+           workspace_slug = EXCLUDED.workspace_slug,
+           branch_count = EXCLUDED.branch_count,
+           region = EXCLUDED.region,
+           industry = EXCLUDED.industry,
+           description = EXCLUDED.description,
+           modules = EXCLUDED.modules,
+           goal = EXCLUDED.goal,
+           updated_at = NOW()
+         RETURNING *`,
+        [
+          userId, profile.businessName, profile.workspaceSlug, profile.branchCount,
+          profile.region, profile.industry, profile.description,
+          JSON.stringify(profile.modules || []), profile.goal,
+        ],
+      );
+      return result.rows[0];
+    },
+
+    async provisionWorkspace({ userId, suffix }) {
+      const client = await pool.connect();
+      try {
+        await client.query("BEGIN");
+        const profileResult = await client.query(
+          `SELECT p.*, u.email, u.full_name
+           FROM onboarding_profiles p
+           JOIN onboarding_users u ON u.id = p.user_id
+           WHERE p.user_id = $1 FOR UPDATE OF p`,
+          [userId],
+        );
+        const profile = profileResult.rows[0];
+        if (!profile) {
+          const error = new Error("Profil onboarding belum lengkap.");
+          error.code = "profile_required";
+          throw error;
+        }
+
+        const existingMembership = profile.tenant_id
+          ? await client.query(
+              `SELECT t.id, t.name, d.domain, m.app_user_id
+               FROM onboarding_memberships m
+               JOIN tenants t ON t.id = m.tenant_id
+               JOIN tenant_domains d ON d.tenant_id = t.id AND d.is_primary = TRUE
+               WHERE m.user_id = $1 AND m.tenant_id = $2`,
+              [userId, profile.tenant_id],
+            )
+          : { rows: [] };
+        if (existingMembership.rows[0]) {
+          const workspace = existingMembership.rows[0];
+          const handoffToken = randomToken(32);
+          await client.query(
+            `INSERT INTO auth_tokens (user_id, token, expires_at, is_magic_link)
+             VALUES ($1, $2, $3, TRUE)`,
+            [workspace.app_user_id, handoffToken, new Date(Date.now() + HANDOFF_TTL_MS)],
+          );
+          await client.query("COMMIT");
+          return { workspace, handoffToken };
+        }
+
+        const slug = normalizeSlug(profile.workspace_slug);
+        const domain = `${slug}.${suffix}`;
+        await client.query("SELECT pg_advisory_xact_lock(hashtext($1))", [domain]);
+        const domainTaken = await client.query(
+          "SELECT 1 FROM tenant_domains WHERE LOWER(domain) = LOWER($1)",
+          [domain],
+        );
+        if (domainTaken.rowCount) {
+          const error = new Error("Subdomain sudah digunakan.");
+          error.code = "slug_unavailable";
+          throw error;
+        }
+
+        const tenantId = crypto.randomUUID();
+        const appUserId = crypto.randomUUID();
+        const features = {
+          inventory_management: profile.modules.includes("ims"),
+          whatsapp_ai: profile.modules.includes("omni"),
+          social_media_automation: profile.modules.includes("social"),
+          crm_autopilot: profile.modules.includes("crm"),
+        };
+        const tenantConfig = {
+          max_users: 25,
+          max_listings: 1000,
+          whatsapp_enabled: profile.modules.includes("omni"),
+          branches: [profile.region],
+          branding: { logo_url: "", primary_color: "#000000", favicon_url: "" },
+          features,
+          onboarding: {
+            industry: profile.industry,
+            branch_count: profile.branch_count,
+            modules: profile.modules,
+            goal: profile.goal,
+          },
+        };
+        await client.query(
+          `INSERT INTO tenants
+            (id, name, slug, description, status, config, created_by, created_at, updated_at)
+           VALUES ($1, $2, $3, $4, 'active', $5::jsonb, $6, NOW(), NOW())`,
+          [tenantId, profile.business_name, slug, profile.description, JSON.stringify(tenantConfig), userId],
+        );
+        await client.query(
+          `INSERT INTO tenant_domains
+            (id, tenant_id, domain, is_primary, verified, created_at, updated_at)
+           VALUES ($1, $2, $3, TRUE, TRUE, NOW(), NOW())`,
+          [crypto.randomUUID(), tenantId, domain],
+        );
+
+        let adminRoleId = "";
+        for (const [roleName, permissions] of TENANT_ROLE_TEMPLATES) {
+          const roleId = crypto.randomUUID();
+          await client.query(
+            `INSERT INTO roles
+              (id, tenant_id, name, seeded_name, permissions, created_at, created_by)
+             VALUES ($1, $2, $3::varchar, $3::text, $4::jsonb, NOW(), NULL)`,
+            [roleId, tenantId, roleName, JSON.stringify(permissions)],
+          );
+          if (roleName === "Admin") adminRoleId = roleId;
+        }
+
+        let username = normalizeSlug(profile.full_name).replace(/-/g, ".") || profile.email.split("@")[0];
+        username = username.slice(0, 80);
+        await client.query(
+          `INSERT INTO users
+            (id, tenant_id, username, display_name, email, password_hash, branch, created_at, updated_at)
+           VALUES ($1, $2, $3, $4, $5, '', $6, NOW(), NOW())`,
+          [appUserId, tenantId, username, profile.full_name, profile.email, profile.region],
+        );
+        await client.query(
+          "INSERT INTO user_roles (user_id, role_id) VALUES ($1, $2)",
+          [appUserId, adminRoleId],
+        );
+        await client.query(
+          `INSERT INTO onboarding_memberships
+            (id, user_id, tenant_id, app_user_id, membership_role)
+           VALUES ($1, $2, $3, $4, 'owner')`,
+          [crypto.randomUUID(), userId, tenantId, appUserId],
+        );
+        await client.query(
+          `UPDATE onboarding_profiles
+           SET tenant_id = $2, completed_at = NOW(), updated_at = NOW()
+           WHERE user_id = $1`,
+          [userId, tenantId],
+        );
+        const handoffToken = randomToken(32);
+        await client.query(
+          `INSERT INTO auth_tokens (user_id, token, expires_at, is_magic_link)
+           VALUES ($1, $2, $3, TRUE)`,
+          [appUserId, handoffToken, new Date(Date.now() + HANDOFF_TTL_MS)],
+        );
+        await client.query("COMMIT");
+        return {
+          workspace: { id: tenantId, name: profile.business_name, domain, app_user_id: appUserId },
+          handoffToken,
+        };
+      } catch (error) {
+        await client.query("ROLLBACK");
+        throw error;
+      } finally {
+        client.release();
+      }
+    },
+
+    async createWorkspaceHandoff(userId, tenantId) {
+      const result = await pool.query(
+        `SELECT t.id, t.name, d.domain, m.app_user_id
+         FROM onboarding_memberships m
+         JOIN tenants t ON t.id = m.tenant_id
+         JOIN tenant_domains d ON d.tenant_id = t.id AND d.is_primary = TRUE
+         WHERE m.user_id = $1 AND m.tenant_id = $2 AND t.status = 'active'`,
+        [userId, tenantId],
+      );
+      const workspace = result.rows[0];
+      if (!workspace) return null;
+      const handoffToken = randomToken(32);
+      await pool.query(
+        `INSERT INTO auth_tokens (user_id, token, expires_at, is_magic_link)
+         VALUES ($1, $2, $3, TRUE)`,
+        [workspace.app_user_id, handoffToken, new Date(Date.now() + HANDOFF_TTL_MS)],
+      );
+      return { workspace, handoffToken };
+    },
+
     async createSession({ userId, sessionDigest, userAgent, ipAddress, expiresAt }) {
       await pool.query("DELETE FROM onboarding_auth_sessions WHERE expires_at <= NOW()");
       await pool.query(
@@ -277,7 +783,11 @@ export async function createPostgresStore(connectionString) {
          WHERE s.user_id = u.id
            AND s.token_digest = $1
            AND s.expires_at > NOW()
-         RETURNING u.id, u.email, u.full_name, u.avatar_url`,
+         RETURNING u.id, u.email, u.full_name, u.avatar_url, u.password_hash,
+           CASE WHEN EXISTS (
+             SELECT 1 FROM onboarding_oauth_accounts oa
+             WHERE oa.user_id = u.id AND oa.provider = 'google'
+           ) THEN 'google' ELSE 'password' END AS provider`,
         [sessionDigest],
       );
       return result.rows[0] || null;
@@ -296,7 +806,7 @@ export async function createPostgresStore(connectionString) {
   };
 }
 
-export function createApp({ config = readConfig(), store = null, oauthClient = null } = {}) {
+export function createApp({ config = readConfig(), store = null, oauthClient = null, mailer = undefined } = {}) {
   validateConfig(config);
   const app = express();
   const cookies = authCookieNames(config);
@@ -309,9 +819,84 @@ export function createApp({ config = readConfig(), store = null, oauthClient = n
           config.googleRedirectUri,
         )
       : null);
+  const emailClient = mailer === undefined ? createMailer(config) : mailer;
 
   if (config.trustProxy) app.set("trust proxy", 1);
   app.disable("x-powered-by");
+  app.use(express.json({ limit: "64kb" }));
+
+  const authAttempts = new Map();
+  function checkAuthRateLimit(req, res) {
+    const key = String(req.ip || req.socket.remoteAddress || "unknown");
+    const now = Date.now();
+    const recent = (authAttempts.get(key) || []).filter((stamp) => now - stamp < 10 * 60 * 1000);
+    recent.push(now);
+    authAttempts.set(key, recent);
+    if (recent.length > 20) {
+      res.status(429).json({ error: "rate_limited", message: "Terlalu banyak percobaan. Coba lagi beberapa menit." });
+      return false;
+    }
+    return true;
+  }
+
+  function assertSameOrigin(req, res) {
+    const origin = req.get("origin");
+    if (origin && origin !== new URL(config.publicBaseUrl).origin) {
+      res.status(403).json({ error: "invalid_origin" });
+      return false;
+    }
+    return true;
+  }
+
+  async function authenticatedUser(req) {
+    if (!store || !config.sessionSecret) return null;
+    const requestCookies = parseCookies(req.headers.cookie);
+    const sessionToken = requestCookies[cookies.session];
+    if (!sessionToken) return null;
+    return store.findSession(tokenDigest(sessionToken, config.sessionSecret));
+  }
+
+  async function issueSession(req, res, userId) {
+    const sessionToken = randomToken(48);
+    await store.createSession({
+      userId,
+      sessionDigest: tokenDigest(sessionToken, config.sessionSecret),
+      userAgent: String(req.headers["user-agent"] || "").slice(0, 500),
+      ipAddress: String(req.ip || "").slice(0, 100),
+      expiresAt: new Date(Date.now() + SESSION_TTL_MS),
+    });
+    res.cookie(cookies.session, sessionToken, {
+      httpOnly: true,
+      secure: cookies.secure,
+      sameSite: "lax",
+      path: "/",
+      maxAge: SESSION_TTL_MS,
+    });
+  }
+
+  async function sendAccountEmail({ user, actionType, subject, pathName, copy }) {
+    if (!emailClient) {
+      const error = new Error("Layanan email belum tersedia.");
+      error.code = "email_unavailable";
+      throw error;
+    }
+    const token = randomToken(32);
+    await store.saveActionToken({
+      userId: user.id,
+      actionType,
+      digest: tokenDigest(token, config.sessionSecret),
+      expiresAt: new Date(Date.now() + (actionType === "verify_email" ? 24 * 60 * 60 * 1000 : 30 * 60 * 1000)),
+    });
+    const target = new URL(pathName, config.publicBaseUrl);
+    target.searchParams.set("token", token);
+    await emailClient.sendMail({
+      from: `MOTOVAX <${config.authEmailFrom}>`,
+      to: user.email,
+      subject,
+      text: `${copy}\n\n${target.toString()}\n\nJika Anda tidak meminta ini, abaikan email ini.`,
+      html: `<p>Halo ${escapeHtml(user.full_name || user.email)},</p><p>${escapeHtml(copy)}</p><p><a href="${escapeHtml(target.toString())}">Lanjutkan di MOTOVAX</a></p><p>Tautan ini memiliki masa berlaku terbatas. Jika Anda tidak meminta ini, abaikan email ini.</p>`,
+    });
+  }
 
   app.use((req, res, next) => {
     res.set({
@@ -343,6 +928,222 @@ export function createApp({ config = readConfig(), store = null, oauthClient = n
       });
     } catch {
       res.status(503).json({ status: "database_unavailable", oauthReady: false });
+    }
+  });
+
+  app.post("/api/auth/signup", async (req, res, next) => {
+    try {
+      if (!assertSameOrigin(req, res) || !checkAuthRateLimit(req, res)) return;
+      if (!store || !config.sessionSecret) {
+        return res.status(503).json({ error: "service_unavailable" });
+      }
+      const fullName = String(req.body?.fullName || "").trim();
+      const email = normalizeEmail(req.body?.email);
+      const password = String(req.body?.password || "");
+      if (fullName.length < 2 || fullName.length > 120) {
+        return res.status(400).json({ error: "invalid_name", message: "Masukkan nama lengkap yang valid." });
+      }
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || email.length > 254) {
+        return res.status(400).json({ error: "invalid_email", message: "Format email tidak valid." });
+      }
+      if (password.length < 8 || password.length > 200 || !/[A-Za-z]/.test(password) || !/\d/.test(password)) {
+        return res.status(400).json({ error: "weak_password", message: "Password minimal 8 karakter dan harus berisi huruf serta angka." });
+      }
+      const user = await store.createPasswordUser({
+        email,
+        fullName,
+        passwordHash: await hashPassword(password),
+      });
+      await sendAccountEmail({
+        user,
+        actionType: "verify_email",
+        subject: "Verifikasi email akun MOTOVAX",
+        pathName: "/api/auth/verify-email",
+        copy: "Verifikasi alamat email Anda untuk melanjutkan pembuatan workspace MOTOVAX.",
+      });
+      return res.status(202).json({ verificationRequired: true, email: user.email });
+    } catch (error) {
+      if (error?.code === "account_exists") {
+        return res.status(409).json({ error: error.code, message: error.message });
+      }
+      return next(error);
+    }
+  });
+
+  app.post("/api/auth/login", async (req, res, next) => {
+    try {
+      if (!assertSameOrigin(req, res) || !checkAuthRateLimit(req, res)) return;
+      if (!store || !config.sessionSecret) {
+        return res.status(503).json({ error: "service_unavailable" });
+      }
+      const email = normalizeEmail(req.body?.email);
+      const password = String(req.body?.password || "");
+      const user = await store.findPasswordUser(email);
+      const valid = user?.password_hash ? await verifyPassword(password, user.password_hash) : false;
+      if (!valid) {
+        return res.status(401).json({ error: "invalid_credentials", message: "Email atau password tidak sesuai." });
+      }
+      if (!user.email_verified) {
+        return res.status(403).json({ error: "verification_required", message: "Email belum diverifikasi. Periksa inbox Anda." });
+      }
+      await issueSession(req, res, user.id);
+      const state = await store.getAccountState(user.id);
+      return res.json({ authenticated: true, user: publicUser({ ...user, provider: "password" }), ...state });
+    } catch (error) {
+      return next(error);
+    }
+  });
+
+  app.get("/api/auth/verify-email", async (req, res, next) => {
+    try {
+      const token = String(req.query.token || "");
+      const userId = token
+        ? await store.takeActionToken({ digest: tokenDigest(token, config.sessionSecret), actionType: "verify_email" })
+        : null;
+      if (!userId) {
+        return res.redirect(302, `${config.publicBaseUrl}/onboarding.html?email=invalid`);
+      }
+      await issueSession(req, res, userId);
+      return res.redirect(302, `${config.publicBaseUrl}/onboarding.html?email=verified`);
+    } catch (error) {
+      return next(error);
+    }
+  });
+
+  app.post("/api/auth/forgot-password", async (req, res, next) => {
+    try {
+      if (!assertSameOrigin(req, res) || !checkAuthRateLimit(req, res)) return;
+      const user = await store.findPasswordUser(normalizeEmail(req.body?.email));
+      if (user?.password_hash) {
+        await sendAccountEmail({
+          user,
+          actionType: "reset_password",
+          subject: "Reset password akun MOTOVAX",
+          pathName: "/onboarding.html?reset=1",
+          copy: "Gunakan tautan berikut untuk membuat password baru. Tautan berlaku selama 30 menit.",
+        });
+      }
+      return res.status(202).json({ message: "Jika email terdaftar, tautan reset telah dikirim." });
+    } catch (error) {
+      if (error?.code === "email_unavailable") return res.status(503).json({ error: error.code, message: error.message });
+      return next(error);
+    }
+  });
+
+  app.post("/api/auth/reset-password", async (req, res, next) => {
+    try {
+      if (!assertSameOrigin(req, res) || !checkAuthRateLimit(req, res)) return;
+      const token = String(req.body?.token || "");
+      const password = String(req.body?.password || "");
+      if (password.length < 8 || password.length > 200 || !/[A-Za-z]/.test(password) || !/\d/.test(password)) {
+        return res.status(400).json({ error: "weak_password", message: "Password minimal 8 karakter dan harus berisi huruf serta angka." });
+      }
+      const userId = token
+        ? await store.takeActionToken({ digest: tokenDigest(token, config.sessionSecret), actionType: "reset_password" })
+        : null;
+      if (!userId) return res.status(400).json({ error: "invalid_token", message: "Tautan reset tidak valid atau sudah kedaluwarsa." });
+      await store.updatePassword(userId, await hashPassword(password));
+      return res.status(204).end();
+    } catch (error) {
+      return next(error);
+    }
+  });
+
+  app.get("/api/onboarding/slug", async (req, res, next) => {
+    try {
+      const user = await authenticatedUser(req);
+      if (!user) return res.status(401).json({ error: "not_authenticated" });
+      const slug = normalizeSlug(req.query.slug);
+      if (slug.length < 3 || RESERVED_SLUGS.has(slug)) {
+        return res.json({ slug, available: false, reason: "reserved_or_invalid" });
+      }
+      const available = await store.isSlugAvailable(slug, config.tenantDomainSuffix);
+      return res.json({ slug, available, domain: `${slug}.${config.tenantDomainSuffix}` });
+    } catch (error) {
+      return next(error);
+    }
+  });
+
+  app.post("/api/onboarding/profile", async (req, res, next) => {
+    try {
+      if (!assertSameOrigin(req, res)) return;
+      const user = await authenticatedUser(req);
+      if (!user) return res.status(401).json({ error: "not_authenticated" });
+      const profile = {
+        businessName: String(req.body?.businessName || "").trim(),
+        workspaceSlug: normalizeSlug(req.body?.workspaceSlug || req.body?.businessName),
+        branchCount: String(req.body?.branchCount || "1").trim(),
+        region: String(req.body?.region || "").trim(),
+        industry: String(req.body?.industry || "general").trim(),
+        description: String(req.body?.description || "").trim().slice(0, 240),
+        modules: Array.isArray(req.body?.modules)
+          ? [...new Set(req.body.modules.filter((item) => ALLOWED_MODULES.has(item)))]
+          : [],
+        goal: ALLOWED_GOALS.has(req.body?.goal) ? req.body.goal : "conversion",
+      };
+      if (profile.businessName.length < 2 || profile.businessName.length > 150 || profile.region.length < 2) {
+        return res.status(400).json({ error: "invalid_profile", message: "Nama bisnis dan wilayah utama wajib diisi." });
+      }
+      if (profile.workspaceSlug.length < 3 || RESERVED_SLUGS.has(profile.workspaceSlug)) {
+        return res.status(400).json({ error: "invalid_slug", message: "Subdomain minimal 3 karakter dan tidak boleh memakai nama sistem." });
+      }
+      if (!ALLOWED_INDUSTRIES.has(profile.industry)) profile.industry = "general";
+      const available = await store.isSlugAvailable(profile.workspaceSlug, config.tenantDomainSuffix);
+      const currentState = await store.getAccountState(user.id);
+      const ownsSameSlug = currentState.profile?.workspace_slug === profile.workspaceSlug && currentState.profile?.tenant_id;
+      if (!available && !ownsSameSlug) {
+        return res.status(409).json({ error: "slug_unavailable", message: "Subdomain sudah digunakan." });
+      }
+      const saved = await store.saveProfile(user.id, profile);
+      return res.json({ profile: saved, domain: `${profile.workspaceSlug}.${config.tenantDomainSuffix}` });
+    } catch (error) {
+      return next(error);
+    }
+  });
+
+  app.post("/api/onboarding/complete", async (req, res, next) => {
+    try {
+      if (!assertSameOrigin(req, res)) return;
+      const user = await authenticatedUser(req);
+      if (!user) return res.status(401).json({ error: "not_authenticated" });
+      const state = await store.getAccountState(user.id);
+      if (!state.profile || !Array.isArray(state.profile.modules) || state.profile.modules.length === 0) {
+        return res.status(400).json({ error: "profile_incomplete", message: "Profil dan minimal satu modul wajib disimpan." });
+      }
+      const result = await store.provisionWorkspace({ userId: user.id, suffix: config.tenantDomainSuffix });
+      await ensureProductDomain(config, result.workspace.domain);
+      const redirectUrl = `https://${result.workspace.domain}/magic-login?token=${encodeURIComponent(result.handoffToken)}`;
+      return res.status(201).json({
+        workspace: {
+          id: result.workspace.id,
+          name: result.workspace.name,
+          domain: result.workspace.domain,
+          redirectUrl,
+        },
+      });
+    } catch (error) {
+      if (["profile_required", "slug_unavailable"].includes(error?.code)) {
+        return res.status(error.code === "slug_unavailable" ? 409 : 400).json({ error: error.code, message: error.message });
+      }
+      if (["domain_provisioning_unavailable", "domain_provisioning_failed"].includes(error?.code)) {
+        return res.status(503).json({ error: error.code, message: error.message });
+      }
+      return next(error);
+    }
+  });
+
+  app.post("/api/workspaces/:tenantId/enter", async (req, res, next) => {
+    try {
+      if (!assertSameOrigin(req, res)) return;
+      const user = await authenticatedUser(req);
+      if (!user) return res.status(401).json({ error: "not_authenticated" });
+      const result = await store.createWorkspaceHandoff(user.id, req.params.tenantId);
+      if (!result) return res.status(404).json({ error: "workspace_not_found" });
+      return res.json({
+        redirectUrl: `https://${result.workspace.domain}/magic-login?token=${encodeURIComponent(result.handoffToken)}`,
+      });
+    } catch (error) {
+      return next(error);
     }
   });
 
@@ -460,21 +1261,7 @@ export function createApp({ config = readConfig(), store = null, oauthClient = n
         name: payload.name || payload.email.split("@")[0],
         picture: payload.picture || "",
       });
-      const sessionToken = randomToken(48);
-      await store.createSession({
-        userId: user.id,
-        sessionDigest: tokenDigest(sessionToken, config.sessionSecret),
-        userAgent: String(req.headers["user-agent"] || "").slice(0, 500),
-        ipAddress: String(req.ip || "").slice(0, 100),
-        expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
-      });
-      res.cookie(cookies.session, sessionToken, {
-        httpOnly: true,
-        secure: cookies.secure,
-        sameSite: "lax",
-        path: "/",
-        maxAge: 30 * 24 * 60 * 60 * 1000,
-      });
+      await issueSession(req, res, user.id);
       return res.redirect(302, oauthResultUrl(config, "success"));
     } catch (error) {
       req.oauthError = error;
@@ -494,15 +1281,11 @@ export function createApp({ config = readConfig(), store = null, oauthClient = n
         tokenDigest(sessionToken, config.sessionSecret),
       );
       if (!user) return res.status(401).json({ authenticated: false });
+      const state = await store.getAccountState(user.id);
       return res.json({
         authenticated: true,
-        user: {
-          id: user.id,
-          email: user.email,
-          fullName: user.full_name,
-          avatarUrl: user.avatar_url,
-          provider: "google",
-        },
+        user: publicUser(user),
+        ...state,
       });
     } catch (error) {
       return next(error);
