@@ -103,6 +103,9 @@ for (const viewport of viewports) {
         hasLoginForm: Boolean(document.querySelector("#authFormLogin")),
         hasLoginTab: Boolean(document.querySelector('[data-auth-mode="login"]')),
         title: document.querySelector("#onboardingPanelTitle")?.textContent.trim(),
+        contentLinks: Array.from(document.querySelectorAll('a[href]'))
+          .filter((link) => !link.matches('[data-google-login]') && !link.closest('[data-reset-form]'))
+          .map((link) => link.href),
       };
     });
 
@@ -118,6 +121,11 @@ for (const viewport of viewports) {
     assert.equal(result.hasLoginForm, false);
     assert.equal(result.hasLoginTab, false);
     assert.equal(result.title, "Buat akun baru");
+    assert.ok(result.contentLinks.length > 0);
+    assert.ok(
+      result.contentLinks.every((href) => href.startsWith("https://motovax.ai/")),
+      `Tautan nonregistrasi harus menuju motovax.ai: ${result.contentLinks.join(", ")}`,
+    );
 
     await page.screenshot({
       path: `/tmp/motovax-oauth-${viewport.name}.png`,

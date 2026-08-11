@@ -25,15 +25,6 @@
   };
   var AUTH_LEAD = "Buat akun Motovax menggunakan email kerja atau akun Google Anda.";
   var GOOGLE_AUTH_ORIGIN = "https://onboard.motovax.com";
-  var DEMO_ANCHORS = {
-    ims: "#inventoryDemo",
-    omni: "#omniDemo",
-    social: "#socialDemo",
-    crm: "#crmDemo",
-    dashboard: "#dashboardDemo",
-    insight: "#insightDemo",
-  };
-
   function loadState() {
     try {
       var raw = localStorage.getItem(STORAGE_KEY);
@@ -111,6 +102,16 @@
     return Array.prototype.slice.call((root || document).querySelectorAll(sel));
   }
 
+  function routeContentLinksToLanding() {
+    qsa("a[href]").forEach(function (link) {
+      if (link.matches("[data-google-login]") || link.closest("[data-reset-form]")) return;
+      var href = link.getAttribute("href");
+      if (!href || /^(?:mailto:|tel:|javascript:)/i.test(href)) return;
+      var target = new URL(href, "https://motovax.ai/");
+      link.href = "https://motovax.ai" + target.pathname + target.search + target.hash;
+    });
+  }
+
   function OnboardingApp() {
     var isLocal = window.location.hostname === "127.0.0.1" || window.location.hostname === "localhost";
     if (window.location.origin !== GOOGLE_AUTH_ORIGIN && !isLocal) {
@@ -119,6 +120,7 @@
     }
     var mobileTrigger = qs("[data-mobile-nav-trigger]");
     if (mobileTrigger) mobileTrigger.remove();
+    routeContentLinksToLanding();
     this.root = document.body;
     this.state = loadState();
     this.toastTimer = null;
