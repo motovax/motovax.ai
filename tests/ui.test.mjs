@@ -86,9 +86,30 @@ const viewports = [
 for (const viewport of viewports) {
   test(`onboarding OAuth responsif pada ${viewport.name}`, async () => {
     const context = await browser.newContext({ viewport });
+    await context.addInitScript(() => {
+      localStorage.setItem("motovax_onboarding_v1", JSON.stringify({
+        step: 4,
+        completed: true,
+        account: { fullName: "Cache Lama", email: "cache@example.com" },
+        business: { businessName: "Tenant Cache", workspaceSlug: "tenant-cache" },
+        workspace: { id: "stale", domain: "tenant-cache.motovax.com", ready: true },
+      }));
+    });
     const page = await context.newPage();
     await page.route(/https:\/\/fonts\.(?:googleapis|gstatic)\.com\//, (route) => route.abort());
+    await page.route("**/api/auth/me", (route) => route.fulfill({
+      status: 401,
+      contentType: "application/json",
+      body: JSON.stringify({ authenticated: false }),
+    }));
+    const sessionResponse = page.waitForResponse((response) => response.url().endsWith("/api/auth/me"));
     await page.goto(`${baseUrl}/onboarding.html`, { waitUntil: "load" });
+    await sessionResponse;
+    await page.waitForSelector('[data-step="1"].is-active');
+    await page.waitForFunction(() => {
+      const state = JSON.parse(localStorage.getItem("motovax_onboarding_v1"));
+      return state.completed === false && state.workspace === null;
+    });
 
     const result = await page.evaluate(() => {
       const googleButton = document.querySelector("[data-google-login]");
@@ -103,6 +124,7 @@ for (const viewport of viewports) {
         hasLoginForm: Boolean(document.querySelector("#authFormLogin")),
         hasLoginTab: Boolean(document.querySelector('[data-auth-mode="login"]')),
         title: document.querySelector("#onboardingPanelTitle")?.textContent.trim(),
+        cachedState: JSON.parse(localStorage.getItem("motovax_onboarding_v1")),
         contentLinks: Array.from(document.querySelectorAll('a[href]'))
           .filter((link) => !link.matches('[data-google-login]') && !link.closest('[data-reset-form]'))
           .map((link) => link.href),
@@ -121,6 +143,8 @@ for (const viewport of viewports) {
     assert.equal(result.hasLoginForm, false);
     assert.equal(result.hasLoginTab, false);
     assert.equal(result.title, "Buat akun baru");
+    assert.equal(result.cachedState.completed, false, JSON.stringify(result.cachedState));
+    assert.equal(result.cachedState.workspace, null);
     assert.ok(result.contentLinks.length > 0);
     assert.ok(
       result.contentLinks.every((href) => href.startsWith("https://motovax.ai/")),

@@ -143,11 +143,11 @@
 
     this.bind();
     this.hydrate();
-    this.goTo(this.state.completed ? 4 : this.state.step || 1, { silent: true });
+    // Workspace aktif hanya boleh berasal dari session server, bukan localStorage lama.
+    this.goTo(1, { silent: true });
     var initialParams = new URLSearchParams(window.location.search);
     if (initialParams.get("reset") === "1" && initialParams.get("token")) this.showResetForm();
     this.hydrateGoogleSession();
-    if (this.state.workspace && !this.state.workspace.ready) this.waitForWorkspace();
   }
 
   OnboardingApp.prototype.bind = function () {
@@ -477,11 +477,19 @@
       headers: { Accept: "application/json" },
     })
       .then(function (response) {
-        if (!response.ok) return null;
+        if (response.status === 401) return { authenticated: false };
+        if (!response.ok) throw new Error("Session belum dapat diperiksa.");
         return response.json();
       })
       .then(function (payload) {
-        if (!payload || !payload.authenticated || !payload.user) return;
+        if (!payload || !payload.authenticated || !payload.user) {
+          self.state = defaultState();
+          saveState(self.state);
+          self.hydrate();
+          self.goTo(1, { silent: true });
+          if (params.get("reset") === "1" && params.get("token")) self.showResetForm();
+          return;
+        }
         self.applyAccountPayload(payload);
         self.state.authMode = "signup";
         saveState(self.state);
