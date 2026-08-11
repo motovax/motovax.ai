@@ -49,8 +49,8 @@ const template = (industry) => {
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="../styles.css?v=logo-20260809" />
-    <link rel="stylesheet" href="./industry.css" />
+    <link rel="stylesheet" href="../styles.css?v=copy-20260811" />
+    <link rel="stylesheet" href="./industry.css?v=copy-20260811" />
   </head>
   <body class="industry-detail-page">
     <header class="site-header">
@@ -103,7 +103,7 @@ const template = (industry) => {
 
     <script>window.__INDUSTRY_SLUG__ = ${JSON.stringify(industry.slug)};</script>
     <script src="./industry-data.js"></script>
-    <script src="./industry-page.js"></script>
+    <script src="./industry-page.js?v=copy-20260811"></script>
     <script src="../script.js?v=20260806-2"></script>
   </body>
 </html>
