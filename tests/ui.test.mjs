@@ -160,6 +160,14 @@ for (const viewport of viewports) {
 
   test(`flow onboarding tenant responsif pada ${viewport.name}`, async () => {
     const context = await browser.newContext({ viewport });
+    await context.addInitScript(() => {
+      window.grecaptcha = {
+        enterprise: {
+          ready(callback) { callback(); },
+          execute() { return Promise.resolve("test-recaptcha-token"); },
+        },
+      };
+    });
     const page = await context.newPage();
     await page.route(/https:\/\/fonts\.(?:googleapis|gstatic)\.com\//, (route) => route.abort());
     await page.route("**/api/auth/me", (route) => route.fulfill({
@@ -180,6 +188,17 @@ for (const viewport of viewports) {
       contentType: "application/json",
       body: JSON.stringify({ profile: {}, domain: "dealer-test.motovax.com" }),
     }));
+    await page.route("**/api/config", (route) => route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({
+        recaptcha: {
+          enabled: true,
+          siteKey: "test-site-key",
+          action: "complete_onboarding",
+        },
+      }),
+    }));
     await page.route("**/api/onboarding/slug?**", (route) => {
       const slug = new URL(route.request().url()).searchParams.get("slug");
       route.fulfill({
@@ -192,18 +211,21 @@ for (const viewport of viewports) {
         }),
       });
     });
-    await page.route("**/api/onboarding/complete", (route) => route.fulfill({
-      status: 201,
-      contentType: "application/json",
-      body: JSON.stringify({
-        workspace: {
-          id: "tenant-1",
-          name: "Dealer Test",
-          domain: "dealer-test.motovax.com",
-          redirectUrl: "https://dealer-test.motovax.com/magic-login?token=test",
-        },
-      }),
-    }));
+    await page.route("**/api/onboarding/complete", (route) => {
+      assert.equal(route.request().postDataJSON().recaptchaToken, "test-recaptcha-token");
+      return route.fulfill({
+        status: 201,
+        contentType: "application/json",
+        body: JSON.stringify({
+          workspace: {
+            id: "tenant-1",
+            name: "Dealer Test",
+            domain: "dealer-test.motovax.com",
+            redirectUrl: "https://dealer-test.motovax.com/magic-login?token=test",
+          },
+        }),
+      });
+    });
 
     const sessionResponse = page.waitForResponse((response) => response.url().endsWith("/api/auth/me"));
     await page.goto(`${baseUrl}/onboarding.html`, { waitUntil: "load" });
@@ -226,6 +248,18 @@ for (const viewport of viewports) {
     await page.locator('[data-business-form] input[name="workspaceSlug"]').blur();
     await page.waitForSelector('[data-slug-status][data-state="available"]');
     await page.click('[data-business-form] button[type="submit"]');
+    await page.waitForSelector('[data-step="3"].is-active');
+    const recaptchaStep = await page.evaluate(() => {
+      const hint = document.querySelector(".onboarding-complete-action .onboarding-hint");
+      const button = document.querySelector('[data-modules-form] button[type="submit"]');
+      return {
+        overflow: document.documentElement.scrollWidth > document.documentElement.clientWidth,
+        hintVisible: Boolean(hint?.getBoundingClientRect().height),
+        buttonVisible: Boolean(button?.getBoundingClientRect().height),
+      };
+    });
+    assert.deepEqual(recaptchaStep, { overflow: false, hintVisible: true, buttonVisible: true });
+    await page.screenshot({ path: `/tmp/motovax-recaptcha-${viewport.name}.png`, fullPage: false });
     await page.click('[data-modules-form] button[type="submit"]');
     await page.waitForSelector('[data-step="4"].is-active');
 

@@ -102,6 +102,29 @@
     return Array.prototype.slice.call((root || document).querySelectorAll(sel));
   }
 
+  function loadRecaptchaScript(siteKey) {
+    if (window.grecaptcha && window.grecaptcha.enterprise) return Promise.resolve();
+    var existing = document.querySelector('script[data-motovax-recaptcha]');
+    if (existing) {
+      return new Promise(function (resolve, reject) {
+        existing.addEventListener("load", resolve, { once: true });
+        existing.addEventListener("error", reject, { once: true });
+      });
+    }
+    return new Promise(function (resolve, reject) {
+      var script = document.createElement("script");
+      script.src = "https://www.google.com/recaptcha/enterprise.js?render=" + encodeURIComponent(siteKey);
+      script.async = true;
+      script.defer = true;
+      script.dataset.motovaxRecaptcha = "true";
+      script.addEventListener("load", resolve, { once: true });
+      script.addEventListener("error", function () {
+        reject(new Error("Proteksi keamanan gagal dimuat. Periksa koneksi lalu muat ulang halaman."));
+      }, { once: true });
+      document.head.appendChild(script);
+    });
+  }
+
   function routeContentLinksToLanding() {
     qsa("a[href]").forEach(function (link) {
       if (link.matches("[data-google-login]") || link.closest("[data-reset-form]")) return;
@@ -127,6 +150,7 @@
     this.workspacePollTimer = null;
     this.slugCheckTimer = null;
     this.slugAvailability = { slug: "", available: null };
+    this.recaptchaConfigPromise = this.prepareRecaptcha();
 
     this.steps = qsa("[data-step]");
     this.railItems = qsa("[data-rail-step]");
@@ -149,6 +173,36 @@
     if (initialParams.get("reset") === "1" && initialParams.get("token")) this.showResetForm();
     this.hydrateGoogleSession();
   }
+
+  OnboardingApp.prototype.prepareRecaptcha = function () {
+    return api("/api/config")
+      .then(function (payload) {
+        var config = payload && payload.recaptcha;
+        if (!config || !config.enabled || !config.siteKey || !config.action) {
+          throw new Error("Proteksi keamanan belum tersedia. Hubungi tim MOTOVAX.");
+        }
+        return loadRecaptchaScript(config.siteKey).then(function () { return config; });
+      })
+      .catch(function (error) {
+        return { enabled: false, error: error.message || "Proteksi keamanan belum tersedia." };
+      });
+  };
+
+  OnboardingApp.prototype.getRecaptchaToken = async function () {
+    var config = await this.recaptchaConfigPromise;
+    if (!config || !config.enabled || !window.grecaptcha || !window.grecaptcha.enterprise) {
+      throw new Error(config && config.error || "Proteksi keamanan belum siap. Muat ulang halaman dan coba lagi.");
+    }
+    return new Promise(function (resolve, reject) {
+      window.grecaptcha.enterprise.ready(function () {
+        window.grecaptcha.enterprise.execute(config.siteKey, { action: config.action })
+          .then(resolve)
+          .catch(function () {
+            reject(new Error("Verifikasi keamanan gagal. Muat ulang halaman dan coba lagi."));
+          });
+      });
+    });
+  };
 
   OnboardingApp.prototype.bind = function () {
     var self = this;
@@ -642,9 +696,10 @@
     setFormLoading(form, true);
     try {
       await this.saveProfile();
+      var recaptchaToken = await this.getRecaptchaToken();
       var payload = await api("/api/onboarding/complete", {
         method: "POST",
-        body: "{}",
+        body: JSON.stringify({ recaptchaToken: recaptchaToken }),
       });
       this.state.workspace = payload.workspace;
       this.state.completed = true;

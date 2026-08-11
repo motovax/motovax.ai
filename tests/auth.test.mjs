@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import crypto from "node:crypto";
 import { after, before, test } from "node:test";
 
-import { createApp } from "../server.mjs";
+import { createApp, verifyRecaptchaToken } from "../server.mjs";
 
 const oauthStates = new Map();
 const sessions = new Map();
@@ -12,6 +12,8 @@ const sentEmails = [];
 let server;
 let baseUrl;
 let authenticatedCookie = "";
+let accountState = { profile: null, workspaces: [] };
+const recaptchaTokens = [];
 
 const config = {
   nodeEnv: "test",
@@ -25,6 +27,12 @@ const config = {
   sessionSecret: "test-session-secret-with-at-least-32-characters",
   databaseUrl: "postgres://test",
   tenantDomainSuffix: "motovax.com",
+  recaptchaProjectId: "motovax-test",
+  recaptchaSiteKey: "test-site-key",
+  recaptchaApiKey: "test-api-key",
+  recaptchaAction: "complete_onboarding",
+  recaptchaScoreThreshold: 0.5,
+  recaptchaExpectedHostname: "127.0.0.1",
   trustProxy: false,
 };
 
@@ -102,7 +110,7 @@ const store = {
     return sessions.get(digest) || null;
   },
   async getAccountState() {
-    return { profile: null, workspaces: [] };
+    return accountState;
   },
   async isSlugAvailable(slug) {
     return slug !== "workspace-terpakai";
@@ -161,6 +169,15 @@ before(async () => {
     store,
     oauthClient,
     mailer: { async sendMail(message) { sentEmails.push(message); } },
+    recaptchaVerifier: async (_config, token) => {
+      recaptchaTokens.push(token);
+      if (token !== "valid-recaptcha-token") {
+        const error = new Error("Verifikasi keamanan tidak valid.");
+        error.code = "recaptcha_invalid";
+        throw error;
+      }
+      return { score: 0.9 };
+    },
   });
   await new Promise((resolve) => {
     server = app.listen(0, "127.0.0.1", resolve);
@@ -179,8 +196,56 @@ test("health menyatakan OAuth siap", async () => {
   assert.deepEqual(await response.json(), {
     status: "ok",
     oauthReady: true,
+    recaptchaReady: true,
     missing: [],
   });
+});
+
+test("config publik hanya mengekspos site key dan action reCAPTCHA", async () => {
+  const response = await fetch(`${baseUrl}/api/config`);
+  assert.equal(response.status, 200);
+  const payload = await response.json();
+  assert.deepEqual(payload, {
+    recaptcha: {
+      enabled: true,
+      siteKey: "test-site-key",
+      action: "complete_onboarding",
+    },
+  });
+  assert.equal(JSON.stringify(payload).includes(config.recaptchaApiKey), false);
+});
+
+test("assessment reCAPTCHA memvalidasi action, hostname, dan skor", async () => {
+  const validFetch = async (_url, options) => {
+    const body = JSON.parse(options.body);
+    assert.equal(body.event.token, "browser-token");
+    assert.equal(body.event.expectedAction, "complete_onboarding");
+    return new Response(JSON.stringify({
+      tokenProperties: {
+        valid: true,
+        action: "complete_onboarding",
+        hostname: "127.0.0.1",
+      },
+      riskAnalysis: { score: 0.9 },
+    }), { status: 200, headers: { "content-type": "application/json" } });
+  };
+  assert.deepEqual(await verifyRecaptchaToken(config, "browser-token", validFetch), { score: 0.9 });
+
+  await assert.rejects(
+    verifyRecaptchaToken(config, "browser-token", async () => new Response(JSON.stringify({
+      tokenProperties: { valid: true, action: "other_action", hostname: "127.0.0.1" },
+      riskAnalysis: { score: 0.9 },
+    }), { status: 200 })),
+    { code: "recaptcha_invalid" },
+  );
+
+  await assert.rejects(
+    verifyRecaptchaToken(config, "browser-token", async () => new Response(JSON.stringify({
+      tokenProperties: { valid: true, action: "complete_onboarding", hostname: "127.0.0.1" },
+      riskAnalysis: { score: 0.2 },
+    }), { status: 200 })),
+    { code: "recaptcha_low_score" },
+  );
 });
 
 test("start membuat state, nonce, PKCE, dan cookie HttpOnly", async () => {
@@ -306,4 +371,20 @@ test("availability workspace menolak nama yang sudah dipakai", async () => {
   const payload = await available.json();
   assert.equal(payload.available, true);
   assert.equal(payload.domain, "workspace-baru.motovax.com");
+});
+
+test("penyelesaian onboarding ditolak sebelum provisioning tanpa token reCAPTCHA valid", async () => {
+  accountState = { profile: { modules: ["ims"] }, workspaces: [] };
+  const response = await fetch(`${baseUrl}/api/onboarding/complete`, {
+    method: "POST",
+    headers: {
+      cookie: authenticatedCookie,
+      origin: "http://127.0.0.1",
+      "content-type": "application/json",
+    },
+    body: "{}",
+  });
+  assert.equal(response.status, 400);
+  assert.equal((await response.json()).error, "recaptcha_invalid");
+  assert.deepEqual(recaptchaTokens, [""]);
 });

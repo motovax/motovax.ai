@@ -90,3 +90,27 @@
     padding: 0 14px 11px;
   }
 }
+.onboarding-complete-action {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.onboarding-complete-action .onboarding-hint {
+  margin-right: 0;
+  max-width: 340px;
+  text-align: right;
+}
+
+@media (max-width: 640px) {
+  .onboarding-complete-action {
+    width: 100%;
+    align-items: stretch;
+  }
+
+  .onboarding-complete-action .onboarding-hint {
+    max-width: none;
+    text-align: center;
+  }
+}

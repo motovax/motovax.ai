@@ -343,7 +343,10 @@
               <p class="onboarding-form-error" data-form-error hidden></p>
               <div class="onboarding-step-actions">
                 <button type="button" class="btn btn-secondary" data-step-back>← Kembali</button>
-                <button type="submit" class="btn btn-primary">Selesaikan setup <span>→</span></button>
+                <div class="onboarding-complete-action">
+                  <small class="onboarding-hint">Dilindungi oleh Google reCAPTCHA untuk mencegah pendaftaran otomatis.</small>
+                  <button type="submit" class="btn btn-primary">Selesaikan setup <span>→</span></button>
+                </div>
               </div>
             </form>
           </div>
@@ -422,6 +425,6 @@
     </div>
 
     <script src="./script.js?v=onb-20260808b"></script>
-    <script src="./onboarding.js?v=session-source-20260811"></script>
+    <script src="./onboarding.js?v=recaptcha-20260811"></script>
   </body>
 </html>

@@ -66,6 +66,13 @@ function readConfig(env = process.env) {
     smtpUser: env.PLUNK_SMTP_USER || env.SMTP_USER || "",
     smtpPassword: env.PLUNK_SMTP_PASSWORD || env.SMTP_PASSWORD || "",
     authEmailFrom: env.AUTH_EMAIL_FROM || "support@motovax.com",
+    recaptchaProjectId: env.RECAPTCHA_PROJECT_ID || "",
+    recaptchaSiteKey: env.RECAPTCHA_SITE_KEY || "",
+    recaptchaApiKey: env.RECAPTCHA_API_KEY || "",
+    recaptchaAction: env.RECAPTCHA_ACTION || "complete_onboarding",
+    recaptchaScoreThreshold: Number(env.RECAPTCHA_SCORE_THRESHOLD || 0.5),
+    recaptchaExpectedHostname:
+      env.RECAPTCHA_EXPECTED_HOSTNAME || new URL(publicBaseUrl).hostname,
     trustProxy: env.TRUST_PROXY !== "false",
   };
 }
@@ -321,6 +328,82 @@ function missingOAuthConfig(config, store) {
   }
   if (!config.databaseUrl || !store) missing.push("EXTERNAL_DATABASE_URL");
   return missing;
+}
+
+function recaptchaReady(config) {
+  return Boolean(
+    config.recaptchaProjectId &&
+    config.recaptchaSiteKey &&
+    config.recaptchaApiKey &&
+    config.recaptchaAction &&
+    config.recaptchaExpectedHostname &&
+    Number.isFinite(config.recaptchaScoreThreshold) &&
+    config.recaptchaScoreThreshold >= 0 &&
+    config.recaptchaScoreThreshold <= 1,
+  );
+}
+
+export async function verifyRecaptchaToken(config, token, fetchImpl = fetch) {
+  if (!recaptchaReady(config)) {
+    const error = new Error("Proteksi reCAPTCHA belum dikonfigurasi pada server.");
+    error.code = "recaptcha_unavailable";
+    throw error;
+  }
+  if (!token || String(token).length > 4096) {
+    const error = new Error("Verifikasi keamanan tidak tersedia. Muat ulang halaman dan coba lagi.");
+    error.code = "recaptcha_invalid";
+    throw error;
+  }
+
+  let response;
+  try {
+    const endpoint = new URL(
+      `https://recaptchaenterprise.googleapis.com/v1/projects/${encodeURIComponent(config.recaptchaProjectId)}/assessments`,
+    );
+    endpoint.searchParams.set("key", config.recaptchaApiKey);
+    response = await fetchImpl(endpoint, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        event: {
+          token: String(token),
+          siteKey: config.recaptchaSiteKey,
+          expectedAction: config.recaptchaAction,
+        },
+      }),
+      signal: AbortSignal.timeout(8_000),
+    });
+  } catch {
+    const error = new Error("Layanan verifikasi keamanan sedang tidak tersedia. Coba lagi.");
+    error.code = "recaptcha_unavailable";
+    throw error;
+  }
+
+  if (!response.ok) {
+    const error = new Error("Layanan verifikasi keamanan sedang tidak tersedia. Coba lagi.");
+    error.code = "recaptcha_unavailable";
+    throw error;
+  }
+
+  const assessment = await response.json();
+  const properties = assessment?.tokenProperties || {};
+  const score = Number(assessment?.riskAnalysis?.score);
+  if (
+    properties.valid !== true ||
+    properties.action !== config.recaptchaAction ||
+    properties.hostname !== config.recaptchaExpectedHostname ||
+    !Number.isFinite(score)
+  ) {
+    const error = new Error("Verifikasi keamanan tidak valid. Muat ulang halaman dan coba lagi.");
+    error.code = "recaptcha_invalid";
+    throw error;
+  }
+  if (score < config.recaptchaScoreThreshold) {
+    const error = new Error("Aktivitas belum dapat diverifikasi. Tunggu sebentar lalu coba lagi.");
+    error.code = "recaptcha_low_score";
+    throw error;
+  }
+  return { score };
 }
 
 export async function createPostgresStore(connectionString) {
@@ -863,7 +946,13 @@ export async function createPostgresStore(connectionString) {
   };
 }
 
-export function createApp({ config = readConfig(), store = null, oauthClient = null, mailer = undefined } = {}) {
+export function createApp({
+  config = readConfig(),
+  store = null,
+  oauthClient = null,
+  mailer = undefined,
+  recaptchaVerifier = verifyRecaptchaToken,
+} = {}) {
   validateConfig(config);
   const app = express();
   const cookies = authCookieNames(config);
@@ -981,11 +1070,22 @@ export function createApp({ config = readConfig(), store = null, oauthClient = n
       return res.status(200).json({
         status: missing.length ? "configuration_required" : "ok",
         oauthReady: missing.length === 0,
+        recaptchaReady: recaptchaReady(config),
         missing,
       });
     } catch {
       res.status(503).json({ status: "database_unavailable", oauthReady: false });
     }
+  });
+
+  app.get("/api/config", (_req, res) => {
+    res.json({
+      recaptcha: {
+        enabled: recaptchaReady(config),
+        siteKey: recaptchaReady(config) ? config.recaptchaSiteKey : "",
+        action: recaptchaReady(config) ? config.recaptchaAction : "",
+      },
+    });
   });
 
   app.post("/api/auth/signup", async (req, res, next) => {
@@ -1167,6 +1267,7 @@ export function createApp({ config = readConfig(), store = null, oauthClient = n
       if (!state.profile || !Array.isArray(state.profile.modules) || state.profile.modules.length === 0) {
         return res.status(400).json({ error: "profile_incomplete", message: "Profil dan minimal satu modul wajib disimpan." });
       }
+      await recaptchaVerifier(config, String(req.body?.recaptchaToken || ""));
       const result = await store.provisionWorkspace({ userId: user.id, suffix: config.tenantDomainSuffix });
       await ensureProductDomain(config, result.workspace.domain);
       return res.status(202).json({
@@ -1180,6 +1281,12 @@ export function createApp({ config = readConfig(), store = null, oauthClient = n
     } catch (error) {
       if (["profile_required", "slug_unavailable"].includes(error?.code)) {
         return res.status(error.code === "slug_unavailable" ? 409 : 400).json({ error: error.code, message: error.message });
+      }
+      if (["recaptcha_invalid", "recaptcha_low_score"].includes(error?.code)) {
+        return res.status(400).json({ error: error.code, message: error.message });
+      }
+      if (error?.code === "recaptcha_unavailable") {
+        return res.status(503).json({ error: error.code, message: error.message });
       }
       if (["domain_provisioning_unavailable", "domain_provisioning_failed"].includes(error?.code)) {
         return res.status(503).json({ error: error.code, message: error.message });
