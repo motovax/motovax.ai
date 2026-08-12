@@ -6,6 +6,102 @@
   background: #fff;
 }
 
+.onboarding-panel .btn-primary {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border: 1px solid rgba(4, 69, 184, 0.42);
+  border-radius: 12px;
+  background: linear-gradient(135deg, #2483ff 0%, #0b63e5 48%, #074bbb 100%);
+  box-shadow:
+    0 12px 26px rgba(8, 78, 190, 0.24),
+    0 3px 8px rgba(8, 78, 190, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 0.34);
+  text-shadow: 0 1px 1px rgba(0, 43, 116, 0.28);
+  transition:
+    transform 180ms ease,
+    border-color 180ms ease,
+    box-shadow 180ms ease,
+    filter 180ms ease;
+}
+
+.onboarding-panel .btn-primary::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  background:
+    radial-gradient(circle at 18% -70%, rgba(255, 255, 255, 0.52), transparent 48%),
+    linear-gradient(110deg, transparent 24%, rgba(255, 255, 255, 0.16) 46%, transparent 66%);
+  transform: translateX(-18%);
+  transition: transform 360ms ease;
+}
+
+.onboarding-panel .btn-primary > * {
+  position: relative;
+  z-index: 1;
+}
+
+.onboarding-panel .btn-primary > span:last-child {
+  display: inline-grid;
+  min-width: 28px;
+  height: 28px;
+  place-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 9px;
+  background: rgba(255, 255, 255, 0.14);
+  transition: transform 180ms ease, background 180ms ease;
+}
+
+.onboarding-panel .btn-primary:hover {
+  border-color: rgba(4, 57, 155, 0.5);
+  box-shadow:
+    0 16px 34px rgba(8, 78, 190, 0.3),
+    0 4px 10px rgba(8, 78, 190, 0.16),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  filter: saturate(1.06);
+  transform: translateY(-2px);
+}
+
+.onboarding-panel .btn-primary:hover::before {
+  transform: translateX(18%);
+}
+
+.onboarding-panel .btn-primary:hover > span:last-child,
+.onboarding-panel .btn-primary:hover > i:last-child {
+  background: rgba(255, 255, 255, 0.22);
+  transform: translateX(2px);
+}
+
+.onboarding-panel .btn-primary:active {
+  box-shadow:
+    0 7px 16px rgba(8, 78, 190, 0.22),
+    inset 0 1px 2px rgba(0, 44, 126, 0.2);
+  filter: saturate(1);
+  transform: translateY(0) scale(0.99);
+}
+
+.onboarding-panel .btn-primary:focus-visible {
+  outline: 3px solid rgba(37, 99, 235, 0.24);
+  outline-offset: 3px;
+}
+
+.onboarding-panel .btn-primary:disabled::before {
+  display: none;
+}
+
+.onboarding-panel .btn-primary:disabled {
+  border-color: #cbd5e1;
+  color: #64748b;
+  background: #e2e8f0;
+  box-shadow: none;
+  cursor: not-allowed;
+  filter: none;
+  text-shadow: none;
+  transform: none;
+  transition: none;
+}
+
 .onboarding-google-btn.is-loading {
   pointer-events: none;
   cursor: wait;
