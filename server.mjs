@@ -66,7 +66,7 @@ function readConfig(env = process.env) {
     smtpPort: Number(env.PLUNK_SMTP_PORT || env.SMTP_PORT || 2587),
     smtpUser: env.PLUNK_SMTP_USER || env.SMTP_USER || "",
     smtpPassword: env.PLUNK_SMTP_PASSWORD || env.SMTP_PASSWORD || "",
-    authEmailFrom: env.AUTH_EMAIL_FROM || "support@motovax.com",
+    authEmailFrom: env.AUTH_EMAIL_FROM || "onboarding@motovax.ai",
     onboardingTeamEmail: env.ONBOARDING_TEAM_EMAIL || "support@motovax.com",
     recaptchaProjectId: env.RECAPTCHA_PROJECT_ID || "",
     recaptchaSiteKey: env.RECAPTCHA_SITE_KEY || "",

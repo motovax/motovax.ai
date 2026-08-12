@@ -34,6 +34,7 @@ const config = {
   recaptchaScoreThreshold: 0.5,
   recaptchaExpectedHostname: "127.0.0.1",
   onboardingTeamEmail: "team@motovax.com",
+  authEmailFrom: "onboarding@motovax.ai",
   trustProxy: false,
 };
 
@@ -289,6 +290,7 @@ test("daftar dan login email/password memakai kredensial nyata", async () => {
   assert.equal(signupBody.email, "password@example.com");
   assert.equal(signupBody.verificationRequired, true);
   assert.equal(sentEmails.length, 1);
+  assert.equal(sentEmails[0].from, "MOTOVAX <onboarding@motovax.ai>");
 
   const verificationUrl = sentEmails[0].text.match(/http:\/\/127\.0\.0\.1\/api\/auth\/verify-email\?token=[^\s]+/)[0];
   const verificationTarget = new URL(verificationUrl);
