@@ -89,15 +89,54 @@
         }
         return payload;
       });
+    }).catch(function (error) {
+      if (error && typeof error.status === "number") throw error;
+      var networkError = new Error("Koneksi ke server terputus. Periksa internet Anda, lalu coba lagi.");
+      networkError.code = "network_error";
+      throw networkError;
     });
   }
 
   function setFormLoading(form, loading) {
     if (!form) return;
+    var submitButton = qs('button[type="submit"]', form);
+    if (submitButton) {
+      if (loading) {
+        if (!submitButton.dataset.originalHtml) submitButton.dataset.originalHtml = submitButton.innerHTML;
+        submitButton.textContent = submitButton.dataset.loadingLabel || "Memproses…";
+        submitButton.setAttribute("aria-busy", "true");
+      } else {
+        if (submitButton.dataset.originalHtml) submitButton.innerHTML = submitButton.dataset.originalHtml;
+        submitButton.removeAttribute("aria-busy");
+      }
+    }
     qsa("button, input, select, textarea", form).forEach(function (element) {
       element.disabled = loading;
     });
     form.classList.toggle("is-loading", loading);
+  }
+
+  function friendlySubmitError(error, fallback) {
+    if (!error) return fallback || "Proses belum berhasil. Silakan coba lagi.";
+    if (error.code === "network_error") return error.message;
+    if (error.status === 401) return "Sesi Anda sudah berakhir. Muat ulang halaman, lalu masuk atau daftar kembali.";
+    if (error.status === 429) return "Terlalu banyak percobaan. Tunggu beberapa menit sebelum mencoba kembali.";
+    if (error.status >= 500) return "Layanan sedang mengalami gangguan. Data Anda belum dikirim; silakan coba lagi beberapa saat.";
+    return error.message || fallback || "Proses belum berhasil. Periksa isian Anda lalu coba lagi.";
+  }
+
+  function clearPasswordFields(form) {
+    if (!form) return;
+    qsa('input[type="password"], input[data-password-revealed]', form).forEach(function (input) {
+      input.value = "";
+      input.type = "password";
+      input.removeAttribute("data-password-revealed");
+    });
+    qsa("[data-password-toggle]", form).forEach(function (toggle) {
+      toggle.textContent = "Tampilkan";
+      toggle.setAttribute("aria-pressed", "false");
+      toggle.setAttribute("aria-label", "Tampilkan password");
+    });
   }
 
   function qsa(sel, root) {
@@ -213,6 +252,32 @@
 
   OnboardingApp.prototype.bind = function () {
     var self = this;
+
+    qsa("[data-password-toggle]").forEach(function (toggle) {
+      toggle.addEventListener("click", function () {
+        var input = document.getElementById(toggle.getAttribute("aria-controls"));
+        if (!input) return;
+        var reveal = input.type === "password";
+        input.type = reveal ? "text" : "password";
+        input.toggleAttribute("data-password-revealed", reveal);
+        toggle.textContent = reveal ? "Sembunyikan" : "Tampilkan";
+        toggle.setAttribute("aria-pressed", reveal ? "true" : "false");
+        toggle.setAttribute("aria-label", reveal ? "Sembunyikan password" : "Tampilkan password");
+        input.focus({ preventScroll: true });
+      });
+    });
+
+    qsa(".onboarding-form input, .onboarding-form select, .onboarding-form textarea").forEach(function (field) {
+      field.addEventListener("input", function () {
+        field.removeAttribute("aria-invalid");
+        var form = field.closest("form");
+        var error = form && qs("[data-form-error]", form);
+        if (error && !error.hidden) {
+          error.hidden = true;
+          error.textContent = "";
+        }
+      });
+    });
 
     if (this.signupForm) {
       this.signupForm.addEventListener("submit", function (e) {
@@ -410,11 +475,11 @@
     var password = String(data.get("password") || "");
     var confirmation = String(data.get("passwordConfirm") || "");
     if (password.length < 8 || !/[A-Za-z]/.test(password) || !/\d/.test(password)) {
-      this.showError(form, "Password minimal 8 karakter dan harus berisi huruf serta angka.");
+      this.showError(form, "Password baru belum memenuhi syarat: gunakan minimal 8 karakter yang berisi huruf dan angka.", "password");
       return;
     }
     if (password !== confirmation) {
-      this.showError(form, "Konfirmasi password tidak cocok.");
+      this.showError(form, "Konfirmasi password baru tidak sama. Ketik ulang password yang sama persis.", "passwordConfirm");
       return;
     }
     setFormLoading(form, true);
@@ -425,10 +490,11 @@
         body: JSON.stringify({ token: params.get("token"), password: password }),
       });
       window.history.replaceState({}, "", window.location.pathname);
+      clearPasswordFields(form);
       this.setAuthMode();
       this.showToast("Password berhasil diperbarui", "Masuk melalui domain workspace Anda.");
     } catch (error) {
-      this.showError(form, error.message);
+      this.showError(form, friendlySubmitError(error, "Password belum berhasil diperbarui. Periksa tautan reset lalu coba lagi."));
     } finally {
       setFormLoading(form, false);
     }
@@ -457,13 +523,17 @@
     var data = new FormData(form);
     var date = String(data.get("date") || "");
     var time = String(data.get("time") || "");
-    if (!date || !time) {
-      this.showError(form, "Pilih tanggal dan waktu meeting.");
+    if (!date) {
+      this.showError(form, "Tanggal meeting belum dipilih. Pilih hari Senin–Jumat yang tersedia.", "date");
+      return;
+    }
+    if (!time) {
+      this.showError(form, "Waktu meeting belum dipilih. Pilih salah satu slot waktu WIB.", "time");
       return;
     }
     var day = new Date(date + "T00:00:00Z").getUTCDay();
     if (day === 0 || day === 6) {
-      this.showError(form, "Meeting tersedia pada hari Senin sampai Jumat.");
+      this.showError(form, "Tanggal tersebut jatuh pada akhir pekan. Pilih hari Senin sampai Jumat.", "date");
       return;
     }
     setFormLoading(form, true);
@@ -487,7 +557,7 @@
       this.goTo(5);
       this.showToast("Jadwal pilihan diterima", "Tim Motovax akan mengirim detail meeting melalui email.");
     } catch (error) {
-      this.showError(form, error.message);
+      this.showError(form, friendlySubmitError(error, "Jadwal belum berhasil dikirim. Periksa pilihan waktu lalu coba lagi."));
     } finally {
       setFormLoading(form, false);
     }
@@ -516,13 +586,26 @@
       el.hidden = true;
       el.textContent = "";
     });
+    qsa('[aria-invalid="true"]').forEach(function (field) {
+      field.removeAttribute("aria-invalid");
+    });
   };
 
-  OnboardingApp.prototype.showError = function (form, message) {
+  OnboardingApp.prototype.showError = function (form, message, field) {
     var err = qs("[data-form-error]", form);
     if (!err) return;
+    if (!err.id) err.id = "onboardingFormError-" + (qsa("[data-form-error]").indexOf(err) + 1);
     err.hidden = false;
     err.textContent = message;
+    if (field) {
+      var target = typeof field === "string" ? form.elements[field] : field;
+      if (target) {
+        target.setAttribute("aria-invalid", "true");
+        target.setAttribute("aria-describedby", err.id);
+        target.focus({ preventScroll: true });
+      }
+    }
+    err.scrollIntoView({ behavior: "smooth", block: "nearest" });
   };
 
   OnboardingApp.prototype.submitSignup = async function () {
@@ -534,19 +617,19 @@
     var confirm = String(fd.get("passwordConfirm") || "");
 
     if (fullName.length < 2) {
-      this.showError(form, "Masukkan nama lengkap yang valid.");
+      this.showError(form, "Nama lengkap belum valid. Masukkan minimal 2 karakter.", "fullName");
       return;
     }
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      this.showError(form, "Format email tidak valid.");
+      this.showError(form, "Email kerja belum valid. Gunakan format seperti nama@perusahaan.com.", "email");
       return;
     }
     if (password.length < 8 || !/[A-Za-z]/.test(password) || !/\d/.test(password)) {
-      this.showError(form, "Password minimal 8 karakter dan harus berisi huruf serta angka.");
+      this.showError(form, "Password belum memenuhi syarat: gunakan minimal 8 karakter yang berisi huruf dan angka.", "password");
       return;
     }
     if (password !== confirm) {
-      this.showError(form, "Konfirmasi password tidak cocok.");
+      this.showError(form, "Konfirmasi password tidak sama. Ketik ulang password yang sama persis.", "passwordConfirm");
       return;
     }
 
@@ -558,17 +641,17 @@
       });
       if (payload.verificationRequired) {
         this.showToast("Periksa email Anda", "Klik tautan verifikasi untuk melanjutkan onboarding.");
-        form.password.value = "";
-        form.passwordConfirm.value = "";
+        clearPasswordFields(form);
         return;
       }
       this.applyAccountPayload(payload);
+      clearPasswordFields(form);
       this.state.authMode = "signup";
       saveState(this.state);
       this.showToast("Akun berhasil dibuat", "Lanjut isi profil bisnis Anda.");
       this.goTo(2);
     } catch (error) {
-      this.showError(form, error.message);
+      this.showError(form, friendlySubmitError(error, "Akun belum berhasil dibuat. Periksa isian lalu coba lagi."));
     } finally {
       setFormLoading(form, false);
     }
@@ -699,15 +782,15 @@
     var description = String(fd.get("description") || "").trim();
 
     if (businessName.length < 2) {
-      this.showError(form, "Nama bisnis / brand wajib diisi.");
+      this.showError(form, "Nama bisnis belum valid. Masukkan minimal 2 karakter.", "businessName");
       return;
     }
     if (region.length < 2) {
-      this.showError(form, "Isi kota / wilayah utama.");
+      this.showError(form, "Kota atau wilayah utama belum valid. Masukkan minimal 2 karakter.", "region");
       return;
     }
     if (!this.validWorkspaceSlug(workspaceSlug)) {
-      this.showError(form, "Subdomain harus 3–40 karakter, berisi huruf kecil, angka, atau tanda hubung.");
+      this.showError(form, "Nama workspace belum valid. Gunakan 3–40 karakter berupa huruf kecil, angka, atau tanda hubung.", "workspaceSlug");
       return;
     }
 
@@ -717,7 +800,7 @@
     try {
       var available = await this.checkWorkspaceAvailability();
       if (!available) {
-        this.showError(form, "Nama workspace tidak tersedia. Pilih nama lain.");
+        this.showError(form, "Nama workspace ini tidak tersedia. Coba nama lain yang lebih spesifik.", "workspaceSlug");
         return;
       }
       this.state.business = {
@@ -733,7 +816,7 @@
       this.showToast("Profil disimpan", "Pilih modul yang ingin diaktifkan.");
       this.goTo(4);
     } catch (error) {
-      this.showError(form, error.message);
+      this.showError(form, friendlySubmitError(error, "Profil belum berhasil disimpan. Periksa isian lalu coba lagi."));
     } finally {
       setFormLoading(form, false);
     }
@@ -804,7 +887,7 @@
     });
 
     if (!checked.length) {
-      this.showError(form, "Pilih minimal satu modul prioritas.");
+      this.showError(form, "Belum ada modul yang dipilih. Aktifkan minimal satu modul untuk melanjutkan.", qs('input[name="modules"]', form));
       return;
     }
 
@@ -828,7 +911,7 @@
       this.goTo(5);
       this.waitForWorkspace();
     } catch (error) {
-      this.showError(form, error.message);
+      this.showError(form, friendlySubmitError(error, "Workspace belum berhasil dibuat. Pilihan Anda tetap tersimpan; silakan coba lagi."));
     } finally {
       setFormLoading(form, false);
     }
@@ -854,7 +937,7 @@
       });
       window.location.assign(payload.redirectUrl);
     } catch (error) {
-      this.showToast("Workspace belum dapat dibuka", error.message);
+      this.showToast("Workspace belum dapat dibuka", friendlySubmitError(error, "Tunggu beberapa saat lalu coba kembali."));
       this.openWorkspace.disabled = false;
     }
   };

@@ -104,6 +104,11 @@ for (const viewport of viewports) {
       contentType: "application/json",
       body: JSON.stringify({ authenticated: false }),
     }));
+    await page.route("**/api/auth/signup", (route) => route.fulfill({
+      status: 503,
+      contentType: "application/json",
+      body: JSON.stringify({ error: "service_unavailable" }),
+    }));
     const sessionResponse = page.waitForResponse((response) => response.url().endsWith("/api/auth/me"));
     await page.goto(`${baseUrl}/onboarding.html`, { waitUntil: "load" });
     await sessionResponse;
@@ -112,6 +117,31 @@ for (const viewport of viewports) {
       const state = JSON.parse(localStorage.getItem("motovax_onboarding_v1"));
       return state.completed === false && state.workspace === null;
     });
+
+    await page.fill('#signupPassword', "rahasia123");
+    await page.click('[data-password-toggle][aria-controls="signupPassword"]');
+    assert.equal(await page.getAttribute('#signupPassword', "type"), "text");
+    assert.equal(
+      await page.getAttribute('[data-password-toggle][aria-controls="signupPassword"]', "aria-pressed"),
+      "true",
+    );
+    await page.click('[data-password-toggle][aria-controls="signupPassword"]');
+    assert.equal(await page.getAttribute('#signupPassword', "type"), "password");
+
+    await page.click('[data-auth-form="signup"] button[type="submit"]');
+    await page.waitForSelector('[data-auth-form="signup"] [data-form-error]:not([hidden])');
+    assert.match(await page.textContent('[data-auth-form="signup"] [data-form-error]'), /nama lengkap/i);
+    assert.equal(await page.evaluate(() => document.activeElement?.getAttribute("name")), "fullName");
+
+    await page.fill('[data-auth-form="signup"] input[name="fullName"]', "Owner Test");
+    await page.fill('[data-auth-form="signup"] input[name="email"]', "owner@example.com");
+    await page.fill('#signupPasswordConfirm', "rahasia123");
+    const failedSignup = page.waitForResponse((response) => response.url().endsWith("/api/auth/signup"));
+    await page.click('[data-auth-form="signup"] button[type="submit"]');
+    await failedSignup;
+    await page.waitForFunction(() => /gangguan/i.test(
+      document.querySelector('[data-auth-form="signup"] [data-form-error]')?.textContent || "",
+    ));
 
     const result = await page.evaluate(() => {
       const googleButton = document.querySelector("[data-google-login]");
@@ -135,6 +165,10 @@ for (const viewport of viewports) {
         inputFontSize: Number.parseFloat(getComputedStyle(firstInput).fontSize),
         inputHeight: firstInput.getBoundingClientRect().height,
         headerBackHeight: headerBack.getBoundingClientRect().height,
+        passwordToggleHeight: document.querySelector('[data-password-toggle]')
+          .getBoundingClientRect().height,
+        errorMessage: document.querySelector('[data-auth-form="signup"] [data-form-error]')
+          ?.textContent.trim(),
         cachedState: JSON.parse(localStorage.getItem("motovax_onboarding_v1")),
         recaptchaLinks: Array.from(document.querySelectorAll('.onboarding-recaptcha-disclosure a'))
           .map((link) => link.href),
@@ -158,6 +192,8 @@ for (const viewport of viewports) {
     assert.equal(result.hasLoginForm, false);
     assert.equal(result.hasLoginTab, false);
     assert.equal(result.title, "Buat akun baru");
+    assert.match(result.errorMessage, /layanan sedang mengalami gangguan/i);
+    assert.ok(result.passwordToggleHeight >= 44, JSON.stringify(result));
     if (viewport.width <= 980) {
       assert.ok(result.panelTop < viewport.height * 0.5, JSON.stringify(result));
       assert.ok(result.railHeight <= 80, JSON.stringify(result));
