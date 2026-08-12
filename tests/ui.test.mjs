@@ -222,6 +222,7 @@ for (const viewport of viewports) {
             id: "tenant-1",
             name: "Dealer Test",
             domain: "dealer-test.motovax.com",
+            ready: false,
             redirectUrl: "https://dealer-test.motovax.com/magic-login?token=test",
           },
         }),
@@ -298,11 +299,33 @@ for (const viewport of viewports) {
       overflow: document.documentElement.scrollWidth > document.documentElement.clientWidth,
       domain: document.querySelector("[data-summary-domain]")?.textContent,
       enterVisible: Boolean(document.querySelector("[data-open-workspace]")?.getBoundingClientRect().height),
+      enterDisabled: document.querySelector("[data-open-workspace]")?.disabled,
+      enterCursor: getComputedStyle(document.querySelector("[data-open-workspace]")).cursor,
+      enterBackground: getComputedStyle(document.querySelector("[data-open-workspace]")).backgroundColor,
+      enterShadow: getComputedStyle(document.querySelector("[data-open-workspace]")).boxShadow,
     }));
     assert.equal(result.overflow, false);
     assert.equal(result.domain, "dealer-test.motovax.com");
     assert.equal(result.enterVisible, true);
+    assert.equal(result.enterDisabled, true);
+    assert.equal(result.enterCursor, "not-allowed");
+    assert.equal(result.enterBackground, "rgb(226, 232, 240)");
+    assert.equal(result.enterShadow, "none");
     await page.screenshot({ path: `/tmp/motovax-tenant-${viewport.name}.png`, fullPage: false });
+
+    const readyResult = await page.evaluate(() => {
+      window.motovaxOnboarding.state.workspace.ready = true;
+      window.motovaxOnboarding.renderSummary();
+      const button = document.querySelector("[data-open-workspace]");
+      return {
+        disabled: button.disabled,
+        label: button.textContent.trim(),
+        backgroundImage: getComputedStyle(button).backgroundImage,
+      };
+    });
+    assert.equal(readyResult.disabled, false);
+    assert.match(readyResult.label, /Masuk ke workspace/);
+    assert.match(readyResult.backgroundImage, /linear-gradient/);
     await context.close();
   });
 
