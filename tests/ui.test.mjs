@@ -82,6 +82,7 @@ const viewports = [
   { name: "reported-1068", width: 1068, height: 693 },
   { name: "tablet", width: 834, height: 1112 },
   { name: "mobile", width: 390, height: 844 },
+  { name: "small-mobile", width: 320, height: 700 },
 ];
 
 for (const viewport of viewports) {
@@ -115,6 +116,10 @@ for (const viewport of viewports) {
     const result = await page.evaluate(() => {
       const googleButton = document.querySelector("[data-google-login]");
       const rect = googleButton.getBoundingClientRect();
+      const panelRect = document.querySelector(".onboarding-panel").getBoundingClientRect();
+      const railRect = document.querySelector(".onboarding-rail").getBoundingClientRect();
+      const firstInput = document.querySelector('[data-auth-form="signup"] input');
+      const headerBack = document.querySelector(".onboarding-link-muted");
       return {
         overflow: document.documentElement.scrollWidth > document.documentElement.clientWidth,
         googleHref: googleButton.href,
@@ -125,6 +130,11 @@ for (const viewport of viewports) {
         hasLoginForm: Boolean(document.querySelector("#authFormLogin")),
         hasLoginTab: Boolean(document.querySelector('[data-auth-mode="login"]')),
         title: document.querySelector("#onboardingPanelTitle")?.textContent.trim(),
+        panelTop: panelRect.top,
+        railHeight: railRect.height,
+        inputFontSize: Number.parseFloat(getComputedStyle(firstInput).fontSize),
+        inputHeight: firstInput.getBoundingClientRect().height,
+        headerBackHeight: headerBack.getBoundingClientRect().height,
         cachedState: JSON.parse(localStorage.getItem("motovax_onboarding_v1")),
         contentLinks: Array.from(document.querySelectorAll('a[href]'))
           .filter((link) => !link.matches('[data-google-login]') && !link.closest('[data-reset-form]'))
@@ -144,6 +154,16 @@ for (const viewport of viewports) {
     assert.equal(result.hasLoginForm, false);
     assert.equal(result.hasLoginTab, false);
     assert.equal(result.title, "Buat akun baru");
+    if (viewport.width <= 980) {
+      assert.ok(result.panelTop < viewport.height * 0.5, JSON.stringify(result));
+      assert.ok(result.railHeight <= 80, JSON.stringify(result));
+    }
+    if (viewport.width <= 720) {
+      assert.equal(result.inputFontSize, 16, JSON.stringify(result));
+      assert.ok(result.inputHeight >= 48, JSON.stringify(result));
+      assert.ok(result.googleHeight >= 48, JSON.stringify(result));
+      assert.ok(result.headerBackHeight >= 44, JSON.stringify(result));
+    }
     assert.equal(result.cachedState.completed, false, JSON.stringify(result.cachedState));
     assert.equal(result.cachedState.workspace, null);
     assert.ok(result.contentLinks.length > 0);
