@@ -69,6 +69,17 @@
   font-weight: 700;
 }
 
+.onboarding-recaptcha-disclosure {
+  display: block;
+  margin-top: 5px;
+}
+
+.onboarding-recaptcha-disclosure a {
+  color: #64748b;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
 @media (max-width: 480px) {
   .onboarding-header .header-inner,
   .onboarding-header-inner {
@@ -389,6 +400,10 @@
 }
 
 @media (max-width: 720px) {
+  .grecaptcha-badge {
+    visibility: hidden !important;
+  }
+
   .onboarding-page {
     padding: 20px 0 36px;
   }

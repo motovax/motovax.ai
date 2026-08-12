@@ -136,8 +136,12 @@ for (const viewport of viewports) {
         inputHeight: firstInput.getBoundingClientRect().height,
         headerBackHeight: headerBack.getBoundingClientRect().height,
         cachedState: JSON.parse(localStorage.getItem("motovax_onboarding_v1")),
+        recaptchaLinks: Array.from(document.querySelectorAll('.onboarding-recaptcha-disclosure a'))
+          .map((link) => link.href),
         contentLinks: Array.from(document.querySelectorAll('a[href]'))
-          .filter((link) => !link.matches('[data-google-login]') && !link.closest('[data-reset-form]'))
+          .filter((link) => !link.matches('[data-google-login]')
+            && !link.closest('[data-reset-form]')
+            && !link.closest('.onboarding-recaptcha-disclosure'))
           .map((link) => link.href),
       };
     });
@@ -166,6 +170,14 @@ for (const viewport of viewports) {
     }
     assert.equal(result.cachedState.completed, false, JSON.stringify(result.cachedState));
     assert.equal(result.cachedState.workspace, null);
+    assert.ok(
+      result.recaptchaLinks.some((href) => href.startsWith("https://policies.google.com/privacy")),
+      JSON.stringify(result.recaptchaLinks),
+    );
+    assert.ok(
+      result.recaptchaLinks.some((href) => href.startsWith("https://policies.google.com/terms")),
+      JSON.stringify(result.recaptchaLinks),
+    );
     assert.ok(result.contentLinks.length > 0);
     assert.ok(
       result.contentLinks.every((href) => href.startsWith("https://motovax.ai/")),

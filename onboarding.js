@@ -129,7 +129,11 @@
 
   function routeContentLinksToLanding() {
     qsa("a[href]").forEach(function (link) {
-      if (link.matches("[data-google-login]") || link.closest("[data-reset-form]")) return;
+      if (
+        link.matches("[data-google-login]") ||
+        link.closest("[data-reset-form]") ||
+        link.closest(".onboarding-recaptcha-disclosure")
+      ) return;
       var href = link.getAttribute("href");
       if (!href || /^(?:mailto:|tel:|javascript:)/i.test(href)) return;
       var target = new URL(href, "https://motovax.ai/");
