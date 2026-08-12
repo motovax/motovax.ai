@@ -2,12 +2,18 @@ import assert from "node:assert/strict";
 import crypto from "node:crypto";
 import { after, before, test } from "node:test";
 
-import { createApp } from "../server.mjs";
+import { createApp, verifyRecaptchaToken } from "../server.mjs";
 
 const oauthStates = new Map();
 const sessions = new Map();
+const passwordUsers = new Map();
+const actionTokens = new Map();
+const sentEmails = [];
 let server;
 let baseUrl;
+let authenticatedCookie = "";
+let accountState = { profile: null, workspaces: [] };
+const recaptchaTokens = [];
 
 const config = {
   nodeEnv: "test",
@@ -20,6 +26,15 @@ const config = {
   googleRedirectUri: "http://127.0.0.1/api/auth/google/callback",
   sessionSecret: "test-session-secret-with-at-least-32-characters",
   databaseUrl: "postgres://test",
+  tenantDomainSuffix: "motovax.com",
+  recaptchaProjectId: "motovax-test",
+  recaptchaSiteKey: "test-site-key",
+  recaptchaApiKey: "test-api-key",
+  recaptchaAction: "complete_onboarding",
+  recaptchaScoreThreshold: 0.5,
+  recaptchaExpectedHostname: "127.0.0.1",
+  onboardingTeamEmail: "team@motovax.com",
+  authEmailFrom: "onboarding@motovax.ai",
   trustProxy: false,
 };
 
@@ -46,6 +61,45 @@ const store = {
       avatar_url: profile.picture,
     };
   },
+  async createPasswordUser({ email, fullName, passwordHash }) {
+    if (passwordUsers.has(email)) {
+      const error = new Error("Akun dengan email tersebut sudah terdaftar.");
+      error.code = "account_exists";
+      throw error;
+    }
+    const user = {
+      id: crypto.randomUUID(),
+      email,
+      full_name: fullName,
+      avatar_url: "",
+      password_hash: passwordHash,
+      email_verified: false,
+    };
+    passwordUsers.set(email, user);
+    return user;
+  },
+  async findPasswordUser(email) {
+    return passwordUsers.get(email) || null;
+  },
+  async saveActionToken(record) {
+    actionTokens.set(`${record.actionType}:${record.digest}`, record.userId);
+  },
+  async takeActionToken({ digest, actionType }) {
+    const key = `${actionType}:${digest}`;
+    const userId = actionTokens.get(key);
+    actionTokens.delete(key);
+    if (userId && actionType === "verify_email") {
+      for (const user of passwordUsers.values()) {
+        if (user.id === userId) user.email_verified = true;
+      }
+    }
+    return userId || null;
+  },
+  async updatePassword(userId, passwordHash) {
+    for (const user of passwordUsers.values()) {
+      if (user.id === userId) user.password_hash = passwordHash;
+    }
+  },
   async createSession(record) {
     sessions.set(record.sessionDigest, {
       id: record.userId,
@@ -56,6 +110,22 @@ const store = {
   },
   async findSession(digest) {
     return sessions.get(digest) || null;
+  },
+  async getAccountState() {
+    return accountState;
+  },
+  async isSlugAvailable(slug) {
+    return slug !== "workspace-terpakai";
+  },
+  async saveMeetingRequest({ scheduledFor, timezone }) {
+    const meeting = {
+      id: "meeting-1",
+      scheduled_for: scheduledFor,
+      timezone,
+      status: "requested",
+    };
+    accountState = { profile: null, workspaces: [], meeting };
+    return meeting;
   },
   async revokeSession(digest) {
     sessions.delete(digest);
@@ -106,7 +176,21 @@ function digest(value) {
 }
 
 before(async () => {
-  const app = createApp({ config, store, oauthClient });
+  const app = createApp({
+    config,
+    store,
+    oauthClient,
+    mailer: { async sendMail(message) { sentEmails.push(message); } },
+    recaptchaVerifier: async (_config, token) => {
+      recaptchaTokens.push(token);
+      if (token !== "valid-recaptcha-token") {
+        const error = new Error("Verifikasi keamanan tidak valid.");
+        error.code = "recaptcha_invalid";
+        throw error;
+      }
+      return { score: 0.9 };
+    },
+  });
   await new Promise((resolve) => {
     server = app.listen(0, "127.0.0.1", resolve);
   });
@@ -124,8 +208,56 @@ test("health menyatakan OAuth siap", async () => {
   assert.deepEqual(await response.json(), {
     status: "ok",
     oauthReady: true,
+    recaptchaReady: true,
     missing: [],
   });
+});
+
+test("config publik hanya mengekspos site key dan action reCAPTCHA", async () => {
+  const response = await fetch(`${baseUrl}/api/config`);
+  assert.equal(response.status, 200);
+  const payload = await response.json();
+  assert.deepEqual(payload, {
+    recaptcha: {
+      enabled: true,
+      siteKey: "test-site-key",
+      action: "complete_onboarding",
+    },
+  });
+  assert.equal(JSON.stringify(payload).includes(config.recaptchaApiKey), false);
+});
+
+test("assessment reCAPTCHA memvalidasi action, hostname, dan skor", async () => {
+  const validFetch = async (_url, options) => {
+    const body = JSON.parse(options.body);
+    assert.equal(body.event.token, "browser-token");
+    assert.equal(body.event.expectedAction, "complete_onboarding");
+    return new Response(JSON.stringify({
+      tokenProperties: {
+        valid: true,
+        action: "complete_onboarding",
+        hostname: "127.0.0.1",
+      },
+      riskAnalysis: { score: 0.9 },
+    }), { status: 200, headers: { "content-type": "application/json" } });
+  };
+  assert.deepEqual(await verifyRecaptchaToken(config, "browser-token", validFetch), { score: 0.9 });
+
+  await assert.rejects(
+    verifyRecaptchaToken(config, "browser-token", async () => new Response(JSON.stringify({
+      tokenProperties: { valid: true, action: "other_action", hostname: "127.0.0.1" },
+      riskAnalysis: { score: 0.9 },
+    }), { status: 200 })),
+    { code: "recaptcha_invalid" },
+  );
+
+  await assert.rejects(
+    verifyRecaptchaToken(config, "browser-token", async () => new Response(JSON.stringify({
+      tokenProperties: { valid: true, action: "complete_onboarding", hostname: "127.0.0.1" },
+      riskAnalysis: { score: 0.2 },
+    }), { status: 200 })),
+    { code: "recaptcha_low_score" },
+  );
 });
 
 test("start membuat state, nonce, PKCE, dan cookie HttpOnly", async () => {
@@ -141,6 +273,45 @@ test("start membuat state, nonce, PKCE, dan cookie HttpOnly", async () => {
   assert.ok(location.searchParams.get("nonce"));
   assert.match(response.headers.get("set-cookie"), /HttpOnly/i);
   assert.match(response.headers.get("set-cookie"), /SameSite=Lax/i);
+});
+
+test("daftar dan login email/password memakai kredensial nyata", async () => {
+  const signup = await fetch(`${baseUrl}/api/auth/signup`, {
+    method: "POST",
+    headers: { "content-type": "application/json", origin: "http://127.0.0.1" },
+    body: JSON.stringify({
+      fullName: "Password User",
+      email: "password@example.com",
+      password: "rahasia123",
+    }),
+  });
+  assert.equal(signup.status, 202);
+  const signupBody = await signup.json();
+  assert.equal(signupBody.email, "password@example.com");
+  assert.equal(signupBody.verificationRequired, true);
+  assert.equal(sentEmails.length, 1);
+  assert.equal(sentEmails[0].from, "MOTOVAX <onboarding@motovax.ai>");
+
+  const verificationUrl = sentEmails[0].text.match(/http:\/\/127\.0\.0\.1\/api\/auth\/verify-email\?token=[^\s]+/)[0];
+  const verificationTarget = new URL(verificationUrl);
+  const verification = await fetch(`${baseUrl}${verificationTarget.pathname}${verificationTarget.search}`, { redirect: "manual" });
+  assert.equal(verification.status, 302);
+  assert.match(verification.headers.get("location"), /email=verified/);
+
+  const invalid = await fetch(`${baseUrl}/api/auth/login`, {
+    method: "POST",
+    headers: { "content-type": "application/json", origin: "http://127.0.0.1" },
+    body: JSON.stringify({ email: "password@example.com", password: "salah123" }),
+  });
+  assert.equal(invalid.status, 401);
+
+  const login = await fetch(`${baseUrl}/api/auth/login`, {
+    method: "POST",
+    headers: { "content-type": "application/json", origin: "http://127.0.0.1" },
+    body: JSON.stringify({ email: "password@example.com", password: "rahasia123" }),
+  });
+  assert.equal(login.status, 200);
+  assert.equal((await login.json()).authenticated, true);
 });
 
 test("callback menolak state yang tidak cocok", async () => {
@@ -178,6 +349,7 @@ test("callback membuat session dan endpoint me mengembalikan user", async () => 
     "motovax_session",
   );
   assert.ok(sessionToken);
+  authenticatedCookie = `motovax_session=${encodeURIComponent(sessionToken)}`;
   assert.ok(sessions.has(digest(sessionToken)));
 
   const me = await fetch(`${baseUrl}/api/auth/me`, {
@@ -193,5 +365,67 @@ test("callback membuat session dan endpoint me mengembalikan user", async () => 
       avatarUrl: "https://example.com/avatar.png",
       provider: "google",
     },
+    profile: null,
+    workspaces: [],
   });
+});
+
+test("availability workspace menolak nama yang sudah dipakai", async () => {
+  const unavailable = await fetch(`${baseUrl}/api/onboarding/slug?slug=workspace-terpakai`, {
+    headers: { cookie: authenticatedCookie },
+  });
+  assert.equal(unavailable.status, 200);
+  assert.equal((await unavailable.json()).available, false);
+
+  const available = await fetch(`${baseUrl}/api/onboarding/slug?slug=workspace-baru`, {
+    headers: { cookie: authenticatedCookie },
+  });
+  assert.equal(available.status, 200);
+  const payload = await available.json();
+  assert.equal(payload.available, true);
+  assert.equal(payload.domain, "workspace-baru.motovax.com");
+});
+
+test("penyelesaian onboarding ditolak sebelum provisioning tanpa token reCAPTCHA valid", async () => {
+  accountState = { profile: { modules: ["ims"] }, workspaces: [] };
+  const response = await fetch(`${baseUrl}/api/onboarding/complete`, {
+    method: "POST",
+    headers: {
+      cookie: authenticatedCookie,
+      origin: "http://127.0.0.1",
+      "content-type": "application/json",
+    },
+    body: "{}",
+  });
+  assert.equal(response.status, 400);
+  assert.equal((await response.json()).error, "recaptcha_invalid");
+  assert.deepEqual(recaptchaTokens, [""]);
+});
+
+test("jalur bersama tim menyimpan jadwal meeting dan mengirim notifikasi", async () => {
+  const date = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000);
+  while ([0, 6].includes(date.getUTCDay())) date.setUTCDate(date.getUTCDate() + 1);
+  const dateText = date.toISOString().slice(0, 10);
+  const response = await fetch(`${baseUrl}/api/onboarding/meeting`, {
+    method: "POST",
+    headers: {
+      cookie: authenticatedCookie,
+      origin: "http://127.0.0.1",
+      "content-type": "application/json",
+    },
+    body: JSON.stringify({
+      date: dateText,
+      time: "10:30",
+      timezone: "Asia/Jakarta",
+      recaptchaToken: "valid-recaptcha-token",
+    }),
+  });
+  assert.equal(response.status, 201);
+  const payload = await response.json();
+  assert.equal(payload.meeting.id, "meeting-1");
+  assert.equal(payload.meeting.timezone, "Asia/Jakarta");
+  assert.equal(payload.meeting.status, "requested");
+  assert.equal(recaptchaTokens.at(-1), "valid-recaptcha-token");
+  assert.equal(sentEmails.at(-2).to, "team@motovax.com");
+  assert.equal(sentEmails.at(-1).to, "user@example.com");
 });

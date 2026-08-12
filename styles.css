@@ -18693,6 +18693,19 @@ body.feature-image-open { overflow: hidden; }
   margin-top: 22px;
 }
 
+.onboarding-ready-actions .btn:disabled {
+  color: #64748b;
+  background: #e2e8f0;
+  border: 1px solid #cbd5e1;
+  box-shadow: none;
+  cursor: not-allowed;
+  opacity: 1;
+}
+
+.onboarding-ready-actions .btn:disabled:hover {
+  transform: none;
+}
+
 .onboarding-reset-link {
   margin-left: auto;
   padding: 0;

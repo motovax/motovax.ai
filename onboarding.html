@@ -6,7 +6,7 @@
     <title>Mulai Coba MOTOVAX — Onboarding User Baru</title>
     <meta
       name="description"
-      content="Daftar atau login, isi profil bisnis, pilih modul prioritas, dan mulai coba MOTOVAX dalam hitungan menit."
+      content="Daftar akun, isi profil bisnis, pilih modul prioritas, dan mulai coba MOTOVAX dalam hitungan menit."
     />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -14,18 +14,18 @@
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="./styles.css?v=copy-20260811" />
-    <link rel="stylesheet" href="./onboarding-auth.css?v=oauth-20260810" />
+    <link rel="stylesheet" href="./styles.css?v=workspace-disabled-20260812" />
+    <link rel="stylesheet" href="./onboarding-auth.css?v=password-eye-20260812" />
   </head>
   <body class="onboarding-body">
     <header class="site-header onboarding-header">
       <div class="container header-inner onboarding-header-inner">
-        <a class="brand" href="./index.html#top" aria-label="MOTOVAX home">
+        <a class="brand" href="https://motovax.ai/#top" aria-label="MOTOVAX home">
           <span>MOTO</span><strong>VAX</strong>
         </a>
         <div class="onboarding-header-actions">
-          <a class="onboarding-link-muted" href="./index.html">← Kembali ke beranda</a>
-          <a class="btn btn-secondary header-cta" href="./index.html#kontak">Jadwalkan Demo</a>
+          <a class="onboarding-link-muted" href="https://motovax.ai/">← Kembali ke beranda</a>
+          <a class="btn btn-secondary header-cta" href="https://motovax.ai/#kontak">Jadwalkan Demo</a>
         </div>
       </div>
     </header>
@@ -37,8 +37,8 @@
             Siapkan ruang kerja bisnis Anda
           </h1>
           <p>
-            Daftar atau masuk, lengkapi profil bisnis, lalu pilih modul prioritas. Data demo
-            disimpan di browser Anda.
+            Satu alur untuk daftar akun, profil bisnis, dan modul prioritas — selaras dengan
+            Command Center MOTOVAX. Progress tersimpan aman pada akun Anda.
           </p>
 
           <ol class="onboarding-rail" data-onboarding-rail aria-label="Progress langkah">
@@ -46,28 +46,35 @@
               <i>1</i>
               <div>
                 <b>Akun</b>
-                <small>Daftar atau login</small>
+                <small>Daftar akun</small>
               </div>
             </li>
             <li data-rail-step="2">
               <i>2</i>
               <div>
-                <b>Profil bisnis</b>
-                <small>Organisasi &amp; cabang</small>
+                <b>Cara onboarding</b>
+                <small>Mandiri atau bersama tim</small>
               </div>
             </li>
             <li data-rail-step="3">
               <i>3</i>
               <div>
-                <b>Modul prioritas</b>
-                <small>Fokus first value</small>
+                <b>Profil bisnis</b>
+                <small>Organisasi &amp; cabang</small>
               </div>
             </li>
             <li data-rail-step="4">
               <i>4</i>
               <div>
+                <b>Modul prioritas</b>
+                <small>Fokus first value</small>
+              </div>
+            </li>
+            <li data-rail-step="5">
+              <i>5</i>
+              <div>
                 <b>Siap coba</b>
-                <small>Masuk ke platform</small>
+                <small>Workspace atau meeting</small>
               </div>
             </li>
           </ol>
@@ -91,7 +98,7 @@
               <span>✓</span>
               <div>
                 <b>Bisa dilanjutkan nanti</b>
-                <small>Progress tersimpan di perangkat ini (localStorage).</small>
+                <small>Progress tersimpan pada akun dan dapat dilanjutkan kembali.</small>
               </div>
             </li>
           </ul>
@@ -106,42 +113,16 @@
           <div class="onboarding-step is-active" data-step="1">
             <header class="onboarding-step-head">
               <span>LANGKAH 1 · AKUN</span>
-              <h2 id="onboardingPanelTitle">Masuk atau buat akun baru</h2>
+              <h2 id="onboardingPanelTitle">Buat akun baru</h2>
               <p data-auth-lead>
-                Gunakan email kerja Anda. Mode demo — tidak mengirim email verifikasi nyata.
+                Buat akun Motovax menggunakan email kerja atau akun Google Anda.
               </p>
             </header>
-
-            <div class="onboarding-auth-tabs" role="tablist" aria-label="Mode akun">
-              <button
-                type="button"
-                class="is-active"
-                role="tab"
-                id="authTabSignup"
-                aria-selected="true"
-                aria-controls="authFormSignup"
-                data-auth-mode="signup"
-              >
-                Daftar
-              </button>
-              <button
-                type="button"
-                role="tab"
-                id="authTabLogin"
-                aria-selected="false"
-                aria-controls="authFormLogin"
-                data-auth-mode="login"
-              >
-                Login
-              </button>
-            </div>
 
             <form
               class="onboarding-form"
               id="authFormSignup"
               data-auth-form="signup"
-              role="tabpanel"
-              aria-labelledby="authTabSignup"
               novalidate
             >
               <label>
@@ -153,46 +134,67 @@
                 <input type="email" name="email" autocomplete="email" placeholder="nama@perusahaan.com" required />
               </label>
               <div class="onboarding-form-row">
-                <label>
-                  <span>Password</span>
-                  <input type="password" name="password" autocomplete="new-password" placeholder="Min. 8 karakter" minlength="8" required />
-                </label>
-                <label>
-                  <span>Konfirmasi</span>
-                  <input type="password" name="passwordConfirm" autocomplete="new-password" placeholder="Ulangi password" minlength="8" required />
-                </label>
+                <div class="onboarding-field">
+                  <label for="signupPassword">Password</label>
+                  <div class="onboarding-password-control">
+                    <input id="signupPassword" type="password" name="password" autocomplete="new-password" placeholder="Min. 8 karakter + angka" minlength="8" required />
+                    <button type="button" data-password-toggle data-password-label="password" aria-controls="signupPassword" aria-label="Tampilkan password" aria-pressed="false">
+                      <svg class="password-icon password-icon-show" viewBox="0 0 24 24" aria-hidden="true"><path d="M2.1 12s3.6-6 9.9-6 9.9 6 9.9 6-3.6 6-9.9 6-9.9-6-9.9-6Z"/><circle cx="12" cy="12" r="3"/></svg>
+                      <svg class="password-icon password-icon-hide" viewBox="0 0 24 24" aria-hidden="true"><path d="m3 3 18 18M10.6 6.1A10.8 10.8 0 0 1 12 6c6.3 0 9.9 6 9.9 6a18 18 0 0 1-2.5 3.2M6.2 6.2C3.6 8 2.1 12 2.1 12s3.6 6 9.9 6a10.4 10.4 0 0 0 4-.8M9.9 9.9a3 3 0 0 0 4.2 4.2"/></svg>
+                    </button>
+                  </div>
+                </div>
+                <div class="onboarding-field">
+                  <label for="signupPasswordConfirm">Konfirmasi</label>
+                  <div class="onboarding-password-control">
+                    <input id="signupPasswordConfirm" type="password" name="passwordConfirm" autocomplete="new-password" placeholder="Ulangi password" minlength="8" required />
+                    <button type="button" data-password-toggle data-password-label="konfirmasi password" aria-controls="signupPasswordConfirm" aria-label="Tampilkan konfirmasi password" aria-pressed="false">
+                      <svg class="password-icon password-icon-show" viewBox="0 0 24 24" aria-hidden="true"><path d="M2.1 12s3.6-6 9.9-6 9.9 6 9.9 6-3.6 6-9.9 6-9.9-6-9.9-6Z"/><circle cx="12" cy="12" r="3"/></svg>
+                      <svg class="password-icon password-icon-hide" viewBox="0 0 24 24" aria-hidden="true"><path d="m3 3 18 18M10.6 6.1A10.8 10.8 0 0 1 12 6c6.3 0 9.9 6 9.9 6a18 18 0 0 1-2.5 3.2M6.2 6.2C3.6 8 2.1 12 2.1 12s3.6 6 9.9 6a10.4 10.4 0 0 0 4-.8M9.9 9.9a3 3 0 0 0 4.2 4.2"/></svg>
+                    </button>
+                  </div>
+                </div>
               </div>
-              <p class="onboarding-form-error" data-form-error hidden></p>
+              <p class="onboarding-form-error" data-form-error role="alert" aria-live="assertive" hidden></p>
               <div class="onboarding-step-actions">
                 <span class="onboarding-hint">
-                  Dengan lanjut, Anda menyetujui <a href="./syarat-ketentuan.html">Syarat &amp; Ketentuan</a>
-                  dan <a href="./kebijakan-privasi.html">Kebijakan Privasi</a> MOTOVAX.
+                  Dengan lanjut, Anda menyetujui <a href="https://motovax.ai/syarat-ketentuan.html">Syarat &amp; Ketentuan</a>
+                  dan <a href="https://motovax.ai/kebijakan-privasi.html">Kebijakan Privasi</a> MOTOVAX.
+                  <span class="onboarding-recaptcha-disclosure">
+                    This site is protected by reCAPTCHA and the Google
+                    <a href="https://policies.google.com/privacy">Privacy Policy</a> and
+                    <a href="https://policies.google.com/terms">Terms of Service</a> apply.
+                  </span>
                 </span>
-                <button type="submit" class="btn btn-primary">Lanjut ke profil <span>→</span></button>
+                <button type="submit" class="btn btn-primary" data-loading-label="Membuat akun…">Lanjut ke profil <span>→</span></button>
               </div>
             </form>
 
-            <form
-              class="onboarding-form"
-              id="authFormLogin"
-              data-auth-form="login"
-              role="tabpanel"
-              aria-labelledby="authTabLogin"
-              hidden
-              novalidate
-            >
-              <label>
-                <span>Email</span>
-                <input type="email" name="email" autocomplete="email" placeholder="nama@perusahaan.com" required />
-              </label>
-              <label>
-                <span>Password</span>
-                <input type="password" name="password" autocomplete="current-password" placeholder="Password Anda" required />
-              </label>
-              <p class="onboarding-form-error" data-form-error hidden></p>
+            <form class="onboarding-form" data-reset-form hidden novalidate>
+              <div class="onboarding-field">
+                <label for="resetPassword">Password baru</label>
+                <div class="onboarding-password-control">
+                  <input id="resetPassword" type="password" name="password" autocomplete="new-password" placeholder="Min. 8 karakter + angka" minlength="8" required />
+                  <button type="button" data-password-toggle data-password-label="password baru" aria-controls="resetPassword" aria-label="Tampilkan password baru" aria-pressed="false">
+                    <svg class="password-icon password-icon-show" viewBox="0 0 24 24" aria-hidden="true"><path d="M2.1 12s3.6-6 9.9-6 9.9 6 9.9 6-3.6 6-9.9 6-9.9-6-9.9-6Z"/><circle cx="12" cy="12" r="3"/></svg>
+                    <svg class="password-icon password-icon-hide" viewBox="0 0 24 24" aria-hidden="true"><path d="m3 3 18 18M10.6 6.1A10.8 10.8 0 0 1 12 6c6.3 0 9.9 6 9.9 6a18 18 0 0 1-2.5 3.2M6.2 6.2C3.6 8 2.1 12 2.1 12s3.6 6 9.9 6a10.4 10.4 0 0 0 4-.8M9.9 9.9a3 3 0 0 0 4.2 4.2"/></svg>
+                  </button>
+                </div>
+              </div>
+              <div class="onboarding-field">
+                <label for="resetPasswordConfirm">Konfirmasi password baru</label>
+                <div class="onboarding-password-control">
+                  <input id="resetPasswordConfirm" type="password" name="passwordConfirm" autocomplete="new-password" placeholder="Ulangi password" minlength="8" required />
+                  <button type="button" data-password-toggle data-password-label="konfirmasi password baru" aria-controls="resetPasswordConfirm" aria-label="Tampilkan konfirmasi password baru" aria-pressed="false">
+                    <svg class="password-icon password-icon-show" viewBox="0 0 24 24" aria-hidden="true"><path d="M2.1 12s3.6-6 9.9-6 9.9 6 9.9 6-3.6 6-9.9 6-9.9-6-9.9-6Z"/><circle cx="12" cy="12" r="3"/></svg>
+                    <svg class="password-icon password-icon-hide" viewBox="0 0 24 24" aria-hidden="true"><path d="m3 3 18 18M10.6 6.1A10.8 10.8 0 0 1 12 6c6.3 0 9.9 6 9.9 6a18 18 0 0 1-2.5 3.2M6.2 6.2C3.6 8 2.1 12 2.1 12s3.6 6 9.9 6a10.4 10.4 0 0 0 4-.8M9.9 9.9a3 3 0 0 0 4.2 4.2"/></svg>
+                  </button>
+                </div>
+              </div>
+              <p class="onboarding-form-error" data-form-error role="alert" aria-live="assertive" hidden></p>
               <div class="onboarding-step-actions">
-                <button type="button" class="btn btn-secondary" data-auth-forgot>Lupa password?</button>
-                <button type="submit" class="btn btn-primary">Login &amp; lanjut <span>→</span></button>
+                <a class="btn btn-secondary" href="./onboarding.html">Batal</a>
+                <button type="submit" class="btn btn-primary" data-loading-label="Menyimpan password…">Simpan password <span>→</span></button>
               </div>
             </form>
 
@@ -226,22 +228,101 @@
                   d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"
                 />
               </svg>
-              Lanjutkan dengan Google
+              Daftar dengan Google
             </a>
           </div>
 
-          <!-- STEP 2: Business -->
+          <!-- STEP 2: Onboarding path -->
           <div class="onboarding-step" data-step="2" hidden>
             <header class="onboarding-step-head">
-              <span>LANGKAH 2 · PROFIL BISNIS</span>
+              <span>LANGKAH 2 · CARA ONBOARDING</span>
+              <h2>Pilih cara memulai Motovax</h2>
+              <p>Lanjutkan sendiri sekarang atau jadwalkan sesi bersama tim Motovax.</p>
+            </header>
+
+            <div class="onboarding-path-grid">
+              <button type="button" class="onboarding-path-card" data-onboarding-choice="self">
+                <span class="onboarding-path-icon">01</span>
+                <strong>Onboarding sendiri</strong>
+                <small>Isi profil, pilih modul, dan buat workspace langsung dari portal ini.</small>
+                <b>Lanjutkan mandiri →</b>
+              </button>
+              <button type="button" class="onboarding-path-card" data-onboarding-choice="team">
+                <span class="onboarding-path-icon">02</span>
+                <strong>Bersama tim Motovax</strong>
+                <small>Pilih jadwal untuk membahas kebutuhan, modul, dan konfigurasi awal.</small>
+                <b>Pilih jadwal →</b>
+              </button>
+            </div>
+
+            <div class="onboarding-step-actions onboarding-path-actions" data-path-actions>
+              <button type="button" class="btn btn-secondary" data-path-back-account>← Kembali</button>
+            </div>
+
+            <form class="onboarding-form onboarding-meeting-form" data-meeting-form hidden novalidate>
+              <div class="onboarding-meeting-head">
+                <div>
+                  <span>JADWALKAN MEETING</span>
+                  <h3>Pilih waktu yang nyaman</h3>
+                  <p>Pilih hari Senin–Jumat dalam zona waktu WIB.</p>
+                </div>
+                <button type="button" class="onboarding-link-button" data-meeting-cancel>Ganti pilihan</button>
+              </div>
+              <div class="onboarding-form-row">
+                <label>
+                  <span>Tanggal meeting</span>
+                  <input type="date" name="date" required />
+                </label>
+                <label>
+                  <span>Waktu (WIB)</span>
+                  <select name="time" required>
+                    <option value="">Pilih waktu</option>
+                    <option value="09:00">09.00 WIB</option>
+                    <option value="10:30">10.30 WIB</option>
+                    <option value="13:30">13.30 WIB</option>
+                    <option value="15:00">15.00 WIB</option>
+                  </select>
+                </label>
+              </div>
+              <p class="onboarding-form-error" data-form-error role="alert" aria-live="assertive" hidden></p>
+              <div class="onboarding-step-actions">
+                <button type="button" class="btn btn-secondary" data-meeting-back-account>← Kembali</button>
+                <small class="onboarding-hint">
+                  Tim Motovax akan mengirim konfirmasi dan detail meeting ke email akun Anda.
+                  <span class="onboarding-recaptcha-disclosure">
+                    This site is protected by reCAPTCHA and the Google
+                    <a href="https://policies.google.com/privacy">Privacy Policy</a> and
+                    <a href="https://policies.google.com/terms">Terms of Service</a> apply.
+                  </span>
+                </small>
+                <button type="submit" class="btn btn-primary" data-loading-label="Mengirim jadwal…">Ajukan jadwal meeting <span>→</span></button>
+              </div>
+            </form>
+          </div>
+
+          <!-- STEP 3: Business -->
+          <div class="onboarding-step" data-step="3" hidden>
+            <header class="onboarding-step-head">
+              <span>LANGKAH 3 · PROFIL BISNIS</span>
               <h2>Ceritakan bisnis Anda</h2>
-              <p>Data ini menyesuaikan label KPI, funnel, dan modul di workspace demo.</p>
+              <p>Data ini digunakan untuk membuat workspace dan konfigurasi awal tenant Anda.</p>
             </header>
 
             <form class="onboarding-form" data-business-form novalidate>
               <label>
                 <span>Nama bisnis / brand</span>
                 <input type="text" name="businessName" placeholder="Contoh: PT Nusantara Digital" required />
+              </label>
+
+              <label>
+                <span>Nama workspace</span>
+                <div class="onboarding-domain-input">
+                  <input type="text" name="workspaceSlug" minlength="3" maxlength="40" pattern="[a-z0-9-]+" placeholder="pilih-nama-workspace" aria-describedby="workspaceSlugStatus" required />
+                  <span>.motovax.com</span>
+                </div>
+                <small class="onboarding-field-help" id="workspaceSlugStatus" data-slug-status aria-live="polite">
+                  Isi sendiri 3–40 karakter: huruf kecil, angka, dan tanda hubung.
+                </small>
               </label>
 
               <div class="onboarding-form-row">
@@ -291,20 +372,20 @@
                 <textarea name="description" rows="2" maxlength="240" placeholder="Contoh: Retail multi-cabang, fokus omnichannel &amp; follow-up lead…"></textarea>
               </label>
 
-              <p class="onboarding-form-error" data-form-error hidden></p>
+              <p class="onboarding-form-error" data-form-error role="alert" aria-live="assertive" hidden></p>
               <div class="onboarding-step-actions">
                 <button type="button" class="btn btn-secondary" data-step-back>← Kembali</button>
-                <button type="submit" class="btn btn-primary">Lanjut pilih modul <span>→</span></button>
+                <button type="submit" class="btn btn-primary" data-loading-label="Menyimpan profil…">Lanjut pilih modul <span>→</span></button>
               </div>
             </form>
           </div>
 
-          <!-- STEP 3: Modules -->
-          <div class="onboarding-step" data-step="3" hidden>
+          <!-- STEP 4: Modules -->
+          <div class="onboarding-step" data-step="4" hidden>
             <header class="onboarding-step-head">
-              <span>LANGKAH 3 · MODUL PRIORITAS</span>
+              <span>LANGKAH 4 · MODUL PRIORITAS</span>
               <h2>Apa yang ingin Anda coba dulu?</h2>
-              <p>Pilih minimal satu. Anda bisa mengubahnya kapan saja di dashboard demo.</p>
+              <p>Pilih minimal satu. Pilihan ini menjadi konfigurasi awal workspace Anda.</p>
             </header>
 
             <form class="onboarding-form" data-modules-form novalidate>
@@ -315,6 +396,7 @@
                   <span class="onboarding-module-icon">IM</span>
                   <b>Inventory Management</b>
                   <small>Stok live multi-lokasi, reservasi, upload data</small>
+                </label>
                 <label class="onboarding-module-card">
                   <input type="checkbox" name="modules" value="omni" checked />
                   <span class="onboarding-module-check" aria-hidden="true"></span>
@@ -362,27 +444,37 @@
                 </div>
               </fieldset>
 
-              <p class="onboarding-form-error" data-form-error hidden></p>
-              <div class="onboarding-step-actions">
-                <button type="button" class="btn btn-secondary" data-step-back>← Kembali</button>
-                <button type="submit" class="btn btn-primary">Selesaikan setup <span>→</span></button>
+              <p class="onboarding-form-error" data-form-error role="alert" aria-live="assertive" hidden></p>
+              <div class="onboarding-step-actions onboarding-module-actions">
+                <button type="button" class="btn btn-secondary onboarding-module-back" data-step-back>← Kembali</button>
+                <div class="onboarding-complete-action">
+                  <small class="onboarding-hint onboarding-recaptcha-disclosure">
+                    This site is protected by reCAPTCHA and the Google
+                    <a href="https://policies.google.com/privacy">Privacy Policy</a> and
+                    <a href="https://policies.google.com/terms">Terms of Service</a> apply.
+                  </small>
+                  <button type="submit" class="btn btn-primary onboarding-finish-button" data-loading-label="Menyiapkan workspace…">
+                    <span>Selesaikan setup</span>
+                    <i aria-hidden="true">→</i>
+                  </button>
+                </div>
               </div>
             </form>
           </div>
 
-          <!-- STEP 4: Ready -->
-          <div class="onboarding-step" data-step="4" hidden>
+          <!-- STEP 5: Ready -->
+          <div class="onboarding-step" data-step="5" hidden>
             <header class="onboarding-step-head">
-              <span>LANGKAH 4 · SIAP</span>
-              <h2>Workspace Anda siap dicoba</h2>
-              <p>Ringkasan preferensi. Lanjut ke demo interaktif di landing atau hubungi tim kami.</p>
+              <span>LANGKAH 5 · SIAP</span>
+              <h2 data-ready-title>Workspace Anda siap digunakan</h2>
+              <p data-ready-copy>Tenant, domain, akun owner, dan konfigurasi awal berhasil dibuat.</p>
             </header>
 
-            <div class="onboarding-success-card" data-success-summary>
+            <div class="onboarding-success-card" data-workspace-summary>
               <div class="onboarding-success-hero">
-                <span class="onboarding-success-badge">Demo ready</span>
+                <span class="onboarding-success-badge" data-workspace-status>Menyiapkan domain</span>
                 <h3 data-summary-name>Bisnis Anda</h3>
-                <p data-summary-user>Siap masuk sebagai user demo</p>
+                <p data-summary-user>Siap masuk sebagai owner</p>
               </div>
               <dl class="onboarding-summary-grid">
                 <div>
@@ -401,6 +493,10 @@
                   <dt>Target</dt>
                   <dd data-summary-goal>Tingkatkan konversi</dd>
                 </div>
+                <div>
+                  <dt>Workspace</dt>
+                  <dd data-summary-domain>—</dd>
+                </div>
               </dl>
               <div>
                 <span class="onboarding-summary-label">Modul aktif</span>
@@ -408,16 +504,43 @@
               </div>
             </div>
 
-            <div class="onboarding-ready-actions">
-              <a class="btn btn-primary" href="./index.html#solusi" data-open-demo>
-                Mulai coba di dashboard <span>→</span>
-              </a>
-              <a class="btn btn-secondary" href="./index.html#kontak" data-wa>
+            <div class="onboarding-success-card onboarding-meeting-summary" data-meeting-summary hidden>
+              <div class="onboarding-success-hero">
+                <span class="onboarding-success-badge">MENUNGGU KONFIRMASI TIM</span>
+                <h3>Jadwal pilihan Anda sudah diterima</h3>
+                <p data-meeting-user>Konfirmasi akan dikirim melalui email.</p>
+              </div>
+              <dl class="onboarding-summary-grid">
+                <div>
+                  <dt>Tanggal &amp; waktu</dt>
+                  <dd data-meeting-datetime>—</dd>
+                </div>
+                <div>
+                  <dt>Zona waktu</dt>
+                  <dd>WIB · Asia/Jakarta</dd>
+                </div>
+                <div>
+                  <dt>Status</dt>
+                  <dd>Menunggu konfirmasi tim Motovax</dd>
+                </div>
+              </dl>
+            </div>
+
+            <div class="onboarding-ready-actions" data-workspace-actions>
+              <button class="btn btn-primary" type="button" data-open-workspace disabled>
+                Masuk ke workspace <span>→</span>
+              </button>
+              <a class="btn btn-secondary" href="https://motovax.ai/#kontak">
                 Jadwalkan demo live
               </a>
-              <button type="button" class="onboarding-reset-link" data-onboarding-reset>
-                Ulangi onboarding
+            </div>
+            <div class="onboarding-ready-actions" data-meeting-actions hidden>
+              <button class="btn btn-primary" type="button" data-change-meeting>
+                Ubah jadwal pilihan
               </button>
+              <a class="btn btn-secondary" href="https://motovax.ai/">
+                Kembali ke motovax.ai
+              </a>
             </div>
           </div>
         </section>
@@ -427,10 +550,10 @@
     <footer class="onboarding-footer">
       <div class="container">
         <span>© <span data-year></span> MOTOVAX</span>
-        <a href="./modul.html">Lihat breakdown modul</a>
-        <a href="./kebijakan-privasi.html">Kebijakan Privasi</a>
-        <a href="./syarat-ketentuan.html">Syarat &amp; Ketentuan</a>
-        <a href="./index.html#kontak">Butuh bantuan?</a>
+        <a href="https://motovax.ai/modul.html">Lihat breakdown modul</a>
+        <a href="https://motovax.ai/kebijakan-privasi.html">Kebijakan Privasi</a>
+        <a href="https://motovax.ai/syarat-ketentuan.html">Syarat &amp; Ketentuan</a>
+        <a href="https://motovax.ai/#kontak">Butuh bantuan?</a>
       </div>
     </footer>
 
@@ -443,6 +566,6 @@
     </div>
 
     <script src="./script.js?v=onb-20260808b"></script>
-    <script src="./onboarding.js?v=oauth-20260810"></script>
+    <script src="./onboarding.js?v=password-eye-20260812"></script>
   </body>
 </html>
