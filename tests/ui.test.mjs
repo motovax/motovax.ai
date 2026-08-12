@@ -167,6 +167,8 @@ for (const viewport of viewports) {
         headerBackHeight: headerBack.getBoundingClientRect().height,
         passwordToggleHeight: document.querySelector('[data-password-toggle]')
           .getBoundingClientRect().height,
+        passwordToggleText: document.querySelector('[data-password-toggle]').textContent.trim(),
+        passwordToggleIcons: document.querySelector('[data-password-toggle]').querySelectorAll('svg').length,
         errorMessage: document.querySelector('[data-auth-form="signup"] [data-form-error]')
           ?.textContent.trim(),
         cachedState: JSON.parse(localStorage.getItem("motovax_onboarding_v1")),
@@ -194,6 +196,8 @@ for (const viewport of viewports) {
     assert.equal(result.title, "Buat akun baru");
     assert.match(result.errorMessage, /layanan sedang mengalami gangguan/i);
     assert.ok(result.passwordToggleHeight >= 44, JSON.stringify(result));
+    assert.equal(result.passwordToggleText, "", JSON.stringify(result));
+    assert.equal(result.passwordToggleIcons, 2, JSON.stringify(result));
     if (viewport.width <= 980) {
       assert.ok(result.panelTop < viewport.height * 0.5, JSON.stringify(result));
       assert.ok(result.railHeight <= 80, JSON.stringify(result));

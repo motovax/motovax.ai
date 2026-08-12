@@ -148,19 +148,38 @@
 }
 
 .onboarding-password-control button {
-  min-width: 88px;
+  display: grid;
+  width: 48px;
+  min-width: 48px;
   min-height: 44px;
-  padding: 0 13px;
+  padding: 0;
+  place-items: center;
   border: 0;
   border-left: 1px solid #e3eaf4;
   color: #0b57d0;
   background: #f7faff;
-  font: inherit;
-  font-size: 12px;
-  font-weight: 800;
   cursor: pointer;
   touch-action: manipulation;
   transition: color 160ms ease, background 160ms ease;
+}
+
+.onboarding-password-control .password-icon {
+  width: 21px;
+  height: 21px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.onboarding-password-control .password-icon-hide,
+.onboarding-password-control button[aria-pressed="true"] .password-icon-show {
+  display: none;
+}
+
+.onboarding-password-control button[aria-pressed="true"] .password-icon-hide {
+  display: block;
 }
 
 .onboarding-password-control button:hover,

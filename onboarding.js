@@ -133,9 +133,9 @@
       input.removeAttribute("data-password-revealed");
     });
     qsa("[data-password-toggle]", form).forEach(function (toggle) {
-      toggle.textContent = "Tampilkan";
+      var label = toggle.dataset.passwordLabel || "password";
       toggle.setAttribute("aria-pressed", "false");
-      toggle.setAttribute("aria-label", "Tampilkan password");
+      toggle.setAttribute("aria-label", "Tampilkan " + label);
     });
   }
 
@@ -258,11 +258,11 @@
         var input = document.getElementById(toggle.getAttribute("aria-controls"));
         if (!input) return;
         var reveal = input.type === "password";
+        var label = toggle.dataset.passwordLabel || "password";
         input.type = reveal ? "text" : "password";
         input.toggleAttribute("data-password-revealed", reveal);
-        toggle.textContent = reveal ? "Sembunyikan" : "Tampilkan";
         toggle.setAttribute("aria-pressed", reveal ? "true" : "false");
-        toggle.setAttribute("aria-label", reveal ? "Sembunyikan password" : "Tampilkan password");
+        toggle.setAttribute("aria-label", (reveal ? "Sembunyikan " : "Tampilkan ") + label);
         input.focus({ preventScroll: true });
       });
     });

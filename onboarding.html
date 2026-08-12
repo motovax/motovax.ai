@@ -15,7 +15,7 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="./styles.css?v=workspace-disabled-20260812" />
-    <link rel="stylesheet" href="./onboarding-auth.css?v=form-feedback-20260812" />
+    <link rel="stylesheet" href="./onboarding-auth.css?v=password-eye-20260812" />
   </head>
   <body class="onboarding-body">
     <header class="site-header onboarding-header">
@@ -138,14 +138,20 @@
                   <label for="signupPassword">Password</label>
                   <div class="onboarding-password-control">
                     <input id="signupPassword" type="password" name="password" autocomplete="new-password" placeholder="Min. 8 karakter + angka" minlength="8" required />
-                    <button type="button" data-password-toggle aria-controls="signupPassword" aria-label="Tampilkan password" aria-pressed="false">Tampilkan</button>
+                    <button type="button" data-password-toggle data-password-label="password" aria-controls="signupPassword" aria-label="Tampilkan password" aria-pressed="false">
+                      <svg class="password-icon password-icon-show" viewBox="0 0 24 24" aria-hidden="true"><path d="M2.1 12s3.6-6 9.9-6 9.9 6 9.9 6-3.6 6-9.9 6-9.9-6-9.9-6Z"/><circle cx="12" cy="12" r="3"/></svg>
+                      <svg class="password-icon password-icon-hide" viewBox="0 0 24 24" aria-hidden="true"><path d="m3 3 18 18M10.6 6.1A10.8 10.8 0 0 1 12 6c6.3 0 9.9 6 9.9 6a18 18 0 0 1-2.5 3.2M6.2 6.2C3.6 8 2.1 12 2.1 12s3.6 6 9.9 6a10.4 10.4 0 0 0 4-.8M9.9 9.9a3 3 0 0 0 4.2 4.2"/></svg>
+                    </button>
                   </div>
                 </div>
                 <div class="onboarding-field">
                   <label for="signupPasswordConfirm">Konfirmasi</label>
                   <div class="onboarding-password-control">
                     <input id="signupPasswordConfirm" type="password" name="passwordConfirm" autocomplete="new-password" placeholder="Ulangi password" minlength="8" required />
-                    <button type="button" data-password-toggle aria-controls="signupPasswordConfirm" aria-label="Tampilkan konfirmasi password" aria-pressed="false">Tampilkan</button>
+                    <button type="button" data-password-toggle data-password-label="konfirmasi password" aria-controls="signupPasswordConfirm" aria-label="Tampilkan konfirmasi password" aria-pressed="false">
+                      <svg class="password-icon password-icon-show" viewBox="0 0 24 24" aria-hidden="true"><path d="M2.1 12s3.6-6 9.9-6 9.9 6 9.9 6-3.6 6-9.9 6-9.9-6-9.9-6Z"/><circle cx="12" cy="12" r="3"/></svg>
+                      <svg class="password-icon password-icon-hide" viewBox="0 0 24 24" aria-hidden="true"><path d="m3 3 18 18M10.6 6.1A10.8 10.8 0 0 1 12 6c6.3 0 9.9 6 9.9 6a18 18 0 0 1-2.5 3.2M6.2 6.2C3.6 8 2.1 12 2.1 12s3.6 6 9.9 6a10.4 10.4 0 0 0 4-.8M9.9 9.9a3 3 0 0 0 4.2 4.2"/></svg>
+                    </button>
                   </div>
                 </div>
               </div>
@@ -169,14 +175,20 @@
                 <label for="resetPassword">Password baru</label>
                 <div class="onboarding-password-control">
                   <input id="resetPassword" type="password" name="password" autocomplete="new-password" placeholder="Min. 8 karakter + angka" minlength="8" required />
-                  <button type="button" data-password-toggle aria-controls="resetPassword" aria-label="Tampilkan password baru" aria-pressed="false">Tampilkan</button>
+                  <button type="button" data-password-toggle data-password-label="password baru" aria-controls="resetPassword" aria-label="Tampilkan password baru" aria-pressed="false">
+                    <svg class="password-icon password-icon-show" viewBox="0 0 24 24" aria-hidden="true"><path d="M2.1 12s3.6-6 9.9-6 9.9 6 9.9 6-3.6 6-9.9 6-9.9-6-9.9-6Z"/><circle cx="12" cy="12" r="3"/></svg>
+                    <svg class="password-icon password-icon-hide" viewBox="0 0 24 24" aria-hidden="true"><path d="m3 3 18 18M10.6 6.1A10.8 10.8 0 0 1 12 6c6.3 0 9.9 6 9.9 6a18 18 0 0 1-2.5 3.2M6.2 6.2C3.6 8 2.1 12 2.1 12s3.6 6 9.9 6a10.4 10.4 0 0 0 4-.8M9.9 9.9a3 3 0 0 0 4.2 4.2"/></svg>
+                  </button>
                 </div>
               </div>
               <div class="onboarding-field">
                 <label for="resetPasswordConfirm">Konfirmasi password baru</label>
                 <div class="onboarding-password-control">
                   <input id="resetPasswordConfirm" type="password" name="passwordConfirm" autocomplete="new-password" placeholder="Ulangi password" minlength="8" required />
-                  <button type="button" data-password-toggle aria-controls="resetPasswordConfirm" aria-label="Tampilkan konfirmasi password baru" aria-pressed="false">Tampilkan</button>
+                  <button type="button" data-password-toggle data-password-label="konfirmasi password baru" aria-controls="resetPasswordConfirm" aria-label="Tampilkan konfirmasi password baru" aria-pressed="false">
+                    <svg class="password-icon password-icon-show" viewBox="0 0 24 24" aria-hidden="true"><path d="M2.1 12s3.6-6 9.9-6 9.9 6 9.9 6-3.6 6-9.9 6-9.9-6-9.9-6Z"/><circle cx="12" cy="12" r="3"/></svg>
+                    <svg class="password-icon password-icon-hide" viewBox="0 0 24 24" aria-hidden="true"><path d="m3 3 18 18M10.6 6.1A10.8 10.8 0 0 1 12 6c6.3 0 9.9 6 9.9 6a18 18 0 0 1-2.5 3.2M6.2 6.2C3.6 8 2.1 12 2.1 12s3.6 6 9.9 6a10.4 10.4 0 0 0 4-.8M9.9 9.9a3 3 0 0 0 4.2 4.2"/></svg>
+                  </button>
                 </div>
               </div>
               <p class="onboarding-form-error" data-form-error role="alert" aria-live="assertive" hidden></p>
@@ -554,6 +566,6 @@
     </div>
 
     <script src="./script.js?v=onb-20260808b"></script>
-    <script src="./onboarding.js?v=form-feedback-20260812"></script>
+    <script src="./onboarding.js?v=password-eye-20260812"></script>
   </body>
 </html>
