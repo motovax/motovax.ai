@@ -103,7 +103,7 @@ Generator creative · Posting/schedule · Ads campaign · Meta Business publish 
 
 Dashboard per role · Sales trend (revenue, GP, HPP) · Sales insight · Channel metrics.
 
-**Demo landing:** `#dashboardDemo`
+**Demo landing:** `#dashboardDemo` · **Flag:** `one_dashboard`
 
 ---
 
@@ -111,7 +111,7 @@ Dashboard per role · Sales trend (revenue, GP, HPP) · Sales insight · Channel
 
 Funnel & channel breakdown sudah ada; attribution LTV multi-touch dan BI builder masih roadmap.
 
-**Demo landing:** `#insightDemo`
+**Demo landing:** `#insightDemo` · **Flag:** `data_insight`
 
 ---
 

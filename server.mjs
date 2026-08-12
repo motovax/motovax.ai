@@ -152,6 +152,8 @@ export function buildIsolatedTenantConfig({ tenantId, profile }) {
     whatsapp_ai: modules.includes("omni"),
     social_media_automation: modules.includes("social"),
     crm_autopilot: modules.includes("crm"),
+    one_dashboard: modules.includes("dashboard"),
+    data_insight: modules.includes("insight"),
   };
 
   return {

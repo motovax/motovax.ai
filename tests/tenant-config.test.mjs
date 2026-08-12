@@ -25,6 +25,8 @@ test("konfigurasi tenant baru terisolasi dan integrasi gagal tertutup", () => {
     whatsapp_ai: true,
     social_media_automation: false,
     crm_autopilot: true,
+    one_dashboard: false,
+    data_insight: false,
   });
   assert.equal(config.ai.additional_prompt, "");
   assert.equal(config.ai.eval_schedule.auto_run_enabled, false);
@@ -41,6 +43,24 @@ test("konfigurasi tenant baru terisolasi dan integrasi gagal tertutup", () => {
     ai_config_scope: "tenant",
     channel_profile_scope: "tenant",
     integration_config_scope: "tenant",
+  });
+});
+
+test("setiap pilihan modul onboarding memiliki feature flag sendiri", () => {
+  const config = buildIsolatedTenantConfig({
+    tenantId: "tenant-semua-modul",
+    profile: profile({
+      modules: ["ims", "omni", "social", "crm", "dashboard", "insight"],
+    }),
+  });
+
+  assert.deepEqual(config.features, {
+    inventory_management: true,
+    whatsapp_ai: true,
+    social_media_automation: true,
+    crm_autopilot: true,
+    one_dashboard: true,
+    data_insight: true,
   });
 });
 
