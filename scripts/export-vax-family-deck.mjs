@@ -54,7 +54,7 @@ for (const [name, width, height] of [['desktop', 1440, 1000], ['tablet', 834, 11
 
 await page.setViewportSize({ width: 1440, height: 1000 });
 await page.pdf({
-  path: 'presentasi/vax-family-sales-deck.pdf',
+  path: 'presentasi/vax-family-pitch-deck.pdf',
   width: '13.333in',
   height: '7.5in',
   printBackground: true,

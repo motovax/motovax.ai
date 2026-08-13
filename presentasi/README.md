@@ -1,6 +1,6 @@
 # Presentasi Vax Family
 
-Deck marketing untuk penjualan Motovax dan pengenalan Terravax.
+Pitch deck korporat VAX Family: **VAX = Velocity AI eXperience**. Motovax adalah legacy user dan vertical pertama, Terravax vertical kedua, dan VAX Next pola ekspansi venture berikutnya.
 
 ## Cara memakai
 
@@ -9,7 +9,7 @@ Deck marketing untuk penjualan Motovax dan pengenalan Terravax.
 3. Navigasi dengan tombol panah, `Space`, `Page Up`, atau `Page Down`.
 4. Klik **PDF**, lalu pilih **Save as PDF**, layout landscape, margin none, dan aktifkan background graphics.
 
-Versi PDF siap kirim tersedia di `vax-family-sales-deck.pdf`.
+Versi PDF siap kirim tersedia di `vax-family-pitch-deck.pdf` pada branch non-production `pitchdeck/vax-family`.
 
 ## Positioning dan guardrail
 
