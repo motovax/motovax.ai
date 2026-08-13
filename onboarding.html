@@ -15,7 +15,7 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="./styles.css?v=workspace-disabled-20260812" />
-    <link rel="stylesheet" href="./onboarding-auth.css?v=password-eye-20260812" />
+    <link rel="stylesheet" href="./onboarding-auth.css?v=wa-setup-20260813" />
   </head>
   <body class="onboarding-body">
     <header class="site-header onboarding-header">
@@ -504,6 +504,96 @@
               </div>
             </div>
 
+            <section class="onboarding-walkthrough" data-login-walkthrough aria-labelledby="walkthroughTitle">
+              <header class="onboarding-walkthrough-head">
+                <span>WALKTHROUGH LOGIN PER ROLE</span>
+                <h3 id="walkthroughTitle">Panduan login sesuai peran Anda</h3>
+                <p>
+                  Pilih peran untuk melihat langkah masuk ke aplikasi dan modul yang dapat
+                  diakses tim tersebut — disesuaikan dengan modul yang sudah Anda aktifkan.
+                </p>
+              </header>
+
+              <div class="onboarding-wt-rolelist" data-role-list role="tablist" aria-label="Pilih peran"></div>
+
+              <div class="onboarding-wt-stage">
+                <div class="onboarding-wt-panel" data-role-panel hidden>
+                  <div class="onboarding-wt-panel-head">
+                    <span class="onboarding-wt-badge" data-role-badge></span>
+                    <div>
+                      <h4 data-role-name></h4>
+                      <p data-role-desc></p>
+                    </div>
+                  </div>
+
+                  <ol class="onboarding-wt-steps" data-role-steps></ol>
+
+                  <div class="onboarding-wt-modules-block">
+                    <span class="onboarding-summary-label">Modul yang dapat diakses peran ini</span>
+                    <div class="onboarding-wt-modules" data-role-modules></div>
+                  </div>
+
+                  <div class="onboarding-wt-actions">
+                    <button type="button" class="btn btn-secondary onboarding-wt-prev" data-wt-prev>←</button>
+                    <span class="onboarding-wt-counter" data-role-counter></span>
+                    <button type="button" class="btn btn-primary onboarding-wt-next" data-wt-next>→</button>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <section class="onboarding-walkthrough onboarding-wa-walkthrough" data-wa-walkthrough aria-labelledby="waWalkthroughTitle" hidden>
+              <header class="onboarding-walkthrough-head">
+                <span>WALKTHROUGH SETUP WHATSAPP</span>
+                <h3 id="waWalkthroughTitle">Hubungkan WhatsApp ke Falcon &amp; Jasmine</h3>
+                <p>
+                  Ikuti langkah menghubungkan nomor WhatsApp kantor ke agen Motovax. Panduan
+                  menyesuaikan modul yang Anda aktifkan: <strong>Falcon</strong> (WhatsApp Sales / Inventory)
+                  dan <strong>Jasmine</strong> (WhatsApp Call Center / Omnichannel).
+                </p>
+              </header>
+
+              <div class="onboarding-wa-tabs" data-wa-tabs role="tablist" aria-label="Pilih agent WhatsApp"></div>
+
+              <div class="onboarding-wa-stage">
+                <div class="onboarding-wa-panel" data-wa-panel hidden>
+                  <div class="onboarding-wa-panel-head">
+                    <span class="onboarding-wt-badge onboarding-wa-badge" data-wa-badge></span>
+                    <div>
+                      <h4 data-wa-name></h4>
+                      <p data-wa-desc></p>
+                    </div>
+                  </div>
+
+                  <ol class="onboarding-wt-steps" data-wa-steps></ol>
+
+                  <div class="onboarding-wa-actions">
+                    <button type="button" class="btn btn-secondary onboarding-wa-prev" data-wa-prev aria-label="Agent sebelumnya">←</button>
+                    <span class="onboarding-wa-counter" data-wa-counter></span>
+                    <button type="button" class="btn btn-primary onboarding-wa-next" data-wa-next aria-label="Agent berikutnya">→</button>
+                  </div>
+                </div>
+
+                <div class="onboarding-wa-phone" data-wa-phone>
+                  <div class="onboarding-wa-phone-frame">
+                    <div class="onboarding-wa-phone-notch"></div>
+                    <div class="onboarding-wa-phone-screen">
+                      <div class="onboarding-wa-phone-head">
+                        <span class="onboarding-wa-phone-avatar" data-wa-phone-avatar></span>
+                        <div>
+                          <b data-wa-phone-name></b>
+                          <small><span data-wa-phone-status></span> · online</small>
+                        </div>
+                      </div>
+                      <div class="onboarding-wa-chat" data-wa-chat></div>
+                      <div class="onboarding-wa-phone-tools" data-wa-phone-tools></div>
+                    </div>
+                  </div>
+                  <small class="onboarding-wa-phone-caption" data-wa-phone-caption></small>
+                </div>
+              </div>
+            </section>
+
             <div class="onboarding-success-card onboarding-meeting-summary" data-meeting-summary hidden>
               <div class="onboarding-success-hero">
                 <span class="onboarding-success-badge">MENUNGGU KONFIRMASI TIM</span>
@@ -566,6 +656,6 @@
     </div>
 
     <script src="./script.js?v=onb-20260808b"></script>
-    <script src="./onboarding.js?v=password-eye-20260812"></script>
+    <script src="./onboarding.js?v=wa-setup-20260813"></script>
   </body>
 </html>

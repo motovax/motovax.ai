@@ -401,6 +401,107 @@ for (const viewport of viewports) {
     await context.close();
   });
 
+  test(`walkthrough login per role responsif pada ${viewport.name}`, async () => {
+    const context = await browser.newContext({ viewport });
+    await context.addInitScript(() => {
+      localStorage.setItem("motovax_onboarding_v1", JSON.stringify({
+        step: 4,
+        completed: true,
+        onboardingMode: "self",
+        account: { fullName: "Owner Test", email: "owner@example.com" },
+        business: { businessName: "Dealer Test", workspaceSlug: "dealer-test", region: "Jakarta" },
+        modules: ["ims", "omni", "crm"],
+        workspace: { id: "tenant-1", domain: "dealer-test.motovax.com", ready: true },
+      }));
+    });
+    const page = await context.newPage();
+    await page.route(/https:\/\/fonts\.(?:googleapis|gstatic)\.com\//, (route) => route.abort());
+    await page.route("**/api/auth/me", (route) => route.fulfill({
+      status: 401,
+      contentType: "application/json",
+      body: JSON.stringify({ authenticated: false }),
+    }));
+    const sessionResponse = page.waitForResponse((response) => response.url().endsWith("/api/auth/me"));
+    await page.goto(`${baseUrl}/onboarding.html`, { waitUntil: "load" });
+    await sessionResponse;
+    await page.waitForSelector('[data-step="1"].is-active');
+    await page.evaluate(() => {
+      const onboarding = window.motovaxOnboarding;
+      onboarding.state = Object.assign(onboarding.state, {
+        completed: true,
+        onboardingMode: "self",
+        business: Object.assign(onboarding.state.business, { businessName: "Dealer Test", workspaceSlug: "dealer-test", region: "Jakarta" }),
+        modules: ["ims", "omni", "crm"],
+        workspace: { id: "tenant-1", domain: "dealer-test.motovax.com", ready: true },
+        meeting: null,
+      });
+      onboarding.goTo(5);
+    });
+    await page.waitForSelector('[data-login-walkthrough]:not([hidden]) [data-role-panel]:not([hidden])');
+
+    const initial = await page.evaluate(() => ({
+      overflow: document.documentElement.scrollWidth > document.documentElement.clientWidth,
+      roleButtons: document.querySelectorAll("[data-wt-role]").length,
+      activeRole: document.querySelector("[data-wt-role].is-active")?.textContent.trim(),
+      counter: document.querySelector("[data-role-counter]")?.textContent.trim(),
+      steps: document.querySelectorAll("[data-role-steps] li").length,
+      stepsHTML: document.querySelector("[data-role-steps]")?.textContent,
+      moduleChips: Array.from(document.querySelectorAll("[data-role-modules] span")).map((el) => el.textContent),
+      emptyHint: Boolean(document.querySelector("[data-role-modules] .onboarding-wt-modules-empty")),
+    }));
+    assert.equal(initial.overflow, false);
+    assert.equal(initial.roleButtons, 6, JSON.stringify(initial));
+    assert.equal(initial.activeRole, "OAOwner / Admin", JSON.stringify(initial));
+    assert.equal(initial.counter, "Peran 1 dari 6", JSON.stringify(initial));
+    assert.equal(initial.steps, 4, JSON.stringify(initial));
+    assert.ok(initial.stepsHTML.includes("dealer-test.motovax.com"), JSON.stringify(initial));
+    assert.deepEqual(initial.moduleChips, ["Inventory", "Omnichannel", "Autopilot CRM"], JSON.stringify(initial));
+    assert.equal(initial.emptyHint, false, JSON.stringify(initial));
+    await page.locator("[data-login-walkthrough]").scrollIntoViewIfNeeded();
+    await page.waitForTimeout(200);
+    await page.screenshot({ path: `/tmp/motovax-walkthrough-${viewport.name}.png`, fullPage: false });
+
+    // Navigate next sampai kembali ke awal (tidak boleh stuck).
+    let lastCounter = "";
+    for (let i = 0; i < 8; i += 1) {
+      await page.click("[data-wt-next]");
+      const current = await page.evaluate(() => ({
+        counter: document.querySelector("[data-role-counter]")?.textContent.trim(),
+        activeCount: document.querySelectorAll("[data-wt-role].is-active").length,
+        panelVisible: !document.querySelector("[data-role-panel]")?.hidden,
+        overflow: document.documentElement.scrollWidth > document.documentElement.clientWidth,
+      }));
+      assert.equal(current.activeCount, 1, JSON.stringify(current));
+      assert.equal(current.panelVisible, true, JSON.stringify(current));
+      assert.equal(current.overflow, false, JSON.stringify(current));
+      if (current.counter === "Peran 1 dari 6" && lastCounter === "Peran 6 dari 6") {
+        break;
+      }
+      assert.notEqual(current.counter, lastCounter, `stuck: ${JSON.stringify(current)}`);
+      lastCounter = current.counter;
+    }
+
+    // Pilih role call center lewat list dan pastikan modul disesuaikan modul aktif.
+    await page.click('[data-wt-role="callcenter"]');
+    await page.waitForSelector('[data-wt-role="callcenter"].is-active');
+    const callCenter = await page.evaluate(() => ({
+      name: document.querySelector("[data-role-name]")?.textContent.trim(),
+      counter: document.querySelector("[data-role-counter]")?.textContent.trim(),
+      chips: Array.from(document.querySelectorAll("[data-role-modules] span")).map((el) => el.textContent),
+      steps: document.querySelectorAll("[data-role-steps] li").length,
+      overflow: document.documentElement.scrollWidth > document.documentElement.clientWidth,
+    }));
+    assert.equal(callCenter.name, "Call Center", JSON.stringify(callCenter));
+    assert.equal(callCenter.counter, "Peran 4 dari 6", JSON.stringify(callCenter));
+    assert.deepEqual(callCenter.chips, ["Omnichannel", "Autopilot CRM"], JSON.stringify(callCenter));
+    assert.equal(callCenter.steps, 4, JSON.stringify(callCenter));
+    assert.equal(callCenter.overflow, false, JSON.stringify(callCenter));
+    await page.locator("[data-login-walkthrough]").scrollIntoViewIfNeeded();
+    await page.waitForTimeout(200);
+    await page.screenshot({ path: `/tmp/motovax-walkthrough-callcenter-${viewport.name}.png`, fullPage: false });
+    await context.close();
+  });
+
   test(`flow onboarding bersama tim responsif pada ${viewport.name}`, async () => {
     const context = await browser.newContext({ viewport });
     await context.addInitScript(() => {
