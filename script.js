@@ -13,6 +13,33 @@ for (const link of document.querySelectorAll("[data-wa]")) {
   }
 }
 
+/** Menampilkan baris headline berurutan dan menggambar underline saat masuk viewport. */
+(function initCascadeHeadlines() {
+  const headlines = document.querySelectorAll("[data-cascade-headline]");
+  if (!headlines.length) return;
+
+  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  for (const headline of headlines) headline.classList.add("is-cascade-ready");
+
+  if (reducedMotion || !("IntersectionObserver" in window)) {
+    for (const headline of headlines) headline.classList.add("is-in-view");
+    return;
+  }
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      for (const entry of entries) {
+        if (!entry.isIntersecting) continue;
+        entry.target.classList.add("is-in-view");
+        observer.unobserve(entry.target);
+      }
+    },
+    { threshold: 0.45 },
+  );
+
+  for (const headline of headlines) observer.observe(headline);
+})();
+
 const contactForm = document.querySelector("[data-contact-form]");
 if (contactForm instanceof HTMLFormElement) {
   contactForm.addEventListener("submit", (event) => {

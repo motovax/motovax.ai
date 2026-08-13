@@ -15,7 +15,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="./styles.css?v=ai-native-platform-20260813" />
+    <link rel="stylesheet" href="./styles.css?v=self-setup-hand-drawn-20260813" />
   </head>
   <body class="home-redesign">
     <header class="site-header">
@@ -37,7 +37,16 @@
         <div class="container home-hero-grid">
           <div class="home-hero-copy">
             <div class="home-kicker"><span></span> Platform Bisnis Berbasis AI</div>
-            <h1>Satu platform.<br /><em>AI di setiap proses bisnis.</em></h1>
+            <h1 class="hero-cascade-headline" data-cascade-headline>
+              <span class="hero-cascade-line">Satu platform.</span>
+              <span class="hero-cascade-line hero-cascade-accent">
+                <em>AI di setiap proses bisnis.</em>
+                <svg class="hero-hand-underline" viewBox="0 0 620 34" preserveAspectRatio="none" aria-hidden="true">
+                  <path d="M7 20C92 8 180 12 265 18C357 25 449 22 613 7" />
+                  <path d="M18 27C142 18 257 24 365 26C453 28 531 19 603 14" />
+                </svg>
+              </span>
+            </h1>
             <p>Motovax menghubungkan pelanggan, inventori, percakapan, keuangan, konten, dan data dalam satu ekosistem cerdas. Bukan sekadar memberikan insight, AI Motovax membantu tim memahami, memutuskan, dan menjalankan pekerjaan secara otomatis.</p>
             <div class="home-hero-actions"><a class="btn btn-primary btn-large" href="https://onboard.motovax.com/onboarding.html">Mulai Sekarang <span>→</span></a></div>
             <div class="home-assurance"><span>✓ Persetujuan manusia</span><span>✓ Akses sesuai peran</span><span>✓ Multi-tenant dan multi-cabang</span></div>
@@ -96,8 +105,32 @@
       </section>
 
       <section class="home-section getting-started">
-        <div class="container narrow-heading"><div class="section-label">MULAI DENGAN MUDAH</div><h2>Aktif dalam 3 langkah.</h2><p>Tim Motovax membantu konfigurasi awal agar sistem sesuai dengan alur bisnis Anda.</p></div>
-        <div class="container start-grid"><article><span>1</span><div class="start-visual">⌁<i>Bisnis Anda</i></div><h3>Ceritakan alur bisnis</h3><p>Pilih kanal, modul, cabang, dan hasil yang ingin dipercepat.</p></article><article><span>2</span><div class="start-visual">⚙<i>Pengaturan terpandu</i></div><h3>Hubungkan data dan kanal</h3><p>Atur peran, inventori, WhatsApp, Meta, dan aturan operasional.</p></article><article><span>3</span><div class="start-visual">↗<i>Mulai digunakan</i></div><h3>Jalankan dan ukur</h3><p>Aktifkan AI bersama tim, lalu pantau perjalanan pelanggan dan performa dari dasbor.</p></article></div>
+        <div class="container start-layout">
+          <div class="start-intro">
+            <div class="section-label">SETUP MANDIRI, TANPA RIBET</div>
+            <h2>Workspace Anda siap dalam 3 langkah simpel.</h2>
+            <p>Tak perlu menunggu bantuan konfigurasi. Ikuti onboarding singkat dan sesuaikan Motovax dengan kebutuhan bisnis Anda sendiri.</p>
+            <a class="btn btn-primary btn-large" href="https://onboard.motovax.com/onboarding.html">Mulai setup sekarang <span>→</span></a>
+            <small><b>✓</b> Bisa diubah kembali kapan saja</small>
+          </div>
+          <ol class="start-steps">
+            <li>
+              <span class="start-number">01</span>
+              <div class="start-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 13a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z"/><path d="M4.5 21a7.5 7.5 0 0 1 15 0"/><path d="M18 7h4m-2-2v4"/></svg></div>
+              <div><small>LANGKAH PERTAMA</small><h3>Buat akun Anda</h3><p>Daftar dengan email atau Google untuk memulai workspace Motovax.</p></div>
+            </li>
+            <li>
+              <span class="start-number">02</span>
+              <div class="start-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 21V8l8-5 8 5v13"/><path d="M8 21v-5h8v5M8 10h.01M12 10h.01M16 10h.01"/></svg></div>
+              <div><small>KENALI BISNIS ANDA</small><h3>Lengkapi profil bisnis</h3><p>Isi industri, jumlah cabang, wilayah, dan detail singkat operasional Anda.</p></div>
+            </li>
+            <li>
+              <span class="start-number">03</span>
+              <div class="start-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4z"/><path d="m15 17 2 2 4-5"/></svg></div>
+              <div><small>SESUAIKAN WORKSPACE</small><h3>Pilih modul prioritas</h3><p>Aktifkan modul yang dibutuhkan. Workspace Anda langsung siap dicoba.</p></div>
+            </li>
+          </ol>
+        </div>
       </section>
 
       <section class="home-cta"><div class="container"><div><span>SIAP MEMULAI TRANSFORMASI BISNIS ANDA?</span><h2>Mulai operasional yang bergerak secepat percakapan pelanggan.</h2><p>Buat akun Motovax dan satukan kanal, data, serta alur kerja bisnis Anda mulai sekarang.</p></div><div><a class="btn btn-light btn-large" href="https://onboard.motovax.com/onboarding.html">Mulai Sekarang <span>→</span></a><small>Mulai onboarding bisnis Anda</small></div></div></section>
