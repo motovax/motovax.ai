@@ -3,514 +3,109 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>MOTOVAX — Agentic AI WhatsApp untuk Showroom</title>
-    <meta
-      name="description"
-      content="Jualan dan layani pelanggan showroom 24/7 dengan Agentic AI WhatsApp Motovax—terhubung ke stok, CRM, handoff tim, simulasi kredit, dan operasional showroom."
-    />
+    <title>MOTOVAX — Agentic AI untuk Operasional & Penjualan</title>
+    <meta name="description" content="Satukan WhatsApp, inventory, CRM, omnichannel, konten, dan analytics dengan agen AI Motovax yang bekerja bersama tim Anda." />
     <meta property="og:type" content="website" />
-    <meta property="og:title" content="MOTOVAX — Agentic AI WhatsApp untuk Showroom" />
-    <meta property="og:description" content="Agen AI yang bantu showroom jualan dan melayani pelanggan 24/7 langsung di WhatsApp." />
+    <meta property="og:title" content="MOTOVAX — Agentic AI untuk Operasional & Penjualan" />
+    <meta property="og:description" content="Dari chat pelanggan sampai follow-up dan insight—satu alur kerja Agentic AI untuk bisnis Anda." />
     <meta property="og:image" content="./icons/icon-512.png" />
     <meta name="theme-color" content="#1267f5" />
-    <link rel="icon" href="./favicon.ico" sizes="any" />
-    <link rel="icon" type="image/png" sizes="32x32" href="./icons/favicon-32.png" />
-    <link rel="icon" type="image/png" sizes="16x16" href="./icons/favicon-16.png" />
     <link rel="icon" type="image/svg+xml" href="./icons/favicon.svg" />
     <link rel="apple-touch-icon" sizes="180x180" href="./icons/apple-touch-icon.png" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
-      rel="stylesheet"
-    />
-    <link rel="stylesheet" href="./styles.css?v=homepage-agentic-20260812" />
-    <style>
-      .modules-page {
-        padding: 110px 0 72px;
-        background:
-          radial-gradient(ellipse 80% 40% at 10% 0%, rgba(25, 103, 242, 0.08), transparent 55%),
-          #f7fafc;
-      }
-      .modules-hero {
-        max-width: 820px;
-        margin-bottom: 40px;
-      }
-      .modules-hero .eyebrow {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        margin-bottom: 14px;
-      }
-      .modules-hero h1 {
-        margin: 0 0 14px;
-        font-size: clamp(32px, 4vw, 48px);
-        letter-spacing: -0.04em;
-        line-height: 1.1;
-      }
-      .modules-hero h1 span {
-        color: var(--blue);
-      }
-      .modules-hero p {
-        margin: 0;
-        color: var(--muted);
-        font-size: 16px;
-        line-height: 1.7;
-        max-width: 640px;
-      }
-      .modules-hero-actions {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 12px;
-        margin-top: 24px;
-      }
-      .modules-proof {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 10px;
-        margin-top: 18px;
-        color: #334155;
-        font-size: 12px;
-        font-weight: 700;
-      }
-      .modules-proof span {
-        padding: 8px 11px;
-        border: 1px solid #dbeafe;
-        border-radius: 999px;
-        background: rgba(255, 255, 255, 0.82);
-      }
-      .module-grid {
-        display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 18px;
-        margin-top: 28px;
-      }
-      .module-card {
-        background: #fff;
-        border: 1px solid #dfebf7;
-        border-radius: 16px;
-        padding: 22px;
-        box-shadow: var(--shadow-soft);
-        display: flex;
-        flex-direction: column;
-        gap: 12px;
-        min-height: 100%;
-        scroll-margin-top: 100px;
-      }
-      .module-card:target {
-        border-color: #93c5fd;
-        box-shadow: 0 0 0 3px rgba(18, 103, 245, 0.15), var(--shadow-soft);
-      }
-      .module-card header {
-        display: flex;
-        align-items: flex-start;
-        justify-content: space-between;
-        gap: 12px;
-      }
-      .module-card .code {
-        width: 42px;
-        height: 42px;
-        border-radius: 10px;
-        display: grid;
-        place-items: center;
-        font-weight: 900;
-        font-size: 12px;
-        color: #fff;
-        background: linear-gradient(135deg, var(--blue), #0a54d2);
-        flex-shrink: 0;
-      }
-      .module-card h2 {
-        margin: 0;
-        font-size: 18px;
-        letter-spacing: -0.02em;
-      }
-      .module-card > p {
-        margin: 0;
-        color: #536175;
-        font-size: 13px;
-        line-height: 1.65;
-      }
-      .module-card ul {
-        margin: 0;
-        padding: 0;
-        list-style: none;
-        display: grid;
-        gap: 6px;
-      }
-      .module-card li {
-        position: relative;
-        padding-left: 16px;
-        font-size: 13px;
-        color: #334155;
-        line-height: 1.45;
-      }
-      .module-card li::before {
-        content: "";
-        position: absolute;
-        left: 0;
-        top: 7px;
-        width: 6px;
-        height: 6px;
-        border-radius: 50%;
-        background: var(--blue);
-      }
-      .module-card footer {
-        margin-top: auto;
-        padding-top: 10px;
-        border-top: 1px dashed #e2e8f0;
-        font-size: 12px;
-        color: #64748b;
-      }
-      .module-card footer a {
-        color: var(--blue);
-        font-weight: 700;
-        text-decoration: none;
-      }
-      .module-card footer a:hover {
-        text-decoration: underline;
-      }
-      .pitch-banner {
-        margin-top: 48px;
-        padding: 28px 32px;
-        border-radius: 18px;
-        background: linear-gradient(135deg, #1967f2, #0a54d2);
-        color: #fff;
-        display: grid;
-        grid-template-columns: 1.4fr auto;
-        gap: 20px;
-        align-items: center;
-      }
-      .pitch-banner h2 {
-        margin: 0 0 8px;
-        font-size: 24px;
-        letter-spacing: -0.03em;
-      }
-      .pitch-banner p {
-        margin: 0;
-        opacity: 0.92;
-        font-size: 14px;
-        line-height: 1.65;
-        max-width: 560px;
-      }
-      .pitch-banner .btn {
-        white-space: nowrap;
-      }
-      .matrix-wrap {
-        margin-top: 48px;
-        overflow-x: auto;
-        border-radius: 16px;
-        border: 1px solid #dfebf7;
-        background: #fff;
-        box-shadow: var(--shadow-soft);
-      }
-      .matrix-wrap table {
-        width: 100%;
-        border-collapse: collapse;
-        font-size: 13px;
-      }
-      .matrix-wrap th,
-      .matrix-wrap td {
-        padding: 12px 16px;
-        text-align: left;
-        border-bottom: 1px solid #eef2f7;
-      }
-      .matrix-wrap th {
-        background: #f8fafc;
-        font-size: 11px;
-        text-transform: uppercase;
-        letter-spacing: 0.04em;
-        color: #64748b;
-      }
-      .matrix-wrap tr:last-child td {
-        border-bottom: 0;
-      }
-      @media (max-width: 900px) {
-        .module-grid {
-          grid-template-columns: 1fr;
-        }
-        .pitch-banner {
-          grid-template-columns: 1fr;
-        }
-      }
-      @media (max-width: 560px) {
-        .modules-page { padding-top: 84px; }
-        .modules-hero-actions .btn { width: 100%; justify-content: center; }
-        .module-card { padding: 18px; }
-        .pitch-banner { padding: 24px 20px; }
-      }
-    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="./styles.css?v=homepage-flow-20260813" />
   </head>
-  <body>
+  <body class="home-redesign">
     <header class="site-header">
       <div class="container header-inner">
-        <a class="brand" href="#top" aria-label="MOTOVAX home">
-          <span>MOTO</span><strong>VAX</strong>
-        </a>
+        <a class="brand" href="#top" aria-label="MOTOVAX home"><span>MOTO</span><strong>VAX</strong></a>
         <nav class="nav" aria-label="Navigasi utama">
           <div class="nav-item nav-item-produk is-current" data-produk-menu>
-            <button
-              type="button"
-              class="nav-produk-trigger"
-              aria-expanded="false"
-              aria-haspopup="true"
-              aria-controls="produk-mega-menu"
-              aria-current="page"
-              data-produk-trigger
-            >
-              Produk
-              <svg class="nav-chevron" width="12" height="12" viewBox="0 0 12 12" aria-hidden="true">
-                <path d="M2.5 4.5 6 8l3.5-3.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
-            </button>
+            <button type="button" class="nav-produk-trigger" aria-expanded="false" aria-haspopup="true" aria-controls="produk-mega-menu" data-produk-trigger>Produk <svg class="nav-chevron" width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 4.5 6 8l3.5-3.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
             <div class="produk-mega" id="produk-mega-menu" role="region" aria-label="Menu produk Motovax" hidden data-produk-panel data-produk-mount></div>
           </div>
-          <a href="#produk">Produk</a>
-          <a href="#m1-agentic">Agentic AI</a>
-          <a href="./harga.html">Harga</a>
-          <a href="./hubungi-kami.html">Hubungi Kami</a>
+          <a href="#cara-kerja">Cara Kerja</a><a href="#solusi">Solusi</a><a href="./harga.html">Harga</a><a href="./hubungi-kami.html">Hubungi Kami</a>
         </nav>
-        <div class="header-actions">
-          <a class="btn btn-secondary header-login" href="./onboarding.html?mode=login">Login</a>
-          <a class="btn btn-primary header-cta" href="./onboarding.html">Mulai Coba Sekarang <span>-></span></a>
-        </div>
+        <div class="header-actions"><a class="btn btn-secondary header-login" href="./onboarding.html?mode=login">Login</a><a class="btn btn-primary header-cta" href="./onboarding.html">Mulai Sekarang <span>→</span></a></div>
       </div>
     </header>
 
-    <main class="modules-page" id="top">
-      <div class="container">
-        <div class="modules-hero">
-          <h1>
-            Agen AI yang bantu showroom<br />
-            <span>jualan langsung di WhatsApp.</span>
-          </h1>
-          <p>
-            Motovax Agentic AI bukan chatbot keyword. Agen AI bekerja 24/7 memakai tool bisnis
-            nyata untuk menjawab pelanggan, mencari stok, mengirim foto, membuat simulasi kredit,
-            menangkap lead, dan menyerahkan percakapan ke tim showroom saat dibutuhkan.
-          </p>
-          <div class="modules-hero-actions">
-            <a class="btn btn-primary" href="#" data-wa>Jadwalkan Demo Showroom <span>→</span></a>
-            <a class="btn btn-secondary" href="#m1-agentic">Lihat Capability</a>
+    <main id="top">
+      <section class="home-hero">
+        <div class="container home-hero-grid">
+          <div class="home-hero-copy">
+            <div class="home-kicker"><span></span> Agentic AI ERP untuk bisnis modern</div>
+            <h1>Semua percakapan bergerak menjadi <em>aksi bisnis.</em></h1>
+            <p>Motovax menyatukan channel pelanggan, inventory, CRM, dan analytics. Agen AI menjawab, mencari data, menjalankan tindak lanjut, lalu menyerahkan konteks lengkap ke tim Anda.</p>
+            <div class="home-hero-actions"><a class="btn btn-primary btn-large" href="./onboarding.html">Mulai Coba Sekarang <span>→</span></a><a class="btn btn-secondary btn-large" href="#cara-kerja">Lihat cara kerjanya</a></div>
+            <div class="home-assurance"><span>✓ Setup terpandu</span><span>✓ Multi-cabang</span><span>✓ AI + human handoff</span></div>
           </div>
-          <div class="modules-proof" aria-label="Keunggulan Agentic AI Motovax">
-            <span>WhatsApp 24/7</span><span>Terhubung stok &amp; CRM</span><span>AI → Agent → Sales</span>
+          <div class="hero-workspace" aria-label="Ilustrasi alur kerja Motovax">
+            <div class="workspace-top"><span class="workspace-logo">M</span><div><b>Motovax Command Center</b><small>Semua channel aktif</small></div><i>LIVE</i></div>
+            <div class="workspace-body">
+              <div class="channel-rail" aria-hidden="true"><span class="active">WA</span><span>IG</span><span>FB</span><span>WEB</span></div>
+              <div class="conversation-card"><small>PERCAKAPAN MASUK</small><div class="chat customer">Ada unit Avanza putih di cabang terdekat?</div><div class="ai-thinking"><span>✦</span> Jasmine AI mencari inventory lintas cabang…</div><div class="chat agent">Ada 3 unit tersedia. Saya kirim foto dan simulasi kreditnya, ya.</div><div class="chat-action"><b>3 unit ditemukan</b><span>Foto terkirim · Simulasi siap</span></div></div>
+              <div class="outcome-panel"><small>OUTCOME OTOMATIS</small><div><span>01</span><p><b>Lead dibuat</b><small>Minat & channel tercatat</small></p><i>✓</i></div><div><span>02</span><p><b>Sales ditugaskan</b><small>Konteks chat ikut terbawa</small></p><i>✓</i></div><div><span>03</span><p><b>Follow-up aktif</b><small>Pipeline terbarui</small></p><i>✓</i></div></div>
+            </div>
+            <div class="floating-chip chip-ai">✦ AI bekerja 24/7</div><div class="floating-chip chip-human">● Agent mengambil alih</div>
           </div>
         </div>
+      </section>
 
-        <div class="module-grid" id="produk">
-          <article class="module-card" id="m1-agentic">
-            <header>
-              <div class="code">M1</div>
-            </header>
-            <h2>Agentic AI (WhatsApp)</h2>
-            <p>Agen Falcon / Jasmine dengan tool native untuk melayani pelanggan dan membantu operasional showroom.</p>
-            <ul>
-              <li>Cari stok, alternatif unit &amp; kirim foto</li>
-              <li>Simulasi kredit, TNS/GP &amp; trade-in</li>
-              <li>Tangkap lead, follow-up &amp; assign sales</li>
-              <li>Handoff ke admin, call center atau MR</li>
-            </ul>
-            <footer><a href="./fitur/agentic-ai.html">Lihat detail Agentic AI →</a></footer>
-          </article>
+      <section class="channel-strip" aria-label="Channel yang didukung"><div class="container"><p>Satu workspace untuk channel yang pelanggan Anda gunakan</p><div class="channel-list"><span>◉ WhatsApp</span><span>◎ Instagram</span><span>● Facebook</span><span>◫ Live Chat</span><span>✉ Broadcast</span></div></div></section>
 
-          <article class="module-card" id="m2-inventory">
-            <header>
-              <div class="code">M2</div>
-            </header>
-            <h2>Inventory Management System</h2>
-            <p>Stok multi-cabang real-time menjadi sumber data yang dapat dipakai agen AI dan tim showroom.</p>
-            <ul>
-              <li>Daftar &amp; detail unit, filter cabang</li>
-              <li>Upload / import Excel + validasi</li>
-              <li>Foto unit &amp; worker perawatan media</li>
-              <li>Query &amp; laporan stok lewat AI WhatsApp</li>
-            </ul>
-            <footer><a href="./fitur/inventory-falcon-ai.html">Lihat detail inventory →</a></footer>
-          </article>
-
-          <article class="module-card" id="m3-omni">
-            <header>
-              <div class="code">M3</div>
-            </header>
-            <h2>AI Omnichannel & Call Center</h2>
-            <p>Inbox WA + Messenger + Instagram: AI 24/7, takeover manusia, handoff MR.</p>
-            <ul>
-              <li>Faneling AI / agent / MR + tag Cold–Hot–Booking</li>
-              <li>Realtime SSE (tanpa polling)</li>
-              <li>Aksi cepat: inventori & simulasi</li>
-              <li>Auto-routing, pin, bulk close & morning briefing</li>
-            </ul>
-            <footer><a href="./fitur/aplikasi-omnichannel.html">Lihat AI Omnichannel →</a></footer>
-          </article>
-
-          <article class="module-card" id="m4-crm">
-            <header>
-              <div class="code">M4</div>
-            </header>
-            <h2>Autopilot CRM</h2>
-            <p>Pipeline, customer, MR, follow-up otomatis, guideline, dan agent workspace dalam satu alur.</p>
-            <ul>
-              <li>Customer & pipeline Cold→Deal</li>
-              <li>Program follow-up / campaign</li>
-              <li>Dashboard MR & salespeople</li>
-              <li>Workspace percakapan MR + monitor PIC</li>
-            </ul>
-            <footer><a href="./fitur/aplikasi-crm.html">Lihat Autopilot CRM →</a></footer>
-          </article>
-
-          <article class="module-card" id="m5-social">
-            <header>
-              <div class="code">M5</div>
-            </header>
-            <h2>Social Media & Ads Automation</h2>
-            <p>Dari stok live ke creative, jadwal posting, campaign insight, publish Meta Business.</p>
-            <ul>
-              <li>Generator template + caption AI</li>
-              <li>Kalender posting & schedule</li>
-              <li>Ads campaign + lead template WA</li>
-              <li>Publish FB/IG via Meta Business</li>
-            </ul>
-            <footer><a href="./fitur/social-media-sora-ai.html">Lihat Social &amp; Ads →</a></footer>
-          </article>
-
-          <article class="module-card" id="m6-dashboard">
-            <header>
-              <div class="code">M6</div>
-            </header>
-            <h2>One Dashboard & Analytics</h2>
-            <p>Command center per role: unit, revenue, GP, funnel, cabang, top agent.</p>
-            <ul>
-              <li>Dashboard management & sales</li>
-              <li>Sales Trend (finansial unit)</li>
-              <li>Sales insight salesperson</li>
-              <li>Multi-vertical ready di demo landing</li>
-            </ul>
-            <footer><a href="./fitur/motovax-360.html">Lihat One Dashboard →</a></footer>
-          </article>
-
-          <article class="module-card" id="m7-insight">
-            <header>
-              <div class="code">M7</div>
-            </header>
-            <h2>Data Insight & Conversion</h2>
-            <p>Insight funnel, channel, serta performa MR dan agent untuk meningkatkan conversion.</p>
-            <ul>
-              <li>Lead → booking → sold</li>
-              <li>Breakdown channel WA/FB/IG/web</li>
-              <li>Email report terjadwal</li>
-              <li>Performa MR, agent & conversion funnel</li>
-            </ul>
-            <footer><a href="./fitur/ana-ai-analytics.html">Lihat Data Insight →</a></footer>
-          </article>
-
-          <article class="module-card" id="m8-platform">
-            <header>
-              <div class="code">M8</div>
-            </header>
-            <h2>Platform · IAM · Integrasi</h2>
-            <p>Multi-tenant SaaS: role, config cabang, pairing channel, developer API.</p>
-            <ul>
-              <li>Users, roles, permission policy</li>
-              <li>Tenant config (branding, finance, AI)</li>
-              <li>WhatsApp / Meta / IG pairing</li>
-              <li>Developer API per tenant</li>
-            </ul>
-            <footer>Fondasi ERP multi-tenant untuk semua modul</footer>
-          </article>
-
-          <article class="module-card" id="m9-finance">
-            <header>
-              <div class="code">M9</div>
-            </header>
-            <h2>Finance & Kalkulator</h2>
-            <p>Perhitungan pembiayaan dan profit unit yang terhubung ke dashboard serta agen AI.</p>
-            <ul>
-              <li>Simulasi kredit melalui web & WhatsApp</li>
-              <li>Kalkulasi TNS, GP, HPP & margin</li>
-              <li>Detail finansial dan profit per unit</li>
-              <li>Analisis finansial untuk tim internal</li>
-            </ul>
-            <footer>Terhubung langsung dengan inventory dan Agentic AI</footer>
-          </article>
-
-          <article class="module-card" id="m10-trade-in-mrp">
-            <header>
-              <div class="code">M10</div>
-            </header>
-            <h2>Trade-in, MRP & Promosi</h2>
-            <p>Proses appraisal, pengolahan MRP, dan program promosi dalam satu workflow operasional.</p>
-            <ul>
-              <li>Appraisal trade-in melalui agen WhatsApp</li>
-              <li>Upload, parsing & ringkasan data MRP</li>
-              <li>Detail hasil dan download Excel</li>
-              <li>Promotion campaign & sinkronisasi listing</li>
-            </ul>
-            <footer>Mempercepat evaluasi unit dan eksekusi program penjualan</footer>
-          </article>
+      <section class="home-section problem-section" id="keunggulan">
+        <div class="container narrow-heading"><div class="section-label">KENAPA MOTOVAX</div><h2>Peluang hilang saat data dan percakapan berjalan sendiri-sendiri.</h2><p>Motovax menjadikan seluruh perjalanan pelanggan sebagai satu alur yang dapat dilihat, dijalankan, dan diukur.</p></div>
+        <div class="container problem-grid">
+          <article><div class="problem-icon red">↗</div><h3>Respons tidak lagi terlambat</h3><p>AI melayani pertanyaan awal 24/7 dan meneruskan kasus yang membutuhkan manusia.</p></article>
+          <article><div class="problem-icon blue">⌕</div><h3>Jawaban memakai data nyata</h3><p>Agen dapat mencari inventory, alternatif unit, foto, dan simulasi dari sistem bisnis.</p></article>
+          <article><div class="problem-icon green">✓</div><h3>Setiap chat punya outcome</h3><p>Lead, assignment, follow-up, dan pipeline bergerak tanpa input ulang yang berulang.</p></article>
         </div>
+      </section>
 
-        <div class="matrix-wrap" role="region" aria-label="Ringkasan capability modul">
-          <table>
-            <thead>
-              <tr>
-                <th>Modul</th>
-                <th>Capability utama</th>
-                <th>Outcome</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr><td>Inventory / Unit</td><td>Stok, cabang, foto & import</td><td>Data unit siap jual dan mudah dicari</td></tr>
-              <tr><td>WhatsApp Agentic AI</td><td>Falcon/Jasmine + business tools</td><td>Layanan dan operasional otomatis 24/7</td></tr>
-              <tr><td>Call Center Omnichannel</td><td>WA, FB, IG & realtime inbox</td><td>AI dan tim manusia bekerja dalam satu alur</td></tr>
-              <tr><td>Autopilot CRM</td><td>Pipeline, customer & follow-up</td><td>Lead bergerak konsisten menuju deal</td></tr>
-              <tr><td>Social Media & Ads</td><td>Creative, schedule & Meta publish</td><td>Dari stok menjadi konten dan lead</td></tr>
-              <tr><td>Dashboard & Insight</td><td>Sales, channel, funnel & margin</td><td>Keputusan berbasis data real-time</td></tr>
-              <tr><td>Platform & Integrasi</td><td>Multi-tenant, RBAC & API</td><td>Fondasi operasional yang aman dan fleksibel</td></tr>
-              <tr><td>Finance & Kalkulator</td><td>Kredit, TNS, GP & unit financials</td><td>Perhitungan pembiayaan lebih cepat</td></tr>
-              <tr><td>Trade-in, MRP & Promosi</td><td>Appraisal, parsing & campaign</td><td>Evaluasi unit dan program penjualan terintegrasi</td></tr>
-            </tbody>
-          </table>
+      <section class="home-section how-section" id="cara-kerja">
+        <div class="container narrow-heading"><div class="section-label">CARA KERJA</div><h2>Dari pesan masuk hingga deal—dalam satu alur.</h2><p>Diagram berikut menunjukkan bagaimana AI, sistem, dan tim bekerja bersama tanpa kehilangan konteks.</p></div>
+        <div class="container flow-diagram" aria-label="Diagram alur kerja Motovax">
+          <article><span class="flow-number">01</span><div class="flow-icon">✦</div><h3>Pelanggan menghubungi</h3><p>Pesan masuk dari WhatsApp, Instagram, Facebook, atau web.</p><div class="flow-tags"><span>WA</span><span>IG</span><span>FB</span></div></article>
+          <div class="flow-connector"><i></i><b>→</b></div>
+          <article><span class="flow-number">02</span><div class="flow-icon">⌘</div><h3>AI memahami & bertindak</h3><p>Agen menjawab dan memakai tool untuk mencari data atau menjalankan aksi.</p><div class="flow-tags"><span>Stok</span><span>Foto</span><span>Kredit</span></div></article>
+          <div class="flow-connector"><i></i><b>→</b></div>
+          <article><span class="flow-number">03</span><div class="flow-icon">⇄</div><h3>Tim mengambil alih</h3><p>Call center atau sales menerima ringkasan, intent, dan riwayat lengkap.</p><div class="flow-tags"><span>Agent</span><span>MR</span><span>Sales</span></div></article>
+          <div class="flow-connector"><i></i><b>→</b></div>
+          <article><span class="flow-number">04</span><div class="flow-icon">↗</div><h3>Outcome terukur</h3><p>Pipeline, follow-up, conversion, dan performa tercatat di dashboard.</p><div class="flow-tags"><span>Lead</span><span>Deal</span><span>Insight</span></div></article>
         </div>
+        <div class="container flow-note"><span>AI-first saat volume tinggi</span><i>+</i><span>Human-first saat dibutuhkan</span><i>=</i><strong>Respons cepat, konteks tetap utuh</strong></div>
+      </section>
 
-        <div class="pitch-banner">
-          <div>
-            <h2>Siap punya agen AI untuk showroom Anda?</h2>
-            <p>
-              Mulai dari WhatsApp Agentic AI, lalu hubungkan inventory, CRM, omnichannel,
-              dan dashboard sesuai kebutuhan operasional showroom Anda.
-            </p>
-          </div>
-          <a class="btn btn-light" href="#" data-wa>Hubungi Tim Motovax <span>-></span></a>
+      <section class="home-section solution-section" id="solusi">
+        <div class="container solution-intro"><div><div class="section-label">SATU PLATFORM, MODULAR</div><h2>Mulai dari kebutuhan hari ini. Hubungkan modul berikutnya saat bisnis bertumbuh.</h2></div><a href="./modul.html">Lihat semua produk <span>→</span></a></div>
+        <div class="container solution-grid">
+          <a class="solution-card featured" href="./fitur/agentic-ai.html"><span class="solution-status">LIVE</span><div class="solution-icon">✦</div><h3>Agentic AI</h3><p>Jasmine dan Falcon menjalankan tool bisnis, bukan sekadar membalas keyword.</p><ul><li>Layanan pelanggan 24/7</li><li>Inventory, foto & simulasi</li><li>Handoff dengan konteks</li></ul><b>Pelajari Agentic AI →</b></a>
+          <a class="solution-card" href="./fitur/aplikasi-omnichannel.html"><span class="solution-status">LIVE</span><div class="solution-icon">☵</div><h3>Omnichannel Inbox</h3><p>Satukan WhatsApp, Messenger, dan Instagram untuk AI dan tim.</p><b>Pelajari Omnichannel →</b></a>
+          <a class="solution-card" href="./fitur/aplikasi-crm.html"><span class="solution-status">LIVE</span><div class="solution-icon">⌁</div><h3>Autopilot CRM</h3><p>Kelola customer, pipeline, assignment, dan follow-up dalam satu journey.</p><b>Pelajari CRM →</b></a>
+          <a class="solution-card" href="./fitur/inventory-falcon-ai.html"><span class="solution-status">LIVE</span><div class="solution-icon">▦</div><h3>Inventory + Falcon</h3><p>Stok multi-cabang real-time yang dapat dicari tim dan agen AI.</p><b>Pelajari Inventory →</b></a>
+          <a class="solution-card" href="./fitur/social-media-sora-ai.html"><span class="solution-status">LIVE</span><div class="solution-icon">◫</div><h3>Social + Sora AI</h3><p>Dari inventory menjadi konten, jadwal, campaign, dan insight Meta.</p><b>Pelajari Social Studio →</b></a>
+          <a class="solution-card" href="./fitur/ana-ai-analytics.html"><span class="solution-status">LIVE</span><div class="solution-icon">◒</div><h3>Ana AI Analytics</h3><p>Baca funnel, channel, sales, cabang, dan metrik finansial utama.</p><b>Pelajari Analytics →</b></a>
         </div>
-      </div>
+      </section>
+
+      <section class="home-section usecase-section">
+        <div class="container usecase-layout"><div class="usecase-copy"><div class="section-label">CONTOH ALUR NYATA</div><h2>Satu pertanyaan pelanggan, banyak pekerjaan selesai otomatis.</h2><p>Pilih alur yang paling dekat dengan operasional Anda. Setiap alur tetap terhubung pada satu profil customer dan sumber data.</p><div class="usecase-tabs" role="list"><button class="active" type="button">Penjualan unit <span>→</span></button><button type="button">Layanan pelanggan <span>→</span></button><button type="button">Follow-up CRM <span>→</span></button></div></div>
+          <div class="journey-card"><div class="journey-head"><span>ALUR PENJUALAN UNIT</span><i>Berjalan 24/7</i></div><ol><li><span>1</span><div><b>Customer bertanya via WhatsApp</b><p>AI mengenali kebutuhan, lokasi, dan preferensi.</p></div></li><li><span>2</span><div><b>Falcon mencari stok live</b><p>Unit cocok, alternatif, foto, dan simulasi disiapkan.</p></div></li><li><span>3</span><div><b>Lead masuk ke CRM</b><p>Intent dan riwayat percakapan tersimpan otomatis.</p></div></li><li><span>4</span><div><b>Sales melanjutkan percakapan</b><p>Tim menerima handoff lengkap dan next action.</p></div></li></ol><div class="journey-result"><span>HASIL</span><b>Lebih sedikit input manual. Lebih cepat menuju follow-up.</b></div></div>
+        </div>
+      </section>
+
+      <section class="home-section getting-started">
+        <div class="container narrow-heading"><div class="section-label">MULAI DENGAN MUDAH</div><h2>Aktif dalam 3 langkah.</h2><p>Tim Motovax membantu konfigurasi awal agar sistem sesuai dengan alur bisnis Anda.</p></div>
+        <div class="container start-grid"><article><span>1</span><div class="start-visual">⌁<i>Bisnis Anda</i></div><h3>Ceritakan alur bisnis</h3><p>Pilih channel, modul, cabang, dan outcome yang ingin dipercepat.</p></article><article><span>2</span><div class="start-visual">⚙<i>Setup terpandu</i></div><h3>Hubungkan data & channel</h3><p>Konfigurasikan peran, inventory, WhatsApp, Meta, dan rule operasional.</p></article><article><span>3</span><div class="start-visual">↗<i>Go live</i></div><h3>Jalankan dan ukur</h3><p>Aktifkan AI bersama tim, lalu pantau journey dan performa dari dashboard.</p></article></div>
+      </section>
+
+      <section class="home-cta"><div class="container"><div><span>SIAP MELIHAT ALURNYA DI BISNIS ANDA?</span><h2>Bangun operasional yang bergerak secepat percakapan pelanggan.</h2><p>Jadwalkan sesi singkat bersama tim Motovax untuk memetakan channel, data, dan workflow Anda.</p></div><div><a class="btn btn-light btn-large" href="#" data-wa>Jadwalkan Demo <span>→</span></a><small>Diskusi kebutuhan tanpa komitmen</small></div></div></section>
     </main>
 
-    <footer class="footer">
-      <div class="container footer-grid">
-        <div>
-          <a class="brand footer-brand" href="#top" aria-label="MOTOVAX home">
-            <span>MOTO</span><strong>VAX</strong>
-          </a>
-          <p>Agentic AI ERP — integrasikan operasional bisnis dengan agen AI.</p>
-        </div>
-        <div>
-          <h3>Produk</h3>
-          <a href="./modul.html">Semua produk</a>
-          <a href="#produk">Semua modul</a>
-          <a href="./harga.html">Harga</a>
-        </div>
-        <div>
-          <h3>Dokumen</h3>
-          <a href="./docs/product/modul-fitur-breakdown.md">Breakdown lengkap (MD)</a>
-        </div>
-        <div>
-          <h3>Hubungi Kami</h3>
-          <p>hello@motovax.ai</p>
-        </div>
-      </div>
-      <div class="copyright">&copy; <span data-year></span> MOTOVAX. All rights reserved.</div>
-    </footer>
-
-    <script src="./script.js?v=homepage-agentic-20260812"></script>
+    <footer class="footer"><div class="container footer-grid"><div><a class="brand footer-brand" href="#top"><span>MOTO</span><strong>VAX</strong></a><p>Agentic AI ERP—percakapan, data, dan tim dalam satu alur kerja.</p></div><div><h3>Produk</h3><a href="./modul.html">Semua Produk</a><a href="./fitur/agentic-ai.html">Agentic AI</a><a href="./harga.html">Harga</a></div><div><h3>Perusahaan</h3><a href="./hubungi-kami.html">Hubungi Kami</a><a href="./kebijakan-privasi.html">Kebijakan Privasi</a><a href="./syarat-ketentuan.html">Syarat & Ketentuan</a></div><div><h3>Kontak</h3><p>hello@motovax.ai</p><a href="#" data-wa>WhatsApp kami →</a></div></div><div class="copyright">&copy; <span data-year></span> MOTOVAX. All rights reserved.</div></footer>
+    <script src="./script.js?v=homepage-flow-20260813"></script>
   </body>
 </html>

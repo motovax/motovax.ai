@@ -1618,7 +1618,7 @@ export function createApp({
     express.static(config.publicDir, {
       dotfiles: "deny",
       extensions: ["html"],
-      index: "onboarding.html",
+      index: "index.html",
       maxAge: config.nodeEnv === "production" ? "1h" : 0,
     }),
   );
