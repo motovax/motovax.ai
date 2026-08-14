@@ -3,11 +3,7 @@
 
   var STORAGE_KEY = "motovax_onboarding_v1";
   var INDUSTRY_LABELS = {
-    general: "Umum / Lainnya",
-    automotive: "Otomotif",
-    property: "Properti",
-    retail: "Retail",
-    other: "Umum / Lainnya", // legacy localStorage
+    automotive: "Dealer mobil",
   };
   var MODULE_LABELS = {
     ims: "Inventory",
@@ -41,22 +37,32 @@
     return {
       step: 1,
       authMode: "signup",
-      onboardingMode: "",
+      onboardingMode: "self",
       account: { fullName: "", email: "", password: "" },
       business: {
         businessName: "",
         workspaceSlug: "",
-        branchCount: "4-10",
+        branchCount: "",
         region: "",
-        industry: "general",
+        industry: "automotive",
         description: "",
       },
       modules: ["ims", "omni", "crm"],
       goal: "conversion",
       completed: false,
       workspace: null,
-      meeting: null,
     };
+  }
+
+  function slugify(value) {
+    return String(value || "")
+      .normalize("NFKD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "")
+      .slice(0, 40)
+      .replace(/-+$/g, "");
   }
 
   function saveState(state) {
@@ -195,6 +201,7 @@
     this.workspacePollTimer = null;
     this.slugCheckTimer = null;
     this.slugAvailability = { slug: "", available: null };
+    this.slugIsAutomatic = !this.state.business.workspaceSlug;
     this.recaptchaConfigPromise = this.prepareRecaptcha();
 
     this.steps = qsa("[data-step]");
@@ -206,8 +213,6 @@
     this.resetForm = qs("[data-reset-form]");
     this.businessForm = qs("[data-business-form]");
     this.modulesForm = qs("[data-modules-form]");
-    this.meetingForm = qs("[data-meeting-form]");
-    this.industryGrid = qs("[data-industry-grid]");
     this.goalGrid = qs("[data-goal-grid]");
     this.openWorkspace = qs("[data-open-workspace]");
 
@@ -307,8 +312,10 @@
         self.submitBusiness();
       });
       var slugInput = this.businessForm.workspaceSlug;
+      var businessNameInput = this.businessForm.businessName;
       if (slugInput) {
-        slugInput.addEventListener("input", function () {
+        slugInput.addEventListener("input", function (event) {
+          if (event.isTrusted) self.slugIsAutomatic = false;
           slugInput.value = slugInput.value.toLowerCase().replace(/[^a-z0-9-]/g, "");
           var formError = qs("[data-form-error]", self.businessForm);
           if (formError) {
@@ -318,7 +325,7 @@
           self.slugAvailability = { slug: "", available: null };
           window.clearTimeout(self.slugCheckTimer);
           if (!self.validWorkspaceSlug(slugInput.value)) {
-            self.setSlugStatus("idle", "Isi sendiri 3–40 karakter: huruf kecil, angka, dan tanda hubung.");
+            self.setSlugStatus("idle", "Otomatis dibuat dari nama bisnis; Anda tetap dapat mengubahnya.");
             return;
           }
           self.setSlugStatus("checking", "Memeriksa ketersediaan workspace…");
@@ -330,45 +337,15 @@
           window.clearTimeout(self.slugCheckTimer);
           if (self.validWorkspaceSlug(slugInput.value)) self.checkWorkspaceAvailability();
         });
+        if (businessNameInput) {
+          businessNameInput.addEventListener("input", function () {
+            if (!self.slugIsAutomatic) return;
+            slugInput.value = slugify(businessNameInput.value);
+            slugInput.dispatchEvent(new Event("input", { bubbles: true }));
+          });
+        }
       }
     }
-
-    qsa("[data-onboarding-choice]").forEach(function (choice) {
-      choice.addEventListener("click", function () {
-        var mode = choice.getAttribute("data-onboarding-choice");
-        self.state.onboardingMode = mode;
-        saveState(self.state);
-        if (mode === "self") {
-          self.goTo(3);
-          return;
-        }
-        self.showMeetingForm();
-      });
-    });
-
-    var pathBackAccount = qs("[data-path-back-account]");
-    if (pathBackAccount) pathBackAccount.addEventListener("click", function () {
-      self.goTo(1);
-    });
-
-    if (this.meetingForm) {
-      this.meetingForm.addEventListener("submit", function (event) {
-        event.preventDefault();
-        self.submitMeeting();
-      });
-    }
-    var meetingCancel = qs("[data-meeting-cancel]");
-    if (meetingCancel) meetingCancel.addEventListener("click", function () { self.hideMeetingForm(); });
-    var meetingBackAccount = qs("[data-meeting-back-account]");
-    if (meetingBackAccount) meetingBackAccount.addEventListener("click", function () {
-      self.hideMeetingForm();
-      self.goTo(1);
-    });
-    var changeMeeting = qs("[data-change-meeting]");
-    if (changeMeeting) changeMeeting.addEventListener("click", function () {
-      self.goTo(2);
-      self.showMeetingForm();
-    });
 
     if (this.modulesForm) {
       this.modulesForm.addEventListener("submit", function (e) {
@@ -383,14 +360,6 @@
       });
     });
 
-    if (this.industryGrid) {
-      qsa("[data-industry]", this.industryGrid).forEach(function (card) {
-        card.addEventListener("click", function () {
-          self.selectIndustry(card.getAttribute("data-industry"));
-        });
-      });
-    }
-
     if (this.goalGrid) {
       qsa("[data-goal]", this.goalGrid).forEach(function (chip) {
         chip.addEventListener("click", function () {
@@ -403,6 +372,7 @@
     if (resetBtn) {
       resetBtn.addEventListener("click", function () {
         self.state = defaultState();
+        self.slugIsAutomatic = true;
         saveState(self.state);
         self.hydrate();
         self.goTo(1);
@@ -416,13 +386,13 @@
       });
     }
 
-    // Deep-link: ?step=2. Parameter mode lama diabaikan karena portal ini signup-only.
+    // Deep-link hanya menerima empat langkah onboarding mandiri.
     var params = new URLSearchParams(window.location.search);
     if (params.get("reset") === "1" && params.get("token")) {
       this.showResetForm();
     }
     var stepParam = parseInt(params.get("step"), 10);
-    if (stepParam >= 1 && stepParam <= 5) {
+    if (stepParam >= 1 && stepParam <= 4) {
       this.state.step = stepParam;
     }
   };
@@ -500,76 +470,8 @@
     }
   };
 
-  OnboardingApp.prototype.showMeetingForm = function () {
-    var pathGrid = qs(".onboarding-path-grid");
-    var pathActions = qs("[data-path-actions]");
-    if (pathGrid) pathGrid.hidden = true;
-    if (pathActions) pathActions.hidden = true;
-    if (this.meetingForm) this.meetingForm.hidden = false;
-  };
-
-  OnboardingApp.prototype.hideMeetingForm = function () {
-    var pathGrid = qs(".onboarding-path-grid");
-    var pathActions = qs("[data-path-actions]");
-    if (pathGrid) pathGrid.hidden = false;
-    if (pathActions) pathActions.hidden = false;
-    if (this.meetingForm) this.meetingForm.hidden = true;
-    this.state.onboardingMode = "";
-    saveState(this.state);
-  };
-
-  OnboardingApp.prototype.submitMeeting = async function () {
-    var form = this.meetingForm;
-    var data = new FormData(form);
-    var date = String(data.get("date") || "");
-    var time = String(data.get("time") || "");
-    if (!date) {
-      this.showError(form, "Tanggal meeting belum dipilih. Pilih hari Senin–Jumat yang tersedia.", "date");
-      return;
-    }
-    if (!time) {
-      this.showError(form, "Waktu meeting belum dipilih. Pilih salah satu slot waktu WIB.", "time");
-      return;
-    }
-    var day = new Date(date + "T00:00:00Z").getUTCDay();
-    if (day === 0 || day === 6) {
-      this.showError(form, "Tanggal tersebut jatuh pada akhir pekan. Pilih hari Senin sampai Jumat.", "date");
-      return;
-    }
-    setFormLoading(form, true);
-    try {
-      var recaptchaToken = await this.getRecaptchaToken();
-      var payload = await api("/api/onboarding/meeting", {
-        method: "POST",
-        body: JSON.stringify({
-          date: date,
-          time: time,
-          timezone: "Asia/Jakarta",
-          recaptchaToken: recaptchaToken,
-        }),
-      });
-      this.state.onboardingMode = "team";
-      this.state.meeting = payload.meeting;
-      this.state.workspace = null;
-      this.state.completed = true;
-      saveState(this.state);
-      this.renderSummary();
-      this.goTo(5);
-      this.showToast("Jadwal pilihan diterima", "Tim Motovax akan mengirim detail meeting melalui email.");
-    } catch (error) {
-      this.showError(form, friendlySubmitError(error, "Jadwal belum berhasil dikirim. Periksa pilihan waktu lalu coba lagi."));
-    } finally {
-      setFormLoading(form, false);
-    }
-  };
-
   OnboardingApp.prototype.selectIndustry = function (id) {
-    this.state.business.industry = id;
-    qsa("[data-industry]", this.industryGrid).forEach(function (card) {
-      var active = card.getAttribute("data-industry") === id;
-      card.classList.toggle("is-active", active);
-      card.setAttribute("aria-selected", active ? "true" : "false");
-    });
+    this.state.business.industry = "automotive";
     saveState(this.state);
   };
 
@@ -668,9 +570,9 @@
       this.state.business = {
         businessName: payload.profile.business_name || "",
         workspaceSlug: payload.profile.workspace_slug || "",
-        branchCount: payload.profile.branch_count || "1",
+        branchCount: payload.profile.branch_count || "",
         region: payload.profile.region || "",
-        industry: payload.profile.industry || "general",
+        industry: "automotive",
         description: payload.profile.description || "",
       };
       this.state.modules = payload.profile.modules || this.state.modules;
@@ -680,25 +582,14 @@
       this.state.business = clean.business;
       this.state.modules = clean.modules;
       this.state.goal = clean.goal;
+      this.slugIsAutomatic = true;
     }
     if (payload.workspaces && payload.workspaces.length) {
       this.state.workspace = Object.assign({ ready: true }, payload.workspaces[0]);
-      this.state.meeting = null;
       this.state.onboardingMode = "self";
-      this.state.completed = true;
-    } else if (payload.meeting) {
-      this.state.workspace = null;
-      this.state.meeting = {
-        id: payload.meeting.id,
-        scheduledFor: payload.meeting.scheduled_for || payload.meeting.scheduledFor,
-        timezone: payload.meeting.timezone,
-        status: payload.meeting.status,
-      };
-      this.state.onboardingMode = "team";
       this.state.completed = true;
     } else {
       this.state.workspace = null;
-      this.state.meeting = null;
       this.state.completed = false;
     }
     this.hydrate();
@@ -737,6 +628,7 @@
       .then(function (payload) {
         if (!payload || !payload.authenticated || !payload.user) {
           self.state = defaultState();
+          self.slugIsAutomatic = true;
           saveState(self.state);
           self.hydrate();
           self.goTo(1, { silent: true });
@@ -747,10 +639,10 @@
         self.state.authMode = "signup";
         saveState(self.state);
 
-        if (self.state.workspace || self.state.meeting) {
-          self.goTo(5);
+        if (self.state.workspace) {
+          self.goTo(4);
         } else {
-          self.goTo(self.state.business.businessName ? 4 : 2);
+          self.goTo(self.state.business.businessName ? 3 : 2);
         }
         if (oauthStatus === "success") {
           self.showToast("Akun Google berhasil didaftarkan", "Lanjut lengkapi onboarding Anda.");
@@ -777,7 +669,7 @@
     var fd = new FormData(form);
     var businessName = String(fd.get("businessName") || "").trim();
     var workspaceSlug = String(fd.get("workspaceSlug") || "").trim();
-    var branchCount = String(fd.get("branchCount") || "1");
+    var branchCount = String(fd.get("branchCount") || "");
     var region = String(fd.get("region") || "").trim();
     var description = String(fd.get("description") || "").trim();
 
@@ -785,8 +677,8 @@
       this.showError(form, "Nama bisnis belum valid. Masukkan minimal 2 karakter.", "businessName");
       return;
     }
-    if (region.length < 2) {
-      this.showError(form, "Kota atau wilayah utama belum valid. Masukkan minimal 2 karakter.", "region");
+    if (region.length === 1) {
+      this.showError(form, "Kota atau wilayah utama boleh dikosongkan atau diisi minimal 2 karakter.", "region");
       return;
     }
     if (!this.validWorkspaceSlug(workspaceSlug)) {
@@ -794,8 +686,7 @@
       return;
     }
 
-    var industry = this.state.business.industry || "general";
-    if (industry === "other") industry = "general";
+    var industry = "automotive";
     setFormLoading(form, true);
     try {
       var available = await this.checkWorkspaceAvailability();
@@ -814,7 +705,7 @@
       await this.saveProfile();
       saveState(this.state);
       this.showToast("Profil disimpan", "Pilih modul yang ingin diaktifkan.");
-      this.goTo(4);
+      this.goTo(3);
     } catch (error) {
       this.showError(form, friendlySubmitError(error, "Profil belum berhasil disimpan. Periksa isian lalu coba lagi."));
     } finally {
@@ -901,14 +792,13 @@
         body: JSON.stringify({ recaptchaToken: recaptchaToken }),
       });
       this.state.workspace = payload.workspace;
-      this.state.meeting = null;
       this.state.onboardingMode = "self";
       this.state.completed = true;
-      this.state.step = 5;
+      this.state.step = 4;
       saveState(this.state);
       this.renderSummary();
       this.showToast("Tenant berhasil dibuat", "Domain aplikasi sedang disiapkan. Halaman ini akan memperbarui status otomatis.");
-      this.goTo(5);
+      this.goTo(4);
       this.waitForWorkspace();
     } catch (error) {
       this.showError(form, friendlySubmitError(error, "Workspace belum berhasil dibuat. Pilihan Anda tetap tersimpan; silakan coba lagi."));
@@ -983,22 +873,11 @@
     if (this.businessForm) {
       if (this.businessForm.businessName) this.businessForm.businessName.value = biz.businessName || "";
       if (this.businessForm.workspaceSlug) this.businessForm.workspaceSlug.value = biz.workspaceSlug || "";
-      if (this.businessForm.branchCount) this.businessForm.branchCount.value = biz.branchCount || "4-10";
+      if (this.businessForm.branchCount) this.businessForm.branchCount.value = biz.branchCount || "";
       if (this.businessForm.region) this.businessForm.region.value = biz.region || "";
       if (this.businessForm.description) this.businessForm.description.value = biz.description || "";
     }
-    if (this.meetingForm && this.meetingForm.date) {
-      var tomorrow = new Date();
-      tomorrow.setDate(tomorrow.getDate() + 1);
-      var maximum = new Date();
-      maximum.setDate(maximum.getDate() + 90);
-      this.meetingForm.date.min = tomorrow.toISOString().slice(0, 10);
-      this.meetingForm.date.max = maximum.toISOString().slice(0, 10);
-    }
-
-    var industry = biz.industry || "general";
-    if (industry === "other") industry = "general";
-    this.selectIndustry(industry);
+    this.selectIndustry("automotive");
     this.selectGoal(this.state.goal || "conversion");
     this.setAuthMode();
 
@@ -1022,31 +901,14 @@
     var goalEl = qs("[data-summary-goal]");
     var modulesEl = qs("[data-summary-modules]");
     var statusEl = qs("[data-workspace-status]");
-    var meetingMode = Boolean(this.state.meeting && !this.state.workspace);
     var workspaceSummary = qs("[data-workspace-summary]");
-    var meetingSummary = qs("[data-meeting-summary]");
     var workspaceActions = qs("[data-workspace-actions]");
-    var meetingActions = qs("[data-meeting-actions]");
     var readyTitle = qs("[data-ready-title]");
     var readyCopy = qs("[data-ready-copy]");
-    if (workspaceSummary) workspaceSummary.hidden = meetingMode;
-    if (meetingSummary) meetingSummary.hidden = !meetingMode;
-    if (workspaceActions) workspaceActions.hidden = meetingMode;
-    if (meetingActions) meetingActions.hidden = !meetingMode;
-    if (readyTitle) readyTitle.textContent = meetingMode ? "Jadwal onboarding telah diajukan" : "Workspace Anda siap digunakan";
-    if (readyCopy) readyCopy.textContent = meetingMode
-      ? "Tim Motovax akan mengonfirmasi jadwal dan mengirim detail meeting melalui email."
-      : "Tenant, domain, akun owner, dan konfigurasi awal berhasil dibuat.";
-    var meetingUser = qs("[data-meeting-user]");
-    if (meetingUser && meetingMode) meetingUser.textContent = "Konfirmasi akan dikirim ke " + (acc.email || "email akun Anda") + ".";
-    var meetingDatetime = qs("[data-meeting-datetime]");
-    if (meetingDatetime && meetingMode) {
-      meetingDatetime.textContent = new Intl.DateTimeFormat("id-ID", {
-        dateStyle: "full",
-        timeStyle: "short",
-        timeZone: "Asia/Jakarta",
-      }).format(new Date(this.state.meeting.scheduledFor)) + " WIB";
-    }
+    if (workspaceSummary) workspaceSummary.hidden = false;
+    if (workspaceActions) workspaceActions.hidden = false;
+    if (readyTitle) readyTitle.textContent = "Workspace Anda siap digunakan";
+    if (readyCopy) readyCopy.textContent = "Tenant, domain, akun owner, dan konfigurasi awal berhasil dibuat.";
 
     if (nameEl) nameEl.textContent = biz.businessName || "Bisnis Anda";
     if (userEl) {
@@ -1054,8 +916,8 @@
         ? acc.fullName + " · " + (acc.email || "")
         : acc.email || "Siap masuk sebagai user demo";
     }
-    if (industryEl) industryEl.textContent = INDUSTRY_LABELS[biz.industry] || INDUSTRY_LABELS.general;
-    if (branchesEl) branchesEl.textContent = (biz.branchCount || "—") + " lokasi";
+    if (industryEl) industryEl.textContent = INDUSTRY_LABELS.automotive;
+    if (branchesEl) branchesEl.textContent = biz.branchCount ? biz.branchCount + " lokasi" : "Belum ditentukan";
     if (regionEl) regionEl.textContent = biz.region || "—";
     if (goalEl) goalEl.textContent = GOAL_LABELS[this.state.goal] || GOAL_LABELS.conversion;
 
@@ -1083,7 +945,7 @@
 
   OnboardingApp.prototype.goTo = function (step, opts) {
     opts = opts || {};
-    step = Math.min(5, Math.max(1, step));
+    step = Math.min(4, Math.max(1, step));
     this.state.step = step;
     if (!opts.silent) saveState(this.state);
 
@@ -1094,26 +956,23 @@
       panel.classList.toggle("is-active", active);
     });
 
-    var teamCompletion = this.state.onboardingMode === "team" && step === 5;
     var railCopies = {
-      3: "Organisasi & cabang",
-      4: "Fokus first value",
+      2: "Dealer & workspace",
+      3: "Fokus first value",
     };
     this.railItems.forEach(function (item) {
       var n = parseInt(item.getAttribute("data-rail-step"), 10);
-      var skipped = teamCompletion && (n === 3 || n === 4);
       item.classList.toggle("is-active", n === step);
-      item.classList.toggle("is-done", n < step && !skipped);
-      item.classList.toggle("is-skipped", skipped);
+      item.classList.toggle("is-done", n < step);
       var copy = qs("small", item);
-      if (copy && railCopies[n]) copy.textContent = skipped ? "Dibahas bersama tim" : railCopies[n];
+      if (copy && railCopies[n]) copy.textContent = railCopies[n];
     });
 
     if (this.progressBar) {
-      this.progressBar.style.setProperty("--p", step * 20 + "%");
+      this.progressBar.style.setProperty("--p", step * 25 + "%");
     }
 
-    if (step === 5) this.renderSummary();
+    if (step === 4) this.renderSummary();
 
     if (!opts.silent) {
       var panel = qs('.onboarding-panel');

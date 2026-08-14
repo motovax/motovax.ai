@@ -6,6 +6,10 @@ Panduan untuk coding agent yang mengerjakan repositori landing **motovax.ai**.
 
 Landing page statis (`index.html`, `modul.html`, `styles.css`, `script.js`) untuk situs publik Motovax. Bukan aplikasi produk penuh.
 
+## Fokus pasar
+
+Motovax berfokus pada **dealer mobil**. Copy, contoh data, onboarding, template workspace, dan klaim capability utama harus memakai konteks operasional dealer mobil (inventori unit, cabang, lead, sales, omnichannel, dan after-sales), bukan positioning generik multi-industri. Jangan menampilkan pilihan industri pada onboarding publik kecuali arah produk berubah melalui instruksi manusia yang eksplisit.
+
 ## Referensi konten fitur & service
 
 Informasi **fitur, service, modul, capability, dan deskripsi produk** yang ditampilkan di motovax.ai (copy landing, menu Produk, kartu fitur, demo, `modul.html`, `docs/product/*`, dsb.) **referensi utamanya diambil dari motovax.app** — yaitu produk aplikasi Motovax / codebase **motovax-app** (route, sidebar, feature flag tenant, backend service, tool agent, behavior produksi).

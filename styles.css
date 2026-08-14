@@ -18975,4 +18975,193 @@ body.feature-image-open { overflow: hidden; }
   }
 }
 
+/* Portal account pada header beranda. */
+.portal-header-auth {
+  position: relative;
+  min-width: 0;
+}
 
+[data-portal-guest][hidden],
+.portal-account[hidden],
+.portal-account-menu[hidden],
+.portal-account-menu [hidden] {
+  display: none !important;
+}
+
+.portal-account-trigger {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr) 16px;
+  align-items: center;
+  gap: 9px;
+  min-height: 46px;
+  max-width: 230px;
+  padding: 5px 10px 5px 6px;
+  border: 1px solid #d7e2ef;
+  border-radius: 12px;
+  color: #172236;
+  background: #fff;
+  font: inherit;
+  cursor: pointer;
+  box-shadow: 0 8px 20px rgba(24, 63, 118, 0.07);
+}
+
+.portal-account-trigger:focus-visible {
+  outline: 3px solid rgba(18, 103, 245, 0.2);
+  outline-offset: 2px;
+}
+
+.portal-account-avatar {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  border-radius: 10px;
+  color: #fff;
+  background: linear-gradient(135deg, #1267f5, #0e4db8);
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.portal-account-copy {
+  display: grid;
+  min-width: 0;
+  gap: 2px;
+  text-align: left;
+}
+
+.portal-account-copy b,
+.portal-account-copy small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.portal-account-copy b {
+  font-size: 12px;
+}
+
+.portal-account-copy small {
+  color: #718096;
+  font-size: 9px;
+}
+
+.portal-account-trigger > svg {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: #64748b;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: transform 160ms ease;
+}
+
+.portal-account-trigger[aria-expanded="true"] > svg {
+  transform: rotate(180deg);
+}
+
+.portal-account-menu {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  z-index: 70;
+  display: grid;
+  width: min(320px, calc(100vw - 32px));
+  padding: 8px;
+  border: 1px solid #dbe5f1;
+  border-radius: 15px;
+  background: #fff;
+  box-shadow: 0 24px 60px rgba(15, 37, 70, 0.2);
+}
+
+.portal-account-summary {
+  display: grid;
+  gap: 3px;
+  margin: 2px 2px 7px;
+  padding: 12px;
+  border-radius: 10px;
+  background: #f4f8fd;
+}
+
+.portal-account-summary b {
+  color: #172236;
+  font-size: 14px;
+}
+
+.portal-account-summary span,
+.portal-account-summary small {
+  overflow: hidden;
+  color: #64748b;
+  font-size: 10px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.portal-account-menu > button {
+  display: grid;
+  gap: 3px;
+  min-height: 51px;
+  padding: 9px 12px;
+  border: 0;
+  border-radius: 9px;
+  color: #1f2b3d;
+  background: transparent;
+  text-align: left;
+  font: inherit;
+  cursor: pointer;
+}
+
+.portal-account-menu > button:hover,
+.portal-account-menu > button:focus-visible {
+  outline: none;
+  background: #edf4ff;
+}
+
+.portal-account-menu > button:disabled {
+  cursor: wait;
+  opacity: 0.6;
+}
+
+.portal-account-menu > button span {
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.portal-account-menu > button small {
+  overflow: hidden;
+  color: #7c899b;
+  font-size: 10px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.portal-account-menu > .portal-workspace-action {
+  color: #0756c9;
+  background: #f2f7ff;
+}
+
+.portal-account-menu > .portal-logout-action {
+  margin-top: 5px;
+  border-top: 1px solid #e7edf5;
+  border-radius: 0 0 9px 9px;
+  color: #b42318;
+}
+
+@media (max-width: 560px) {
+  .portal-account-trigger {
+    grid-template-columns: 34px 14px;
+    max-width: none;
+  }
+
+  .portal-account-copy {
+    display: none;
+  }
+
+  .portal-account-menu {
+    position: fixed;
+    top: 70px;
+    right: 16px;
+    left: 16px;
+    width: auto;
+  }
+}

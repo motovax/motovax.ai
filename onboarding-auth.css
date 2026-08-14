@@ -2,6 +2,186 @@
   text-decoration: none;
 }
 
+.portal-login-body {
+  display: flex;
+  min-height: 100vh;
+  flex-direction: column;
+}
+
+.portal-login-page {
+  display: grid;
+  flex: 1;
+  align-items: center;
+  padding: clamp(32px, 7vw, 88px) 0;
+}
+
+.portal-login-shell {
+  display: grid;
+  grid-template-columns: minmax(0, 0.92fr) minmax(420px, 0.72fr);
+  align-items: center;
+  gap: clamp(44px, 8vw, 112px);
+}
+
+.portal-login-intro {
+  max-width: 610px;
+}
+
+.portal-login-kicker {
+  color: #1267f5;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.13em;
+}
+
+.portal-login-intro h1 {
+  margin: 16px 0 18px;
+  font-size: clamp(38px, 5vw, 64px);
+  line-height: 1.02;
+  letter-spacing: -0.055em;
+}
+
+.portal-login-intro > p {
+  max-width: 520px;
+  margin: 0;
+  color: #607086;
+  font-size: 17px;
+  line-height: 1.7;
+}
+
+.portal-login-intro ul {
+  display: grid;
+  gap: 13px;
+  margin: 28px 0 0;
+  padding: 0;
+  list-style: none;
+  color: #334155;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.portal-login-intro li {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+}
+
+.portal-login-intro li span {
+  display: grid;
+  width: 25px;
+  height: 25px;
+  place-items: center;
+  border-radius: 50%;
+  color: #047857;
+  background: #d1fae5;
+  font-size: 11px;
+}
+
+.portal-login-panel {
+  min-height: 0;
+  padding: 34px;
+}
+
+.portal-login-form {
+  gap: 17px;
+}
+
+.portal-login-submit {
+  width: 100%;
+  min-height: 50px;
+  margin-top: 2px;
+}
+
+.portal-register-prompt {
+  display: grid;
+  gap: 6px;
+  margin-top: 22px;
+  padding: 17px;
+  border: 1px solid #dbe7f5;
+  border-radius: 12px;
+  background: #f6f9fd;
+  text-align: center;
+}
+
+.portal-register-prompt span {
+  color: #64748b;
+  font-size: 12px;
+}
+
+.portal-register-prompt a {
+  color: #0b57d0;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.portal-login-help {
+  margin: 18px 0 0;
+  color: #7b8799;
+  font-size: 11px;
+  line-height: 1.5;
+  text-align: center;
+}
+
+.portal-login-help a {
+  color: #0b57d0;
+  font-weight: 700;
+}
+
+.portal-login-footer {
+  padding-top: 20px;
+}
+
+@media (max-width: 900px) {
+  .portal-login-shell {
+    grid-template-columns: 1fr;
+    gap: 34px;
+  }
+
+  .portal-login-intro {
+    max-width: 720px;
+    text-align: center;
+  }
+
+  .portal-login-intro > p {
+    margin-inline: auto;
+  }
+
+  .portal-login-intro ul {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .portal-login-panel {
+    width: min(560px, 100%);
+    margin-inline: auto;
+  }
+}
+
+@media (max-width: 560px) {
+  .portal-login-page {
+    align-items: start;
+    padding: 24px 0 42px;
+  }
+
+  .portal-login-intro h1 {
+    font-size: clamp(34px, 11vw, 44px);
+  }
+
+  .portal-login-intro > p {
+    font-size: 15px;
+  }
+
+  .portal-login-intro ul {
+    display: grid;
+    justify-content: start;
+    text-align: left;
+  }
+
+  .portal-login-panel {
+    padding: 24px 18px;
+  }
+}
+
 .onboarding-header {
   background: #fff;
 }

@@ -4,6 +4,7 @@ import path from "node:path";
 import { promisify } from "node:util";
 
 import express from "express";
+import bcrypt from "bcryptjs";
 import { OAuth2Client } from "google-auth-library";
 import nodemailer from "nodemailer";
 import pg from "pg";
@@ -13,14 +14,13 @@ const MODULE_PATH = fileURLToPath(import.meta.url);
 const MODULE_DIR = path.dirname(MODULE_PATH);
 const scryptAsync = promisify(crypto.scrypt);
 const SESSION_TTL_MS = 30 * 24 * 60 * 60 * 1000;
+const PORTAL_SESSION_TTL_MS = 30 * 24 * 60 * 60 * 1000;
 const HANDOFF_TTL_MS = 60 * 1000;
 const ALLOWED_MODULES = new Set(["ims", "omni", "social", "crm", "dashboard", "insight"]);
 const ALLOWED_GOALS = new Set(["conversion", "response", "inventory", "scale"]);
-const ALLOWED_INDUSTRIES = new Set(["general", "automotive", "property", "retail"]);
 const RESERVED_SLUGS = new Set([
   "api", "app", "assets", "auth", "dss", "internal", "motovax-ai", "onboard", "status", "support", "www",
 ]);
-const ONBOARDING_MEETING_TIMES = new Set(["09:00", "10:30", "13:30", "15:00"]);
 const MOBIX_TENANT_ID = "4c8bdcb3-c535-4ad6-b2fb-53f5361c8489";
 
 const FULL_TENANT_PERMISSIONS = [
@@ -57,7 +57,11 @@ export function shouldProvisionCallCenterRole({ tenantId, modules }) {
 }
 
 export function tenantRoleTemplatesForProvisioning({ tenantId, modules }) {
-  const templates = TENANT_ROLE_TEMPLATES.map(([name, permissions]) => [name, [...permissions]]);
+  const billingRoles = new Set(["Admin", "Management", "President Director"]);
+  const templates = TENANT_ROLE_TEMPLATES.map(([name, permissions]) => [
+    name,
+    billingRoles.has(name) ? [...permissions, "billing:read"] : [...permissions],
+  ]);
   if (shouldProvisionCallCenterRole({ tenantId, modules })) {
     templates.push(["Call Center", [...CALL_CENTER_PERMISSIONS]]);
   }
@@ -75,6 +79,7 @@ function readConfig(env = process.env) {
     port: Number(env.PORT || 3000),
     publicDir: path.resolve(env.PUBLIC_DIR || MODULE_DIR),
     publicBaseUrl,
+    portalLandingUrl: env.PORTAL_LANDING_URL || "https://motovax.ai/",
     oauthSuccessUrl:
       env.OAUTH_SUCCESS_URL || `${publicBaseUrl}/onboarding.html`,
     googleClientId: env.GOOGLE_OAUTH_CLIENT_ID || "",
@@ -91,7 +96,6 @@ function readConfig(env = process.env) {
     smtpUser: env.PLUNK_SMTP_USER || env.SMTP_USER || "",
     smtpPassword: env.PLUNK_SMTP_PASSWORD || env.SMTP_PASSWORD || "",
     authEmailFrom: env.AUTH_EMAIL_FROM || "onboarding@motovax.ai",
-    onboardingTeamEmail: env.ONBOARDING_TEAM_EMAIL || "support@motovax.com",
     recaptchaProjectId: env.RECAPTCHA_PROJECT_ID || "",
     recaptchaSiteKey: env.RECAPTCHA_SITE_KEY || "",
     recaptchaApiKey: env.RECAPTCHA_API_KEY || "",
@@ -163,6 +167,18 @@ async function verifyPassword(password, encoded) {
   return expected.length === derived.length && crypto.timingSafeEqual(expected, derived);
 }
 
+async function verifyTenantPassword(password, productHash, onboardingHash = "") {
+  const candidate = String(password || "");
+  const appHash = String(productHash || "");
+  if (/^\$2[aby]\$/.test(appHash)) {
+    return bcrypt.compare(candidate, appHash);
+  }
+  if (String(onboardingHash || "").startsWith("scrypt$")) {
+    return verifyPassword(candidate, onboardingHash);
+  }
+  return false;
+}
+
 function normalizeEmail(value) {
   return String(value || "").trim().toLowerCase();
 }
@@ -178,6 +194,7 @@ export function buildIsolatedTenantConfig({ tenantId, profile, callCenterRoleId 
     crm_autopilot: modules.includes("crm"),
     one_dashboard: modules.includes("dashboard"),
     data_insight: modules.includes("insight"),
+    billing_menu: true,
   };
 
   return {
@@ -214,8 +231,8 @@ export function buildIsolatedTenantConfig({ tenantId, profile, callCenterRoleId 
     demo: { public_enabled: false, public_slug: "", allow_writes: false },
     motosocial_api_key: "",
     onboarding: {
-      industry: profile?.industry || "general",
-      branch_count: profile?.branch_count || "1",
+      industry: "automotive",
+      branch_count: profile?.branch_count || "",
       modules,
       goal: profile?.goal || "conversion",
     },
@@ -239,6 +256,15 @@ function normalizeSlug(value) {
     .replace(/-+$/g, "");
 }
 
+function normalizeWorkspace(value, suffix = "motovax.com") {
+  const raw = String(value || "").trim().toLowerCase().replace(/^https?:\/\//, "").split(/[/?#]/)[0];
+  const normalizedSuffix = String(suffix || "motovax.com").toLowerCase();
+  const slug = normalizeSlug(raw.endsWith(`.${normalizedSuffix}`)
+    ? raw.slice(0, -(normalizedSuffix.length + 1))
+    : raw.split(".")[0]);
+  return { slug, domain: `${slug}.${normalizedSuffix}` };
+}
+
 function publicUser(row) {
   return {
     id: row.id,
@@ -246,6 +272,24 @@ function publicUser(row) {
     fullName: row.full_name,
     avatarUrl: row.avatar_url,
     provider: row.provider || (row.password_hash ? "password" : "google"),
+  };
+}
+
+function publicPortalUser(row) {
+  const permissions = Array.isArray(row.permissions) ? row.permissions : [];
+  const features = row.tenant_config?.features || {};
+  return {
+    id: row.id,
+    username: row.username,
+    displayName: row.display_name || row.username,
+    email: row.email || "",
+    role: row.role || "Anggota",
+    tenant: {
+      id: row.tenant_id,
+      name: row.tenant_name,
+      domain: row.domain,
+    },
+    canViewBilling: permissions.includes("billing:read") && features.billing_menu !== false,
   };
 }
 
@@ -488,6 +532,18 @@ export async function createPostgresStore(connectionString) {
       last_seen_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
     );
 
+    CREATE TABLE IF NOT EXISTS portal_auth_sessions (
+      id UUID PRIMARY KEY,
+      app_user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      tenant_id UUID NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
+      token_digest CHAR(64) NOT NULL UNIQUE,
+      user_agent TEXT NOT NULL DEFAULT '',
+      ip_address TEXT NOT NULL DEFAULT '',
+      expires_at TIMESTAMPTZ NOT NULL,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      last_seen_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    );
+
     CREATE TABLE IF NOT EXISTS onboarding_oauth_states (
       state_digest CHAR(64) PRIMARY KEY,
       code_verifier TEXT NOT NULL,
@@ -547,6 +603,10 @@ export async function createPostgresStore(connectionString) {
       ON onboarding_auth_sessions(user_id);
     CREATE INDEX IF NOT EXISTS onboarding_auth_sessions_expiry_idx
       ON onboarding_auth_sessions(expires_at);
+    CREATE INDEX IF NOT EXISTS portal_auth_sessions_expiry_idx
+      ON portal_auth_sessions(expires_at);
+    CREATE INDEX IF NOT EXISTS portal_auth_sessions_user_idx
+      ON portal_auth_sessions(app_user_id, tenant_id);
     CREATE INDEX IF NOT EXISTS onboarding_oauth_states_expiry_idx
       ON onboarding_oauth_states(expires_at);
     CREATE INDEX IF NOT EXISTS onboarding_action_tokens_user_idx
@@ -748,7 +808,7 @@ export async function createPostgresStore(connectionString) {
     },
 
     async getAccountState(userId) {
-      const [profileResult, workspaceResult, meetingResult] = await Promise.all([
+      const [profileResult, workspaceResult] = await Promise.all([
         pool.query(
           `SELECT business_name, workspace_slug, branch_count, region, industry,
                   description, modules, goal, tenant_id, completed_at
@@ -764,12 +824,6 @@ export async function createPostgresStore(connectionString) {
            ORDER BY t.name`,
           [userId],
         ),
-        pool.query(
-          `SELECT id, scheduled_for, timezone, status
-           FROM onboarding_meeting_requests
-           WHERE user_id = $1`,
-          [userId],
-        ),
       ]);
       return {
         profile: profileResult.rows[0] || null,
@@ -780,24 +834,113 @@ export async function createPostgresStore(connectionString) {
           domain: row.domain,
           role: row.membership_role,
         })),
-        meeting: meetingResult.rows[0] || null,
       };
     },
 
-    async saveMeetingRequest({ userId, scheduledFor, timezone }) {
+    async findPortalUser({ workspace, identifier }) {
       const result = await pool.query(
-        `INSERT INTO onboarding_meeting_requests
-          (id, user_id, scheduled_for, timezone, status)
-         VALUES ($1, $2, $3, $4, 'requested')
-         ON CONFLICT (user_id) DO UPDATE SET
-           scheduled_for = EXCLUDED.scheduled_for,
-           timezone = EXCLUDED.timezone,
-           status = 'requested',
-           updated_at = NOW()
-         RETURNING id, scheduled_for, timezone, status`,
-        [crypto.randomUUID(), userId, scheduledFor, timezone],
+        `SELECT
+           u.id,
+           u.username,
+           COALESCE(NULLIF(BTRIM(u.display_name), ''), u.username) AS display_name,
+           COALESCE(u.email, '') AS email,
+           u.password_hash,
+           COALESCE(ou.password_hash, '') AS onboarding_password_hash,
+           t.id AS tenant_id,
+           t.name AS tenant_name,
+           COALESCE(t.config, '{}'::jsonb) AS tenant_config,
+           d.domain,
+           COALESCE(string_agg(DISTINCT r.name, ', ' ORDER BY r.name), '') AS role,
+           COALESCE(
+             (SELECT jsonb_agg(permission.value) FROM (
+               SELECT DISTINCT jsonb_array_elements_text(rp.permissions) AS value
+               FROM user_roles urp
+               JOIN roles rp ON rp.id = urp.role_id
+               WHERE urp.user_id = u.id
+             ) AS permission),
+             '[]'::jsonb
+           ) AS permissions
+         FROM users u
+         JOIN tenants t ON t.id = u.tenant_id AND t.status = 'active'
+         JOIN tenant_domains d ON d.tenant_id = t.id AND d.is_primary = TRUE
+         LEFT JOIN user_roles ur ON ur.user_id = u.id
+         LEFT JOIN roles r ON r.id = ur.role_id
+         LEFT JOIN onboarding_memberships om ON om.app_user_id = u.id AND om.tenant_id = t.id
+         LEFT JOIN onboarding_users ou ON ou.id = om.user_id
+         WHERE (LOWER(d.domain) = LOWER($1) OR LOWER(t.slug) = LOWER($2))
+           AND (LOWER(u.username) = LOWER($3) OR LOWER(COALESCE(u.email, '')) = LOWER($3))
+         GROUP BY u.id, u.username, u.display_name, u.email, u.password_hash,
+                  ou.password_hash, t.id, t.name, t.config, d.domain
+         LIMIT 1`,
+        [workspace.domain, workspace.slug, identifier],
       );
-      return result.rows[0];
+      return result.rows[0] || null;
+    },
+
+    async createPortalSession({ appUserId, tenantId, sessionDigest, userAgent, ipAddress, expiresAt }) {
+      await pool.query("DELETE FROM portal_auth_sessions WHERE expires_at <= NOW()");
+      await pool.query(
+        `INSERT INTO portal_auth_sessions
+          (id, app_user_id, tenant_id, token_digest, user_agent, ip_address, expires_at)
+         VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+        [crypto.randomUUID(), appUserId, tenantId, sessionDigest, userAgent, ipAddress, expiresAt],
+      );
+    },
+
+    async findPortalSession(sessionDigest) {
+      const result = await pool.query(
+        `UPDATE portal_auth_sessions s
+         SET last_seen_at = NOW()
+         FROM users u, tenants t, tenant_domains d
+         WHERE s.token_digest = $1
+           AND s.expires_at > NOW()
+           AND u.id = s.app_user_id
+           AND t.id = s.tenant_id
+           AND t.status = 'active'
+           AND u.tenant_id = t.id
+           AND d.tenant_id = t.id
+           AND d.is_primary = TRUE
+         RETURNING u.id, u.username,
+           COALESCE(NULLIF(BTRIM(u.display_name), ''), u.username) AS display_name,
+           COALESCE(u.email, '') AS email,
+           t.id AS tenant_id, t.name AS tenant_name,
+           COALESCE(t.config, '{}'::jsonb) AS tenant_config,
+           d.domain,
+           COALESCE((SELECT string_agg(DISTINCT r.name, ', ' ORDER BY r.name)
+             FROM user_roles ur JOIN roles r ON r.id = ur.role_id
+             WHERE ur.user_id = u.id), '') AS role,
+           COALESCE((SELECT jsonb_agg(permission.value) FROM (
+             SELECT DISTINCT jsonb_array_elements_text(rp.permissions) AS value
+             FROM user_roles urp JOIN roles rp ON rp.id = urp.role_id
+             WHERE urp.user_id = u.id
+           ) AS permission), '[]'::jsonb) AS permissions`,
+        [sessionDigest],
+      );
+      return result.rows[0] || null;
+    },
+
+    async revokePortalSession(sessionDigest) {
+      await pool.query("DELETE FROM portal_auth_sessions WHERE token_digest = $1", [sessionDigest]);
+    },
+
+    async createPortalHandoff(appUserId, tenantId) {
+      const result = await pool.query(
+        `SELECT u.id AS app_user_id, t.id, t.name, d.domain
+         FROM users u
+         JOIN tenants t ON t.id = u.tenant_id AND t.status = 'active'
+         JOIN tenant_domains d ON d.tenant_id = t.id AND d.is_primary = TRUE
+         WHERE u.id = $1 AND t.id = $2`,
+        [appUserId, tenantId],
+      );
+      const workspace = result.rows[0];
+      if (!workspace) return null;
+      const handoffToken = randomToken(32);
+      await pool.query(
+        `INSERT INTO auth_tokens (user_id, token, expires_at, is_magic_link)
+         VALUES ($1, $2, $3, TRUE)`,
+        [appUserId, handoffToken, new Date(Date.now() + HANDOFF_TTL_MS)],
+      );
+      return { workspace, handoffToken };
     },
 
     async isSlugAvailable(slug, suffix) {
@@ -1072,6 +1215,34 @@ export function createApp({
     return store.findSession(tokenDigest(sessionToken, config.sessionSecret));
   }
 
+  async function authenticatedPortalUser(req) {
+    if (!store || !config.sessionSecret || !store.findPortalSession) return null;
+    const match = String(req.get("authorization") || "").match(/^Bearer\s+([A-Za-z0-9_-]{32,})$/i);
+    if (!match) return null;
+    return store.findPortalSession(tokenDigest(match[1], config.sessionSecret));
+  }
+
+  function portalCors(req, res, next) {
+    const origin = String(req.get("origin") || "");
+    const landingOrigin = new URL(config.portalLandingUrl || "https://motovax.ai/").origin;
+    const authOrigin = new URL(config.publicBaseUrl).origin;
+    const allowed = origin === landingOrigin
+      || origin === authOrigin
+      || origin === "https://www.motovax.ai"
+      || /^http:\/\/(?:127\.0\.0\.1|localhost)(?::\d+)?$/.test(origin);
+    if (origin && allowed) {
+      res.set("Access-Control-Allow-Origin", origin);
+      res.set("Access-Control-Allow-Headers", "Authorization, Content-Type");
+      res.set("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+      res.set("Vary", "Origin");
+    }
+    if (req.method === "OPTIONS") {
+      return allowed ? res.status(204).end() : res.status(403).end();
+    }
+    if (origin && !allowed) return res.status(403).json({ error: "invalid_origin" });
+    return next();
+  }
+
   async function issueSession(req, res, userId) {
     const sessionToken = randomToken(48);
     await store.createSession({
@@ -1156,6 +1327,97 @@ export function createApp({
         action: recaptchaReady(config) ? config.recaptchaAction : "",
       },
     });
+  });
+
+  app.use("/api/portal", portalCors);
+
+  app.post("/api/portal/login", async (req, res, next) => {
+    try {
+      if (!assertSameOrigin(req, res) || !checkAuthRateLimit(req, res)) return;
+      if (!store || !config.sessionSecret || !store.findPortalUser || !store.createPortalSession) {
+        return res.status(503).json({ error: "service_unavailable" });
+      }
+      const workspace = normalizeWorkspace(req.body?.workspace, config.tenantDomainSuffix);
+      const identifier = String(req.body?.identifier || "").trim().toLowerCase();
+      const password = String(req.body?.password || "");
+      if (workspace.slug.length < 2 || identifier.length < 2 || password.length < 1) {
+        return res.status(400).json({
+          error: "invalid_login",
+          message: "Lengkapi workspace, username atau email, dan password Anda.",
+        });
+      }
+      const user = await store.findPortalUser({ workspace, identifier });
+      const valid = user
+        ? await verifyTenantPassword(password, user.password_hash, user.onboarding_password_hash)
+        : false;
+      if (!valid) {
+        return res.status(401).json({
+          error: "invalid_credentials",
+          message: "Workspace, username/email, atau password tidak sesuai.",
+        });
+      }
+      const sessionToken = randomToken(48);
+      const expiresAt = new Date(Date.now() + PORTAL_SESSION_TTL_MS);
+      await store.createPortalSession({
+        appUserId: user.id,
+        tenantId: user.tenant_id,
+        sessionDigest: tokenDigest(sessionToken, config.sessionSecret),
+        userAgent: String(req.headers["user-agent"] || "").slice(0, 500),
+        ipAddress: String(req.ip || "").slice(0, 100),
+        expiresAt,
+      });
+      return res.json({
+        authenticated: true,
+        token: sessionToken,
+        expiresAt: expiresAt.toISOString(),
+        user: publicPortalUser(user),
+        returnUrl: config.portalLandingUrl || "https://motovax.ai/",
+      });
+    } catch (error) {
+      return next(error);
+    }
+  });
+
+  app.get("/api/portal/me", async (req, res, next) => {
+    try {
+      const user = await authenticatedPortalUser(req);
+      if (!user) return res.status(401).json({ authenticated: false });
+      return res.json({ authenticated: true, user: publicPortalUser(user) });
+    } catch (error) {
+      return next(error);
+    }
+  });
+
+  app.post("/api/portal/workspace/enter", async (req, res, next) => {
+    try {
+      const user = await authenticatedPortalUser(req);
+      if (!user) return res.status(401).json({ error: "not_authenticated" });
+      const destinations = new Set(["/", "/settings/account", "/billing"]);
+      const destination = destinations.has(req.body?.destination) ? req.body.destination : "/";
+      if (destination === "/billing" && !publicPortalUser(user).canViewBilling) {
+        return res.status(403).json({ error: "billing_forbidden", message: "Akun ini tidak memiliki akses billing." });
+      }
+      const result = await store.createPortalHandoff(user.id, user.tenant_id);
+      if (!result) return res.status(404).json({ error: "workspace_not_found" });
+      const redirect = new URL(`https://${result.workspace.domain}/magic-login`);
+      redirect.searchParams.set("token", result.handoffToken);
+      if (destination !== "/") redirect.searchParams.set("redirect", destination);
+      return res.json({ redirectUrl: redirect.toString() });
+    } catch (error) {
+      return next(error);
+    }
+  });
+
+  app.post("/api/portal/logout", async (req, res, next) => {
+    try {
+      const match = String(req.get("authorization") || "").match(/^Bearer\s+([A-Za-z0-9_-]{32,})$/i);
+      if (match && store?.revokePortalSession && config.sessionSecret) {
+        await store.revokePortalSession(tokenDigest(match[1], config.sessionSecret));
+      }
+      return res.status(204).end();
+    } catch (error) {
+      return next(error);
+    }
   });
 
   app.post("/api/auth/signup", async (req, res, next) => {
@@ -1291,73 +1553,6 @@ export function createApp({
     }
   });
 
-  app.post("/api/onboarding/meeting", async (req, res, next) => {
-    try {
-      if (!assertSameOrigin(req, res)) return;
-      const user = await authenticatedUser(req);
-      if (!user) return res.status(401).json({ error: "not_authenticated" });
-
-      const date = String(req.body?.date || "");
-      const time = String(req.body?.time || "");
-      const timezone = String(req.body?.timezone || "Asia/Jakarta");
-      if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || !ONBOARDING_MEETING_TIMES.has(time) || timezone !== "Asia/Jakarta") {
-        return res.status(400).json({ error: "invalid_meeting_schedule", message: "Pilih tanggal dan waktu meeting yang tersedia." });
-      }
-      const day = new Date(`${date}T00:00:00Z`).getUTCDay();
-      const scheduledFor = new Date(`${date}T${time}:00+07:00`);
-      const delay = scheduledFor.getTime() - Date.now();
-      if (!Number.isFinite(scheduledFor.getTime()) || day === 0 || day === 6 || delay < 12 * 60 * 60 * 1000 || delay > 90 * 24 * 60 * 60 * 1000) {
-        return res.status(400).json({ error: "invalid_meeting_schedule", message: "Meeting harus dipilih pada hari kerja dalam 90 hari ke depan." });
-      }
-
-      await recaptchaVerifier(config, String(req.body?.recaptchaToken || ""));
-      const meeting = await store.saveMeetingRequest({ userId: user.id, scheduledFor, timezone });
-      if (emailClient) {
-        const formatted = new Intl.DateTimeFormat("id-ID", {
-          dateStyle: "full",
-          timeStyle: "short",
-          timeZone: timezone,
-        }).format(scheduledFor);
-        const notification = await Promise.allSettled([
-          emailClient.sendMail({
-            from: `MOTOVAX <${config.authEmailFrom}>`,
-            to: config.onboardingTeamEmail,
-            replyTo: user.email,
-            subject: `Permintaan onboarding bersama tim — ${user.full_name || user.email}`,
-            text: `Pengguna: ${user.full_name || "-"}\nEmail: ${user.email}\nJadwal pilihan: ${formatted} WIB\n\nSilakan konfirmasi detail meeting kepada pengguna.`,
-            html: `<p>Permintaan onboarding bersama tim baru.</p><ul><li>Pengguna: ${escapeHtml(user.full_name || "-")}</li><li>Email: ${escapeHtml(user.email)}</li><li>Jadwal pilihan: ${escapeHtml(formatted)} WIB</li></ul><p>Silakan konfirmasi detail meeting kepada pengguna.</p>`,
-          }),
-          emailClient.sendMail({
-            from: `MOTOVAX <${config.authEmailFrom}>`,
-            to: user.email,
-            subject: "Jadwal onboarding bersama tim MOTOVAX diterima",
-            text: `Pilihan jadwal Anda: ${formatted} WIB. Tim MOTOVAX akan mengirim konfirmasi dan detail meeting ke email ini.`,
-            html: `<p>Halo ${escapeHtml(user.full_name || user.email)},</p><p>Pilihan jadwal Anda: <strong>${escapeHtml(formatted)} WIB</strong>.</p><p>Tim MOTOVAX akan mengirim konfirmasi dan detail meeting ke email ini.</p>`,
-          }),
-        ]);
-        if (notification.some((result) => result.status === "rejected")) {
-          console.error("meeting_notification_failed", { userId: user.id });
-        }
-      }
-      return res.status(201).json({
-        meeting: {
-          id: meeting.id,
-          scheduledFor: meeting.scheduled_for,
-          timezone: meeting.timezone,
-          status: meeting.status,
-        },
-      });
-    } catch (error) {
-      if (["recaptcha_invalid", "recaptcha_low_score"].includes(error?.code)) {
-        return res.status(400).json({ error: error.code, message: error.message });
-      }
-      if (error?.code === "recaptcha_unavailable") {
-        return res.status(503).json({ error: error.code, message: error.message });
-      }
-      return next(error);
-    }
-  });
-
   app.post("/api/onboarding/profile", async (req, res, next) => {
     try {
       if (!assertSameOrigin(req, res)) return;
@@ -1366,22 +1561,26 @@ export function createApp({
       const profile = {
         businessName: String(req.body?.businessName || "").trim(),
         workspaceSlug: normalizeSlug(req.body?.workspaceSlug || req.body?.businessName),
-        branchCount: String(req.body?.branchCount || "1").trim(),
+        branchCount: String(req.body?.branchCount || "").trim(),
         region: String(req.body?.region || "").trim(),
-        industry: String(req.body?.industry || "general").trim(),
+        industry: "automotive",
         description: String(req.body?.description || "").trim().slice(0, 240),
         modules: Array.isArray(req.body?.modules)
           ? [...new Set(req.body.modules.filter((item) => ALLOWED_MODULES.has(item)))]
           : [],
         goal: ALLOWED_GOALS.has(req.body?.goal) ? req.body.goal : "conversion",
       };
-      if (profile.businessName.length < 2 || profile.businessName.length > 150 || profile.region.length < 2) {
-        return res.status(400).json({ error: "invalid_profile", message: "Nama bisnis dan wilayah utama wajib diisi." });
+      if (
+        profile.businessName.length < 2
+        || profile.businessName.length > 150
+        || profile.region.length === 1
+        || profile.region.length > 120
+      ) {
+        return res.status(400).json({ error: "invalid_profile", message: "Nama bisnis wajib diisi; wilayah boleh dikosongkan." });
       }
       if (profile.workspaceSlug.length < 3 || RESERVED_SLUGS.has(profile.workspaceSlug)) {
         return res.status(400).json({ error: "invalid_slug", message: "Subdomain minimal 3 karakter dan tidak boleh memakai nama sistem." });
       }
-      if (!ALLOWED_INDUSTRIES.has(profile.industry)) profile.industry = "general";
       const available = await store.isSlugAvailable(profile.workspaceSlug, config.tenantDomainSuffix);
       const currentState = await store.getAccountState(user.id);
       const ownsSameSlug = currentState.profile?.workspace_slug === profile.workspaceSlug && currentState.profile?.tenant_id;
@@ -1642,6 +1841,13 @@ export function createApp({
       )
     ) {
       return res.status(404).end();
+    }
+    return next();
+  });
+  app.get("/", (req, res, next) => {
+    const authHost = new URL(config.publicBaseUrl).hostname;
+    if (authHost === "onboard.motovax.com" && req.hostname === authHost) {
+      return res.redirect(302, "/onboarding.html");
     }
     return next();
   });

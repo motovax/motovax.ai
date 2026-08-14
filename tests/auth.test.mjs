@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import crypto from "node:crypto";
 import { after, before, test } from "node:test";
+import bcrypt from "bcryptjs";
 
 import { createApp, verifyRecaptchaToken } from "../server.mjs";
 
@@ -14,6 +15,8 @@ let baseUrl;
 let authenticatedCookie = "";
 let accountState = { profile: null, workspaces: [] };
 const recaptchaTokens = [];
+const portalSessions = new Map();
+let portalPasswordHash = "";
 
 const config = {
   nodeEnv: "test",
@@ -33,7 +36,6 @@ const config = {
   recaptchaAction: "complete_onboarding",
   recaptchaScoreThreshold: 0.5,
   recaptchaExpectedHostname: "127.0.0.1",
-  onboardingTeamEmail: "team@motovax.com",
   authEmailFrom: "onboarding@motovax.ai",
   trustProxy: false,
 };
@@ -114,18 +116,52 @@ const store = {
   async getAccountState() {
     return accountState;
   },
+  async findPortalUser({ workspace, identifier }) {
+    if (workspace.slug !== "dealer-test" || identifier !== "owner") return null;
+    return {
+      id: "app-user-1",
+      username: "owner",
+      display_name: "Owner Dealer",
+      email: "owner@dealer.test",
+      password_hash: portalPasswordHash,
+      onboarding_password_hash: "",
+      tenant_id: "tenant-1",
+      tenant_name: "Dealer Test",
+      tenant_config: { features: { billing_menu: true } },
+      domain: "dealer-test.motovax.com",
+      role: "Admin",
+      permissions: ["billing:read", "tenant:read"],
+    };
+  },
+  async createPortalSession(record) {
+    portalSessions.set(record.sessionDigest, {
+      id: record.appUserId,
+      username: "owner",
+      display_name: "Owner Dealer",
+      email: "owner@dealer.test",
+      tenant_id: record.tenantId,
+      tenant_name: "Dealer Test",
+      tenant_config: { features: { billing_menu: true } },
+      domain: "dealer-test.motovax.com",
+      role: "Admin",
+      permissions: ["billing:read", "tenant:read"],
+    });
+  },
+  async findPortalSession(sessionDigest) {
+    return portalSessions.get(sessionDigest) || null;
+  },
+  async revokePortalSession(sessionDigest) {
+    portalSessions.delete(sessionDigest);
+  },
+  async createPortalHandoff(appUserId, tenantId) {
+    if (appUserId !== "app-user-1" || tenantId !== "tenant-1") return null;
+    return {
+      workspace: { domain: "dealer-test.motovax.com" },
+      handoffToken: "handoff-token-1",
+    };
+  },
   async isSlugAvailable(slug) {
     return slug !== "workspace-terpakai";
-  },
-  async saveMeetingRequest({ scheduledFor, timezone }) {
-    const meeting = {
-      id: "meeting-1",
-      scheduled_for: scheduledFor,
-      timezone,
-      status: "requested",
-    };
-    accountState = { profile: null, workspaces: [], meeting };
-    return meeting;
   },
   async revokeSession(digest) {
     sessions.delete(digest);
@@ -176,6 +212,7 @@ function digest(value) {
 }
 
 before(async () => {
+  portalPasswordHash = await bcrypt.hash("rahasia123", 4);
   const app = createApp({
     config,
     store,
@@ -386,6 +423,51 @@ test("availability workspace menolak nama yang sudah dipakai", async () => {
   assert.equal(payload.domain, "workspace-baru.motovax.com");
 });
 
+test("portal login tenant membawa profil, billing, logout, dan handoff workspace", async () => {
+  const login = await fetch(`${baseUrl}/api/portal/login`, {
+    method: "POST",
+    headers: { origin: "http://127.0.0.1", "content-type": "application/json" },
+    body: JSON.stringify({ workspace: "dealer-test", identifier: "owner", password: "rahasia123" }),
+  });
+  assert.equal(login.status, 200);
+  const loginPayload = await login.json();
+  assert.equal(loginPayload.authenticated, true);
+  assert.equal(loginPayload.user.displayName, "Owner Dealer");
+  assert.equal(loginPayload.user.tenant.domain, "dealer-test.motovax.com");
+  assert.equal(loginPayload.user.canViewBilling, true);
+  assert.ok(loginPayload.token.length >= 32);
+
+  const authorization = `Bearer ${loginPayload.token}`;
+  const me = await fetch(`${baseUrl}/api/portal/me`, {
+    headers: { authorization, origin: "https://motovax.ai" },
+  });
+  assert.equal(me.status, 200);
+  assert.equal(me.headers.get("access-control-allow-origin"), "https://motovax.ai");
+  assert.equal((await me.json()).user.role, "Admin");
+
+  const enter = await fetch(`${baseUrl}/api/portal/workspace/enter`, {
+    method: "POST",
+    headers: { authorization, origin: "https://motovax.ai", "content-type": "application/json" },
+    body: JSON.stringify({ destination: "/billing" }),
+  });
+  assert.equal(enter.status, 200);
+  const enterUrl = new URL((await enter.json()).redirectUrl);
+  assert.equal(enterUrl.origin, "https://dealer-test.motovax.com");
+  assert.equal(enterUrl.pathname, "/magic-login");
+  assert.equal(enterUrl.searchParams.get("token"), "handoff-token-1");
+  assert.equal(enterUrl.searchParams.get("redirect"), "/billing");
+
+  const logout = await fetch(`${baseUrl}/api/portal/logout`, {
+    method: "POST",
+    headers: { authorization, origin: "https://motovax.ai" },
+  });
+  assert.equal(logout.status, 204);
+  const expired = await fetch(`${baseUrl}/api/portal/me`, {
+    headers: { authorization, origin: "https://motovax.ai" },
+  });
+  assert.equal(expired.status, 401);
+});
+
 test("penyelesaian onboarding ditolak sebelum provisioning tanpa token reCAPTCHA valid", async () => {
   accountState = { profile: { modules: ["ims"] }, workspaces: [] };
   const response = await fetch(`${baseUrl}/api/onboarding/complete`, {
@@ -400,32 +482,4 @@ test("penyelesaian onboarding ditolak sebelum provisioning tanpa token reCAPTCHA
   assert.equal(response.status, 400);
   assert.equal((await response.json()).error, "recaptcha_invalid");
   assert.deepEqual(recaptchaTokens, [""]);
-});
-
-test("jalur bersama tim menyimpan jadwal meeting dan mengirim notifikasi", async () => {
-  const date = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000);
-  while ([0, 6].includes(date.getUTCDay())) date.setUTCDate(date.getUTCDate() + 1);
-  const dateText = date.toISOString().slice(0, 10);
-  const response = await fetch(`${baseUrl}/api/onboarding/meeting`, {
-    method: "POST",
-    headers: {
-      cookie: authenticatedCookie,
-      origin: "http://127.0.0.1",
-      "content-type": "application/json",
-    },
-    body: JSON.stringify({
-      date: dateText,
-      time: "10:30",
-      timezone: "Asia/Jakarta",
-      recaptchaToken: "valid-recaptcha-token",
-    }),
-  });
-  assert.equal(response.status, 201);
-  const payload = await response.json();
-  assert.equal(payload.meeting.id, "meeting-1");
-  assert.equal(payload.meeting.timezone, "Asia/Jakarta");
-  assert.equal(payload.meeting.status, "requested");
-  assert.equal(recaptchaTokens.at(-1), "valid-recaptcha-token");
-  assert.equal(sentEmails.at(-2).to, "team@motovax.com");
-  assert.equal(sentEmails.at(-1).to, "user@example.com");
 });
