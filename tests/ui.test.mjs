@@ -75,6 +75,54 @@ const viewports = [
   { name: "mobile", width: 390, height: 844 },
 ];
 
+for (const viewport of viewports) {
+  test(`CTA daftar membuka formulir registrasi awal kosong pada ${viewport.name}`, async () => {
+    const context = await browser.newContext({ viewport });
+    await context.addInitScript(() => {
+      localStorage.setItem("motovax_onboarding_v1", JSON.stringify({
+        step: 4,
+        account: { fullName: "Owner Demo", email: "owner@demo.test" },
+        business: { businessName: "Tenant Demo", workspaceSlug: "tenant-demo", industry: "automotive" },
+        completed: true,
+        workspace: { id: "tenant-demo", name: "Tenant Demo", domain: "tenant-demo.motovax.com", ready: true },
+      }));
+    });
+    const page = await context.newPage();
+    let logoutCount = 0;
+    let meCount = 0;
+    await page.route(/https:\/\/fonts\.(?:googleapis|gstatic)\.com\//, (route) => route.abort());
+    await page.route("**/api/config", (route) => route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ recaptcha: { enabled: true, siteKey: "test", action: "complete_onboarding" } }) }));
+    await page.route("**/api/auth/logout", (route) => {
+      logoutCount += 1;
+      return route.fulfill({ status: 204 });
+    });
+    await page.route("**/api/auth/me", (route) => {
+      meCount += 1;
+      return route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({
+        authenticated: true,
+        user: { id: "owner-demo", email: "owner@demo.test", fullName: "Owner Demo", provider: "password" },
+        profile: { business_name: "Tenant Demo", workspace_slug: "tenant-demo" },
+        workspaces: [{ id: "tenant-demo", name: "Tenant Demo", domain: "tenant-demo.motovax.com", ready: true }],
+      }) });
+    });
+
+    await page.goto(`${baseUrl}/onboarding.html?fresh=1`, { waitUntil: "load" });
+    await page.waitForFunction(() => !new URL(window.location.href).searchParams.has("fresh"));
+    await page.waitForSelector('[data-step="1"].is-active');
+
+    assert.equal(logoutCount, 1);
+    assert.equal(meCount, 0);
+    assert.equal(await page.inputValue('[data-auth-form="signup"] input[name="fullName"]'), "");
+    assert.equal(await page.inputValue('[data-auth-form="signup"] input[name="email"]'), "");
+    assert.equal(await page.locator('[data-step="4"]').isHidden(), true);
+    assert.equal(await page.getByText("Jadwalkan demo live", { exact: false }).count(), 0);
+    assert.equal(await page.evaluate(() => JSON.parse(localStorage.getItem("motovax_onboarding_v1")).workspace), null);
+    assert.equal(await noOverflow(page), true);
+    await page.screenshot({ path: `/tmp/motovax-fresh-registration-${viewport.name}.png`, fullPage: false });
+    await context.close();
+  });
+}
+
 function noOverflow(page) {
   return page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth);
 }
@@ -206,7 +254,7 @@ for (const viewport of viewports) {
     });
     await page.route("https://motovax.ai/**", (route) => route.fulfill({ status: 200, contentType: "text/html", body: "<title>Landing</title>" }));
     await page.goto(`${baseUrl}/login.html`, { waitUntil: "load" });
-    assert.equal(await page.getAttribute('.portal-register-prompt a', "href"), "https://onboard.motovax.com/");
+    assert.equal(await page.getAttribute('.portal-register-prompt a', "href"), "https://onboard.motovax.com/onboarding.html?fresh=1");
     assert.equal(await page.locator('input[name="workspace"]').count(), 0);
     await page.fill('input[name="identifier"]', "owner");
     await page.click('[data-portal-login-form] button[type="submit"]');

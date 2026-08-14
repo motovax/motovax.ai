@@ -196,7 +196,9 @@
     if (mobileTrigger) mobileTrigger.remove();
     routeContentLinksToLanding();
     this.root = document.body;
-    this.state = loadState();
+    var initialParams = new URLSearchParams(window.location.search);
+    this.isFreshRegistration = initialParams.get("fresh") === "1";
+    this.state = this.isFreshRegistration ? defaultState() : loadState();
     this.toastTimer = null;
     this.workspacePollTimer = null;
     this.slugCheckTimer = null;
@@ -220,10 +222,41 @@
     this.hydrate();
     // Workspace aktif hanya boleh berasal dari session server, bukan localStorage lama.
     this.goTo(1, { silent: true });
-    var initialParams = new URLSearchParams(window.location.search);
     if (initialParams.get("reset") === "1" && initialParams.get("token")) this.showResetForm();
-    this.hydrateGoogleSession();
+    if (this.isFreshRegistration) {
+      this.startFreshRegistration(initialParams);
+    } else {
+      this.hydrateGoogleSession();
+    }
   }
+
+  OnboardingApp.prototype.startFreshRegistration = function (params) {
+    var self = this;
+    setFormLoading(this.signupForm, true);
+    api("/api/auth/logout", { method: "POST", body: "{}" })
+      .then(function () {
+        try {
+          localStorage.removeItem(STORAGE_KEY);
+        } catch (_error) {
+          /* state in-memory tetap menjadi sumber formulir baru */
+        }
+        self.state = defaultState();
+        self.slugIsAutomatic = true;
+        self.hydrate();
+        self.goTo(1, { silent: true });
+        params.delete("fresh");
+        var query = params.toString();
+        window.history.replaceState({}, "", window.location.pathname + (query ? "?" + query : "") + window.location.hash);
+        self.isFreshRegistration = false;
+        setFormLoading(self.signupForm, false);
+      })
+      .catch(function (error) {
+        self.showError(
+          self.signupForm,
+          friendlySubmitError(error, "Sesi pendaftaran sebelumnya belum dapat diakhiri. Muat ulang halaman untuk mencoba lagi."),
+        );
+      });
+  };
 
   OnboardingApp.prototype.prepareRecaptcha = function () {
     return api("/api/config")
