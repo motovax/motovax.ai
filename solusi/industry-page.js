@@ -232,7 +232,13 @@
             <p>${escapeHtml(industry.ctaDesc)}</p>
           </div>
           <div class="industry-cta-actions">
-            <a class="industry-wa-link" href="#" data-wa>WhatsApp kami</a>
+            <a class="industry-wa-link" href="#" data-wa>
+              <svg class="industry-wa-icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M20.5 3.5A11.8 11.8 0 0 0 12.1 0C5.6 0 .3 5.3.3 11.8c0 2.1.5 4.1 1.6 5.9L.2 24l6.5-1.7a11.8 11.8 0 0 0 5.4 1.4h.1c6.5 0 11.8-5.3 11.8-11.8 0-3.2-1.2-6.1-3.5-8.4Zm-8.3 18.2h-.1c-1.8 0-3.5-.5-5-1.4l-.4-.2-3.8 1 1-3.7-.2-.4a9.8 9.8 0 1 1 8.5 4.7Zm5.4-7.3c-.3-.1-1.8-.9-2.1-1-.3-.1-.5-.1-.7.2l-1 1.2c-.2.2-.4.2-.7.1-1.9-.9-3.2-1.7-4.5-3.9-.3-.5.3-.5.9-1.6.1-.2.1-.4 0-.6l-.9-2.2c-.2-.5-.5-.4-.7-.4h-.6c-.2 0-.6.1-.9.4-.3.4-1.2 1.2-1.2 3s1.3 3.5 1.5 3.7c.2.2 2.6 4 6.4 5.6 2.4 1 3.4 1.1 4.7.9.8-.1 1.8-.7 2-1.4.3-.7.3-1.3.2-1.4-.1-.2-.3-.2-.6-.4Z"/>
+              </svg>
+              <span>Hubungi Kami</span>
+              <span class="industry-wa-arrow" aria-hidden="true">→</span>
+            </a>
           </div>
         </div>
       </section>
