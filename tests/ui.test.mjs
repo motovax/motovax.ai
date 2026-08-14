@@ -185,6 +185,55 @@ for (const viewport of viewports) {
   });
 }
 
+for (const viewport of viewports) {
+  test(`kartu kapabilitas homepage konsisten pada ${viewport.name}`, async () => {
+    const context = await browser.newContext({ viewport });
+    const page = await context.newPage();
+    await page.route(/https:\/\/fonts\.(?:googleapis|gstatic)\.com\//, (route) => route.abort());
+    await page.goto(`${baseUrl}/index.html`, { waitUntil: "load" });
+
+    const section = page.locator("#solusi");
+    await section.scrollIntoViewIfNeeded();
+    const layout = await section.evaluate((element) => {
+      const intro = element.querySelector(".solution-intro").getBoundingClientRect();
+      const grid = element.querySelector(".solution-grid").getBoundingClientRect();
+      const cards = [...element.querySelectorAll(".solution-card")].map((card) => {
+        const rect = card.getBoundingClientRect();
+        const style = getComputedStyle(card);
+        return {
+          x: rect.x,
+          y: rect.y,
+          width: rect.width,
+          height: rect.height,
+          backgroundColor: style.backgroundColor,
+          color: style.color,
+        };
+      });
+      const allCapabilitiesLink = element.querySelector(".solution-intro > a").getBoundingClientRect();
+      return {
+        cards,
+        introGap: grid.top - intro.bottom,
+        allCapabilitiesLinkHeight: allCapabilitiesLink.height,
+      };
+    });
+
+    assert.equal(layout.cards.length, 6);
+    assert.equal(new Set(layout.cards.map((card) => card.backgroundColor)).size, 1);
+    assert.equal(new Set(layout.cards.map((card) => card.color)).size, 1);
+    assert.ok(layout.introGap >= 29, `jarak judul ke kartu ${layout.introGap}px`);
+    assert.ok(layout.allCapabilitiesLinkHeight >= 44);
+
+    const firstRowY = layout.cards[0].y;
+    const firstRowCards = layout.cards.filter((card) => Math.abs(card.y - firstRowY) < 1);
+    assert.equal(firstRowCards.length, viewport.name === "desktop" ? 3 : viewport.name === "tablet" ? 2 : 1);
+    assert.ok(firstRowCards.every((card) => Math.abs(card.height - firstRowCards[0].height) < .1));
+    assert.equal(await noOverflow(page), true);
+
+    await section.screenshot({ path: `/tmp/motovax-solution-cards-${viewport.name}.png` });
+    await context.close();
+  });
+}
+
 function noOverflow(page) {
   return page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth);
 }
