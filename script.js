@@ -1046,16 +1046,13 @@ if (contactForm instanceof HTMLFormElement) {
   const headerInner = header?.querySelector(".header-inner");
   if (!(header instanceof HTMLElement) || !(headerInner instanceof HTMLElement)) return;
 
-  /* Beranda: header hanya logo + Login. Hamburger membuat bar tambahan di mobile. */
-  if (document.body.classList.contains("home-redesign")) return;
-
   let trigger = header.querySelector("[data-mobile-nav-trigger]");
-  let panel = header.querySelector("[data-mobile-nav-panel]");
-  let backdrop = header.querySelector("[data-mobile-nav-backdrop]");
+  let panel = document.querySelector("[data-mobile-nav-panel]");
+  let backdrop = document.querySelector("[data-mobile-nav-backdrop]");
 
-  /* Halaman selain beranda memakai header yang sama, tetapi markup menu mobile
-   * tidak diduplikasi ke puluhan file HTML. Bentuk menu di sini agar setiap
-   * halaman selalu mendapat navigasi mobile/tablet yang identik. */
+  /* Seluruh halaman memakai header yang sama, tetapi markup menu mobile tidak
+   * diduplikasi ke puluhan file HTML. Bentuk menu di sini agar setiap halaman,
+   * termasuk beranda, selalu mendapat navigasi mobile/tablet yang identik. */
   if (!trigger || !panel || !backdrop) {
     const path = location.pathname.replace(/\/+$/, "") || "/";
     const nested = path.includes("/fitur/") || path.includes("/solusi/") || /\/(fitur|solusi)$/.test(path);
@@ -1095,7 +1092,9 @@ if (contactForm instanceof HTMLFormElement) {
       <a class="btn btn-primary mobile-nav-cta" href="${root}hubungi-kami.html" data-mobile-nav-close>Diskusikan Dealer Anda <span>→</span></a>`;
 
     headerInner.appendChild(trigger);
-    header.append(backdrop, panel);
+    /* Letakkan layer fixed di body agar backdrop-filter pada sticky header tidak
+     * menjadikannya containing block setinggi header. */
+    document.body.append(backdrop, panel);
   }
 
   if (!(trigger instanceof HTMLButtonElement) || !(panel instanceof HTMLElement) || !(backdrop instanceof HTMLElement)) return;

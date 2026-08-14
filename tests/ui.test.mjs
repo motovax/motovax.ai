@@ -202,6 +202,47 @@ for (const viewport of viewports) {
     await context.close();
   });
 
+  test(`navigasi beranda responsif pada ${viewport.name}`, async () => {
+    const context = await browser.newContext({ viewport });
+    const page = await context.newPage();
+    await page.route(/https:\/\/fonts\.(?:googleapis|gstatic)\.com\//, (route) => route.abort());
+    await page.route("https://onboard.motovax.com/api/portal/me", (route) => route.abort());
+    await page.goto(`${baseUrl}/index.html`, { waitUntil: "load" });
+
+    const trigger = page.locator("[data-mobile-nav-trigger]");
+    const panel = page.locator("[data-mobile-nav-panel]");
+    assert.equal(await trigger.count(), 1);
+
+    if (viewport.width > 1024) {
+      assert.equal(await trigger.isHidden(), true);
+      assert.equal(await page.locator(".nav").isVisible(), true);
+    } else {
+      assert.equal(await trigger.isVisible(), true);
+      assert.equal(await trigger.getAttribute("aria-expanded"), "false");
+      await trigger.click();
+      assert.equal(await trigger.getAttribute("aria-expanded"), "true");
+      assert.equal(await panel.isVisible(), true);
+      assert.equal(await panel.locator("a", { hasText: "Produk" }).isVisible(), true);
+      assert.equal(await panel.locator("a", { hasText: "Solusi Dealer Mobil" }).isVisible(), true);
+      assert.equal(await panel.locator("a", { hasText: "Cara Kerja" }).isVisible(), true);
+      assert.equal(await panel.locator("a", { hasText: "Harga" }).isVisible(), true);
+      const panelBox = await panel.boundingBox();
+      assert.ok(panelBox);
+      assert.ok(Math.abs(panelBox.y + panelBox.height - viewport.height) <= 1);
+      assert.ok(panelBox.height > viewport.height / 2);
+      assert.equal(await page.locator("body").evaluate((body) => getComputedStyle(body).overflow), "hidden");
+      await page.screenshot({ path: `/tmp/motovax-mobile-navigation-open-${viewport.name}.png`, fullPage: false });
+      await page.keyboard.press("Escape");
+      assert.equal(await panel.isHidden(), true);
+      assert.equal(await trigger.getAttribute("aria-expanded"), "false");
+      await page.waitForTimeout(250);
+    }
+
+    assert.equal(await noOverflow(page), true);
+    await page.screenshot({ path: `/tmp/motovax-mobile-navigation-${viewport.name}.png`, fullPage: false });
+    await context.close();
+  });
+
   test(`positioning dealer mobil konsisten pada ${viewport.name}`, async () => {
     const context = await browser.newContext({ viewport });
     const page = await context.newPage();
