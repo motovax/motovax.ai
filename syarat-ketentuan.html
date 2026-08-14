@@ -11,18 +11,26 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="./styles.css?v=logo-20260809" />
+    <link rel="stylesheet" href="./styles.css?v=remove-demo-cta-20260814" />
     <link rel="stylesheet" href="./legal.css?v=20260810-1" />
   </head>
   <body class="legal-page">
     <header class="site-header legal-header">
       <div class="container header-inner">
         <a class="brand" href="./index.html#top" aria-label="MOTOVAX home"><span>MOTO</span><strong>VAX</strong></a>
-        <span aria-hidden="true"></span>
-        <div class="legal-header-actions">
-          <a class="legal-header-link" href="./index.html">Beranda</a>
-          <a class="btn btn-primary" href="./hubungi-kami.html">Hubungi Kami <span>→</span></a>
-        </div>
+        <nav class="nav" aria-label="Navigasi utama">
+          <div class="nav-item nav-item-produk" data-produk-menu>
+            <button type="button" class="nav-produk-trigger" aria-expanded="false" aria-haspopup="true" aria-controls="produk-mega-menu" data-produk-trigger>
+              Produk
+              <svg class="nav-chevron" width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 4.5 6 8l3.5-3.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+            <div class="produk-mega" id="produk-mega-menu" role="region" aria-label="Menu produk Motovax" hidden data-produk-panel data-produk-mount></div>
+          </div>
+          <a href="./index.html#cara-kerja">Cara Kerja</a>
+          <a href="./index.html#solusi">Solusi</a>
+          <a href="./harga.html">Harga</a>
+          <a href="./hubungi-kami.html">Hubungi Kami</a>
+        </nav>
       </div>
     </header>
 
@@ -125,5 +133,6 @@
       </div>
       <div class="copyright">&copy; 2026 MOTOVAX. All rights reserved.</div>
     </footer>
+    <script src="./script.js?v=nav-parity-20260814"></script>
   </body>
 </html>

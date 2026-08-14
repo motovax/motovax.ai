@@ -14,8 +14,8 @@
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="./styles.css?v=dealer-onboarding-20260814" />
-    <link rel="stylesheet" href="./onboarding-auth.css?v=dealer-onboarding-20260814" />
+    <link rel="stylesheet" href="./styles.css?v=remove-demo-cta-20260814" />
+    <link rel="stylesheet" href="./onboarding-auth.css?v=email-verification-20260814" />
   </head>
   <body class="onboarding-body">
     <header class="site-header onboarding-header">
@@ -25,7 +25,6 @@
         </a>
         <div class="onboarding-header-actions">
           <a class="onboarding-link-muted" href="https://motovax.ai/">← Kembali ke beranda</a>
-          <a class="btn btn-secondary header-cta" href="https://motovax.ai/#kontak">Jadwalkan Demo</a>
         </div>
       </div>
     </header>
@@ -105,8 +104,8 @@
           <!-- STEP 1: Auth -->
           <div class="onboarding-step is-active" data-step="1">
             <header class="onboarding-step-head">
-              <span>LANGKAH 1 · AKUN</span>
-              <h2 id="onboardingPanelTitle">Buat akun baru</h2>
+              <span data-auth-kicker>LANGKAH 1 · AKUN</span>
+              <h2 id="onboardingPanelTitle" data-auth-title>Buat akun baru</h2>
               <p data-auth-lead>
                 Buat akun Motovax menggunakan email kerja atau akun Google Anda.
               </p>
@@ -162,6 +161,37 @@
                 <button type="submit" class="btn btn-primary" data-loading-label="Membuat akun…">Lanjut ke profil <span>→</span></button>
               </div>
             </form>
+
+            <section class="email-verification" data-verification-panel data-state="pending" aria-labelledby="emailVerificationTitle" hidden>
+              <div class="email-verification-icon" aria-hidden="true">
+                <svg data-verification-icon="mail" viewBox="0 0 48 48"><path d="M7 13.5h34v23H7z"/><path d="m8 15 16 13 16-13"/></svg>
+                <svg data-verification-icon="success" viewBox="0 0 48 48" hidden><circle cx="24" cy="24" r="18"/><path d="m16 24 5.2 5.2L33 17.8"/></svg>
+                <svg data-verification-icon="error" viewBox="0 0 48 48" hidden><circle cx="24" cy="24" r="18"/><path d="M24 15v11M24 33h.01"/></svg>
+              </div>
+              <div class="email-verification-copy">
+                <h3 id="emailVerificationTitle" data-verification-title>Periksa kotak masuk</h3>
+                <p data-verification-copy>Kami mengirim link verifikasi ke:</p>
+                <strong data-verification-email>nama@perusahaan.com</strong>
+              </div>
+              <ol class="email-verification-steps" data-verification-steps>
+                <li><span>1</span><p>Buka email terbaru dari <b>MOTOVAX</b>.</p></li>
+                <li><span>2</span><p>Klik <b>Verifikasi email</b>. Link berlaku 24 jam.</p></li>
+                <li><span>3</span><p>Kembali ke halaman ini untuk melanjutkan profil dealer.</p></li>
+              </ol>
+              <p class="email-verification-status" data-verification-status role="status" aria-live="polite"></p>
+              <div class="email-verification-actions">
+                <a class="btn btn-primary" data-verification-mailbox href="https://mail.google.com/" target="_blank" rel="noopener noreferrer">
+                  <span data-verification-mailbox-label>Buka kotak masuk</span><span>↗</span>
+                </a>
+                <button class="btn btn-secondary" type="button" data-verification-check>Saya sudah verifikasi</button>
+              </div>
+              <div class="email-verification-secondary">
+                <button type="button" data-verification-resend>Kirim ulang email</button>
+                <span aria-hidden="true">•</span>
+                <button type="button" data-verification-change>Ganti alamat email</button>
+              </div>
+              <p class="email-verification-help">Tidak menemukan email? Periksa folder spam atau promosi. Link lama otomatis tidak berlaku setelah email baru dikirim.</p>
+            </section>
 
             <form class="onboarding-form" data-reset-form hidden novalidate>
               <div class="onboarding-field">
@@ -232,6 +262,11 @@
               <h2>Ceritakan dealer Anda</h2>
               <p>Data ini digunakan untuk membuat workspace dan konfigurasi awal tenant dealer mobil Anda.</p>
             </header>
+
+            <div class="email-verified-banner" data-email-verified-banner role="status" hidden>
+              <span aria-hidden="true">✓</span>
+              <p><b>Email berhasil diverifikasi.</b> Sekarang lengkapi profil dealer Anda.</p>
+            </div>
 
             <form class="onboarding-form" data-business-form novalidate>
               <label>
@@ -366,8 +401,8 @@
           <div class="onboarding-step" data-step="4" hidden>
             <header class="onboarding-step-head">
               <span>LANGKAH 4 · SIAP</span>
-              <h2 data-ready-title>Workspace Anda siap digunakan</h2>
-              <p data-ready-copy>Tenant, domain, akun owner, dan konfigurasi awal berhasil dibuat.</p>
+              <h2 data-ready-title>Pendaftaran berhasil</h2>
+              <p data-ready-copy>Akun Anda sudah aktif. Anda akan diarahkan ke motovax.ai dalam kondisi login.</p>
             </header>
 
             <div class="onboarding-success-card" data-workspace-summary>
@@ -408,9 +443,6 @@
               <button class="btn btn-primary" type="button" data-open-workspace disabled>
                 Masuk ke workspace <span>→</span>
               </button>
-              <a class="btn btn-secondary" href="https://motovax.ai/#kontak">
-                Jadwalkan demo live
-              </a>
             </div>
           </div>
         </section>

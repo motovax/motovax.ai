@@ -83,6 +83,7 @@ for (const link of document.querySelectorAll("[data-wa]")) {
   if (transferredToken) {
     localStorage.setItem(TOKEN_KEY, transferredToken);
     fragment.delete("portal_session");
+    fragment.delete("portal_action");
     const cleanHash = fragment.toString();
     history.replaceState({}, "", `${location.pathname}${location.search}${cleanHash ? `#${cleanHash}` : ""}`);
   }
@@ -107,13 +108,13 @@ for (const link of document.querySelectorAll("[data-wa]")) {
   }
 
   root.addEventListener("click", async (event) => {
-    const destinationButton = event.target.closest?.("[data-portal-destination]");
-    if (destinationButton && root.contains(destinationButton)) {
-      destinationButton.disabled = true;
+    const workspaceButton = event.target.closest?.("[data-portal-workspace]");
+    if (workspaceButton && root.contains(workspaceButton)) {
+      workspaceButton.disabled = true;
       try {
         const payload = await portalApi("/api/portal/workspace/enter", {
           method: "POST",
-          body: JSON.stringify({ destination: destinationButton.dataset.portalDestination || "/" }),
+          body: JSON.stringify({ destination: "/" }),
         });
         window.location.assign(payload.redirectUrl);
       } catch (error) {
@@ -123,7 +124,7 @@ for (const link of document.querySelectorAll("[data-wa]")) {
         } else {
           window.alert(error.message);
         }
-        destinationButton.disabled = false;
+        workspaceButton.disabled = false;
       }
       return;
     }
@@ -146,12 +147,15 @@ for (const link of document.querySelectorAll("[data-wa]")) {
     renderGuest();
     return;
   }
-  portalApi("/api/portal/me")
+
+  const loadAccount = () => portalApi("/api/portal/me")
     .then((payload) => renderAccount(payload.user))
     .catch((error) => {
       if (error.status === 401) localStorage.removeItem(TOKEN_KEY);
       renderGuest();
     });
+
+  loadAccount();
 })();
 
 /** Typewriter pada outcome dealer: test drive dan penjualan unit. */
@@ -1083,9 +1087,8 @@ if (contactForm instanceof HTMLFormElement) {
     panel.innerHTML = `
       <nav class="mobile-nav-links">
         <a href="${root}modul.html" data-mobile-nav-close>Produk <span>→</span></a>
-        <a href="${root}solusi/otomotif.html" data-mobile-nav-close>Solusi Dealer Mobil <span>→</span></a>
         <a href="${home}#cara-kerja" data-mobile-nav-close>Cara Kerja <span>→</span></a>
-        <a href="${home}#keunggulan" data-mobile-nav-close>Keunggulan <span>→</span></a>
+        <a href="${root}solusi/otomotif.html" data-mobile-nav-close>Solusi <span>→</span></a>
         <a href="${root}harga.html" data-mobile-nav-close>Harga <span>→</span></a>
         <a href="${root}hubungi-kami.html" data-mobile-nav-close>Hubungi Kami <span>→</span></a>
       </nav>

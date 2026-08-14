@@ -17,6 +17,7 @@ let accountState = { profile: null, workspaces: [] };
 const recaptchaTokens = [];
 const portalSessions = new Map();
 let portalPasswordHash = "";
+let otherPortalPasswordHash = "";
 
 const config = {
   nodeEnv: "test",
@@ -63,39 +64,81 @@ const store = {
       avatar_url: profile.picture,
     };
   },
-  async createPasswordUser({ email, fullName, passwordHash }) {
-    if (passwordUsers.has(email)) {
+  async createPasswordUser({ email, fullName, passwordHash, authenticatedUserId = "" }) {
+    const existing = passwordUsers.get(email);
+    if (existing?.email_verified && existing.id !== authenticatedUserId) {
       const error = new Error("Akun dengan email tersebut sudah terdaftar.");
       error.code = "account_exists";
       throw error;
     }
-    const user = {
-      id: crypto.randomUUID(),
-      email,
-      full_name: fullName,
-      avatar_url: "",
-      password_hash: passwordHash,
-      email_verified: false,
-    };
+    const user = existing || { id: crypto.randomUUID(), email, avatar_url: "", email_verified: false };
+    user.full_name = fullName;
+    user.password_hash = passwordHash;
     passwordUsers.set(email, user);
     return user;
   },
   async findPasswordUser(email) {
     return passwordUsers.get(email) || null;
   },
+  async findPasswordUserById(userId) {
+    return [...passwordUsers.values()].find((user) => user.id === userId) || null;
+  },
   async saveActionToken(record) {
-    actionTokens.set(`${record.actionType}:${record.digest}`, record.userId);
+    for (const token of actionTokens.values()) {
+      if (token.userId === record.userId && token.actionType === record.actionType && !token.usedAt) {
+        token.usedAt = Date.now();
+      }
+    }
+    actionTokens.set(`${record.actionType}:${record.digest}`, {
+      ...record,
+      createdAt: Date.now(),
+      usedAt: null,
+    });
+  },
+  async findActionToken({ digest, actionType }) {
+    const token = actionTokens.get(`${actionType}:${digest}`);
+    if (!token || token.usedAt || new Date(token.expiresAt).getTime() <= Date.now()) return null;
+    return token.userId;
+  },
+  async getActionTokenStatus({ digest, actionType }) {
+    const token = actionTokens.get(`${actionType}:${digest}`);
+    if (!token) return "invalid";
+    if (token.usedAt) return "used";
+    if (new Date(token.expiresAt).getTime() <= Date.now()) return "expired";
+    return "active";
+  },
+  async getActionTokenResendDelay({ userId, actionType, cooldownSeconds }) {
+    const latest = [...actionTokens.values()]
+      .filter((token) => token.userId === userId && token.actionType === actionType)
+      .reduce((max, token) => Math.max(max, token.createdAt), 0);
+    return Math.max(0, Math.ceil((latest + cooldownSeconds * 1000 - Date.now()) / 1000));
   },
   async takeActionToken({ digest, actionType }) {
     const key = `${actionType}:${digest}`;
-    const userId = actionTokens.get(key);
-    actionTokens.delete(key);
+    const token = actionTokens.get(key);
+    if (!token || token.usedAt || new Date(token.expiresAt).getTime() <= Date.now()) return null;
+    token.usedAt = Date.now();
+    const userId = token.userId;
     if (userId && actionType === "verify_email") {
       for (const user of passwordUsers.values()) {
         if (user.id === userId) user.email_verified = true;
       }
+      for (const pendingToken of actionTokens.values()) {
+        if (pendingToken.userId === userId && pendingToken.actionType === "pending_signup" && !pendingToken.usedAt) {
+          pendingToken.usedAt = Date.now();
+        }
+      }
     }
     return userId || null;
+  },
+  async deletePendingPasswordUser(userId) {
+    const entry = [...passwordUsers.entries()].find(([, user]) => user.id === userId);
+    if (!entry || entry[1].email_verified) return false;
+    passwordUsers.delete(entry[0]);
+    for (const [key, token] of actionTokens.entries()) {
+      if (token.userId === userId) actionTokens.delete(key);
+    }
+    return true;
   },
   async updatePassword(userId, passwordHash) {
     for (const user of passwordUsers.values()) {
@@ -103,11 +146,14 @@ const store = {
     }
   },
   async createSession(record) {
+    const passwordUser = [...passwordUsers.values()].find((user) => user.id === record.userId);
     sessions.set(record.sessionDigest, {
       id: record.userId,
-      email: "user@example.com",
-      full_name: "User Test",
-      avatar_url: "https://example.com/avatar.png",
+      email: passwordUser?.email || "user@example.com",
+      full_name: passwordUser?.full_name || "User Test",
+      avatar_url: passwordUser?.avatar_url || "https://example.com/avatar.png",
+      password_hash: passwordUser?.password_hash || "",
+      provider: passwordUser ? "password" : "google",
     });
   },
   async findSession(digest) {
@@ -116,9 +162,18 @@ const store = {
   async getAccountState() {
     return accountState;
   },
-  async findPortalUser({ workspace, identifier }) {
-    if (workspace.slug !== "dealer-test" || identifier !== "owner") return null;
+  async provisionWorkspace() {
     return {
+      workspace: {
+        id: "tenant-1",
+        name: "Dealer Test",
+        domain: "dealer-test.motovax.com",
+        app_user_id: "app-user-1",
+      },
+    };
+  },
+  async findPortalUsers({ identifier }) {
+    const owner = {
       id: "app-user-1",
       username: "owner",
       display_name: "Owner Dealer",
@@ -132,6 +187,23 @@ const store = {
       role: "Admin",
       permissions: ["billing:read", "tenant:read"],
     };
+    if (identifier === "owner" || identifier === "owner@dealer.test") return [owner];
+    const other = {
+      ...owner,
+      id: "app-user-2",
+      username: "shared",
+      email: "other@dealer.test",
+      password_hash: otherPortalPasswordHash,
+      tenant_id: "tenant-2",
+      tenant_name: "Dealer Lain",
+      domain: "dealer-lain.motovax.com",
+    };
+    if (identifier === "shared") return [{ ...owner, username: "shared" }, other];
+    if (identifier === "ambiguous") return [
+      { ...owner, username: "ambiguous" },
+      { ...other, username: "ambiguous", password_hash: portalPasswordHash },
+    ];
+    return [];
   },
   async createPortalSession(record) {
     portalSessions.set(record.sessionDigest, {
@@ -149,6 +221,21 @@ const store = {
   },
   async findPortalSession(sessionDigest) {
     return portalSessions.get(sessionDigest) || null;
+  },
+  async getPortalBilling(tenantId) {
+    return {
+      tenant_id: tenantId,
+      tenant_name: "Dealer Test",
+      period_start: "2026-08-01T00:00:00.000Z",
+      period_end: "2026-09-01T00:00:00.000Z",
+      member_count: 1,
+      max_users: 25,
+      max_listings: 500,
+      enabled_features: ["inventory_management", "crm_autopilot", "billing_menu"],
+      members: [{ id: "app-user-1", display_name: "Owner Dealer", username: "owner", roles: "Admin" }],
+      billing_configured: false,
+      invoice_status: "not_configured",
+    };
   },
   async revokePortalSession(sessionDigest) {
     portalSessions.delete(sessionDigest);
@@ -169,6 +256,7 @@ const store = {
 };
 
 let currentNonce = "";
+let googleProfileEmail = "user@example.com";
 const oauthClient = {
   generateAuthUrl(options) {
     currentNonce = options.nonce;
@@ -188,7 +276,7 @@ const oauthClient = {
       getPayload() {
         return {
           sub: "google-user-123",
-          email: "user@example.com",
+          email: googleProfileEmail,
           email_verified: true,
           name: "User Test",
           picture: "https://example.com/avatar.png",
@@ -213,6 +301,7 @@ function digest(value) {
 
 before(async () => {
   portalPasswordHash = await bcrypt.hash("rahasia123", 4);
+  otherPortalPasswordHash = await bcrypt.hash("password-lain", 4);
   const app = createApp({
     config,
     store,
@@ -227,6 +316,7 @@ before(async () => {
       }
       return { score: 0.9 };
     },
+    productDomainEnsurer: async () => {},
   });
   await new Promise((resolve) => {
     server = app.listen(0, "127.0.0.1", resolve);
@@ -326,14 +416,66 @@ test("daftar dan login email/password memakai kredensial nyata", async () => {
   const signupBody = await signup.json();
   assert.equal(signupBody.email, "password@example.com");
   assert.equal(signupBody.verificationRequired, true);
+  assert.equal(signupBody.resendAfterSeconds, 60);
   assert.equal(sentEmails.length, 1);
   assert.equal(sentEmails[0].from, "MOTOVAX <onboarding@motovax.ai>");
+  assert.match(sentEmails[0].text, /Verifikasi Email:/);
+  assert.match(sentEmails[0].text, /berlaku selama 24 jam/);
+  assert.match(sentEmails[0].html, /^<!doctype html>/);
+  assert.match(sentEmails[0].html, /role="presentation"/);
+  assert.match(sentEmails[0].html, /Platform Dealer Mobil/);
+  assert.match(sentEmails[0].html, />Verifikasi Email<\/a>/);
+  assert.match(sentEmails[0].html, /berlaku selama <strong>24 jam<\/strong>/);
+  assert.match(sentEmails[0].html, /logo-motovax\.png\?v=email-20260814/);
+  assert.doesNotMatch(sentEmails[0].html, /<script/i);
+
+  const pendingSignup = cookieValue(signup.headers.get("set-cookie"), "motovax_pending_signup");
+  assert.ok(pendingSignup);
+  const pending = await fetch(`${baseUrl}/api/auth/pending-signup`, {
+    headers: { cookie: `motovax_pending_signup=${encodeURIComponent(pendingSignup)}` },
+  });
+  assert.equal(pending.status, 200);
+  assert.equal((await pending.json()).email, "password@example.com");
+
+  const resendDuringCooldown = await fetch(`${baseUrl}/api/auth/resend-verification`, {
+    method: "POST",
+    headers: {
+      "content-type": "application/json",
+      origin: "http://127.0.0.1",
+      cookie: `motovax_pending_signup=${encodeURIComponent(pendingSignup)}`,
+    },
+    body: "{}",
+  });
+  assert.equal(resendDuringCooldown.status, 429);
+  assert.ok((await resendDuringCooldown.json()).retryAfterSeconds > 0);
 
   const verificationUrl = sentEmails[0].text.match(/http:\/\/127\.0\.0\.1\/api\/auth\/verify-email\?token=[^\s]+/)[0];
   const verificationTarget = new URL(verificationUrl);
-  const verification = await fetch(`${baseUrl}${verificationTarget.pathname}${verificationTarget.search}`, { redirect: "manual" });
+  const firstTokenDigest = digest(verificationTarget.searchParams.get("token"));
+  actionTokens.get(`verify_email:${firstTokenDigest}`).createdAt = Date.now() - 61_000;
+
+  const resent = await fetch(`${baseUrl}/api/auth/resend-verification`, {
+    method: "POST",
+    headers: {
+      "content-type": "application/json",
+      origin: "http://127.0.0.1",
+      cookie: `motovax_pending_signup=${encodeURIComponent(pendingSignup)}`,
+    },
+    body: "{}",
+  });
+  assert.equal(resent.status, 202);
+  assert.equal(sentEmails.length, 2);
+
+  const superseded = await fetch(`${baseUrl}${verificationTarget.pathname}${verificationTarget.search}`, { redirect: "manual" });
+  assert.equal(superseded.status, 302);
+  assert.match(superseded.headers.get("location"), /email=used/);
+
+  const resentVerificationUrl = sentEmails[1].text.match(/http:\/\/127\.0\.0\.1\/api\/auth\/verify-email\?token=[^\s]+/)[0];
+  const resentVerificationTarget = new URL(resentVerificationUrl);
+  const verification = await fetch(`${baseUrl}${resentVerificationTarget.pathname}${resentVerificationTarget.search}`, { redirect: "manual" });
   assert.equal(verification.status, 302);
   assert.match(verification.headers.get("location"), /email=verified/);
+  assert.match(verification.headers.get("set-cookie"), /motovax_pending_signup=;/);
 
   const invalid = await fetch(`${baseUrl}/api/auth/login`, {
     method: "POST",
@@ -349,6 +491,79 @@ test("daftar dan login email/password memakai kredensial nyata", async () => {
   });
   assert.equal(login.status, 200);
   assert.equal((await login.json()).authenticated, true);
+
+  const loginSession = cookieValue(login.headers.get("set-cookie"), "motovax_session");
+  const sentEmailCount = sentEmails.length;
+  const updateFromStepOne = await fetch(`${baseUrl}/api/auth/signup`, {
+    method: "POST",
+    headers: {
+      "content-type": "application/json",
+      origin: "http://127.0.0.1",
+      cookie: `motovax_session=${encodeURIComponent(loginSession)}`,
+    },
+    body: JSON.stringify({
+      fullName: "Password User Diperbarui",
+      email: "password@example.com",
+      password: "rahasia456",
+    }),
+  });
+  assert.equal(updateFromStepOne.status, 200);
+  const updatePayload = await updateFromStepOne.json();
+  assert.equal(updatePayload.authenticated, true);
+  assert.equal(updatePayload.accountUpdated, true);
+  assert.equal(updatePayload.user.fullName, "Password User Diperbarui");
+  assert.equal(sentEmails.length, sentEmailCount);
+
+  const duplicateWithoutOwnerSession = await fetch(`${baseUrl}/api/auth/signup`, {
+    method: "POST",
+    headers: { "content-type": "application/json", origin: "http://127.0.0.1" },
+    body: JSON.stringify({
+      fullName: "Bukan Pemilik",
+      email: "password@example.com",
+      password: "rahasia789",
+    }),
+  });
+  assert.equal(duplicateWithoutOwnerSession.status, 409);
+
+  const loginWithUpdatedPassword = await fetch(`${baseUrl}/api/auth/login`, {
+    method: "POST",
+    headers: { "content-type": "application/json", origin: "http://127.0.0.1" },
+    body: JSON.stringify({ email: "password@example.com", password: "rahasia456" }),
+  });
+  assert.equal(loginWithUpdatedPassword.status, 200);
+});
+
+test("pendaftaran manual dapat dibatalkan untuk mengganti email", async () => {
+  const signup = await fetch(`${baseUrl}/api/auth/signup`, {
+    method: "POST",
+    headers: { "content-type": "application/json", origin: "http://127.0.0.1" },
+    body: JSON.stringify({
+      fullName: "Email Lama",
+      email: "ganti-email@example.com",
+      password: "rahasia123",
+    }),
+  });
+  assert.equal(signup.status, 202);
+  const pendingSignup = cookieValue(signup.headers.get("set-cookie"), "motovax_pending_signup");
+  const verificationUrl = sentEmails.at(-1).text.match(/http:\/\/127\.0\.0\.1\/api\/auth\/verify-email\?token=[^\s]+/)[0];
+  const verificationTarget = new URL(verificationUrl);
+  actionTokens.get(`verify_email:${digest(verificationTarget.searchParams.get("token"))}`).expiresAt = new Date(Date.now() - 1_000);
+  const expired = await fetch(`${baseUrl}${verificationTarget.pathname}${verificationTarget.search}`, { redirect: "manual" });
+  assert.equal(expired.status, 302);
+  assert.match(expired.headers.get("location"), /email=expired/);
+
+  const cancel = await fetch(`${baseUrl}/api/auth/pending-signup`, {
+    method: "DELETE",
+    headers: {
+      "content-type": "application/json",
+      origin: "http://127.0.0.1",
+      cookie: `motovax_pending_signup=${encodeURIComponent(pendingSignup)}`,
+    },
+    body: "{}",
+  });
+  assert.equal(cancel.status, 204);
+  assert.equal(passwordUsers.has("ganti-email@example.com"), false);
+  assert.match(cancel.headers.get("set-cookie"), /motovax_pending_signup=;/);
 });
 
 test("callback menolak state yang tidak cocok", async () => {
@@ -407,6 +622,59 @@ test("callback membuat session dan endpoint me mengembalikan user", async () => 
   });
 });
 
+test("callback Google mode portal membuat sesi tenant dan mengarah ke landing", async () => {
+  googleProfileEmail = "owner@dealer.test";
+  try {
+    const start = await fetch(`${baseUrl}/api/auth/google/start?mode=portal`, {
+      redirect: "manual",
+    });
+    const stateCookie = cookieValue(start.headers.get("set-cookie"), "motovax_oauth_state");
+    const state = new URL(start.headers.get("location")).searchParams.get("state");
+    assert.match(state, /^portal\./);
+    assert.equal(stateCookie, state);
+
+    const callback = await fetch(
+      `${baseUrl}/api/auth/google/callback?code=valid-code&state=${encodeURIComponent(state)}`,
+      {
+        redirect: "manual",
+        headers: { cookie: `motovax_oauth_state=${encodeURIComponent(stateCookie)}` },
+      },
+    );
+    assert.equal(callback.status, 302);
+    const location = new URL(callback.headers.get("location"));
+    assert.equal(location.origin, "https://motovax.ai");
+    const sessionToken = new URLSearchParams(location.hash.replace(/^#/, "")).get("portal_session");
+    assert.ok(sessionToken.length >= 48);
+    assert.ok(portalSessions.has(digest(sessionToken)));
+  } finally {
+    googleProfileEmail = "user@example.com";
+  }
+});
+
+test("callback Google mode portal menolak email yang belum menjadi user tenant", async () => {
+  googleProfileEmail = "belum-terdaftar@example.com";
+  try {
+    const start = await fetch(`${baseUrl}/api/auth/google/start?mode=portal`, {
+      redirect: "manual",
+    });
+    const stateCookie = cookieValue(start.headers.get("set-cookie"), "motovax_oauth_state");
+    const state = new URL(start.headers.get("location")).searchParams.get("state");
+    const callback = await fetch(
+      `${baseUrl}/api/auth/google/callback?code=valid-code&state=${encodeURIComponent(state)}`,
+      {
+        redirect: "manual",
+        headers: { cookie: `motovax_oauth_state=${encodeURIComponent(stateCookie)}` },
+      },
+    );
+    const location = new URL(callback.headers.get("location"));
+    assert.equal(location.pathname, "/login.html");
+    assert.equal(location.searchParams.get("oauth"), "failed");
+    assert.equal(location.searchParams.get("reason"), "account_not_found");
+  } finally {
+    googleProfileEmail = "user@example.com";
+  }
+});
+
 test("availability workspace menolak nama yang sudah dipakai", async () => {
   const unavailable = await fetch(`${baseUrl}/api/onboarding/slug?slug=workspace-terpakai`, {
     headers: { cookie: authenticatedCookie },
@@ -427,7 +695,7 @@ test("portal login tenant membawa profil, billing, logout, dan handoff workspace
   const login = await fetch(`${baseUrl}/api/portal/login`, {
     method: "POST",
     headers: { origin: "http://127.0.0.1", "content-type": "application/json" },
-    body: JSON.stringify({ workspace: "dealer-test", identifier: "owner", password: "rahasia123" }),
+    body: JSON.stringify({ identifier: "owner", password: "rahasia123" }),
   });
   assert.equal(login.status, 200);
   const loginPayload = await login.json();
@@ -444,6 +712,15 @@ test("portal login tenant membawa profil, billing, logout, dan handoff workspace
   assert.equal(me.status, 200);
   assert.equal(me.headers.get("access-control-allow-origin"), "https://motovax.ai");
   assert.equal((await me.json()).user.role, "Admin");
+
+  const billing = await fetch(`${baseUrl}/api/portal/billing`, {
+    headers: { authorization, origin: "https://motovax.ai" },
+  });
+  assert.equal(billing.status, 200);
+  const billingPayload = await billing.json();
+  assert.equal(billingPayload.tenant_name, "Dealer Test");
+  assert.equal(billingPayload.member_count, 1);
+  assert.deepEqual(billingPayload.enabled_features, ["inventory_management", "crm_autopilot", "billing_menu"]);
 
   const enter = await fetch(`${baseUrl}/api/portal/workspace/enter`, {
     method: "POST",
@@ -468,6 +745,27 @@ test("portal login tenant membawa profil, billing, logout, dan handoff workspace
   assert.equal(expired.status, 401);
 });
 
+test("portal login memilih tenant dari password saat username dipakai di beberapa workspace", async () => {
+  const response = await fetch(`${baseUrl}/api/portal/login`, {
+    method: "POST",
+    headers: { origin: "http://127.0.0.1", "content-type": "application/json" },
+    body: JSON.stringify({ identifier: "shared", password: "rahasia123" }),
+  });
+  assert.equal(response.status, 200);
+  const payload = await response.json();
+  assert.equal(payload.user.tenant.domain, "dealer-test.motovax.com");
+});
+
+test("portal login menolak kredensial ambigu di beberapa workspace", async () => {
+  const response = await fetch(`${baseUrl}/api/portal/login`, {
+    method: "POST",
+    headers: { origin: "http://127.0.0.1", "content-type": "application/json" },
+    body: JSON.stringify({ identifier: "ambiguous", password: "rahasia123" }),
+  });
+  assert.equal(response.status, 409);
+  assert.equal((await response.json()).error, "ambiguous_account");
+});
+
 test("penyelesaian onboarding ditolak sebelum provisioning tanpa token reCAPTCHA valid", async () => {
   accountState = { profile: { modules: ["ims"] }, workspaces: [] };
   const response = await fetch(`${baseUrl}/api/onboarding/complete`, {
@@ -482,4 +780,31 @@ test("penyelesaian onboarding ditolak sebelum provisioning tanpa token reCAPTCHA
   assert.equal(response.status, 400);
   assert.equal((await response.json()).error, "recaptcha_invalid");
   assert.deepEqual(recaptchaTokens, [""]);
+});
+
+test("penyelesaian onboarding membuat sesi portal untuk redirect login otomatis", async () => {
+  accountState = { profile: { modules: ["ims"] }, workspaces: [] };
+  const response = await fetch(`${baseUrl}/api/onboarding/complete`, {
+    method: "POST",
+    headers: {
+      cookie: authenticatedCookie,
+      origin: "http://127.0.0.1",
+      "content-type": "application/json",
+    },
+    body: JSON.stringify({ recaptchaToken: "valid-recaptcha-token" }),
+  });
+  assert.equal(response.status, 202);
+  const payload = await response.json();
+  assert.equal(payload.workspace.ready, false);
+  assert.equal(payload.portalSession.returnUrl, "https://motovax.ai/");
+  assert.ok(payload.portalSession.token.length >= 48);
+
+  const me = await fetch(`${baseUrl}/api/portal/me`, {
+    headers: {
+      authorization: `Bearer ${payload.portalSession.token}`,
+      origin: "https://motovax.ai",
+    },
+  });
+  assert.equal(me.status, 200);
+  assert.equal((await me.json()).authenticated, true);
 });

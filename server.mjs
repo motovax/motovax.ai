@@ -16,6 +16,8 @@ const scryptAsync = promisify(crypto.scrypt);
 const SESSION_TTL_MS = 30 * 24 * 60 * 60 * 1000;
 const PORTAL_SESSION_TTL_MS = 30 * 24 * 60 * 60 * 1000;
 const HANDOFF_TTL_MS = 60 * 1000;
+const EMAIL_VERIFICATION_TTL_MS = 24 * 60 * 60 * 1000;
+const EMAIL_VERIFICATION_RESEND_COOLDOWN_SECONDS = 60;
 const ALLOWED_MODULES = new Set(["ims", "omni", "social", "crm", "dashboard", "insight"]);
 const ALLOWED_GOALS = new Set(["conversion", "response", "inventory", "scale"]);
 const RESERVED_SLUGS = new Set([
@@ -123,6 +125,139 @@ function escapeHtml(value) {
   return String(value || "").replace(/[&<>"']/g, (character) => ({
     "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;",
   })[character]);
+}
+
+export function buildAccountEmail({
+  displayName,
+  copy,
+  targetUrl,
+  actionType,
+  publicBaseUrl,
+}) {
+  const isVerification = actionType === "verify_email";
+  const actionLabel = isVerification ? "Verifikasi Email" : "Atur Ulang Password";
+  const heading = isVerification ? "Verifikasi alamat email Anda" : "Atur ulang password Anda";
+  const preheader = isVerification
+    ? "Satu langkah lagi untuk melanjutkan pembuatan workspace dealer Anda di MOTOVAX."
+    : "Gunakan tautan aman ini untuk membuat password baru akun MOTOVAX Anda.";
+  const expiry = isVerification ? "24 jam" : "30 menit";
+  const safeName = escapeHtml(displayName || "Pengguna MOTOVAX");
+  const safeCopy = escapeHtml(copy);
+  const safeTargetUrl = escapeHtml(targetUrl);
+  const logoUrl = escapeHtml(new URL("/icons/logo-motovax.png?v=email-20260814", publicBaseUrl).toString());
+
+  const text = [
+    `Halo ${String(displayName || "Pengguna MOTOVAX")},`,
+    "",
+    String(copy || ""),
+    "",
+    `${actionLabel}:`,
+    String(targetUrl || ""),
+    "",
+    `Tautan ini berlaku selama ${expiry} dan hanya dapat digunakan satu kali.`,
+    "Jika Anda tidak merasa melakukan permintaan ini, abaikan email ini. Akun Anda tetap aman.",
+    "",
+    "Salam,",
+    "Tim MOTOVAX",
+  ].join("\n");
+
+  const html = `<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="x-apple-disable-message-reformatting">
+    <title>${escapeHtml(heading)} · MOTOVAX</title>
+    <style>
+      @media only screen and (max-width: 620px) {
+        .email-shell { padding: 18px 10px !important; }
+        .email-content { padding: 30px 22px !important; }
+        .email-header { padding: 22px !important; }
+        .email-title { font-size: 27px !important; line-height: 34px !important; }
+        .email-button { display: block !important; text-align: center !important; }
+        .email-footer { padding: 20px 22px !important; }
+      }
+    </style>
+  </head>
+  <body style="margin:0; padding:0; background-color:#f3f6fb; color:#17243a; font-family:Arial,Helvetica,sans-serif; -webkit-text-size-adjust:100%; -ms-text-size-adjust:100%;">
+    <div style="display:none; max-height:0; overflow:hidden; opacity:0; color:transparent; line-height:1px; mso-hide:all;">${escapeHtml(preheader)}&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;</div>
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" bgcolor="#f3f6fb" style="width:100%; border-collapse:collapse; background-color:#f3f6fb;">
+      <tr>
+        <td class="email-shell" align="center" style="padding:36px 16px;">
+          <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="width:100%; max-width:640px; border-collapse:separate; border-spacing:0;">
+            <tr>
+              <td style="height:5px; border-radius:14px 14px 0 0; background-color:#1769e0; font-size:0; line-height:0;">&nbsp;</td>
+            </tr>
+            <tr>
+              <td class="email-header" bgcolor="#ffffff" style="padding:25px 38px 22px; border-right:1px solid #dfe7f2; border-left:1px solid #dfe7f2; background-color:#ffffff;">
+                <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="width:100%; border-collapse:collapse;">
+                  <tr>
+                    <td valign="middle">
+                      <img src="${logoUrl}" width="160" alt="MOTOVAX" style="display:block; width:160px; max-width:100%; height:auto; border:0; color:#17243a; font-size:22px; font-weight:700;">
+                    </td>
+                    <td align="right" valign="middle" style="padding-left:16px; color:#6b7b91; font-size:11px; font-weight:700; line-height:16px; letter-spacing:.08em; text-transform:uppercase;">Platform Dealer Mobil</td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+            <tr>
+              <td class="email-content" bgcolor="#ffffff" style="padding:40px 38px 38px; border-right:1px solid #dfe7f2; border-left:1px solid #dfe7f2; background-color:#ffffff;">
+                <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="width:100%; border-collapse:collapse;">
+                  <tr>
+                    <td style="padding-bottom:18px;">
+                      <span style="display:inline-block; padding:7px 11px; border-radius:999px; background-color:#eaf2ff; color:#0b57c9; font-size:11px; font-weight:700; line-height:14px; letter-spacing:.08em; text-transform:uppercase;">Keamanan Akun</span>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="email-title" style="padding-bottom:14px; color:#14213a; font-size:32px; font-weight:700; line-height:40px; letter-spacing:-.02em;">${escapeHtml(heading)}</td>
+                  </tr>
+                  <tr>
+                    <td style="padding-bottom:12px; color:#314158; font-size:16px; line-height:25px;">Halo <strong style="color:#17243a;">${safeName}</strong>,</td>
+                  </tr>
+                  <tr>
+                    <td style="padding-bottom:26px; color:#52627a; font-size:15px; line-height:24px;">${safeCopy}</td>
+                  </tr>
+                  <tr>
+                    <td style="padding-bottom:28px;">
+                      <table role="presentation" cellspacing="0" cellpadding="0" border="0" style="border-collapse:separate;">
+                        <tr>
+                          <td bgcolor="#1769e0" style="border-radius:9px; background-color:#1769e0; box-shadow:0 8px 18px rgba(23,105,224,.20);">
+                            <a class="email-button" href="${safeTargetUrl}" target="_blank" style="display:inline-block; padding:14px 26px; border:1px solid #1769e0; border-radius:9px; color:#ffffff; font-size:15px; font-weight:700; line-height:20px; text-decoration:none;">${actionLabel}</a>
+                          </td>
+                        </tr>
+                      </table>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style="padding:17px 18px; border:1px solid #dbe7f7; border-radius:10px; background-color:#f7faff; color:#41536c; font-size:13px; line-height:20px;">
+                      <strong style="display:block; padding-bottom:3px; color:#1d3150; font-size:13px;">Tautan aman dengan masa berlaku terbatas</strong>
+                      Tautan ini berlaku selama <strong>${expiry}</strong> dan hanya dapat digunakan satu kali. Jangan teruskan email ini kepada siapa pun.
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style="padding-top:25px; color:#718096; font-size:12px; line-height:19px;">
+                      Jika tombol tidak berfungsi, salin dan tempel tautan berikut ke browser Anda:<br>
+                      <a href="${safeTargetUrl}" target="_blank" style="color:#1769e0; text-decoration:underline; word-break:break-all; overflow-wrap:anywhere;">${safeTargetUrl}</a>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+            <tr>
+              <td class="email-footer" bgcolor="#edf2f8" style="padding:22px 38px; border:1px solid #dfe7f2; border-radius:0 0 14px 14px; background-color:#edf2f8; color:#6b7b91; font-size:12px; line-height:19px;">
+                <strong style="color:#3a4b63;">Tidak merasa mendaftar atau meminta perubahan?</strong><br>
+                Abaikan email ini. Tidak ada tindakan lain yang perlu dilakukan.<br><br>
+                Email otomatis dari <strong style="color:#3a4b63;">MOTOVAX</strong> · Platform operasional dealer mobil.
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>`;
+
+  return { text, html };
 }
 
 function validateConfig(config) {
@@ -256,15 +391,6 @@ function normalizeSlug(value) {
     .replace(/-+$/g, "");
 }
 
-function normalizeWorkspace(value, suffix = "motovax.com") {
-  const raw = String(value || "").trim().toLowerCase().replace(/^https?:\/\//, "").split(/[/?#]/)[0];
-  const normalizedSuffix = String(suffix || "motovax.com").toLowerCase();
-  const slug = normalizeSlug(raw.endsWith(`.${normalizedSuffix}`)
-    ? raw.slice(0, -(normalizedSuffix.length + 1))
-    : raw.split(".")[0]);
-  return { slug, domain: `${slug}.${normalizedSuffix}` };
-}
-
 function publicUser(row) {
   return {
     id: row.id,
@@ -384,13 +510,22 @@ function authCookieNames(config) {
     secure,
     session: secure ? "__Host-motovax_session" : "motovax_session",
     state: secure ? "__Host-motovax_oauth_state" : "motovax_oauth_state",
+    pendingSignup: secure ? "__Host-motovax_pending_signup" : "motovax_pending_signup",
   };
 }
 
-function oauthResultUrl(config, status, reason = "") {
-  const target = new URL(config.oauthSuccessUrl);
+function oauthResultUrl(config, status, reason = "", authMode = "signup") {
+  const target = authMode === "portal"
+    ? new URL("/login.html", config.publicBaseUrl)
+    : new URL(config.oauthSuccessUrl);
   target.searchParams.set("oauth", status);
   if (reason) target.searchParams.set("reason", reason);
+  return target.toString();
+}
+
+function portalOauthSuccessUrl(config, sessionToken) {
+  const target = new URL(config.portalLandingUrl || "https://motovax.ai/");
+  target.hash = new URLSearchParams({ portal_session: sessionToken }).toString();
   return target.toString();
 }
 
@@ -707,7 +842,7 @@ export async function createPostgresStore(connectionString) {
       }
     },
 
-    async createPasswordUser({ email, fullName, passwordHash }) {
+    async createPasswordUser({ email, fullName, passwordHash, authenticatedUserId = "" }) {
       const client = await pool.connect();
       try {
         await client.query("BEGIN");
@@ -716,7 +851,7 @@ export async function createPostgresStore(connectionString) {
           [email],
         );
         let user = existing.rows[0];
-        if (user?.password_hash && user.email_verified) {
+        if (user?.email_verified && user.id !== authenticatedUserId) {
           const conflict = new Error("Akun dengan email tersebut sudah terdaftar.");
           conflict.code = "account_exists";
           throw conflict;
@@ -757,18 +892,103 @@ export async function createPostgresStore(connectionString) {
       return result.rows[0] || null;
     },
 
+    async findPasswordUserById(userId) {
+      const result = await pool.query(
+        "SELECT * FROM onboarding_users WHERE id = $1 LIMIT 1",
+        [userId],
+      );
+      return result.rows[0] || null;
+    },
+
     async saveActionToken({ userId, actionType, digest, expiresAt }) {
-      await pool.query(
-        `UPDATE onboarding_action_tokens
-         SET used_at = COALESCE(used_at, NOW())
-         WHERE user_id = $1 AND action_type = $2 AND used_at IS NULL`,
-        [userId, actionType],
+      const client = await pool.connect();
+      try {
+        await client.query("BEGIN");
+        await client.query(
+          "SELECT pg_advisory_xact_lock(hashtext($1))",
+          [`${userId}:${actionType}`],
+        );
+        await client.query(
+          `UPDATE onboarding_action_tokens
+           SET used_at = COALESCE(used_at, NOW())
+           WHERE user_id = $1 AND action_type = $2 AND used_at IS NULL`,
+          [userId, actionType],
+        );
+        await client.query(
+          `INSERT INTO onboarding_action_tokens (token_digest, user_id, action_type, expires_at)
+           VALUES ($1, $2, $3, $4)`,
+          [digest, userId, actionType, expiresAt],
+        );
+        await client.query("COMMIT");
+      } catch (error) {
+        await client.query("ROLLBACK");
+        throw error;
+      } finally {
+        client.release();
+      }
+    },
+
+    async findActionToken({ digest, actionType }) {
+      const result = await pool.query(
+        `SELECT user_id
+         FROM onboarding_action_tokens
+         WHERE token_digest = $1 AND action_type = $2
+           AND used_at IS NULL AND expires_at > NOW()
+         LIMIT 1`,
+        [digest, actionType],
       );
-      await pool.query(
-        `INSERT INTO onboarding_action_tokens (token_digest, user_id, action_type, expires_at)
-         VALUES ($1, $2, $3, $4)`,
-        [digest, userId, actionType, expiresAt],
+      return result.rows[0]?.user_id || null;
+    },
+
+    async getActionTokenStatus({ digest, actionType }) {
+      const result = await pool.query(
+        `SELECT
+           CASE
+             WHEN used_at IS NOT NULL THEN 'used'
+             WHEN expires_at <= NOW() THEN 'expired'
+             ELSE 'active'
+           END AS status
+         FROM onboarding_action_tokens
+         WHERE token_digest = $1 AND action_type = $2
+         LIMIT 1`,
+        [digest, actionType],
       );
+      return result.rows[0]?.status || "invalid";
+    },
+
+    async getActionTokenResendDelay({ userId, actionType, cooldownSeconds }) {
+      const result = await pool.query(
+        `SELECT COALESCE(
+           GREATEST(
+             0,
+             CEIL(EXTRACT(EPOCH FROM (
+               MAX(created_at) + ($3::text || ' seconds')::interval - NOW()
+             )))
+           ),
+           0
+         )::int AS retry_after_seconds
+         FROM onboarding_action_tokens
+         WHERE user_id = $1 AND action_type = $2`,
+        [userId, actionType, cooldownSeconds],
+      );
+      return Number(result.rows[0]?.retry_after_seconds || 0);
+    },
+
+    async deletePendingPasswordUser(userId) {
+      const result = await pool.query(
+        `DELETE FROM onboarding_users u
+         WHERE u.id = $1
+           AND u.email_verified = FALSE
+           AND NOT EXISTS (
+             SELECT 1 FROM onboarding_profiles p WHERE p.user_id = u.id
+           )
+           AND NOT EXISTS (
+             SELECT 1 FROM onboarding_memberships m WHERE m.user_id = u.id
+           )
+         RETURNING id`,
+        [userId],
+      );
+      return Boolean(result.rowCount);
     },
 
     async takeActionToken({ digest, actionType }) {
@@ -787,6 +1007,12 @@ export async function createPostgresStore(connectionString) {
         if (userId && actionType === "verify_email") {
           await client.query(
             "UPDATE onboarding_users SET email_verified = TRUE, updated_at = NOW() WHERE id = $1",
+            [userId],
+          );
+          await client.query(
+            `UPDATE onboarding_action_tokens
+             SET used_at = COALESCE(used_at, NOW())
+             WHERE user_id = $1 AND action_type = 'pending_signup' AND used_at IS NULL`,
             [userId],
           );
         }
@@ -837,7 +1063,7 @@ export async function createPostgresStore(connectionString) {
       };
     },
 
-    async findPortalUser({ workspace, identifier }) {
+    async findPortalUsers({ identifier }) {
       const result = await pool.query(
         `SELECT
            u.id,
@@ -867,14 +1093,18 @@ export async function createPostgresStore(connectionString) {
          LEFT JOIN roles r ON r.id = ur.role_id
          LEFT JOIN onboarding_memberships om ON om.app_user_id = u.id AND om.tenant_id = t.id
          LEFT JOIN onboarding_users ou ON ou.id = om.user_id
-         WHERE (LOWER(d.domain) = LOWER($1) OR LOWER(t.slug) = LOWER($2))
-           AND (LOWER(u.username) = LOWER($3) OR LOWER(COALESCE(u.email, '')) = LOWER($3))
+         WHERE LOWER(u.username) = LOWER($1)
+            OR LOWER(COALESCE(u.email, '')) = LOWER($1)
          GROUP BY u.id, u.username, u.display_name, u.email, u.password_hash,
                   ou.password_hash, t.id, t.name, t.config, d.domain
-         LIMIT 1`,
-        [workspace.domain, workspace.slug, identifier],
+         ORDER BY
+           CASE WHEN LOWER(COALESCE(u.email, '')) = LOWER($1) THEN 0 ELSE 1 END,
+           t.name,
+           u.id
+         LIMIT 21`,
+        [identifier],
       );
-      return result.rows[0] || null;
+      return result.rows;
     },
 
     async createPortalSession({ appUserId, tenantId, sessionDigest, userAgent, ipAddress, expiresAt }) {
@@ -917,6 +1147,53 @@ export async function createPostgresStore(connectionString) {
         [sessionDigest],
       );
       return result.rows[0] || null;
+    },
+
+    async getPortalBilling(tenantId) {
+      const [tenantResult, membersResult] = await Promise.all([
+        pool.query(
+          `SELECT id, name, COALESCE(config, '{}'::jsonb) AS config
+           FROM tenants
+           WHERE id = $1 AND status = 'active'`,
+          [tenantId],
+        ),
+        pool.query(
+          `SELECT u.id, COALESCE(NULLIF(BTRIM(u.display_name), ''), u.username) AS display_name,
+             u.username,
+             COALESCE(string_agg(DISTINCT r.name, ', ' ORDER BY r.name), '') AS roles
+           FROM users u
+           LEFT JOIN user_roles ur ON ur.user_id = u.id
+           LEFT JOIN roles r ON r.id = ur.role_id
+           WHERE u.tenant_id = $1
+           GROUP BY u.id, u.display_name, u.username
+           ORDER BY COALESCE(NULLIF(BTRIM(u.display_name), ''), u.username), u.username`,
+          [tenantId],
+        ),
+      ]);
+      const tenant = tenantResult.rows[0];
+      if (!tenant) return null;
+      const tenantConfig = tenant.config || {};
+      const features = tenantConfig.features || {};
+      const periodStart = new Date();
+      periodStart.setUTCDate(1);
+      periodStart.setUTCHours(0, 0, 0, 0);
+      const periodEnd = new Date(periodStart);
+      periodEnd.setUTCMonth(periodEnd.getUTCMonth() + 1);
+      return {
+        tenant_id: tenant.id,
+        tenant_name: tenant.name,
+        period_start: periodStart.toISOString(),
+        period_end: periodEnd.toISOString(),
+        member_count: membersResult.rowCount,
+        max_users: Number(tenantConfig.max_users || 0),
+        max_listings: Number(tenantConfig.max_listings || 0),
+        enabled_features: Object.entries(features)
+          .filter(([, enabled]) => enabled === true)
+          .map(([key]) => key),
+        members: membersResult.rows,
+        billing_configured: false,
+        invoice_status: "not_configured",
+      };
     },
 
     async revokePortalSession(sessionDigest) {
@@ -1165,6 +1442,7 @@ export function createApp({
   oauthClient = null,
   mailer = undefined,
   recaptchaVerifier = verifyRecaptchaToken,
+  productDomainEnsurer = ensureProductDomain,
 } = {}) {
   validateConfig(config);
   const app = express();
@@ -1261,6 +1539,67 @@ export function createApp({
     });
   }
 
+  function clearPendingSignupCookie(res) {
+    res.clearCookie(cookies.pendingSignup, {
+      httpOnly: true,
+      secure: cookies.secure,
+      sameSite: "lax",
+      path: "/",
+    });
+  }
+
+  async function issuePendingSignup(res, userId) {
+    const pendingToken = randomToken(32);
+    await store.saveActionToken({
+      userId,
+      actionType: "pending_signup",
+      digest: tokenDigest(pendingToken, config.sessionSecret),
+      expiresAt: new Date(Date.now() + EMAIL_VERIFICATION_TTL_MS),
+    });
+    res.cookie(cookies.pendingSignup, pendingToken, {
+      httpOnly: true,
+      secure: cookies.secure,
+      sameSite: "lax",
+      path: "/",
+      maxAge: EMAIL_VERIFICATION_TTL_MS,
+    });
+  }
+
+  async function pendingSignupUser(req) {
+    if (!store?.findActionToken || !store?.findPasswordUserById || !config.sessionSecret) return null;
+    const requestCookies = parseCookies(req.headers.cookie);
+    const pendingToken = requestCookies[cookies.pendingSignup];
+    if (!pendingToken) return null;
+    const userId = await store.findActionToken({
+      digest: tokenDigest(pendingToken, config.sessionSecret),
+      actionType: "pending_signup",
+    });
+    return userId ? store.findPasswordUserById(userId) : null;
+  }
+
+  async function verificationResendDelay(userId) {
+    if (!store?.getActionTokenResendDelay) return 0;
+    return store.getActionTokenResendDelay({
+      userId,
+      actionType: "verify_email",
+      cooldownSeconds: EMAIL_VERIFICATION_RESEND_COOLDOWN_SECONDS,
+    });
+  }
+
+  async function issuePortalSession(req, user) {
+    const sessionToken = randomToken(48);
+    const expiresAt = new Date(Date.now() + PORTAL_SESSION_TTL_MS);
+    await store.createPortalSession({
+      appUserId: user.id,
+      tenantId: user.tenant_id,
+      sessionDigest: tokenDigest(sessionToken, config.sessionSecret),
+      userAgent: String(req.headers["user-agent"] || "").slice(0, 500),
+      ipAddress: String(req.ip || "").slice(0, 100),
+      expiresAt,
+    });
+    return { sessionToken, expiresAt };
+  }
+
   async function sendAccountEmail({ user, actionType, subject, pathName, copy }) {
     if (!emailClient) {
       const error = new Error("Layanan email belum tersedia.");
@@ -1272,16 +1611,23 @@ export function createApp({
       userId: user.id,
       actionType,
       digest: tokenDigest(token, config.sessionSecret),
-      expiresAt: new Date(Date.now() + (actionType === "verify_email" ? 24 * 60 * 60 * 1000 : 30 * 60 * 1000)),
+      expiresAt: new Date(Date.now() + (actionType === "verify_email" ? EMAIL_VERIFICATION_TTL_MS : 30 * 60 * 1000)),
     });
     const target = new URL(pathName, config.publicBaseUrl);
     target.searchParams.set("token", token);
+    const emailContent = buildAccountEmail({
+      displayName: user.full_name || user.email,
+      copy,
+      targetUrl: target.toString(),
+      actionType,
+      publicBaseUrl: config.publicBaseUrl,
+    });
     await emailClient.sendMail({
       from: `MOTOVAX <${config.authEmailFrom}>`,
       to: user.email,
       subject,
-      text: `${copy}\n\n${target.toString()}\n\nJika Anda tidak meminta ini, abaikan email ini.`,
-      html: `<p>Halo ${escapeHtml(user.full_name || user.email)},</p><p>${escapeHtml(copy)}</p><p><a href="${escapeHtml(target.toString())}">Lanjutkan di MOTOVAX</a></p><p>Tautan ini memiliki masa berlaku terbatas. Jika Anda tidak meminta ini, abaikan email ini.</p>`,
+      text: emailContent.text,
+      html: emailContent.html,
     });
   }
 
@@ -1334,38 +1680,38 @@ export function createApp({
   app.post("/api/portal/login", async (req, res, next) => {
     try {
       if (!assertSameOrigin(req, res) || !checkAuthRateLimit(req, res)) return;
-      if (!store || !config.sessionSecret || !store.findPortalUser || !store.createPortalSession) {
+      if (!store || !config.sessionSecret || !store.findPortalUsers || !store.createPortalSession) {
         return res.status(503).json({ error: "service_unavailable" });
       }
-      const workspace = normalizeWorkspace(req.body?.workspace, config.tenantDomainSuffix);
       const identifier = String(req.body?.identifier || "").trim().toLowerCase();
       const password = String(req.body?.password || "");
-      if (workspace.slug.length < 2 || identifier.length < 2 || password.length < 1) {
+      if (identifier.length < 2 || password.length < 1) {
         return res.status(400).json({
           error: "invalid_login",
-          message: "Lengkapi workspace, username atau email, dan password Anda.",
+          message: "Lengkapi username atau email dan password Anda.",
         });
       }
-      const user = await store.findPortalUser({ workspace, identifier });
-      const valid = user
-        ? await verifyTenantPassword(password, user.password_hash, user.onboarding_password_hash)
-        : false;
-      if (!valid) {
+      const candidates = await store.findPortalUsers({ identifier });
+      const matchedUsers = [];
+      for (const candidate of candidates.slice(0, 21)) {
+        if (await verifyTenantPassword(password, candidate.password_hash, candidate.onboarding_password_hash)) {
+          matchedUsers.push(candidate);
+        }
+      }
+      if (matchedUsers.length === 0) {
         return res.status(401).json({
           error: "invalid_credentials",
-          message: "Workspace, username/email, atau password tidak sesuai.",
+          message: "Username/email atau password tidak sesuai.",
         });
       }
-      const sessionToken = randomToken(48);
-      const expiresAt = new Date(Date.now() + PORTAL_SESSION_TTL_MS);
-      await store.createPortalSession({
-        appUserId: user.id,
-        tenantId: user.tenant_id,
-        sessionDigest: tokenDigest(sessionToken, config.sessionSecret),
-        userAgent: String(req.headers["user-agent"] || "").slice(0, 500),
-        ipAddress: String(req.ip || "").slice(0, 100),
-        expiresAt,
-      });
+      if (matchedUsers.length > 1 || candidates.length > 20) {
+        return res.status(409).json({
+          error: "ambiguous_account",
+          message: "Akun cocok dengan lebih dari satu workspace. Gunakan alamat email akun yang unik atau hubungi admin.",
+        });
+      }
+      const [user] = matchedUsers;
+      const { sessionToken, expiresAt } = await issuePortalSession(req, user);
       return res.json({
         authenticated: true,
         token: sessionToken,
@@ -1383,6 +1729,22 @@ export function createApp({
       const user = await authenticatedPortalUser(req);
       if (!user) return res.status(401).json({ authenticated: false });
       return res.json({ authenticated: true, user: publicPortalUser(user) });
+    } catch (error) {
+      return next(error);
+    }
+  });
+
+  app.get("/api/portal/billing", async (req, res, next) => {
+    try {
+      const user = await authenticatedPortalUser(req);
+      if (!user) return res.status(401).json({ error: "not_authenticated" });
+      if (!publicPortalUser(user).canViewBilling) {
+        return res.status(403).json({ error: "billing_forbidden", message: "Akun ini tidak memiliki akses billing." });
+      }
+      if (!store?.getPortalBilling) return res.status(503).json({ error: "service_unavailable" });
+      const billing = await store.getPortalBilling(user.tenant_id);
+      if (!billing) return res.status(404).json({ error: "workspace_not_found" });
+      return res.json(billing);
     } catch (error) {
       return next(error);
     }
@@ -1438,11 +1800,22 @@ export function createApp({
       if (password.length < 8 || password.length > 200 || !/[A-Za-z]/.test(password) || !/\d/.test(password)) {
         return res.status(400).json({ error: "weak_password", message: "Password minimal 8 karakter dan harus berisi huruf serta angka." });
       }
+      const signedInUser = await authenticatedUser(req);
       const user = await store.createPasswordUser({
         email,
         fullName,
         passwordHash: await hashPassword(password),
+        authenticatedUserId: signedInUser?.id || "",
       });
+      if (user.email_verified) {
+        const state = await store.getAccountState(user.id);
+        return res.json({
+          authenticated: true,
+          accountUpdated: true,
+          user: publicUser({ ...user, provider: signedInUser?.provider }),
+          ...state,
+        });
+      }
       await sendAccountEmail({
         user,
         actionType: "verify_email",
@@ -1450,11 +1823,95 @@ export function createApp({
         pathName: "/api/auth/verify-email",
         copy: "Verifikasi alamat email Anda untuk melanjutkan pembuatan workspace MOTOVAX.",
       });
-      return res.status(202).json({ verificationRequired: true, email: user.email });
+      await issuePendingSignup(res, user.id);
+      return res.status(202).json({
+        verificationRequired: true,
+        email: user.email,
+        expiresInSeconds: EMAIL_VERIFICATION_TTL_MS / 1000,
+        resendAfterSeconds: EMAIL_VERIFICATION_RESEND_COOLDOWN_SECONDS,
+      });
     } catch (error) {
       if (error?.code === "account_exists") {
         return res.status(409).json({ error: error.code, message: error.message });
       }
+      return next(error);
+    }
+  });
+
+  app.get("/api/auth/pending-signup", async (req, res, next) => {
+    try {
+      const user = await pendingSignupUser(req);
+      if (!user || user.email_verified) {
+        clearPendingSignupCookie(res);
+        return res.status(401).json({ pending: false });
+      }
+      return res.json({
+        pending: true,
+        email: user.email,
+        resendAfterSeconds: await verificationResendDelay(user.id),
+        expiresInSeconds: EMAIL_VERIFICATION_TTL_MS / 1000,
+      });
+    } catch (error) {
+      return next(error);
+    }
+  });
+
+  app.post("/api/auth/resend-verification", async (req, res, next) => {
+    try {
+      if (!assertSameOrigin(req, res) || !checkAuthRateLimit(req, res)) return;
+      const user = await pendingSignupUser(req);
+      if (!user) return res.status(401).json({ error: "pending_signup_required", message: "Sesi pendaftaran tidak ditemukan. Silakan daftar kembali." });
+      if (user.email_verified) {
+        clearPendingSignupCookie(res);
+        return res.status(409).json({ error: "already_verified", message: "Email sudah diverifikasi. Silakan lanjutkan onboarding." });
+      }
+      const retryAfterSeconds = await verificationResendDelay(user.id);
+      if (retryAfterSeconds > 0) {
+        res.set("Retry-After", String(retryAfterSeconds));
+        return res.status(429).json({
+          error: "resend_cooldown",
+          message: "Tunggu sebentar sebelum mengirim ulang email verifikasi.",
+          retryAfterSeconds,
+        });
+      }
+      await sendAccountEmail({
+        user,
+        actionType: "verify_email",
+        subject: "Verifikasi email akun MOTOVAX",
+        pathName: "/api/auth/verify-email",
+        copy: "Verifikasi alamat email Anda untuk melanjutkan pembuatan workspace MOTOVAX.",
+      });
+      return res.status(202).json({
+        sent: true,
+        email: user.email,
+        resendAfterSeconds: EMAIL_VERIFICATION_RESEND_COOLDOWN_SECONDS,
+        expiresInSeconds: EMAIL_VERIFICATION_TTL_MS / 1000,
+      });
+    } catch (error) {
+      if (error?.code === "email_unavailable") return res.status(503).json({ error: error.code, message: error.message });
+      return next(error);
+    }
+  });
+
+  app.delete("/api/auth/pending-signup", async (req, res, next) => {
+    try {
+      if (!assertSameOrigin(req, res) || !checkAuthRateLimit(req, res)) return;
+      const user = await pendingSignupUser(req);
+      if (!user) {
+        clearPendingSignupCookie(res);
+        return res.status(204).end();
+      }
+      if (user.email_verified) {
+        clearPendingSignupCookie(res);
+        return res.status(409).json({ error: "already_verified", message: "Email sudah diverifikasi dan tidak dapat diganti dari halaman ini." });
+      }
+      const deleted = await store.deletePendingPasswordUser?.(user.id);
+      if (!deleted) {
+        return res.status(409).json({ error: "pending_signup_locked", message: "Pendaftaran ini sudah memiliki data lanjutan dan tidak dapat dibatalkan." });
+      }
+      clearPendingSignupCookie(res);
+      return res.status(204).end();
+    } catch (error) {
       return next(error);
     }
   });
@@ -1486,13 +1943,19 @@ export function createApp({
   app.get("/api/auth/verify-email", async (req, res, next) => {
     try {
       const token = String(req.query.token || "");
-      const userId = token
-        ? await store.takeActionToken({ digest: tokenDigest(token, config.sessionSecret), actionType: "verify_email" })
+      const digest = token ? tokenDigest(token, config.sessionSecret) : "";
+      const userId = digest
+        ? await store.takeActionToken({ digest, actionType: "verify_email" })
         : null;
       if (!userId) {
-        return res.redirect(302, `${config.publicBaseUrl}/onboarding.html?email=invalid`);
+        const status = digest && store?.getActionTokenStatus
+          ? await store.getActionTokenStatus({ digest, actionType: "verify_email" })
+          : "invalid";
+        const reason = new Set(["used", "expired"]).has(status) ? status : "invalid";
+        return res.redirect(302, `${config.publicBaseUrl}/onboarding.html?email=${reason}`);
       }
       await issueSession(req, res, userId);
+      clearPendingSignupCookie(res);
       return res.redirect(302, `${config.publicBaseUrl}/onboarding.html?email=verified`);
     } catch (error) {
       return next(error);
@@ -1605,13 +2068,28 @@ export function createApp({
       }
       await recaptchaVerifier(config, String(req.body?.recaptchaToken || ""));
       const result = await store.provisionWorkspace({ userId: user.id, suffix: config.tenantDomainSuffix });
-      await ensureProductDomain(config, result.workspace.domain);
+      await productDomainEnsurer(config, result.workspace.domain);
+      const portalToken = randomToken(48);
+      const portalExpiresAt = new Date(Date.now() + PORTAL_SESSION_TTL_MS);
+      await store.createPortalSession({
+        appUserId: result.workspace.app_user_id,
+        tenantId: result.workspace.id,
+        sessionDigest: tokenDigest(portalToken, config.sessionSecret),
+        userAgent: String(req.headers["user-agent"] || "").slice(0, 500),
+        ipAddress: String(req.ip || "").slice(0, 100),
+        expiresAt: portalExpiresAt,
+      });
       return res.status(202).json({
         workspace: {
           id: result.workspace.id,
           name: result.workspace.name,
           domain: result.workspace.domain,
           ready: false,
+        },
+        portalSession: {
+          token: portalToken,
+          expiresAt: portalExpiresAt.toISOString(),
+          returnUrl: config.portalLandingUrl || "https://motovax.ai/",
         },
       });
     } catch (error) {
@@ -1677,11 +2155,13 @@ export function createApp({
         });
       }
 
-      const state = randomToken(32);
+      const authMode = req.query.mode === "portal"
+        ? "portal"
+        : req.query.mode === "login" ? "login" : "signup";
+      const state = `${authMode === "portal" ? "portal." : ""}${randomToken(32)}`;
       const codeVerifier = randomToken(64);
       const nonce = randomToken(32);
       const codeChallenge = sha256(codeVerifier);
-      const authMode = req.query.mode === "login" ? "login" : "signup";
 
       await store.saveOAuthState({
         stateDigest: tokenDigest(state, config.sessionSecret),
@@ -1718,16 +2198,19 @@ export function createApp({
 
   app.get("/api/auth/google/callback", async (req, res, next) => {
     try {
+      const requestedState = String(req.query.state || "");
+      let authMode = requestedState.startsWith("portal.") ? "portal" : "signup";
+      req.oauthMode = authMode;
       const missing = missingOAuthConfig(config, store);
       if (missing.length || !client) {
-        return res.redirect(302, oauthResultUrl(config, "failed", "configuration"));
+        return res.redirect(302, oauthResultUrl(config, "failed", "configuration", authMode));
       }
 
       const requestCookies = parseCookies(req.headers.cookie);
-      const state = String(req.query.state || "");
+      const state = requestedState;
       const stateCookie = requestCookies[cookies.state] || "";
       if (!state || !safeEqual(state, stateCookie)) {
-        return res.redirect(302, oauthResultUrl(config, "failed", "state"));
+        return res.redirect(302, oauthResultUrl(config, "failed", "state", authMode));
       }
 
       const transaction = await store.takeOAuthState(
@@ -1740,15 +2223,17 @@ export function createApp({
         path: "/",
       });
       if (!transaction) {
-        return res.redirect(302, oauthResultUrl(config, "failed", "expired"));
+        return res.redirect(302, oauthResultUrl(config, "failed", "expired", authMode));
       }
+      authMode = transaction.auth_mode === "portal" ? "portal" : transaction.auth_mode;
+      req.oauthMode = authMode;
       if (req.query.error) {
-        return res.redirect(302, oauthResultUrl(config, "denied"));
+        return res.redirect(302, oauthResultUrl(config, "denied", "", authMode));
       }
 
       const code = String(req.query.code || "");
       if (!code) {
-        return res.redirect(302, oauthResultUrl(config, "failed", "code"));
+        return res.redirect(302, oauthResultUrl(config, "failed", "code", authMode));
       }
 
       const tokenResponse = await client.getToken({
@@ -1774,14 +2259,34 @@ export function createApp({
         throw new Error("Klaim identitas Google tidak valid.");
       }
 
-      const user = await store.upsertGoogleUser({
+      const googleProfile = {
         subject: payload.sub,
         email: payload.email.toLowerCase(),
         name: payload.name || payload.email.split("@")[0],
         picture: payload.picture || "",
-      });
+      };
+
+      if (authMode === "portal") {
+        if (!store.findPortalUsers || !store.createPortalSession) {
+          return res.redirect(302, oauthResultUrl(config, "failed", "configuration", authMode));
+        }
+        const candidates = await store.findPortalUsers({ identifier: googleProfile.email });
+        const matchingUsers = candidates.filter(
+          (candidate) => String(candidate.email || "").trim().toLowerCase() === googleProfile.email,
+        );
+        if (matchingUsers.length === 0) {
+          return res.redirect(302, oauthResultUrl(config, "failed", "account_not_found", authMode));
+        }
+        if (matchingUsers.length > 1 || candidates.length > 20) {
+          return res.redirect(302, oauthResultUrl(config, "failed", "ambiguous_account", authMode));
+        }
+        const { sessionToken } = await issuePortalSession(req, matchingUsers[0]);
+        return res.redirect(302, portalOauthSuccessUrl(config, sessionToken));
+      }
+
+      const user = await store.upsertGoogleUser(googleProfile);
       await issueSession(req, res, user.id);
-      return res.redirect(302, oauthResultUrl(config, "success"));
+      return res.redirect(302, oauthResultUrl(config, "success", "", authMode));
     } catch (error) {
       req.oauthError = error;
       return next(error);
@@ -1822,12 +2327,17 @@ export function createApp({
       if (sessionToken && store && config.sessionSecret) {
         await store.revokeSession(tokenDigest(sessionToken, config.sessionSecret));
       }
+      const pendingUser = await pendingSignupUser(req);
+      if (pendingUser && !pendingUser.email_verified && store?.deletePendingPasswordUser) {
+        await store.deletePendingPasswordUser(pendingUser.id);
+      }
       res.clearCookie(cookies.session, {
         httpOnly: true,
         secure: cookies.secure,
         sameSite: "lax",
         path: "/",
       });
+      clearPendingSignupCookie(res);
       return res.status(204).end();
     } catch (error) {
       return next(error);
@@ -1847,7 +2357,7 @@ export function createApp({
   app.get("/", (req, res, next) => {
     const authHost = new URL(config.publicBaseUrl).hostname;
     if (authHost === "onboard.motovax.com" && req.hostname === authHost) {
-      return res.redirect(302, "/onboarding.html");
+      return res.redirect(302, "/onboarding.html?fresh=1");
     }
     return next();
   });
@@ -1866,7 +2376,7 @@ export function createApp({
       message: error instanceof Error ? error.message : "unknown_error",
     });
     if (req.path === "/api/auth/google/callback") {
-      return res.redirect(302, oauthResultUrl(config, "failed", "server"));
+      return res.redirect(302, oauthResultUrl(config, "failed", "server", req.oauthMode));
     }
     return res.status(500).json({ error: "internal_server_error" });
   });
