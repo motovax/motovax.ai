@@ -849,7 +849,54 @@ if (contactForm instanceof HTMLFormElement) {
   });
 })();
 
-/** Mega menu Solusi — khusus dealer mobil dan role operasionalnya. */
+const dealerSolutionNavigation = Object.freeze({
+  outcomes: [
+    {
+      title: "Tangkap & respons setiap lead",
+      desc: "Satukan WhatsApp, Instagram, dan Facebook dengan AI serta takeover manusia.",
+      capability: "AI Omnichannel + Agentic AI",
+      icon: "lead",
+      href: "aplikasi-omnichannel.html",
+    },
+    {
+      title: "Percepat follow-up hingga closing",
+      desc: "Jaga lead tetap bergerak dan arahkan sales ke tindakan terbaik berikutnya.",
+      capability: "Autopilot CRM + handoff sales",
+      icon: "closing",
+      href: "aplikasi-crm.html",
+    },
+    {
+      title: "Putar stok lebih cepat",
+      desc: "Pantau stok dan aging lintas cabang serta bantu tim menemukan unit yang tepat.",
+      capability: "Inventory Management + Falcon AI",
+      icon: "inventory",
+      href: "inventory-falcon-ai.html",
+    },
+    {
+      title: "Aktifkan kampanye dari stok",
+      desc: "Ubah data unit menjadi konten dan kampanye yang relevan di setiap channel.",
+      capability: "Social Media & Ads Automation",
+      icon: "campaign",
+      href: "social-media-sora-ai.html",
+    },
+    {
+      title: "Kendalikan performa semua cabang",
+      desc: "Baca funnel, channel, sales, stok, margin, dan cabang dalam satu tampilan.",
+      capability: "One Dashboard & Analytics",
+      icon: "analytics",
+      href: "ana-ai-analytics.html",
+    },
+  ],
+  roles: [
+    { title: "Owner & Manajemen", href: "motovax-360.html" },
+    { title: "Sales", href: "motovax-sales-suite.html" },
+    { title: "Call Center", href: "motovax-service-suite.html" },
+    { title: "Marketing", href: "motovax-broadcast.html" },
+    { title: "Operasional", href: "inventory-falcon-ai.html" },
+  ],
+});
+
+/** Mega menu Solusi — outcome dealer sebagai jalur utama, role sebagai jalur sekunder. */
 (function initSolusiMegaMenu() {
   const solusiLinks = [...document.querySelectorAll('.nav > a[href*="#solusi"]')].filter(
     (link) => link.textContent.trim() === "Solusi",
@@ -860,55 +907,41 @@ if (contactForm instanceof HTMLFormElement) {
   const inNestedDir = path.includes("/fitur/") || path.includes("/solusi/") || /\/(fitur|solusi)$/.test(path);
   const fiturPrefix = inNestedDir ? "../fitur/" : "./fitur/";
   const solusiPrefix = path.includes("/solusi/") || /\/solusi$/.test(path) ? "./" : inNestedDir ? "../solusi/" : "./solusi/";
-  const home = inNestedDir ? "../index.html#" : path.endsWith("modul.html") ? "./index.html#" : "#";
+  const contactHref = inNestedDir ? "../hubungi-kami.html" : "./hubungi-kami.html";
 
   const icon = (paths) =>
     `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${paths}</svg>`;
 
   const icons = {
     automotive: icon('<path d="M5 16 3.5 14.5 5 10l2-4h10l2 4 1.5 4.5L19 16"/><path d="M5 10h14M6 16h12M7 19v2m10-2v2"/><circle cx="7.5" cy="14" r="1"/><circle cx="16.5" cy="14" r="1"/>'),
-    sales: icon('<path d="M4 19V9m6 10V5m6 14v-7m4 7H2"/><path d="m5 7 5-4 5 3 5-4"/>'),
-    service: icon('<path d="M12 3a8 8 0 0 0-8 8v3a3 3 0 0 0 3 3h1v-7H7a3 3 0 0 0-3 3m16 0a3 3 0 0 0-3-3h-1v7h1a3 3 0 0 0 3-3z"/><path d="M16 19c-1 2-3 2-5 2"/>'),
-    marketing: icon('<path d="M3 11v4h4l9 4V7l-9 4z"/><path d="M7 15l2 5h3M19 9c1 1 1 4 0 5"/>'),
-    operations: icon('<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1-2.8 2.8-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.6V21h-4v-.1a1.7 1.7 0 0 0-1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1L4.2 17l.1-.1a1.7 1.7 0 0 0 .3-1.9A1.7 1.7 0 0 0 3 14H3v-4h.1a1.7 1.7 0 0 0 1.6-1 1.7 1.7 0 0 0-.3-1.9L4.2 7 7 4.2l.1.1A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1-1.6V3h4v.1a1.7 1.7 0 0 0 1 1.6 1.7 1.7 0 0 0 1.9-.3l.1-.1L19.8 7l-.1.1a1.7 1.7 0 0 0-.3 1.9 1.7 1.7 0 0 0 1.6 1h.1v4H21a1.7 1.7 0 0 0-1.6 1z"/>'),
+    lead: icon('<path d="M4 5.5h16v11H9l-5 4v-15Z"/><path d="M8 9h8m-8 3.5h5"/>'),
+    closing: icon('<path d="M4 19V9m6 10V5m6 14v-7m4 7H2"/><path d="m5 7 5-4 5 3 5-4"/>'),
+    inventory: icon('<path d="m4 8 8-4 8 4-8 4-8-4Z"/><path d="M4 8v8l8 4 8-4V8M12 12v8"/>'),
+    campaign: icon('<path d="M3 10v4h4l9 4V6l-9 4H3Z"/><path d="m7 14 2 6h3m7-12c1 1 1 5 0 6"/>'),
+    analytics: icon('<path d="M4 20V12m5 8V7m5 13v-5m5 5V4"/><path d="m4 9 5-4 5 3 5-5"/>'),
   };
 
-  const groups = [
-    {
-      id: "dealer",
-      title: "Dealer Mobil",
-      items: [
-        { title: "Solusi Dealer Mobil", desc: "Stok unit, lead, sales, test drive, dan closing terintegrasi", icon: "automotive", slug: "otomotif", status: "live", statusLabel: "Live", href: `${solusiPrefix}otomotif.html` },
-      ],
-    },
-    {
-      id: "roles",
-      title: "Roles",
-      items: [
-        { title: "Sales", desc: "Lacak penjualan barang", icon: "sales", href: `${fiturPrefix}motovax-sales-suite.html` },
-        { title: "Customer Service", desc: "Kelola pelayanan pelanggan", icon: "service", href: `${fiturPrefix}motovax-service-suite.html` },
-        { title: "Marketing", desc: "Atur pemasaran produk", icon: "marketing", href: `${fiturPrefix}motovax-broadcast.html` },
-        { title: "Operasional", desc: "Otomatiskan proses operasional", icon: "operations", href: `${fiturPrefix}automasi-workflow.html` },
-      ],
-    },
-  ];
-
-  const renderItems = (group) => group.items
+  const renderOutcomes = () => dealerSolutionNavigation.outcomes
     .map((item) => {
-      const isCurrent = Boolean(item.slug && (path.endsWith(`/solusi/${item.slug}`) || path.endsWith(`/solusi/${item.slug}.html`)));
       return `
-      <a class="solusi-mega-item${isCurrent ? " is-current" : ""}" href="${item.href}"${isCurrent ? ' aria-current="page"' : ""} data-solusi-close>
+      <a class="solusi-mega-item solusi-outcome-item" href="${fiturPrefix}${item.href}" data-solusi-close>
         <span class="solusi-mega-icon">${icons[item.icon]}</span>
         <span class="solusi-mega-meta">
-          <span class="solusi-mega-title-row">
-            <strong>${item.title}</strong>
-            ${item.statusLabel ? `<span class="solusi-mega-status ${item.status}">${item.statusLabel}</span>` : ""}
-          </span>
+          <strong>${item.title}</strong>
           <small>${item.desc}</small>
+          <em>${item.capability}</em>
         </span>
         <svg class="solusi-mega-arrow" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </a>`;
     })
+    .join("");
+
+  const renderRoles = () => dealerSolutionNavigation.roles
+    .map((role) => `
+      <a href="${fiturPrefix}${role.href}" data-solusi-close>
+        <span>${role.title}</span>
+        <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>`)
     .join("");
 
   const renderMenu = (id) => `
@@ -918,26 +951,35 @@ if (contactForm instanceof HTMLFormElement) {
         <path d="M2.5 4.5 6 8l3.5-3.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
     </button>
-    <div class="produk-mega solusi-mega" id="${id}" role="region" aria-label="Menu solusi dealer mobil berdasarkan kebutuhan dan peran" hidden data-solusi-panel>
-      <div class="produk-mega-tabs">
-        <div class="produk-mega-tabs-inner" role="tablist" aria-label="Kategori solusi">
-          ${groups.map((group, index) => `
-            <button type="button" class="produk-mega-tab${index === 0 ? " is-active" : ""}" id="${id}-tab-${group.id}" role="tab" aria-selected="${index === 0 ? "true" : "false"}" aria-controls="${id}-panel-${group.id}" data-solusi-tab="${group.id}">${group.title}</button>`).join("")}
-        </div>
-      </div>
+    <div class="produk-mega solusi-mega" id="${id}" role="region" aria-label="Menu solusi dealer mobil berdasarkan kebutuhan bisnis" hidden data-solusi-panel>
       <div class="solusi-mega-content">
-        ${groups.map((group, index) => `
-          <section class="solusi-mega-panel${index === 0 ? " is-active" : ""}" id="${id}-panel-${group.id}" role="tabpanel" aria-labelledby="${id}-tab-${group.id}" data-solusi-panel-content="${group.id}" ${index === 0 ? "" : "hidden"}>
-            <div class="solusi-mega-heading">
-              <span>Solusi</span>
-              <h3>${group.title}</h3>
+        <div class="solusi-mega-heading">
+          <span>Solusi dealer mobil</span>
+          <h3>Apa yang ingin dealer Anda tingkatkan?</h3>
+        </div>
+        <div class="solusi-mega-layout">
+          <div class="solusi-mega-grid">${renderOutcomes()}</div>
+          <aside class="solusi-mega-aside" aria-label="Gambaran lengkap dan solusi berdasarkan tim">
+            <a class="solusi-mega-overview" href="${solusiPrefix}otomotif.html" data-solusi-close>
+              <span class="solusi-mega-icon">${icons.automotive}</span>
+              <span>
+                <small>PLATFORM TERPADU</small>
+                <strong>Lihat solusi dealer secara menyeluruh</strong>
+                <em>Dari stok dan lead hingga follow-up serta keputusan manajemen.</em>
+              </span>
+              <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </a>
+            <div class="solusi-role-group">
+              <span>Jelajahi berdasarkan tim</span>
+              <div>${renderRoles()}</div>
             </div>
-            <div class="solusi-mega-grid solusi-mega-grid-${group.id}">${renderItems(group)}</div>
-            <a class="solusi-mega-contact" href="${home}kontak" data-solusi-close>
-              Ingin melihat alur yang relevan? <strong>Diskusikan kebutuhan dealer Anda</strong>
+            <a class="solusi-mega-contact" href="${contactHref}" data-solusi-close>
+              <span>Belum yakin harus mulai dari mana?</span>
+              <strong>Diskusikan target dealer Anda</strong>
               <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </a>
-          </section>`).join("")}
+          </aside>
+        </div>
       </div>
     </div>`;
 
@@ -993,19 +1035,6 @@ if (contactForm instanceof HTMLFormElement) {
     document.body.classList.remove("solusi-menu-open");
   };
 
-  const setActiveTab = (menu, groupId) => {
-    for (const tab of menu.querySelectorAll("[data-solusi-tab]")) {
-      const active = tab.getAttribute("data-solusi-tab") === groupId;
-      tab.classList.toggle("is-active", active);
-      tab.setAttribute("aria-selected", active ? "true" : "false");
-    }
-    for (const panel of menu.querySelectorAll("[data-solusi-panel-content]")) {
-      const active = panel.getAttribute("data-solusi-panel-content") === groupId;
-      panel.classList.toggle("is-active", active);
-      panel.hidden = !active;
-    }
-  };
-
   for (const menu of menus) {
     const trigger = menu.querySelector("[data-solusi-trigger]");
     trigger?.addEventListener("click", (event) => {
@@ -1018,13 +1047,6 @@ if (contactForm instanceof HTMLFormElement) {
     menu.addEventListener("click", (event) => {
       const target = event.target;
       if (!(target instanceof Element)) return;
-      const tab = target.closest("[data-solusi-tab]");
-      if (tab) {
-        event.preventDefault();
-        event.stopPropagation();
-        setActiveTab(menu, tab.getAttribute("data-solusi-tab") || "dealer");
-        return;
-      }
       if (target.closest("[data-solusi-close]")) requestAnimationFrame(() => closeMenu(menu));
     });
   }
@@ -1037,7 +1059,10 @@ if (contactForm instanceof HTMLFormElement) {
     closeAll();
   });
   document.addEventListener("keydown", (event) => {
-    if (event.key === "Escape") closeAll();
+    if (event.key !== "Escape") return;
+    const openTrigger = document.querySelector("[data-solusi-menu].is-open [data-solusi-trigger]");
+    closeAll();
+    if (openTrigger instanceof HTMLElement) openTrigger.focus();
   });
   document.addEventListener("motovax:nav-menu-open", (event) => {
     if (event.detail?.source !== "solusi") closeAll();
@@ -1088,7 +1113,30 @@ if (contactForm instanceof HTMLFormElement) {
       <nav class="mobile-nav-links">
         <a href="${root}modul.html" data-mobile-nav-close>Produk <span>→</span></a>
         <a href="${home}#cara-kerja" data-mobile-nav-close>Cara Kerja <span>→</span></a>
-        <a href="${root}solusi/otomotif.html" data-mobile-nav-close>Solusi <span>→</span></a>
+        <details class="mobile-solutions">
+          <summary>Solusi <span aria-hidden="true">+</span></summary>
+          <div class="mobile-solutions-body">
+            <a class="mobile-solutions-overview" href="${root}solusi/otomotif.html" data-mobile-nav-close>
+              <small>PLATFORM TERPADU</small>
+              <strong>Solusi dealer secara menyeluruh</strong>
+              <span>Dari stok dan lead hingga keputusan manajemen.</span>
+            </a>
+            <p>Berdasarkan kebutuhan dealer</p>
+            <div class="mobile-solutions-grid">
+              ${dealerSolutionNavigation.outcomes.map((item) => `
+                <a href="${root}fitur/${item.href}" data-mobile-nav-close>
+                  <strong>${item.title}</strong>
+                  <small>${item.capability}</small>
+                </a>`).join("")}
+            </div>
+            <div class="mobile-solution-roles">
+              <p>Berdasarkan tim</p>
+              <div>
+                ${dealerSolutionNavigation.roles.map((role) => `<a href="${root}fitur/${role.href}" data-mobile-nav-close>${role.title}</a>`).join("")}
+              </div>
+            </div>
+          </div>
+        </details>
         <a href="${root}harga.html" data-mobile-nav-close>Harga <span>→</span></a>
         <a href="${root}hubungi-kami.html" data-mobile-nav-close>Hubungi Kami <span>→</span></a>
       </nav>

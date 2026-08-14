@@ -343,16 +343,66 @@ a {
   transform: rotate(45deg);
 }
 
+.mobile-solutions-body {
+  padding: 14px 0 18px;
+  border-bottom: 1px solid #e8eef6;
+}
+
+.mobile-solutions-overview {
+  display: block;
+  padding: 14px;
+  border: 1px solid #cfe0fb;
+  border-radius: 12px;
+  color: #14233b;
+  background: linear-gradient(145deg, #eef5ff, #fbfdff);
+}
+
+.mobile-solutions-overview small,
+.mobile-solutions-overview strong,
+.mobile-solutions-overview span {
+  display: block;
+}
+
+.mobile-solutions-overview small {
+  color: #2c76ed;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.07em;
+}
+
+.mobile-solutions-overview strong {
+  margin-top: 4px;
+  font-size: 13px;
+}
+
+.mobile-solutions-overview span {
+  margin-top: 4px;
+  color: #687890;
+  font-size: 11px;
+  line-height: 1.45;
+}
+
+.mobile-solutions-body > p,
+.mobile-solution-roles > p {
+  margin: 14px 2px 7px;
+  color: #8791a1;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
 .mobile-solutions-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 8px;
-  padding: 14px 0 18px;
 }
 
 .mobile-solutions-grid a {
+  display: block;
   min-width: 0;
-  padding: 11px;
+  min-height: 70px;
+  padding: 12px;
   border: 1px solid #e2eaf5;
   border-radius: 10px;
   color: #172a49;
@@ -361,18 +411,38 @@ a {
   font-weight: 700;
 }
 
+.mobile-solutions-grid strong {
+  display: block;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
 .mobile-solutions-grid small {
   display: block;
-  margin-top: 3px;
-  color: #74839a;
-  font-size: 9px;
+  margin-top: 5px;
+  color: #2c76ed;
+  font-size: 8px;
   font-weight: 800;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.045em;
+  line-height: 1.35;
   text-transform: uppercase;
 }
 
-.mobile-solutions-grid a:first-child small {
-  color: #087e5a;
+.mobile-solution-roles > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.mobile-solution-roles a {
+  min-height: 34px;
+  padding: 8px 10px;
+  border: 1px solid #e2eaf5;
+  border-radius: 999px;
+  color: #42536b;
+  background: #fff;
+  font-size: 10px;
+  font-weight: 700;
 }
 
 .mobile-nav-cta {
@@ -767,8 +837,9 @@ body.produk-menu-open {
   display: none !important;
 }
 
-/* —— Menu Solusi (Industri | Roles, ala Qontak) —— */
+/* —— Menu Solusi: outcome dealer sebagai jalur utama —— */
 .solusi-mega {
+  max-height: calc(100vh - 78px);
   overflow-y: auto;
 }
 
@@ -777,73 +848,80 @@ body.produk-menu-open {
   max-width: 1248px;
   min-height: 0;
   margin: 0 auto;
-  padding: 24px 24px 26px;
+  padding: 26px 24px 28px;
   background: #fff;
 }
 
-.solusi-mega-panel[hidden] {
-  display: none !important;
-}
-
 .solusi-mega-heading {
-  display: flex;
-  align-items: baseline;
-  gap: 10px;
-  margin-bottom: 14px;
+  display: grid;
+  gap: 5px;
+  margin-bottom: 18px;
 }
 
 .solusi-mega-heading span {
-  color: #8791a1;
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.05em;
+  color: #2c76ed;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.09em;
   text-transform: uppercase;
 }
 
 .solusi-mega-heading h3 {
   margin: 0;
   color: #081833;
-  font-size: 20px;
+  font-size: 22px;
   line-height: 1.3;
   letter-spacing: -0.02em;
 }
 
-.solusi-mega-grid {
+.solusi-mega-layout {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 4px 20px;
+  grid-template-columns: minmax(0, 1fr) 338px;
+  gap: 28px;
+  align-items: start;
 }
 
-.solusi-mega-grid-roles {
+.solusi-mega-grid {
+  display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  max-width: 820px;
+  gap: 8px;
 }
 
 .solusi-mega-item {
   display: grid;
-  grid-template-columns: 42px minmax(0, 1fr) 16px;
-  align-items: center;
-  gap: 12px;
+  grid-template-columns: 46px minmax(0, 1fr) 16px;
+  align-items: start;
+  gap: 13px;
   min-width: 0;
-  padding: 10px;
-  border-radius: 10px;
+  min-height: 132px;
+  padding: 15px;
+  border: 1px solid #e7edf6;
+  border-radius: 13px;
   color: inherit;
-  transition: background 0.15s ease, color 0.15s ease;
+  background: #fff;
+  transition: border-color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+}
+
+.solusi-mega-item:last-child {
+  grid-column: 1 / -1;
+  min-height: 116px;
 }
 
 .solusi-mega-item:hover,
 .solusi-mega-item:focus-visible {
-  color: #2c76ed;
+  border-color: #bcd4fb;
   background: #f4f8ff;
-  outline: none;
+  box-shadow: 0 10px 24px rgba(31, 92, 181, 0.09);
+  outline: 2px solid transparent;
+  transform: translateY(-1px);
 }
 
 .solusi-mega-icon {
-  width: 42px;
-  height: 42px;
+  width: 46px;
+  height: 46px;
   display: grid;
   place-items: center;
-  border-radius: 10px;
+  border-radius: 12px;
   color: #2c76ed;
   background: #eaf2ff;
 }
@@ -864,8 +942,8 @@ body.produk-menu-open {
 }
 
 .solusi-mega-icon svg {
-  width: 22px;
-  height: 22px;
+  width: 23px;
+  height: 23px;
 }
 
 .solusi-mega-meta {
@@ -873,55 +951,41 @@ body.produk-menu-open {
 }
 
 .solusi-mega-meta strong,
-.solusi-mega-meta small {
+.solusi-mega-meta small,
+.solusi-mega-meta em {
   display: block;
 }
 
 .solusi-mega-meta strong {
   color: #081833;
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 700;
   line-height: 1.35;
 }
 
-.solusi-mega-title-row {
-  display: flex !important;
-  align-items: center;
-  gap: 7px;
-  min-width: 0;
+.solusi-mega-meta small {
+  margin-top: 4px;
+  color: #626b79;
+  font-size: 12px;
+  line-height: 1.45;
 }
 
-.solusi-mega-status {
-  display: inline-flex !important;
-  flex: none;
-  align-items: center;
-  min-height: 18px;
-  padding: 2px 6px;
-  border-radius: 999px;
-  color: #66758d;
-  background: #edf2f8;
+.solusi-mega-meta em {
+  margin-top: 8px;
+  color: #2c76ed;
   font-size: 9px;
+  font-style: normal;
   font-weight: 800;
-  letter-spacing: 0.04em;
-  line-height: 1;
+  letter-spacing: 0.05em;
+  line-height: 1.35;
   text-transform: uppercase;
 }
 
-.solusi-mega-status.live {
-  color: #087e5a;
-  background: #e4f8f0;
-}
-
-.solusi-mega-meta small {
-  margin-top: 2px;
-  color: #626b79;
-  font-size: 12.5px;
-  line-height: 1.4;
-}
-
 .solusi-mega-arrow {
+  align-self: center;
   width: 16px;
   height: 16px;
+  color: #2c76ed;
   opacity: 0;
   transform: translateX(-4px);
   transition: opacity 0.15s ease, transform 0.15s ease;
@@ -933,20 +997,133 @@ body.produk-menu-open {
   transform: translateX(0);
 }
 
-.solusi-mega-contact {
-  display: inline-flex;
+.solusi-mega-aside {
+  display: grid;
+  gap: 16px;
+  min-width: 0;
+  padding-left: 26px;
+  border-left: 1px solid #e4ebf5;
+}
+
+.solusi-mega-overview {
+  display: grid;
+  grid-template-columns: 46px minmax(0, 1fr) 16px;
   align-items: center;
-  gap: 4px;
-  margin: 18px 10px 0;
-  color: #626b79;
+  gap: 12px;
+  min-width: 0;
+  padding: 15px;
+  border: 1px solid #cfe0fb;
+  border-radius: 14px;
+  color: #12233e;
+  background: linear-gradient(145deg, #f0f6ff, #fbfdff);
+}
+
+.solusi-mega-overview > span:nth-child(2) {
+  min-width: 0;
+}
+
+.solusi-mega-overview small,
+.solusi-mega-overview strong,
+.solusi-mega-overview em {
+  display: block;
+}
+
+.solusi-mega-overview small {
+  color: #2c76ed;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.07em;
+}
+
+.solusi-mega-overview strong {
+  margin-top: 4px;
+  color: #081833;
   font-size: 13px;
+  line-height: 1.4;
+}
+
+.solusi-mega-overview em {
+  margin-top: 4px;
+  color: #617087;
+  font-size: 10.5px;
+  font-style: normal;
+  line-height: 1.45;
+}
+
+.solusi-mega-overview > svg {
+  width: 16px;
+  color: #2c76ed;
+  transition: transform 0.15s ease;
+}
+
+.solusi-mega-overview:hover > svg,
+.solusi-mega-overview:focus-visible > svg {
+  transform: translateX(3px);
+}
+
+.solusi-role-group > span {
+  display: block;
+  margin-bottom: 6px;
+  color: #8791a1;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.solusi-role-group > div {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 2px 8px;
+}
+
+.solusi-role-group a {
+  display: flex;
+  min-width: 0;
+  min-height: 36px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 7px 8px;
+  border-radius: 8px;
+  color: #314159;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.solusi-role-group a:hover,
+.solusi-role-group a:focus-visible {
+  color: #2c76ed;
+  background: #f4f8ff;
+}
+
+.solusi-role-group svg {
+  flex: 0 0 13px;
+  width: 13px;
+}
+
+.solusi-mega-contact {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 16px;
+  align-items: center;
+  gap: 2px 8px;
+  margin: 0;
+  padding: 12px 14px;
+  border-radius: 11px;
+  color: #53647c;
+  background: #f6f8fb;
+  font-size: 10.5px;
 }
 
 .solusi-mega-contact strong {
+  grid-column: 1;
   color: #2c76ed;
+  font-size: 12px;
 }
 
 .solusi-mega-contact svg {
+  grid-column: 2;
+  grid-row: 1 / span 2;
   width: 16px;
   height: 16px;
   color: #2c76ed;
