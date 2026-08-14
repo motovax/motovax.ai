@@ -93,6 +93,8 @@ async function measure(page) {
   return page.evaluate(() => {
     const slider = document.querySelector("[data-flow-slider]");
     const viewport = document.querySelector("[data-flow-viewport]");
+    const e2e = document.querySelector(".e2e-flow");
+    const e2eStages = [...document.querySelectorAll(".e2e-stage")];
     const active = document.querySelector(".native-flow.is-active");
     const dots = [...document.querySelectorAll("[data-flow-dot]")];
     const activeDot = document.querySelector("[data-flow-dot].is-active");
@@ -115,6 +117,10 @@ async function measure(page) {
       sliderWidth: slider?.getBoundingClientRect().width || 0,
       triggerWidth: triggerCard?.getBoundingClientRect().width || 0,
       branchWidth: branch?.getBoundingClientRect().width || 0,
+      e2eWidth: e2e?.getBoundingClientRect().width || 0,
+      e2eStageCount: e2eStages.length,
+      e2eMinStageWidth: Math.min(...e2eStages.map((el) => el.getBoundingClientRect().width)),
+      e2eMinStageHeight: Math.min(...e2eStages.map((el) => el.getBoundingClientRect().height)),
     };
   });
 }
@@ -128,6 +134,14 @@ for (const viewport of viewports) {
     await page.locator("[data-flow-slider]").scrollIntoViewIfNeeded();
 
     const first = await measure(page);
+    const sectionCopy = await page.evaluate(() => ({
+      title: document.querySelector("#cara-kerja h2")?.textContent?.replace(/\s+/g, " ").trim(),
+      stages: [...document.querySelectorAll(".e2e-stage-head h3")].map((el) => el.textContent.trim()),
+      labels: [...document.querySelectorAll(".e2e-stage-head small")].map((el) => el.textContent.trim()),
+    }));
+    assert.match(sectionCopy.title || "", /Satu platform untuk membantu bisnis mendapatkan customer/i);
+    assert.deepEqual(sectionCopy.stages, ["Sora AI", "Jasmine AI", "Autopilot CRM"]);
+    assert.deepEqual(sectionCopy.labels, ["ATTRACT", "CONVERT", "RETAIN & CLOSE"]);
     assert.equal(first.slide, "pelanggan");
     assert.equal(first.heading, "Pelanggan menanyakan produk");
     assert.equal(first.dots, 5);
@@ -135,6 +149,12 @@ for (const viewport of viewports) {
     assert.ok(first.minDot >= 44, `target sentuh dots terlalu kecil di ${viewport.name}: ${first.minDot}`);
     assert.equal(first.overflow, false, `halaman overflow horizontal di ${viewport.name}`);
     assert.ok(first.viewportWidth > 200);
+    assert.equal(first.e2eStageCount, 3);
+    assert.ok(first.e2eWidth > 280, `diagram e2e tidak terlihat di ${viewport.name}`);
+    assert.ok(first.e2eMinStageHeight > 180, `kartu tahap e2e terlalu pendek di ${viewport.name}: ${first.e2eMinStageHeight}`);
+    if (viewport.width < 1100) {
+      assert.ok(first.e2eMinStageWidth >= 280, `kartu tahap e2e terlalu sempit di ${viewport.name}: ${first.e2eMinStageWidth}`);
+    }
     if (viewport.width >= 1440) {
       assert.ok(first.triggerWidth >= 360, `kartu pemicu terlalu sempit di desktop: ${first.triggerWidth}`);
       assert.ok(first.branchWidth >= 360, `kartu cabang terlalu sempit di desktop: ${first.branchWidth}`);
