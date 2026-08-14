@@ -149,6 +149,24 @@ for (const viewport of viewports) {
     const title = await page.locator(".usecase-heading h2").textContent();
     assert.equal(title?.trim(), "CONTOH ALUR NYATA");
 
+    const visual = await page.evaluate(() => {
+      const section = document.querySelector(".usecase-section");
+      const flow = document.querySelector(".native-flow-section");
+      const photo = document.querySelector(".usecase-photo img");
+      const sectionStyle = section ? getComputedStyle(section) : null;
+      const flowStyle = flow ? getComputedStyle(flow) : null;
+      const photoStyle = photo ? getComputedStyle(photo) : null;
+      return {
+        sectionBg: sectionStyle?.backgroundImage || sectionStyle?.backgroundColor || "",
+        flowBg: flowStyle?.backgroundImage || flowStyle?.backgroundColor || "",
+        photoBg: photoStyle?.backgroundColor || "",
+      };
+    });
+    assert.match(visual.sectionBg, /rgb\(18,\s*103,\s*245\)/, "section use case harus memakai biru Motovax yang sama");
+    assert.match(visual.flowBg, /rgb\(18,\s*103,\s*245\)/, "section di atas harus tetap biru Motovax");
+    assert.equal(visual.sectionBg, visual.flowBg, "background biru use case harus sama dengan hirarki di atasnya");
+    assert.ok(!/rgb\(0,\s*0,\s*0\)|#000/.test(visual.photoBg), "foto tidak boleh berlatar hitam");
+
     for (const item of cases) {
       await page.click(`[data-usecase="${item.id}"]`);
       const img = page.locator(`[data-usecase-panel="${item.id}"] [data-usecase-visual]`);
