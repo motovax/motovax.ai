@@ -14,7 +14,7 @@
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="./styles.css?v=solution-outcomes-20260814" />
+    <link rel="stylesheet" href="./styles.css?v=direct-workspace-20260814" />
     <link rel="stylesheet" href="./onboarding-auth.css?v=email-verification-20260814" />
   </head>
   <body class="onboarding-body">
@@ -402,7 +402,7 @@
             <header class="onboarding-step-head">
               <span>LANGKAH 4 · SIAP</span>
               <h2 data-ready-title>Pendaftaran berhasil</h2>
-              <p data-ready-copy>Akun Anda sudah aktif. Anda akan diarahkan ke motovax.ai dalam kondisi login.</p>
+              <p data-ready-copy>Akun Anda sudah aktif. Anda akan langsung diarahkan ke workspace dealer.</p>
             </header>
 
             <div class="onboarding-redirect-card" data-redirect-state role="status" aria-live="polite" aria-busy="true" hidden>
@@ -411,13 +411,13 @@
                 <i>✓</i>
               </div>
               <span class="onboarding-redirect-kicker">WORKSPACE TERCATAT</span>
-              <h3>Mengalihkan ke portal Motovax</h3>
+              <h3>Mengalihkan ke workspace Anda</h3>
               <p>
                 Domain <strong data-redirect-domain>workspace dealer Anda</strong> diproses aman di latar belakang.
-                Anda tidak perlu menunggu untuk melanjutkan.
+                Setelah domain siap, akses aman dibuka otomatis tanpa langkah tambahan.
               </p>
               <div class="onboarding-redirect-progress" aria-hidden="true"><span></span></div>
-              <small>Pengalihan otomatis maksimal 3 detik.</small>
+              <small>Halaman ini memeriksa kesiapan workspace secara otomatis.</small>
             </div>
 
             <div class="onboarding-success-card" data-workspace-summary>
@@ -454,10 +454,8 @@
               </div>
             </div>
 
-            <div class="onboarding-ready-actions" data-workspace-actions>
-              <button class="btn btn-primary" type="button" data-open-workspace disabled>
-                Masuk ke workspace <span>→</span>
-              </button>
+            <div class="onboarding-ready-actions" data-workspace-actions hidden>
+              <button class="btn btn-primary" type="button" data-open-workspace hidden>Coba alihkan kembali <span>→</span></button>
             </div>
           </div>
         </section>
@@ -482,7 +480,7 @@
       </div>
     </div>
 
-    <script src="./script.js?v=solution-outcomes-20260814"></script>
-    <script src="./onboarding.js?v=dealer-onboarding-20260814"></script>
+    <script src="./script.js?v=direct-workspace-20260814"></script>
+    <script src="./onboarding.js?v=direct-workspace-20260814"></script>
   </body>
 </html>

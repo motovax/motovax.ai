@@ -22,8 +22,6 @@
   var AUTH_LEAD = "Buat akun Motovax menggunakan email kerja atau akun Google Anda.";
   var GOOGLE_AUTH_ORIGIN = "https://onboard.motovax.com";
   var FINAL_SETUP_TIMEOUT_MS = 3000;
-  var REDIRECT_DELAY_MS = 650;
-  var REDIRECT_FALLBACK_MS = 2600;
   function loadState() {
     try {
       var raw = localStorage.getItem(STORAGE_KEY);
@@ -253,7 +251,6 @@
     this.workspacePollTimer = null;
     this.slugCheckTimer = null;
     this.verificationTimer = null;
-    this.redirectSafetyTimer = null;
     this.isRedirecting = false;
     this.slugAvailability = { slug: "", available: null };
     this.slugIsAutomatic = !this.state.business.workspaceSlug;
@@ -281,9 +278,25 @@
     if (this.isFreshRegistration) {
       this.startFreshRegistration(initialParams);
     } else {
-      this.hydrateGoogleSession();
+      this.resumeExistingSession();
     }
   }
+
+  OnboardingApp.prototype.resumeExistingSession = function () {
+    var self = this;
+    api("/api/portal/workspace/enter", { method: "POST", body: "{}" })
+      .then(function (payload) {
+        if (!payload?.redirectUrl) throw new Error("Workspace belum dapat dibuka.");
+        self.showRedirectState();
+        window.location.replace(payload.redirectUrl);
+      })
+      .catch(function (error) {
+        if (error.status !== 401) {
+          self.showToast("Sesi workspace belum dapat dibuka", "Onboarding akun tetap diperiksa agar progress Anda tidak hilang.");
+        }
+        self.hydrateGoogleSession();
+      });
+  };
 
   OnboardingApp.prototype.startFreshRegistration = function (params) {
     var self = this;
@@ -698,7 +711,9 @@
     if (!options.quiet && status) status.textContent = "Memeriksa status verifikasi…";
     try {
       var payload = await api("/api/auth/me");
-      if (!payload?.authenticated || !payload.user) throw Object.assign(new Error("Email belum terverifikasi."), { status: 401 });
+      if (!this.isVerifiedPendingAccount(payload)) {
+        throw Object.assign(new Error("Email belum terverifikasi."), { status: 401 });
+      }
       this.state.pendingVerification = null;
       this.applyAccountPayload(payload);
       saveState(this.state);
@@ -713,6 +728,17 @@
     } finally {
       if (button) button.disabled = false;
     }
+  };
+
+  OnboardingApp.prototype.isVerifiedPendingAccount = function (payload) {
+    var pendingEmail = String(this.state.pendingVerification?.email || "").trim().toLowerCase();
+    var sessionEmail = String(payload?.user?.email || "").trim().toLowerCase();
+    return Boolean(
+      pendingEmail
+      && payload?.authenticated
+      && payload?.user?.emailVerified === true
+      && sessionEmail === pendingEmail
+    );
   };
 
   OnboardingApp.prototype.showResetForm = function () {
@@ -923,6 +949,9 @@
         if (!payload || !payload.authenticated || !payload.user) {
           return self.restorePendingSignup(emailStatus, params);
         }
+        if (self.state.pendingVerification?.email && !self.isVerifiedPendingAccount(payload)) {
+          return self.restorePendingSignup(emailStatus, params);
+        }
         self.state.pendingVerification = null;
         self.applyAccountPayload(payload);
         self.state.authMode = "signup";
@@ -930,6 +959,8 @@
 
         if (self.state.workspace) {
           self.goTo(4);
+          self.showRedirectState();
+          self.enterWorkspace();
         } else {
           self.goTo(self.state.business.businessName ? 3 : 2);
         }
@@ -1129,7 +1160,8 @@
       this.renderSummary();
       this.goTo(4);
       this.showRedirectState();
-      this.redirectToPortal(payload.portalSession, remainingTime());
+      if (this.state.workspace.ready) this.enterWorkspace();
+      else this.waitForWorkspace();
     } catch (error) {
       this.showError(form, friendlySubmitError(error, "Workspace belum berhasil dibuat. Pilihan Anda tetap tersimpan; silakan coba lagi."));
     } finally {
@@ -1151,41 +1183,8 @@
     if (workspaceSummary) workspaceSummary.hidden = true;
     if (workspaceActions) workspaceActions.hidden = true;
     if (readyTitle) readyTitle.textContent = "Pendaftaran berhasil";
-    if (readyCopy) readyCopy.textContent = "Akses aman sedang disiapkan. Anda langsung dialihkan tanpa menunggu domain workspace aktif.";
+    if (readyCopy) readyCopy.textContent = "Akses aman sedang disiapkan. Anda langsung dialihkan saat domain workspace siap.";
     if (redirectDomain) redirectDomain.textContent = this.state.workspace?.domain || "workspace dealer Anda";
-  };
-
-  OnboardingApp.prototype.redirectToPortal = function (portalSession, timeoutMs) {
-    var target;
-    try {
-      target = new URL(portalSession?.returnUrl || "https://motovax.ai/");
-      if (target.protocol !== "https:" && !/^http:\/\/(?:127\.0\.0\.1|localhost)(?::\d+)?$/.test(target.origin)) {
-        throw new Error("Portal URL tidak aman.");
-      }
-    } catch (_error) {
-      target = new URL("https://motovax.ai/");
-    }
-    if (portalSession?.token) {
-      target.hash = new URLSearchParams({ portal_session: portalSession.token }).toString();
-    }
-    var targetUrl = target.toString();
-    var redirectWindow = Math.max(1, Math.min(REDIRECT_FALLBACK_MS, Number(timeoutMs || REDIRECT_FALLBACK_MS)));
-    var initialDelay = Math.min(REDIRECT_DELAY_MS, Math.max(1, redirectWindow - 100));
-    var navigate = function (replace) {
-      try {
-        if (replace) window.location.replace(targetUrl);
-        else window.location.assign(targetUrl);
-      } catch (_error) {
-        window.location.href = targetUrl;
-      }
-    };
-    window.clearTimeout(this.redirectSafetyTimer);
-    window.setTimeout(function () {
-      navigate(false);
-    }, initialDelay);
-    this.redirectSafetyTimer = window.setTimeout(function () {
-      navigate(true);
-    }, redirectWindow);
   };
 
   OnboardingApp.prototype.enterWorkspace = async function () {
@@ -1200,7 +1199,7 @@
       window.location.assign(workspace.redirectUrl);
       return;
     }
-    this.openWorkspace.disabled = true;
+    if (this.openWorkspace) this.openWorkspace.disabled = true;
     try {
       var payload = await api("/api/workspaces/" + encodeURIComponent(workspace.id) + "/enter", {
         method: "POST",
@@ -1208,8 +1207,18 @@
       });
       window.location.assign(payload.redirectUrl);
     } catch (error) {
+      if (error.code === "workspace_provisioning") {
+        this.state.workspace = Object.assign({}, workspace, { ready: false });
+        saveState(this.state);
+        this.showRedirectState();
+        this.waitForWorkspace();
+        return;
+      }
       this.showToast("Workspace belum dapat dibuka", friendlySubmitError(error, "Tunggu beberapa saat lalu coba kembali."));
-      this.openWorkspace.disabled = false;
+      if (this.openWorkspace) {
+        this.openWorkspace.hidden = false;
+        this.openWorkspace.disabled = false;
+      }
     }
   };
 
@@ -1226,7 +1235,8 @@
             saveState(self.state);
             self.workspacePollTimer = null;
             self.renderSummary();
-            self.showToast("Workspace siap digunakan", self.state.workspace.domain + " sudah aktif.");
+            self.showRedirectState();
+            self.enterWorkspace();
             return;
           }
           if (Date.now() - startedAt > 8 * 60 * 1000) {
@@ -1296,7 +1306,7 @@
     if (workspaceSummary) workspaceSummary.hidden = false;
     if (workspaceActions) workspaceActions.hidden = false;
     if (readyTitle) readyTitle.textContent = "Pendaftaran berhasil";
-    if (readyCopy) readyCopy.textContent = "Akun Anda sudah aktif. Anda akan diarahkan ke motovax.ai dalam kondisi login.";
+    if (readyCopy) readyCopy.textContent = "Akun Anda sudah aktif. Anda akan langsung diarahkan ke workspace dealer.";
 
     if (nameEl) nameEl.textContent = biz.businessName || "Dealer Anda";
     if (userEl) {
@@ -1325,9 +1335,7 @@
     if (statusEl) statusEl.textContent = this.state.workspace?.ready ? "Tenant aktif" : "Menyiapkan domain";
     if (this.openWorkspace) {
       this.openWorkspace.disabled = !this.state.workspace?.ready;
-      this.openWorkspace.innerHTML = this.state.workspace?.ready
-        ? "Masuk ke workspace <span>→</span>"
-        : "Menyiapkan workspace…";
+      this.openWorkspace.innerHTML = "Coba alihkan kembali <span>→</span>";
     }
   };
 

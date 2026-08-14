@@ -432,6 +432,7 @@ function publicUser(row) {
   return {
     id: row.id,
     email: row.email,
+    emailVerified: row.email_verified === true,
     fullName: row.full_name,
     avatarUrl: row.avatar_url,
     provider: row.provider || (row.password_hash ? "password" : "google"),
@@ -548,6 +549,7 @@ function authCookieNames(config) {
   return {
     secure,
     session: secure ? "__Host-motovax_session" : "motovax_session",
+    portalSession: secure ? "__Host-motovax_portal_session" : "motovax_portal_session",
     state: secure ? "__Host-motovax_oauth_state" : "motovax_oauth_state",
     pendingSignup: secure ? "__Host-motovax_pending_signup" : "motovax_pending_signup",
   };
@@ -559,12 +561,6 @@ function oauthResultUrl(config, status, reason = "", authMode = "signup") {
     : new URL(config.oauthSuccessUrl);
   target.searchParams.set("oauth", status);
   if (reason) target.searchParams.set("reason", reason);
-  return target.toString();
-}
-
-function portalOauthSuccessUrl(config, sessionToken) {
-  const target = new URL(config.portalLandingUrl || "https://motovax.ai/");
-  target.hash = new URLSearchParams({ portal_session: sessionToken }).toString();
   return target.toString();
 }
 
@@ -1490,7 +1486,7 @@ export async function createPostgresStore(connectionString) {
          WHERE s.user_id = u.id
            AND s.token_digest = $1
            AND s.expires_at > NOW()
-         RETURNING u.id, u.email, u.full_name, u.avatar_url, u.password_hash,
+         RETURNING u.id, u.email, u.email_verified, u.full_name, u.avatar_url, u.password_hash,
            CASE WHEN EXISTS (
              SELECT 1 FROM onboarding_oauth_accounts oa
              WHERE oa.user_id = u.id AND oa.provider = 'google'
@@ -1603,14 +1599,17 @@ export function createApp({
     const requestCookies = parseCookies(req.headers.cookie);
     const sessionToken = requestCookies[cookies.session];
     if (!sessionToken) return null;
-    return store.findSession(tokenDigest(sessionToken, config.sessionSecret));
+    const user = await store.findSession(tokenDigest(sessionToken, config.sessionSecret));
+    return user?.email_verified === true ? user : null;
   }
 
   async function authenticatedPortalUser(req) {
     if (!store || !config.sessionSecret || !store.findPortalSession) return null;
     const match = String(req.get("authorization") || "").match(/^Bearer\s+([A-Za-z0-9_-]{32,})$/i);
-    if (!match) return null;
-    return store.findPortalSession(tokenDigest(match[1], config.sessionSecret));
+    const requestCookies = parseCookies(req.headers.cookie);
+    const sessionToken = match?.[1] || requestCookies[cookies.portalSession];
+    if (!sessionToken) return null;
+    return store.findPortalSession(tokenDigest(sessionToken, config.sessionSecret));
   }
 
   function portalCors(req, res, next) {
@@ -1699,7 +1698,7 @@ export function createApp({
     });
   }
 
-  async function issuePortalSession(req, user) {
+  async function issuePortalSession(req, res, user) {
     const sessionToken = randomToken(48);
     const expiresAt = new Date(Date.now() + PORTAL_SESSION_TTL_MS);
     await store.createPortalSession({
@@ -1709,6 +1708,13 @@ export function createApp({
       userAgent: String(req.headers["user-agent"] || "").slice(0, 500),
       ipAddress: String(req.ip || "").slice(0, 100),
       expiresAt,
+    });
+    res.cookie(cookies.portalSession, sessionToken, {
+      httpOnly: true,
+      secure: cookies.secure,
+      sameSite: "lax",
+      path: "/",
+      maxAge: PORTAL_SESSION_TTL_MS,
     });
     return { sessionToken, expiresAt };
   }
@@ -1824,13 +1830,15 @@ export function createApp({
         });
       }
       const [user] = matchedUsers;
-      const { sessionToken, expiresAt } = await issuePortalSession(req, user);
+      const { expiresAt } = await issuePortalSession(req, res, user);
+      const handoff = await store.createPortalHandoff(user.id, user.tenant_id);
+      if (!handoff) return res.status(404).json({ error: "workspace_not_found" });
+      const redirect = new URL(`https://${handoff.workspace.domain}/magic-login`);
+      redirect.searchParams.set("token", handoff.handoffToken);
       return res.json({
         authenticated: true,
-        token: sessionToken,
         expiresAt: expiresAt.toISOString(),
-        user: publicPortalUser(user),
-        returnUrl: config.portalLandingUrl || "https://motovax.ai/",
+        redirectUrl: redirect.toString(),
       });
     } catch (error) {
       return next(error);
@@ -1889,6 +1897,17 @@ export function createApp({
       if (match && store?.revokePortalSession && config.sessionSecret) {
         await store.revokePortalSession(tokenDigest(match[1], config.sessionSecret));
       }
+      const requestCookies = parseCookies(req.headers.cookie);
+      const cookieToken = requestCookies[cookies.portalSession];
+      if (cookieToken && store?.revokePortalSession && config.sessionSecret) {
+        await store.revokePortalSession(tokenDigest(cookieToken, config.sessionSecret));
+      }
+      res.clearCookie(cookies.portalSession, {
+        httpOnly: true,
+        secure: cookies.secure,
+        sameSite: "lax",
+        path: "/",
+      });
       return res.status(204).end();
     } catch (error) {
       return next(error);
@@ -2181,16 +2200,6 @@ export function createApp({
       }
       await recaptchaVerifier(config, String(req.body?.recaptchaToken || ""));
       const result = await store.provisionWorkspace({ userId: user.id, suffix: config.tenantDomainSuffix });
-      const portalToken = randomToken(48);
-      const portalExpiresAt = new Date(Date.now() + PORTAL_SESSION_TTL_MS);
-      await store.createPortalSession({
-        appUserId: result.workspace.app_user_id,
-        tenantId: result.workspace.id,
-        sessionDigest: tokenDigest(portalToken, config.sessionSecret),
-        userAgent: String(req.headers["user-agent"] || "").slice(0, 500),
-        ipAddress: String(req.ip || "").slice(0, 100),
-        expiresAt: portalExpiresAt,
-      });
       provisionDomainInBackground(result.workspace.domain);
       return res.status(202).json({
         workspace: {
@@ -2198,11 +2207,6 @@ export function createApp({
           name: result.workspace.name,
           domain: result.workspace.domain,
           ready: false,
-        },
-        portalSession: {
-          token: portalToken,
-          expiresAt: portalExpiresAt.toISOString(),
-          returnUrl: config.portalLandingUrl || "https://motovax.ai/",
         },
       });
     } catch (error) {
@@ -2399,8 +2403,14 @@ export function createApp({
         if (matchingUsers.length > 1 || candidates.length > 20) {
           return res.redirect(302, oauthResultUrl(config, "failed", "ambiguous_account", authMode));
         }
-        const { sessionToken } = await issuePortalSession(req, matchingUsers[0]);
-        return res.redirect(302, portalOauthSuccessUrl(config, sessionToken));
+        await issuePortalSession(req, res, matchingUsers[0]);
+        const handoff = await store.createPortalHandoff(matchingUsers[0].id, matchingUsers[0].tenant_id);
+        if (!handoff) {
+          return res.redirect(302, oauthResultUrl(config, "failed", "workspace_not_found", authMode));
+        }
+        const redirect = new URL(`https://${handoff.workspace.domain}/magic-login`);
+        redirect.searchParams.set("token", handoff.handoffToken);
+        return res.redirect(302, redirect.toString());
       }
 
       const user = await store.upsertGoogleUser(googleProfile);
@@ -2423,7 +2433,7 @@ export function createApp({
       const user = await store.findSession(
         tokenDigest(sessionToken, config.sessionSecret),
       );
-      if (!user) return res.status(401).json({ authenticated: false });
+      if (!user || user.email_verified !== true) return res.status(401).json({ authenticated: false });
       const state = await store.getAccountState(user.id);
       return res.json({
         authenticated: true,
@@ -2446,11 +2456,21 @@ export function createApp({
       if (sessionToken && store && config.sessionSecret) {
         await store.revokeSession(tokenDigest(sessionToken, config.sessionSecret));
       }
+      const portalSessionToken = requestCookies[cookies.portalSession];
+      if (portalSessionToken && store?.revokePortalSession && config.sessionSecret) {
+        await store.revokePortalSession(tokenDigest(portalSessionToken, config.sessionSecret));
+      }
       const pendingUser = await pendingSignupUser(req);
       if (pendingUser && !pendingUser.email_verified && store?.deletePendingPasswordUser) {
         await store.deletePendingPasswordUser(pendingUser.id);
       }
       res.clearCookie(cookies.session, {
+        httpOnly: true,
+        secure: cookies.secure,
+        sameSite: "lax",
+        path: "/",
+      });
+      res.clearCookie(cookies.portalSession, {
         httpOnly: true,
         secure: cookies.secure,
         sameSite: "lax",
@@ -2476,9 +2496,12 @@ export function createApp({
   app.get("/", (req, res, next) => {
     const authHost = new URL(config.publicBaseUrl).hostname;
     if (authHost === "onboard.motovax.com" && req.hostname === authHost) {
-      return res.redirect(302, "/onboarding.html?fresh=1");
+      return res.redirect(302, "/onboarding.html");
     }
     return next();
+  });
+  app.get(["/profile.html", "/billing.html"], (_req, res) => {
+    return res.redirect(302, new URL("/login.html", config.publicBaseUrl).toString());
   });
   app.use(
     express.static(config.publicDir, {

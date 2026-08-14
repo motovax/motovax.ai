@@ -2,7 +2,6 @@
   "use strict";
 
   var AUTH_ORIGIN = "https://onboard.motovax.com";
-  var LANDING_ORIGIN = "https://motovax.ai";
   var local = window.location.hostname === "127.0.0.1" || window.location.hostname === "localhost";
   if (!local && window.location.origin !== AUTH_ORIGIN) {
     window.location.replace(AUTH_ORIGIN + "/login.html");
@@ -16,6 +15,28 @@
   var password = document.getElementById("portalPassword");
   var passwordToggle = document.querySelector("[data-password-toggle]");
   var googleButton = document.querySelector("[data-google-login]");
+
+  function revealLogin() {
+    document.body.classList.remove("is-session-checking");
+  }
+
+  function enterActiveWorkspace() {
+    return fetch("/api/portal/workspace/enter", {
+      method: "POST",
+      credentials: "same-origin",
+      headers: { Accept: "application/json", "Content-Type": "application/json" },
+      body: JSON.stringify({ destination: "/" }),
+    }).then(function (response) {
+      return response.json().catch(function () { return {}; }).then(function (payload) {
+        if (!response.ok || !payload.redirectUrl) {
+          var error = new Error(payload.message || "Sesi belum dapat dilanjutkan.");
+          error.status = response.status;
+          throw error;
+        }
+        return payload.redirectUrl;
+      });
+    });
+  }
 
   function showError(message, field) {
     errorBox.hidden = false;
@@ -62,6 +83,15 @@
     var cleanQuery = oauthParams.toString();
     window.history.replaceState({}, "", window.location.pathname + (cleanQuery ? "?" + cleanQuery : "") + window.location.hash);
   }
+
+  enterActiveWorkspace()
+    .then(function (redirectUrl) { window.location.replace(redirectUrl); })
+    .catch(function (error) {
+      revealLogin();
+      if (error.status && error.status !== 401) {
+        showError("Sesi tersimpan belum dapat dibuka. Silakan login kembali.");
+      }
+    });
 
   if (googleButton) {
     googleButton.addEventListener("click", function () {
@@ -110,12 +140,8 @@
         });
       })
       .then(function (payload) {
-        var target = new URL(payload.returnUrl || LANDING_ORIGIN + "/");
-        if (target.origin !== LANDING_ORIGIN) target = new URL(LANDING_ORIGIN + "/");
-        target.hash = new URLSearchParams({
-          portal_session: payload.token,
-        }).toString();
-        window.location.assign(target.toString());
+        if (!payload.redirectUrl) throw new Error("Workspace belum dapat dibuka.");
+        window.location.assign(payload.redirectUrl);
       })
       .catch(function (error) {
         showError(error.message || "Login belum berhasil. Silakan coba lagi.");

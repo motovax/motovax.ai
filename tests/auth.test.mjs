@@ -152,6 +152,7 @@ const store = {
     sessions.set(record.sessionDigest, {
       id: record.userId,
       email: passwordUser?.email || "user@example.com",
+      email_verified: passwordUser?.email_verified ?? true,
       full_name: passwordUser?.full_name || "User Test",
       avatar_url: passwordUser?.avatar_url || "https://example.com/avatar.png",
       password_hash: passwordUser?.password_hash || "",
@@ -451,6 +452,17 @@ test("daftar dan login email/password memakai kredensial nyata", async () => {
   assert.equal(pending.status, 200);
   assert.equal((await pending.json()).email, "password@example.com");
 
+  const unverifiedSession = "unverified-session-token-for-regression-test-123456";
+  await store.createSession({
+    userId: passwordUsers.get("password@example.com").id,
+    sessionDigest: digest(unverifiedSession),
+  });
+  const unverifiedMe = await fetch(`${baseUrl}/api/auth/me`, {
+    headers: { cookie: `motovax_session=${encodeURIComponent(unverifiedSession)}` },
+  });
+  assert.equal(unverifiedMe.status, 401);
+  assert.deepEqual(await unverifiedMe.json(), { authenticated: false });
+
   const resendDuringCooldown = await fetch(`${baseUrl}/api/auth/resend-verification`, {
     method: "POST",
     headers: {
@@ -627,6 +639,7 @@ test("callback membuat session dan endpoint me mengembalikan user", async () => 
     user: {
       id: "40aa7e34-66fd-42d9-b586-93e65607b670",
       email: "user@example.com",
+      emailVerified: true,
       fullName: "User Test",
       avatarUrl: "https://example.com/avatar.png",
       provider: "google",
@@ -636,7 +649,7 @@ test("callback membuat session dan endpoint me mengembalikan user", async () => 
   });
 });
 
-test("callback Google mode portal membuat sesi tenant dan mengarah ke landing", async () => {
+test("callback Google mode portal membuat sesi tenant dan langsung ke workspace", async () => {
   googleProfileEmail = "owner@dealer.test";
   try {
     const start = await fetch(`${baseUrl}/api/auth/google/start?mode=portal`, {
@@ -656,8 +669,10 @@ test("callback Google mode portal membuat sesi tenant dan mengarah ke landing", 
     );
     assert.equal(callback.status, 302);
     const location = new URL(callback.headers.get("location"));
-    assert.equal(location.origin, "https://motovax.ai");
-    const sessionToken = new URLSearchParams(location.hash.replace(/^#/, "")).get("portal_session");
+    assert.equal(location.origin, "https://dealer-test.motovax.com");
+    assert.equal(location.pathname, "/magic-login");
+    assert.equal(location.searchParams.get("token"), "handoff-token-1");
+    const sessionToken = cookieValue(callback.headers.get("set-cookie"), "motovax_portal_session");
     assert.ok(sessionToken.length >= 48);
     assert.ok(portalSessions.has(digest(sessionToken)));
   } finally {
@@ -705,7 +720,7 @@ test("availability workspace menolak nama yang sudah dipakai", async () => {
   assert.equal(payload.domain, "workspace-baru.motovax.com");
 });
 
-test("portal login tenant membawa profil, billing, logout, dan handoff workspace", async () => {
+test("portal login tenant membuat cookie sesi dan langsung handoff workspace", async () => {
   const login = await fetch(`${baseUrl}/api/portal/login`, {
     method: "POST",
     headers: { origin: "http://127.0.0.1", "content-type": "application/json" },
@@ -714,50 +729,34 @@ test("portal login tenant membawa profil, billing, logout, dan handoff workspace
   assert.equal(login.status, 200);
   const loginPayload = await login.json();
   assert.equal(loginPayload.authenticated, true);
-  assert.equal(loginPayload.user.displayName, "Owner Dealer");
-  assert.equal(loginPayload.user.tenant.domain, "dealer-test.motovax.com");
-  assert.equal(loginPayload.user.canViewBilling, true);
-  assert.ok(loginPayload.token.length >= 32);
-
-  const authorization = `Bearer ${loginPayload.token}`;
-  const me = await fetch(`${baseUrl}/api/portal/me`, {
-    headers: { authorization, origin: "https://motovax.ai" },
-  });
-  assert.equal(me.status, 200);
-  assert.equal(me.headers.get("access-control-allow-origin"), "https://motovax.ai");
-  assert.equal((await me.json()).user.role, "Admin");
-
-  const billing = await fetch(`${baseUrl}/api/portal/billing`, {
-    headers: { authorization, origin: "https://motovax.ai" },
-  });
-  assert.equal(billing.status, 200);
-  const billingPayload = await billing.json();
-  assert.equal(billingPayload.tenant_name, "Dealer Test");
-  assert.equal(billingPayload.member_count, 1);
-  assert.deepEqual(billingPayload.enabled_features, ["inventory_management", "crm_autopilot", "billing_menu"]);
-  assert.equal(billingPayload.total_monthly_price, 4_500_000);
-  assert.equal(billingPayload.remaining_credits, 375);
-  assert.deepEqual(billingPayload.packages.map((pkg) => pkg.id), ["core", "crm", "inventory_falcon"]);
+  const loginUrl = new URL(loginPayload.redirectUrl);
+  assert.equal(loginUrl.origin, "https://dealer-test.motovax.com");
+  assert.equal(loginUrl.pathname, "/magic-login");
+  assert.equal(loginUrl.searchParams.get("token"), "handoff-token-1");
+  const sessionToken = cookieValue(login.headers.get("set-cookie"), "motovax_portal_session");
+  assert.ok(sessionToken.length >= 48);
 
   const enter = await fetch(`${baseUrl}/api/portal/workspace/enter`, {
     method: "POST",
-    headers: { authorization, origin: "https://motovax.ai", "content-type": "application/json" },
-    body: JSON.stringify({ destination: "/billing" }),
+    headers: { cookie: `motovax_portal_session=${encodeURIComponent(sessionToken)}`, origin: "http://127.0.0.1", "content-type": "application/json" },
+    body: JSON.stringify({ destination: "/" }),
   });
   assert.equal(enter.status, 200);
   const enterUrl = new URL((await enter.json()).redirectUrl);
   assert.equal(enterUrl.origin, "https://dealer-test.motovax.com");
   assert.equal(enterUrl.pathname, "/magic-login");
   assert.equal(enterUrl.searchParams.get("token"), "handoff-token-1");
-  assert.equal(enterUrl.searchParams.get("redirect"), "/billing");
+  assert.equal(enterUrl.searchParams.has("redirect"), false);
 
   const logout = await fetch(`${baseUrl}/api/portal/logout`, {
     method: "POST",
-    headers: { authorization, origin: "https://motovax.ai" },
+    headers: { cookie: `motovax_portal_session=${encodeURIComponent(sessionToken)}`, origin: "http://127.0.0.1" },
   });
   assert.equal(logout.status, 204);
-  const expired = await fetch(`${baseUrl}/api/portal/me`, {
-    headers: { authorization, origin: "https://motovax.ai" },
+  const expired = await fetch(`${baseUrl}/api/portal/workspace/enter`, {
+    method: "POST",
+    headers: { cookie: `motovax_portal_session=${encodeURIComponent(sessionToken)}`, origin: "http://127.0.0.1", "content-type": "application/json" },
+    body: "{}",
   });
   assert.equal(expired.status, 401);
 });
@@ -770,7 +769,7 @@ test("portal login memilih tenant dari password saat username dipakai di beberap
   });
   assert.equal(response.status, 200);
   const payload = await response.json();
-  assert.equal(payload.user.tenant.domain, "dealer-test.motovax.com");
+  assert.equal(new URL(payload.redirectUrl).origin, "https://dealer-test.motovax.com");
 });
 
 test("portal login menolak kredensial ambigu di beberapa workspace", async () => {
@@ -781,6 +780,14 @@ test("portal login menolak kredensial ambigu di beberapa workspace", async () =>
   });
   assert.equal(response.status, 409);
   assert.equal((await response.json()).error, "ambiguous_account");
+});
+
+test("URL profile dan billing lama dialihkan ke gerbang login", async () => {
+  for (const pathName of ["/profile.html", "/billing.html"]) {
+    const response = await fetch(`${baseUrl}${pathName}`, { redirect: "manual" });
+    assert.equal(response.status, 302);
+    assert.equal(new URL(response.headers.get("location")).pathname, "/login.html");
+  }
 });
 
 test("penyelesaian onboarding ditolak sebelum provisioning tanpa token reCAPTCHA valid", async () => {
@@ -799,7 +806,7 @@ test("penyelesaian onboarding ditolak sebelum provisioning tanpa token reCAPTCHA
   assert.deepEqual(recaptchaTokens, [""]);
 });
 
-test("penyelesaian onboarding langsung membuat sesi portal tanpa menunggu provisioning domain", async () => {
+test("penyelesaian onboarding langsung merespons tanpa menunggu provisioning domain", async () => {
   accountState = { profile: { modules: ["ims"] }, workspaces: [] };
   domainEnsureHandler = () => new Promise(() => {});
   const startedAt = Date.now();
@@ -818,16 +825,6 @@ test("penyelesaian onboarding langsung membuat sesi portal tanpa menunggu provis
   assert.ok(responseTime < 1000, `respons selesai dalam ${responseTime}ms`);
   const payload = await response.json();
   assert.equal(payload.workspace.ready, false);
-  assert.equal(payload.portalSession.returnUrl, "https://motovax.ai/");
-  assert.ok(payload.portalSession.token.length >= 48);
+  assert.equal("portalSession" in payload, false);
   assert.ok(domainEnsureCalls.includes("dealer-test.motovax.com"));
-
-  const me = await fetch(`${baseUrl}/api/portal/me`, {
-    headers: {
-      authorization: `Bearer ${payload.portalSession.token}`,
-      origin: "https://motovax.ai",
-    },
-  });
-  assert.equal(me.status, 200);
-  assert.equal((await me.json()).authenticated, true);
 });

@@ -13,149 +13,33 @@ for (const link of document.querySelectorAll("[data-wa]")) {
   }
 }
 
-/** Session portal tenant untuk menu akun beranda statis motovax.ai. */
-(function initPortalAccount() {
-  const root = document.querySelector("[data-portal-auth]");
-  if (!(root instanceof HTMLElement)) return;
-
-  const API_ORIGIN = "https://onboard.motovax.com";
-  const TOKEN_KEY = "motovax_portal_session";
-  const guest = root.querySelector("[data-portal-guest]");
-  const account = root.querySelector("[data-portal-account]");
-  const trigger = root.querySelector("[data-portal-trigger]");
-  const menu = root.querySelector("[data-portal-menu]");
-  const billing = root.querySelector("[data-portal-billing]");
-  let token = "";
-
-  const portalApi = (path, options = {}) => fetch(`${API_ORIGIN}${path}`, {
-    ...options,
-    headers: {
-      Accept: "application/json",
-      Authorization: `Bearer ${token}`,
-      "Content-Type": "application/json",
-      ...(options.headers || {}),
-    },
-  }).then(async (response) => {
-    if (response.status === 204) return null;
-    const payload = await response.json().catch(() => ({}));
-    if (!response.ok) {
-      const error = new Error(payload.message || "Permintaan akun belum berhasil.");
-      error.status = response.status;
-      throw error;
-    }
-    return payload;
-  });
-
-  const setText = (selector, value) => {
-    const element = root.querySelector(selector);
-    if (element) element.textContent = value || "";
-  };
-
-  const closeMenu = () => {
-    if (!menu || !trigger) return;
-    menu.hidden = true;
-    trigger.setAttribute("aria-expanded", "false");
-  };
-
-  const renderGuest = () => {
-    if (guest) guest.hidden = false;
-    if (account) account.hidden = true;
-    closeMenu();
-  };
-
-  const renderAccount = (user) => {
-    const name = user.displayName || user.username || "Akun MOTOVAX";
-    const initials = name.split(/\s+/).filter(Boolean).map((part) => part[0]).join("").slice(0, 2).toUpperCase();
-    setText("[data-portal-name]", name);
-    setText("[data-portal-tenant]", user.tenant?.name || "Workspace");
-    setText("[data-portal-initials]", initials || "MV");
-    setText("[data-portal-menu-name]", name);
-    setText("[data-portal-menu-email]", user.email || `@${user.username}`);
-    setText("[data-portal-menu-role]", `${user.role || "Anggota"} · ${user.tenant?.name || "Tenant"}`);
-    setText("[data-portal-domain]", user.tenant?.domain || "");
-    if (billing) billing.hidden = user.canViewBilling !== true;
-    if (guest) guest.hidden = true;
-    if (account) account.hidden = false;
-  };
-
+/** Kompatibilitas session lama: handoff langsung, tanpa portal akun di landing. */
+(function continueLegacyPortalHandoff() {
   const fragment = new URLSearchParams(window.location.hash.replace(/^#/, ""));
   const transferredToken = fragment.get("portal_session");
-  if (transferredToken) {
-    localStorage.setItem(TOKEN_KEY, transferredToken);
-    fragment.delete("portal_session");
-    fragment.delete("portal_action");
-    const cleanHash = fragment.toString();
-    history.replaceState({}, "", `${location.pathname}${location.search}${cleanHash ? `#${cleanHash}` : ""}`);
-  }
-  token = transferredToken || localStorage.getItem(TOKEN_KEY) || "";
+  if (!transferredToken) return;
+  fragment.delete("portal_session");
+  fragment.delete("portal_action");
+  const cleanHash = fragment.toString();
+  history.replaceState({}, "", `${location.pathname}${location.search}${cleanHash ? `#${cleanHash}` : ""}`);
 
-  if (trigger && menu) {
-    trigger.addEventListener("click", () => {
-      const open = menu.hidden;
-      menu.hidden = !open;
-      trigger.setAttribute("aria-expanded", open ? "true" : "false");
-      if (open) menu.querySelector('[role="menuitem"]:not([hidden])')?.focus();
+  fetch("https://onboard.motovax.com/api/portal/workspace/enter", {
+    method: "POST",
+    headers: {
+      Accept: "application/json",
+      Authorization: `Bearer ${transferredToken}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ destination: "/" }),
+  })
+    .then(async (response) => {
+      const payload = await response.json().catch(() => ({}));
+      if (!response.ok || !payload.redirectUrl) throw new Error("Session lama tidak dapat dilanjutkan.");
+      window.location.replace(payload.redirectUrl);
+    })
+    .catch(() => {
+      window.location.replace("https://onboard.motovax.com/login.html");
     });
-    document.addEventListener("click", (event) => {
-      if (!root.contains(event.target)) closeMenu();
-    });
-    document.addEventListener("keydown", (event) => {
-      if (event.key === "Escape" && !menu.hidden) {
-        closeMenu();
-        trigger.focus();
-      }
-    });
-  }
-
-  root.addEventListener("click", async (event) => {
-    const workspaceButton = event.target.closest?.("[data-portal-workspace]");
-    if (workspaceButton && root.contains(workspaceButton)) {
-      workspaceButton.disabled = true;
-      try {
-        const payload = await portalApi("/api/portal/workspace/enter", {
-          method: "POST",
-          body: JSON.stringify({ destination: "/" }),
-        });
-        window.location.assign(payload.redirectUrl);
-      } catch (error) {
-        if (error.status === 401) {
-          localStorage.removeItem(TOKEN_KEY);
-          renderGuest();
-        } else {
-          window.alert(error.message);
-        }
-        workspaceButton.disabled = false;
-      }
-      return;
-    }
-
-    const logout = event.target.closest?.("[data-portal-logout]");
-    if (logout && root.contains(logout)) {
-      logout.disabled = true;
-      try {
-        await portalApi("/api/portal/logout", { method: "POST", body: "{}" });
-      } catch (_) {
-        // Session lokal tetap dibuang saat layanan logout tidak terjangkau.
-      }
-      localStorage.removeItem(TOKEN_KEY);
-      token = "";
-      renderGuest();
-    }
-  });
-
-  if (!token) {
-    renderGuest();
-    return;
-  }
-
-  const loadAccount = () => portalApi("/api/portal/me")
-    .then((payload) => renderAccount(payload.user))
-    .catch((error) => {
-      if (error.status === 401) localStorage.removeItem(TOKEN_KEY);
-      renderGuest();
-    });
-
-  loadAccount();
 })();
 
 /** Typewriter pada outcome dealer: test drive dan penjualan unit. */

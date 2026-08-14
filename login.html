@@ -4,14 +4,14 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Login Akun Tenant — MOTOVAX</title>
-    <meta name="description" content="Masuk menggunakan akun workspace dealer Anda untuk mengakses profil, billing, dan workspace MOTOVAX." />
+    <meta name="description" content="Masuk menggunakan akun workspace dealer Anda dan lanjut langsung ke workspace MOTOVAX." />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="./styles.css?v=solution-outcomes-20260814" />
+    <link rel="stylesheet" href="./styles.css?v=direct-workspace-20260814" />
     <link rel="stylesheet" href="./onboarding-auth.css?v=portal-google-login-20260814" />
   </head>
-  <body class="onboarding-body portal-login-body">
+  <body class="onboarding-body portal-login-body is-session-checking">
     <header class="site-header onboarding-header">
       <div class="container header-inner onboarding-header-inner">
         <a class="brand" href="https://motovax.ai/" aria-label="MOTOVAX home"><span>MOTO</span><strong>VAX</strong></a>
@@ -24,17 +24,22 @@
     <main class="portal-login-page">
       <div class="container portal-login-shell">
         <section class="portal-login-intro" aria-labelledby="portalLoginIntro">
-          <span class="portal-login-kicker">PORTAL AKUN MOTOVAX</span>
-          <h1 id="portalLoginIntro">Satu akses untuk akun dan workspace dealer Anda.</h1>
+          <span class="portal-login-kicker">AKSES WORKSPACE MOTOVAX</span>
+          <h1 id="portalLoginIntro">Satu login, langsung ke workspace dealer Anda.</h1>
           <p>Masuk memakai akun tenant yang biasa digunakan di workspace MOTOVAX.</p>
           <ul>
-            <li><span>✓</span> Profil akun dan informasi tenant</li>
-            <li><span>✓</span> Akses billing sesuai izin peran</li>
-            <li><span>✓</span> Masuk langsung ke workspace tanpa login ulang</li>
+            <li><span>✓</span> Tenant terdeteksi otomatis</li>
+            <li><span>✓</span> Handoff aman tanpa login ulang</li>
+            <li><span>✓</span> Sesi aktif langsung dilanjutkan</li>
           </ul>
         </section>
 
         <section class="onboarding-panel portal-login-panel" aria-labelledby="portalLoginTitle">
+          <div class="portal-login-session-check" data-session-check role="status" aria-live="polite">
+            <span class="portal-login-session-spinner" aria-hidden="true"></span>
+            <div><b>Memeriksa sesi Anda…</b><p>Jika Anda sudah login, kami langsung mengarahkan ke workspace tenant.</p></div>
+          </div>
+          <div class="portal-login-auth-content" data-login-auth-content>
           <header class="onboarding-step-head">
             <span>LOGIN TENANT</span>
             <h2 id="portalLoginTitle">Selamat datang kembali</h2>
@@ -80,9 +85,10 @@
 
           <div class="portal-register-prompt">
             <span>Belum punya workspace MOTOVAX?</span>
-            <a href="https://onboard.motovax.com/onboarding.html?fresh=1">Daftar dan mulai onboarding <span aria-hidden="true">→</span></a>
+            <a href="https://onboard.motovax.com/onboarding.html">Daftar dan mulai onboarding <span aria-hidden="true">→</span></a>
           </div>
           <p class="portal-login-help">Lupa akses akun tenant? Hubungi admin workspace atau <a href="https://motovax.ai/hubungi-kami.html">tim MOTOVAX</a>.</p>
+          </div>
         </section>
       </div>
     </main>
@@ -90,6 +96,6 @@
     <footer class="onboarding-footer portal-login-footer">
       <div class="container"><span>© <span data-year></span> MOTOVAX</span><a href="https://motovax.ai/kebijakan-privasi.html">Kebijakan Privasi</a><a href="https://motovax.ai/syarat-ketentuan.html">Syarat &amp; Ketentuan</a></div>
     </footer>
-    <script src="./login.js?v=portal-google-login-20260814"></script>
+    <script src="./login.js?v=direct-workspace-20260814"></script>
   </body>
 </html>

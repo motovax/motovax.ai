@@ -202,9 +202,12 @@ for (const viewport of viewports) {
     const page = await context.newPage();
     let resendCount = 0;
     let cancelCount = 0;
+    let mePayload = null;
     await page.route(/https:\/\/fonts\.(?:googleapis|gstatic)\.com\//, (route) => route.abort());
     await page.route("**/api/config", (route) => route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ recaptcha: { enabled: true, siteKey: "test", action: "complete_onboarding" } }) }));
-    await page.route("**/api/auth/me", (route) => route.fulfill({ status: 401, contentType: "application/json", body: JSON.stringify({ authenticated: false }) }));
+    await page.route("**/api/auth/me", (route) => mePayload
+      ? route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify(mePayload) })
+      : route.fulfill({ status: 401, contentType: "application/json", body: JSON.stringify({ authenticated: false }) }));
     await page.route("**/api/auth/pending-signup", (route) => {
       if (route.request().method() === "DELETE") {
         cancelCount += 1;
@@ -246,6 +249,17 @@ for (const viewport of viewports) {
       await page.screenshot({ path: "/tmp/motovax-email-verification-mobile-actions.png", fullPage: false });
     }
 
+    mePayload = {
+      authenticated: true,
+      user: { id: "old-session", email: "akun-lama@dealer.test", emailVerified: true, fullName: "Akun Lama", provider: "password" },
+      profile: null,
+      workspaces: [],
+    };
+    await page.click('[data-verification-check]');
+    await page.waitForFunction(() => document.querySelector('[data-verification-status]')?.textContent.includes("belum terverifikasi"));
+    assert.equal(await page.locator('[data-verification-panel]').isVisible(), true);
+    assert.equal(await page.locator('[data-step="2"]').isHidden(), true);
+
     await page.waitForTimeout(1100);
     await page.click('[data-verification-resend]');
     await page.waitForFunction(() => document.querySelector('[data-verification-status]')?.textContent.includes("Email baru sudah dikirim"));
@@ -285,7 +299,7 @@ test("verifikasi berhasil berlanjut ke profil dealer dengan konfirmasi", async (
   await page.route("**/api/config", (route) => route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ recaptcha: { enabled: false } }) }));
   await page.route("**/api/auth/me", (route) => route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({
     authenticated: true,
-    user: { id: "owner-verified", email: "owner@dealer.test", fullName: "Owner Dealer", provider: "password" },
+    user: { id: "owner-verified", email: "owner@dealer.test", emailVerified: true, fullName: "Owner Dealer", provider: "password" },
     profile: null,
     workspaces: [],
   }) }));
@@ -366,6 +380,44 @@ test("alur final berhenti menunggu setelah 3 detik ketika server tidak merespons
   await context.close();
 });
 
+test("tombol cek hanya melanjutkan akun pending yang sama setelah verified", async () => {
+  const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
+  await context.addInitScript(() => {
+    localStorage.setItem("motovax_onboarding_v1", JSON.stringify({
+      step: 1,
+      authMode: "signup",
+      account: { fullName: "Owner Dealer", email: "owner@dealer.test", provider: "password" },
+      pendingVerification: { email: "owner@dealer.test", resendAvailableAt: 0 },
+      business: { businessName: "", workspaceSlug: "", branchCount: "", region: "", industry: "automotive", description: "" },
+      modules: ["ims", "omni", "crm"],
+      goal: "conversion",
+      completed: false,
+      workspace: null,
+    }));
+  });
+  const page = await context.newPage();
+  let verified = false;
+  await page.route(/https:\/\/fonts\.(?:googleapis|gstatic)\.com\//, (route) => route.abort());
+  await page.route("**/api/config", (route) => route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ recaptcha: { enabled: false } }) }));
+  await page.route("**/api/auth/pending-signup", (route) => route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ pending: true, email: "owner@dealer.test", resendAfterSeconds: 0, expiresInSeconds: 86400 }) }));
+  await page.route("**/api/auth/me", (route) => verified
+    ? route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({
+      authenticated: true,
+      user: { id: "owner-verified", email: "owner@dealer.test", emailVerified: true, fullName: "Owner Dealer", provider: "password" },
+      profile: null,
+      workspaces: [],
+    }) })
+    : route.fulfill({ status: 401, contentType: "application/json", body: JSON.stringify({ authenticated: false }) }));
+
+  await page.goto(`${baseUrl}/onboarding.html`, { waitUntil: "load" });
+  await page.waitForSelector('[data-verification-panel]:not([hidden])');
+  verified = true;
+  await page.click('[data-verification-check]');
+  await page.waitForSelector('[data-step="2"].is-active');
+  assert.equal(await page.locator('[data-email-verified-banner]').isVisible(), true);
+  await context.close();
+});
+
 for (const viewport of viewports) {
   test(`onboarding dealer mandiri responsif pada ${viewport.name}`, async () => {
     const context = await browser.newContext({ viewport });
@@ -410,16 +462,18 @@ for (const viewport of viewports) {
       profilePayload = route.request().postDataJSON();
       return route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ profile: profilePayload, domain: `${profilePayload.workspaceSlug}.motovax.com` }) });
     });
-    const workspaceReady = viewport.name === "desktop";
     await page.route("**/api/onboarding/complete", (route) => route.fulfill({
       status: 202,
       contentType: "application/json",
       body: JSON.stringify({
-        workspace: { id: "tenant-1", name: "Dealer Maju Jaya", domain: "dealer-maju-jaya.motovax.com", ready: workspaceReady },
-        portalSession: { token: `portal-onboarding-${viewport.name}`, returnUrl: "https://motovax.ai/" },
+        workspace: { id: "tenant-1", name: "Dealer Maju Jaya", domain: "dealer-maju-jaya.motovax.com", ready: true },
       }),
     }));
-    await page.route("https://motovax.ai/**", (route) => route.fulfill({ status: 200, contentType: "text/html", body: "<title>Landing</title>" }));
+    await page.route("**/api/workspaces/tenant-1/enter", async (route) => {
+      await new Promise((resolve) => setTimeout(resolve, 350));
+      return route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ redirectUrl: "https://dealer-maju-jaya.motovax.com/magic-login?token=onboarding-handoff" }) });
+    });
+    await page.route("https://dealer-maju-jaya.motovax.com/**", (route) => route.fulfill({ status: 200, contentType: "text/html", body: "<title>Workspace Dealer</title>" }));
 
     await page.goto(`${baseUrl}/onboarding.html`, { waitUntil: "load" });
     await page.waitForSelector('[data-step="1"].is-active');
@@ -485,11 +539,9 @@ for (const viewport of viewports) {
       actionsHidden: true,
     });
     await page.screenshot({ path: `/tmp/motovax-onboarding-${viewport.name}.png`, fullPage: false });
-    await page.waitForURL("https://motovax.ai/**");
+    await page.waitForURL("https://dealer-maju-jaya.motovax.com/**");
     assert.ok(Date.now() - redirectStartedAt < 3000);
-    const onboardingFragment = new URLSearchParams(new URL(page.url()).hash.replace(/^#/, ""));
-    assert.equal(onboardingFragment.get("portal_session"), `portal-onboarding-${viewport.name}`);
-    assert.equal(onboardingFragment.has("portal_action"), false);
+    assert.equal(new URL(page.url()).searchParams.get("token"), "onboarding-handoff");
     await context.close();
   });
 
@@ -500,16 +552,18 @@ for (const viewport of viewports) {
     let loginPayload;
     await page.route("**/api/portal/login", (route) => {
       loginPayload = route.request().postDataJSON();
-      return route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ token: "portal-token-test-abcdefghijklmnopqrstuvwxyz123456", returnUrl: "https://motovax.ai/" }) });
+      return route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ redirectUrl: "https://dealer-test.motovax.com/magic-login?token=login-handoff" }) });
     });
-    await page.route("https://motovax.ai/**", (route) => route.fulfill({ status: 200, contentType: "text/html", body: "<title>Landing</title>" }));
+    await page.route("https://dealer-test.motovax.com/**", (route) => route.fulfill({ status: 200, contentType: "text/html", body: "<title>Workspace Dealer</title>" }));
     await page.goto(`${baseUrl}/login.html?oauth=failed&reason=account_not_found`, { waitUntil: "load" });
+    await page.waitForSelector(".portal-login-auth-content:visible");
     assert.equal(await page.locator('[data-login-error]').isVisible(), true);
     assert.match(await page.locator('[data-login-error]').textContent(), /belum terdaftar pada workspace MOTOVAX/);
     assert.equal(new URL(page.url()).searchParams.has("oauth"), false);
     assert.equal(await fitsViewport(page), true);
     await page.goto(`${baseUrl}/login.html`, { waitUntil: "load" });
-    assert.equal(await page.getAttribute('.portal-register-prompt a', "href"), "https://onboard.motovax.com/onboarding.html?fresh=1");
+    await page.waitForSelector(".portal-login-auth-content:visible");
+    assert.equal(await page.getAttribute('.portal-register-prompt a', "href"), "https://onboard.motovax.com/onboarding.html");
     assert.equal(await page.locator('[data-google-login]').isVisible(), true);
     assert.equal(await page.getAttribute('[data-google-login]', "href"), "https://onboard.motovax.com/api/auth/google/start?mode=portal");
     assert.equal(await page.getByRole("link", { name: "Login dengan Google", exact: true }).count(), 1);
@@ -530,105 +584,22 @@ for (const viewport of viewports) {
     const response = page.waitForResponse((item) => item.url().endsWith("/api/portal/login"));
     await page.click('[data-portal-login-form] button[type="submit"]');
     await response;
-    await page.waitForURL("https://motovax.ai/**");
+    await page.waitForURL("https://dealer-test.motovax.com/**");
     assert.deepEqual(loginPayload, { identifier: "owner", password: "rahasia123" });
-    const loginFragment = new URLSearchParams(new URL(page.url()).hash.replace(/^#/, ""));
-    assert.equal(loginFragment.get("portal_session"), "portal-token-test-abcdefghijklmnopqrstuvwxyz123456");
-    assert.equal(loginFragment.has("portal_action"), false);
+    assert.equal(new URL(page.url()).searchParams.get("token"), "login-handoff");
     await context.close();
   });
 
-  test(`menu akun beranda responsif pada ${viewport.name}`, async () => {
+  test(`landing tidak menampilkan portal akun pada ${viewport.name}`, async () => {
     const context = await browser.newContext({ viewport });
-    await context.addInitScript(() => localStorage.setItem("motovax_portal_session", "portal-token-test-abcdefghijklmnopqrstuvwxyz123456"));
     const page = await context.newPage();
     await page.route(/https:\/\/fonts\.(?:googleapis|gstatic)\.com\//, (route) => route.abort());
-    await page.route("https://onboard.motovax.com/api/portal/me", (route) => {
-      const corsHeaders = {
-        "access-control-allow-origin": baseUrl,
-        "access-control-allow-headers": "Authorization, Content-Type",
-        "access-control-allow-methods": "GET, POST, OPTIONS",
-      };
-      if (route.request().method() === "OPTIONS") return route.fulfill({ status: 204, headers: corsHeaders });
-      return route.fulfill({
-        status: 200,
-        headers: corsHeaders,
-        contentType: "application/json",
-        body: JSON.stringify({ authenticated: true, user: { username: "owner", displayName: "Owner Dealer", email: "owner@dealer.test", role: "Admin", canViewBilling: true, tenant: { id: "tenant-1", name: "Dealer Test", domain: "dealer-test.motovax.com" } } }),
-      });
-    });
     await page.goto(`${baseUrl}/index.html`, { waitUntil: "load" });
-    await page.waitForSelector("[data-portal-account]:not([hidden])");
-    assert.equal(await page.locator("[data-portal-guest]").isHidden(), true);
-    await page.click("[data-portal-trigger]");
-    assert.equal(await page.locator("[data-portal-menu]").isVisible(), true);
-    assert.equal(await page.getAttribute('[data-portal-menu] a[href="./profile.html"]', "href"), "./profile.html");
-    assert.equal(await page.locator("[data-portal-billing]").isVisible(), true);
-    assert.equal(await page.getAttribute('[data-portal-menu] a[href="./billing.html"]', "href"), "./billing.html");
-    assert.equal(await page.locator("[data-portal-workspace]").isVisible(), true);
-    assert.equal(await page.locator("[data-portal-logout]").isVisible(), true);
+    assert.equal(await page.locator("[data-portal-account], [data-portal-workspace], [data-portal-billing]").count(), 0);
+    assert.equal(await page.getByRole("link", { name: "Login/Daftar", exact: true }).count(), 1);
+    assert.equal(await page.getAttribute('.site-header a[href="https://onboard.motovax.com/login.html"]', "href"), "https://onboard.motovax.com/login.html");
     assert.equal(await noOverflow(page), true);
-    await page.screenshot({ path: `/tmp/motovax-account-${viewport.name}.png`, fullPage: false });
-    await page.keyboard.press("Escape");
-    assert.equal(await page.locator("[data-portal-menu]").isHidden(), true);
-
-    await page.route("https://onboard.motovax.com/api/portal/billing", (route) => {
-      const corsHeaders = {
-        "access-control-allow-origin": baseUrl,
-        "access-control-allow-headers": "Authorization, Content-Type",
-        "access-control-allow-methods": "GET, POST, OPTIONS",
-      };
-      if (route.request().method() === "OPTIONS") return route.fulfill({ status: 204, headers: corsHeaders });
-      return route.fulfill({
-        status: 200,
-        headers: corsHeaders,
-        contentType: "application/json",
-        body: JSON.stringify({
-          tenant_id: "tenant-1",
-          tenant_name: "Dealer Test",
-          period_start: "2026-08-01T00:00:00.000Z",
-          period_end: "2026-09-01T00:00:00.000Z",
-          member_count: 2,
-          max_users: 25,
-          max_listings: 500,
-          enabled_features: ["inventory_management", "crm_autopilot", "billing_menu"],
-          packages: [
-            { id: "core", name: "Core — Platform Integrasi Agentic AI", price_amount: 1500000, billing_cycle: "monthly", included_credits: 0, used_credits: 0, remaining_credits: 0 },
-            { id: "crm", name: "CRM", price_amount: 1500000, billing_cycle: "monthly", included_credits: 0, used_credits: 0, remaining_credits: 0 },
-            { id: "inventory_falcon", name: "Inventory + Falcon AI", price_amount: 1500000, billing_cycle: "monthly", included_credits: 500, used_credits: 125, remaining_credits: 375 },
-          ],
-          total_monthly_price: 4500000,
-          included_credits: 500,
-          used_credits: 125,
-          remaining_credits: 375,
-          members: [
-            { id: "owner-1", display_name: "Owner Dealer", username: "owner", roles: "Admin" },
-            { id: "sales-1", display_name: "Sales Dealer", username: "sales", roles: "Sales" },
-          ],
-          billing_configured: false,
-          invoice_status: "not_configured",
-        }),
-      });
-    });
-
-    await page.goto(`${baseUrl}/profile.html`, { waitUntil: "load" });
-    await page.waitForSelector("[data-account-shell]:not([hidden])");
-    assert.equal(await page.locator('[data-account-page="profile"] [data-account-email]').first().textContent(), "owner@dealer.test");
-    assert.equal(await page.locator('[data-account-page="profile"] [data-account-domain]').textContent(), "dealer-test.motovax.com");
-    assert.equal(await noOverflow(page), true);
-    await page.screenshot({ path: `/tmp/motovax-profile-${viewport.name}.png`, fullPage: false });
-
-    await page.goto(`${baseUrl}/billing.html`, { waitUntil: "load" });
-    await page.waitForSelector("[data-account-shell]:not([hidden])");
-    assert.equal(await page.locator("[data-billing-members]").textContent(), "2");
-    assert.equal(await page.locator("[data-billing-module-count]").textContent(), "2");
-    assert.equal(await page.locator("[data-billing-member-list] .account-member").count(), 2);
-    assert.equal(await page.locator("[data-billing-packages] .billing-package").count(), 3);
-    assert.equal(await page.locator("[data-billing-total-price]").textContent(), "Rp 4.500.000");
-    assert.equal(await page.locator("[data-billing-remaining-credits]").textContent(), "375");
-    assert.equal(await page.getAttribute("[data-billing-credit-progress]", "aria-valuenow"), "75");
-    assert.equal(await noOverflow(page), true);
-    await page.screenshot({ path: `/tmp/motovax-billing-${viewport.name}.png`, fullPage: false });
+    await page.screenshot({ path: `/tmp/motovax-stateless-landing-${viewport.name}.png`, fullPage: false });
     await context.close();
   });
 
@@ -734,28 +705,49 @@ for (const viewport of viewports) {
   });
 }
 
-test("session portal dari login berhenti di motovax.ai tanpa handoff otomatis", async () => {
+test("kunjungan ulang ke login dan onboarding langsung melanjutkan sesi tenant", async () => {
+  for (const entryPath of ["/login.html", "/onboarding.html"]) {
+    const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
+    const page = await context.newPage();
+    let authMeCount = 0;
+    await page.route("**/api/auth/me", (route) => {
+      authMeCount += 1;
+      return route.fulfill({ status: 401, contentType: "application/json", body: JSON.stringify({ authenticated: false }) });
+    });
+    await page.route("**/api/portal/workspace/enter", async (route) => {
+      await new Promise((resolve) => setTimeout(resolve, 1500));
+      return route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ redirectUrl: "https://dealer-test.motovax.com/magic-login?token=returning-session" }) });
+    });
+    await page.route("https://dealer-test.motovax.com/**", (route) => route.fulfill({ status: 200, contentType: "text/html", body: "<title>Workspace Dealer</title>" }));
+    await page.goto(`${baseUrl}${entryPath}`, { waitUntil: "domcontentloaded" });
+    if (entryPath === "/login.html") {
+      await page.waitForTimeout(120);
+      assert.equal(await page.locator("[data-session-check]").isVisible(), true);
+      assert.equal(await page.locator("[data-login-auth-content]").isHidden(), true);
+      assert.equal(await noOverflow(page), true);
+      await page.screenshot({ path: "/tmp/motovax-returning-session-mobile.png", fullPage: false });
+    }
+    await page.waitForURL("https://dealer-test.motovax.com/**");
+    assert.equal(new URL(page.url()).searchParams.get("token"), "returning-session");
+    if (entryPath === "/onboarding.html") assert.equal(authMeCount, 0);
+    await context.close();
+  }
+});
+
+test("session portal legacy di landing langsung handoff ke workspace", async () => {
   const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
   const page = await context.newPage();
   const token = "portal-token-test-abcdefghijklmnopqrstuvwxyz123456";
   let enterRequestCount = 0;
   await page.route("https://onboard.motovax.com/api/portal/workspace/enter", (route) => {
     enterRequestCount += 1;
-    return route.fulfill({ status: 500, contentType: "application/json", body: "{}" });
+    return route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ redirectUrl: "https://dealer-test.motovax.com/magic-login?token=legacy-handoff" }) });
   });
-  await page.route("https://onboard.motovax.com/api/portal/me", (route) => route.fulfill({
-      status: 200,
-      contentType: "application/json",
-      body: JSON.stringify({ authenticated: true, user: { username: "owner", displayName: "Owner Dealer", email: "owner@dealer.test", role: "Admin", canViewBilling: true, tenant: { id: "tenant-1", name: "Dealer Test", domain: "dealer-test.motovax.com" } } }),
-  }));
+  await page.route("https://dealer-test.motovax.com/**", (route) => route.fulfill({ status: 200, contentType: "text/html", body: "<title>Workspace Dealer</title>" }));
 
   await page.goto(`${baseUrl}/index.html#portal_session=${token}&portal_action=enter_workspace`, { waitUntil: "domcontentloaded" });
-  await page.waitForSelector("[data-portal-account]:not([hidden])");
-  assert.equal(new URL(page.url()).origin, baseUrl);
-  assert.equal(new URL(page.url()).hash, "");
-  assert.equal(enterRequestCount, 0);
-  const storage = await context.storageState();
-  const landingStorage = storage.origins.find((item) => item.origin === baseUrl)?.localStorage || [];
-  assert.equal(landingStorage.find((item) => item.name === "motovax_portal_session")?.value, token);
+  await page.waitForURL("https://dealer-test.motovax.com/**");
+  assert.equal(enterRequestCount, 1);
+  assert.equal(new URL(page.url()).searchParams.get("token"), "legacy-handoff");
   await context.close();
 });
