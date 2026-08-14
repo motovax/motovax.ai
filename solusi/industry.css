@@ -157,7 +157,33 @@
 .industry-cta h2 { max-width: 760px; margin: 11px 0 10px; font-size: clamp(30px,3.2vw,45px); line-height: 1.08; letter-spacing: -.045em; }
 .industry-cta p { max-width: 670px; margin: 0; color: #c7e2ff; font-size: 14px; line-height: 1.65; }
 .industry-cta-actions { display: flex; align-items: center; flex-wrap: wrap; justify-content: flex-end; gap: 16px; flex: 0 0 auto; }
-.industry-wa-link { color: #fff; font-size: 12px; font-weight: 800; text-decoration: underline; text-underline-offset: 4px; }
+.industry-wa-link {
+  min-height: 58px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 0 24px;
+  border: 1px solid rgba(255,255,255,.72);
+  border-radius: 14px;
+  color: #073f9d;
+  background: #fff;
+  box-shadow: 0 16px 36px rgba(2,30,86,.24), inset 0 1px 0 rgba(255,255,255,.8);
+  font-size: 15px;
+  font-weight: 850;
+  letter-spacing: -.01em;
+  transition: transform .18s ease, box-shadow .18s ease, background-color .18s ease;
+}
+.industry-wa-link:hover {
+  color: #073f9d;
+  background: #f3fbff;
+  box-shadow: 0 20px 42px rgba(2,30,86,.3), 0 0 0 5px rgba(255,255,255,.1);
+  transform: translateY(-3px);
+}
+.industry-wa-link:focus-visible { outline: 3px solid #8de7ff; outline-offset: 4px; }
+.industry-wa-icon { width: 23px; height: 23px; flex: 0 0 auto; fill: #16a66a; }
+.industry-wa-arrow { margin-left: 2px; font-size: 19px; line-height: 1; transition: transform .18s ease; }
+.industry-wa-link:hover .industry-wa-arrow { transform: translateX(3px); }
 .industry-missing { min-height: 70vh; display: grid; place-items: center; padding: 100px 0; text-align: center; }
 .industry-missing span { color: #1267f5; font-size: 14px; font-weight: 900; }
 .industry-missing h1 { margin: 12px 0; font-size: 42px; }
@@ -210,4 +236,9 @@
   .industry-related-grid > a { grid-template-columns: 44px minmax(0,1fr) 18px; min-height: 106px; }
   .industry-related-grid > a > span { width: 44px; height: 44px; }
   .industry-cta-actions { width: 100%; }
+  .industry-wa-link { width: 100%; min-height: 60px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .industry-wa-link, .industry-wa-arrow { transition: none; }
 }
