@@ -11,7 +11,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="./styles.css?v=solution-outcomes-20260814" />
-    <link rel="stylesheet" href="./account.css?v=portal-account-pages-20260814" />
+    <link rel="stylesheet" href="./account.css?v=billing-credits-20260814" />
   </head>
   <body class="account-page" data-account-page="billing">
     <header class="account-header">
@@ -60,9 +60,20 @@
               <span class="account-badge">Informasi</span>
             </header>
             <div class="billing-status">
-              <div><small>Nominal tagihan</small><b>Belum dikonfigurasi</b><small data-billing-period>Periode berjalan</small></div>
-              <small>Hubungi Motovax untuk detail komersial.</small>
+              <div><small>Nilai paket aktif</small><b><span data-billing-total-price>—</span><em>/ bulan</em></b><small data-billing-period>Periode berjalan</small></div>
+              <div class="billing-status-aside"><small>Invoice digital belum diaktifkan.</small><a href="./harga.html">Lihat referensi harga →</a></div>
             </div>
+          </article>
+
+          <article class="account-card">
+            <header class="account-card-head"><div><h2>Saldo kredit AI</h2><p>Kredit paket dan pemakaian aksi AI berhasil pada periode berjalan.</p></div><span class="account-badge">Live</span></header>
+            <div class="billing-credit-summary">
+              <div><span>Kredit paket</span><b data-billing-included-credits>—</b></div>
+              <div><span>Sudah dipakai</span><b data-billing-used-credits>—</b></div>
+              <div><span>Sisa kredit</span><b data-billing-remaining-credits>—</b></div>
+            </div>
+            <div class="billing-credit-track" role="progressbar" aria-label="Persentase sisa kredit" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" data-billing-credit-progress><span></span></div>
+            <p class="billing-credit-note">Satu aksi AI yang berhasil tercatat sebagai satu kredit. Aksi gagal dan proses latar tidak mengurangi saldo.</p>
           </article>
 
           <article class="account-card">
@@ -76,7 +87,8 @@
           </article>
 
           <article class="account-card">
-            <header class="account-card-head"><div><h2>Paket &amp; modul</h2><p>Kapabilitas yang saat ini aktif pada tenant.</p></div><span class="account-badge">Aktif</span></header>
+            <header class="account-card-head"><div><h2>Paket, harga &amp; kredit</h2><p>Rincian paket aktif berdasarkan katalog harga Motovax.</p></div><span class="account-badge">Aktif</span></header>
+            <div class="billing-packages" data-billing-packages></div>
             <div class="account-tags" data-billing-modules></div>
           </article>
 
@@ -85,11 +97,11 @@
             <div class="account-members" data-billing-member-list></div>
           </article>
 
-          <p class="account-note"><strong>Transparansi penagihan.</strong> Halaman ini menampilkan data operasional yang sudah tersedia di Motovax. Harga kontrak, pembayaran, dan invoice belum ditampilkan sebelum sumber billing resmi dikonfigurasi.</p>
+          <p class="account-note"><strong>Transparansi penagihan.</strong> Harga di atas mengikuti katalog publik Motovax dan dihitung dari paket aktif tenant. Nominal invoice final, diskon kontrak, pajak, dan status pembayaran akan tersedia setelah invoice digital diaktifkan.</p>
         </section>
       </div>
     </main>
 
-    <script src="./account.js?v=portal-account-pages-20260814"></script>
+    <script src="./account.js?v=billing-credits-20260814"></script>
   </body>
 </html>

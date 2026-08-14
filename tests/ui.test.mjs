@@ -641,6 +641,15 @@ for (const viewport of viewports) {
           max_users: 25,
           max_listings: 500,
           enabled_features: ["inventory_management", "crm_autopilot", "billing_menu"],
+          packages: [
+            { id: "core", name: "Core — Platform Integrasi Agentic AI", price_amount: 1500000, billing_cycle: "monthly", included_credits: 0, used_credits: 0, remaining_credits: 0 },
+            { id: "crm", name: "CRM", price_amount: 1500000, billing_cycle: "monthly", included_credits: 0, used_credits: 0, remaining_credits: 0 },
+            { id: "inventory_falcon", name: "Inventory + Falcon AI", price_amount: 1500000, billing_cycle: "monthly", included_credits: 500, used_credits: 125, remaining_credits: 375 },
+          ],
+          total_monthly_price: 4500000,
+          included_credits: 500,
+          used_credits: 125,
+          remaining_credits: 375,
           members: [
             { id: "owner-1", display_name: "Owner Dealer", username: "owner", roles: "Admin" },
             { id: "sales-1", display_name: "Sales Dealer", username: "sales", roles: "Sales" },
@@ -663,6 +672,10 @@ for (const viewport of viewports) {
     assert.equal(await page.locator("[data-billing-members]").textContent(), "2");
     assert.equal(await page.locator("[data-billing-module-count]").textContent(), "2");
     assert.equal(await page.locator("[data-billing-member-list] .account-member").count(), 2);
+    assert.equal(await page.locator("[data-billing-packages] .billing-package").count(), 3);
+    assert.equal(await page.locator("[data-billing-total-price]").textContent(), "Rp 4.500.000");
+    assert.equal(await page.locator("[data-billing-remaining-credits]").textContent(), "375");
+    assert.equal(await page.getAttribute("[data-billing-credit-progress]", "aria-valuenow"), "75");
     assert.equal(await noOverflow(page), true);
     await page.screenshot({ path: `/tmp/motovax-billing-${viewport.name}.png`, fullPage: false });
     await context.close();

@@ -26,6 +26,41 @@ const RESERVED_SLUGS = new Set([
   "api", "app", "assets", "auth", "dss", "internal", "motovax-ai", "onboard", "status", "support", "www",
 ]);
 const MOBIX_TENANT_ID = "4c8bdcb3-c535-4ad6-b2fb-53f5361c8489";
+const BILLING_PACKAGE_DEFINITIONS = [
+  { id: "core", name: "Core — Platform Integrasi Agentic AI", priceAmount: 1_500_000, includedCredits: 0, enabled: () => true },
+  { id: "crm", name: "CRM", priceAmount: 1_500_000, includedCredits: 0, enabled: (features) => features.crm_autopilot === true },
+  { id: "omni_jasmine", name: "Omni + Jasmine AI", priceAmount: 2_000_000, includedCredits: 500, enabled: (features) => features.whatsapp_ai === true },
+  { id: "inventory_falcon", name: "Inventory + Falcon AI", priceAmount: 1_500_000, includedCredits: 500, enabled: (features) => features.inventory_management === true },
+  { id: "ana_analytics", name: "Ana AI — Advanced Analytics", priceAmount: 1_000_000, includedCredits: 0, enabled: (features) => features.data_insight === true || features.one_dashboard === true },
+  { id: "social_sora", name: "Social Media + Sora AI", priceAmount: 1_500_000, includedCredits: 500, enabled: (features) => features.social_media_automation === true },
+];
+
+export function buildBillingPackages(features = {}, usageRows = []) {
+  const usageByPackage = new Map(usageRows.map((row) => [String(row.package_id || ""), Math.max(0, Number(row.used_credits || 0))]));
+  return BILLING_PACKAGE_DEFINITIONS
+    .filter((definition) => definition.enabled(features))
+    .map((definition) => {
+      const usedCredits = usageByPackage.get(definition.id) || 0;
+      return {
+        id: definition.id,
+        name: definition.name,
+        price_amount: definition.priceAmount,
+        billing_cycle: "monthly",
+        included_credits: definition.includedCredits,
+        used_credits: usedCredits,
+        remaining_credits: Math.max(0, definition.includedCredits - usedCredits),
+      };
+    });
+}
+
+function summarizeBillingPackages(packages) {
+  return packages.reduce((summary, pkg) => ({
+    totalMonthlyPrice: summary.totalMonthlyPrice + pkg.price_amount,
+    includedCredits: summary.includedCredits + pkg.included_credits,
+    usedCredits: summary.usedCredits + pkg.used_credits,
+    remainingCredits: summary.remainingCredits + pkg.remaining_credits,
+  }), { totalMonthlyPrice: 0, includedCredits: 0, usedCredits: 0, remainingCredits: 0 });
+}
 
 const FULL_TENANT_PERMISSIONS = [
   "tenant:read", "tenant:update", "user:create", "user:read", "user:update", "user:delete",
@@ -1155,7 +1190,12 @@ export async function createPostgresStore(connectionString) {
     },
 
     async getPortalBilling(tenantId) {
-      const [tenantResult, membersResult] = await Promise.all([
+      const periodStart = new Date();
+      periodStart.setUTCDate(1);
+      periodStart.setUTCHours(0, 0, 0, 0);
+      const periodEnd = new Date(periodStart);
+      periodEnd.setUTCMonth(periodEnd.getUTCMonth() + 1);
+      const [tenantResult, membersResult, usageResult] = await Promise.all([
         pool.query(
           `SELECT id, name, COALESCE(config, '{}'::jsonb) AS config
            FROM tenants
@@ -1174,16 +1214,30 @@ export async function createPostgresStore(connectionString) {
            ORDER BY COALESCE(NULLIF(BTRIM(u.display_name), ''), u.username), u.username`,
           [tenantId],
         ),
+        pool.query(
+          `SELECT CASE ai_engine
+             WHEN 'jasmine' THEN 'omni_jasmine'
+             WHEN 'falcon' THEN 'inventory_falcon'
+             WHEN 'sora' THEN 'social_sora'
+           END AS package_id,
+           COUNT(*)::int AS used_credits
+           FROM ai_usage_events
+           WHERE tenant_id = $1
+             AND created_at >= $2
+             AND created_at < $3
+             AND success = TRUE
+             AND COALESCE(worker, '') = ''
+             AND ai_engine IN ('jasmine', 'falcon', 'sora')
+           GROUP BY package_id`,
+          [tenantId, periodStart, periodEnd],
+        ),
       ]);
       const tenant = tenantResult.rows[0];
       if (!tenant) return null;
       const tenantConfig = tenant.config || {};
       const features = tenantConfig.features || {};
-      const periodStart = new Date();
-      periodStart.setUTCDate(1);
-      periodStart.setUTCHours(0, 0, 0, 0);
-      const periodEnd = new Date(periodStart);
-      periodEnd.setUTCMonth(periodEnd.getUTCMonth() + 1);
+      const packages = buildBillingPackages(features, usageResult.rows);
+      const packageSummary = summarizeBillingPackages(packages);
       return {
         tenant_id: tenant.id,
         tenant_name: tenant.name,
@@ -1196,6 +1250,11 @@ export async function createPostgresStore(connectionString) {
           .filter(([, enabled]) => enabled === true)
           .map(([key]) => key),
         members: membersResult.rows,
+        packages,
+        total_monthly_price: packageSummary.totalMonthlyPrice,
+        included_credits: packageSummary.includedCredits,
+        used_credits: packageSummary.usedCredits,
+        remaining_credits: packageSummary.remainingCredits,
         billing_configured: false,
         invoice_status: "not_configured",
       };
