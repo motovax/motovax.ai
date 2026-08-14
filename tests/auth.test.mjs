@@ -3,7 +3,7 @@ import crypto from "node:crypto";
 import { after, before, test } from "node:test";
 import bcrypt from "bcryptjs";
 
-import { createApp, verifyRecaptchaToken } from "../server.mjs";
+import { buildBillingPackages, createApp, verifyRecaptchaToken } from "../server.mjs";
 
 const oauthStates = new Map();
 const sessions = new Map();
@@ -225,6 +225,10 @@ const store = {
     return portalSessions.get(sessionDigest) || null;
   },
   async getPortalBilling(tenantId) {
+    const packages = buildBillingPackages(
+      { inventory_management: true, crm_autopilot: true },
+      [{ package_id: "inventory_falcon", used_credits: 125 }],
+    );
     return {
       tenant_id: tenantId,
       tenant_name: "Dealer Test",
@@ -235,6 +239,11 @@ const store = {
       max_listings: 500,
       enabled_features: ["inventory_management", "crm_autopilot", "billing_menu"],
       members: [{ id: "app-user-1", display_name: "Owner Dealer", username: "owner", roles: "Admin" }],
+      packages,
+      total_monthly_price: 4_500_000,
+      included_credits: 500,
+      used_credits: 125,
+      remaining_credits: 375,
       billing_configured: false,
       invoice_status: "not_configured",
     };
@@ -726,6 +735,9 @@ test("portal login tenant membawa profil, billing, logout, dan handoff workspace
   assert.equal(billingPayload.tenant_name, "Dealer Test");
   assert.equal(billingPayload.member_count, 1);
   assert.deepEqual(billingPayload.enabled_features, ["inventory_management", "crm_autopilot", "billing_menu"]);
+  assert.equal(billingPayload.total_monthly_price, 4_500_000);
+  assert.equal(billingPayload.remaining_credits, 375);
+  assert.deepEqual(billingPayload.packages.map((pkg) => pkg.id), ["core", "crm", "inventory_falcon"]);
 
   const enter = await fetch(`${baseUrl}/api/portal/workspace/enter`, {
     method: "POST",

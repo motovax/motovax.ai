@@ -82,6 +82,59 @@
     return formatter.format(startDate) + " – " + formatter.format(endDate);
   }
 
+  function formatNumber(value) {
+    return new Intl.NumberFormat("id-ID").format(Number(value || 0));
+  }
+
+  function formatCurrency(value) {
+    return new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", maximumFractionDigits: 0 }).format(Number(value || 0));
+  }
+
+  function appendCreditMetric(parent, label, value, emphasize) {
+    var metric = document.createElement("div");
+    var title = document.createElement("span");
+    var amount = document.createElement("strong");
+    title.textContent = label;
+    amount.textContent = formatNumber(value);
+    if (emphasize) amount.className = "is-emphasized";
+    metric.append(title, amount);
+    parent.appendChild(metric);
+  }
+
+  function renderBillingPackages(packages) {
+    var container = document.querySelector("[data-billing-packages]");
+    if (!container) return;
+    container.innerHTML = "";
+    packages.forEach(function (pkg) {
+      var card = document.createElement("article");
+      card.className = "billing-package";
+      var header = document.createElement("div");
+      var identity = document.createElement("div");
+      var name = document.createElement("h3");
+      var price = document.createElement("p");
+      var badge = document.createElement("span");
+      name.textContent = pkg.name;
+      price.textContent = formatCurrency(pkg.price_amount) + " / bulan";
+      badge.textContent = "Aktif";
+      identity.append(name, price);
+      header.append(identity, badge);
+      card.appendChild(header);
+      if (pkg.included_credits > 0) {
+        var credits = document.createElement("div");
+        credits.className = "billing-package-credits";
+        appendCreditMetric(credits, "Paket", pkg.included_credits, false);
+        appendCreditMetric(credits, "Terpakai", pkg.used_credits, false);
+        appendCreditMetric(credits, "Sisa", pkg.remaining_credits, true);
+        card.appendChild(credits);
+      } else {
+        var noCredits = document.createElement("small");
+        noCredits.textContent = "Tidak memakai alokasi kredit AI.";
+        card.appendChild(noCredits);
+      }
+      container.appendChild(card);
+    });
+  }
+
   function renderBilling(billing) {
     setText("[data-billing-period]", formatPeriod(billing.period_start, billing.period_end));
     setText("[data-billing-members]", billing.member_count);
@@ -89,6 +142,20 @@
     setText("[data-billing-max-listings]", formatLimit(billing.max_listings));
     var features = (billing.enabled_features || []).filter(function (feature) { return feature !== "billing_menu"; });
     setText("[data-billing-module-count]", features.length);
+    setText("[data-billing-total-price]", formatCurrency(billing.total_monthly_price));
+    setText("[data-billing-included-credits]", formatNumber(billing.included_credits));
+    setText("[data-billing-used-credits]", formatNumber(billing.used_credits));
+    setText("[data-billing-remaining-credits]", formatNumber(billing.remaining_credits));
+    var includedCredits = Number(billing.included_credits || 0);
+    var remainingCredits = Number(billing.remaining_credits || 0);
+    var remainingPercentage = includedCredits > 0 ? Math.max(0, Math.min(100, remainingCredits / includedCredits * 100)) : 0;
+    var progress = document.querySelector("[data-billing-credit-progress]");
+    if (progress) {
+      progress.setAttribute("aria-valuenow", String(Math.round(remainingPercentage)));
+      var progressFill = progress.querySelector("span");
+      if (progressFill) progressFill.style.width = remainingPercentage + "%";
+    }
+    renderBillingPackages(billing.packages || []);
     var tags = document.querySelector("[data-billing-modules]");
     if (tags) {
       tags.innerHTML = "";
