@@ -76,74 +76,94 @@ const viewports = [
 ];
 
 for (const viewport of viewports) {
-  test(`spidol merah "Konversi justru menurun?" pada ${viewport.name}`, async () => {
+  test(`image tantangan dealer menggantikan teks pada ${viewport.name}`, async () => {
     const context = await browser.newContext({ viewport });
     const page = await context.newPage();
     await page.route(/https:\/\/fonts\.(?:googleapis|gstatic)\.com\//, (route) => route.abort());
-    await page.goto(`${baseUrl}/index.html?v=marker-underline-20260815`, { waitUntil: "load" });
+    await page.goto(`${baseUrl}/index.html?v=tantangan-img-20260815`, { waitUntil: "load" });
 
-    const heading = page.locator("#keunggulan h2");
-    await heading.scrollIntoViewIfNeeded();
-
-    const mark = page.locator("[data-marker-underline]");
-    await mark.waitFor({ state: "visible" });
+    const section = page.locator("#keunggulan");
+    const image = page.locator("[data-problem-visual]");
+    await image.scrollIntoViewIfNeeded();
     await page.waitForFunction(() => {
-      const el = document.querySelector("[data-marker-underline]");
-      return Boolean(el && el.classList.contains("is-drawn"));
+      const img = document.querySelector("[data-problem-visual]");
+      return Boolean(img && img.complete && img.naturalWidth > 0 && img.currentSrc.includes("tantangan-dealer-hari-ini"));
     });
-    await page.waitForTimeout(1100);
+    await image.evaluate((img) => img.decode?.() || Promise.resolve());
 
     const metrics = await page.evaluate(() => {
-      const heading = document.querySelector("#keunggulan h2");
-      const mark = document.querySelector("[data-marker-underline]");
-      const text = mark?.querySelector(".marker-underline-text");
-      const svg = mark?.querySelector(".marker-underline-svg");
-      const strokes = [...(mark?.querySelectorAll(".marker-stroke") || [])];
-      const markRect = mark?.getBoundingClientRect();
-      const textRect = text?.getBoundingClientRect();
-      const svgRect = svg?.getBoundingClientRect();
+      const section = document.querySelector("#keunggulan");
+      const label = section?.querySelector(".section-label");
+      const heading = section?.querySelector("h2");
+      const img = section?.querySelector("[data-problem-visual]");
+      const opener = section?.querySelector("[data-hero-image-open]");
+      const oldCopy = section?.textContent || "";
+      const imgRect = img?.getBoundingClientRect();
+      const wrapRect = section?.querySelector(".problem-visual")?.getBoundingClientRect();
       return {
-        headingText: heading?.textContent.replace(/\s+/g, " ").trim() || "",
-        phrase: text?.textContent.trim() || "",
-        hasMengapa: (heading?.textContent || "").includes("Mengapa"),
-        isDrawn: mark?.classList.contains("is-drawn") || false,
-        isAnimatable: mark?.classList.contains("is-animatable") || false,
-        strokeCount: strokes.length,
-        strokeColors: strokes.map((path) => getComputedStyle(path).stroke),
-        svgWidth: svgRect?.width || 0,
-        svgHeight: svgRect?.height || 0,
-        markWidth: markRect?.width || 0,
-        markHeight: markRect?.height || 0,
-        textWidth: textRect?.width || 0,
-        textHeight: textRect?.height || 0,
+        label: label?.textContent.trim() || "",
+        heading: heading?.textContent.replace(/\s+/g, " ").trim() || "",
+        headingHidden: heading ? getComputedStyle(heading).position === "absolute" : false,
+        hasOldHeadline: /Iklan makin banyak|Konversi justru menurun|Database leads dealer/i.test(oldCopy),
+        hasMarker: Boolean(section?.querySelector("[data-marker-underline]")),
+        naturalWidth: img?.naturalWidth || 0,
+        naturalHeight: img?.naturalHeight || 0,
+        currentSrc: img?.currentSrc || "",
+        renderWidth: imgRect?.width || 0,
+        renderHeight: imgRect?.height || 0,
+        wrapWidth: wrapRect?.width || 0,
+        wrapHeight: wrapRect?.height || 0,
+        objectFit: img ? getComputedStyle(img).objectFit : "",
+        aspectRatio: img ? getComputedStyle(img).aspectRatio : "",
+        openerLabel: opener?.textContent.replace(/\s+/g, " ").trim() || "",
         overflow: document.documentElement.scrollWidth > document.documentElement.clientWidth,
       };
     });
 
-    assert.equal(metrics.headingText, "Iklan makin banyak. Pameran makin sering. Konversi justru menurun?");
-    assert.equal(metrics.phrase, "Konversi justru menurun?");
-    assert.equal(metrics.hasMengapa, false);
-    assert.equal(metrics.isDrawn, true);
-    assert.equal(metrics.isAnimatable, true);
-    assert.equal(metrics.strokeCount, 2);
-    assert.ok(metrics.strokeColors.some((color) => /rgb\(239,\s*35,\s*60\)|rgb\(193,\s*18,\s*31\)/.test(color)), JSON.stringify(metrics.strokeColors));
-    assert.ok(metrics.svgWidth > 80, JSON.stringify(metrics));
-    assert.ok(metrics.svgHeight > 6, JSON.stringify(metrics));
-    assert.ok(metrics.markWidth >= metrics.textWidth - 1, JSON.stringify(metrics));
-    assert.ok(metrics.textHeight < 90, `frasa harus satu baris: ${JSON.stringify(metrics)}`);
-    assert.ok(metrics.svgWidth >= metrics.textWidth * 0.92, JSON.stringify(metrics));
+    assert.equal(metrics.label, "TANTANGAN DEALER HARI INI");
+    assert.match(metrics.heading, /follow-up|lead|insight/i);
+    assert.equal(metrics.headingHidden, true);
+    assert.equal(metrics.hasOldHeadline, false, "teks lama di bawah label harus sudah dihapus");
+    assert.equal(metrics.hasMarker, false);
+    assert.ok(metrics.naturalWidth > 300, JSON.stringify(metrics));
+    assert.ok(metrics.naturalHeight > 200, JSON.stringify(metrics));
+    assert.match(metrics.currentSrc, /tantangan-dealer-hari-ini/);
+    assert.ok(metrics.renderWidth > 280, JSON.stringify(metrics));
+    assert.ok(Math.abs(metrics.renderWidth - metrics.wrapWidth) < 1, JSON.stringify(metrics));
+    assert.equal(metrics.objectFit, "contain");
+    assert.equal(metrics.openerLabel, "Buka ukuran penuh ↗");
     assert.equal(metrics.overflow, false, JSON.stringify(metrics));
 
-    const section = page.locator("#keunggulan");
     await section.screenshot({
-      path: `/tmp/motovax-marker-underline-${viewport.name}.png`,
+      path: `/tmp/motovax-tantangan-dealer-${viewport.name}.png`,
     });
 
-    await mark.click();
+    await page.locator("#keunggulan [data-hero-image-open]").click();
+    const modal = page.locator("[data-hero-image-modal]");
+    await modal.waitFor({ state: "visible" });
     await page.waitForFunction(() => {
-      const el = document.querySelector("[data-marker-underline]");
-      return Boolean(el && el.classList.contains("is-animatable") && el.classList.contains("is-drawn"));
+      const img = document.querySelector("[data-hero-image-modal-img]");
+      const src = img?.currentSrc || img?.getAttribute("src") || "";
+      return src.includes("tantangan-dealer-hari-ini");
     });
+    const modalState = await page.evaluate(() => {
+      const img = document.querySelector("[data-hero-image-modal-img]");
+      return {
+        hidden: document.querySelector("[data-hero-image-modal]")?.hidden ?? true,
+        bodyLocked: document.body.classList.contains("feature-image-open"),
+        src: img?.currentSrc || img?.getAttribute("src") || "",
+        title: document.querySelector("[data-hero-image-modal-title]")?.textContent.trim() || "",
+      };
+    });
+    assert.equal(modalState.hidden, false);
+    assert.equal(modalState.bodyLocked, true);
+    assert.match(modalState.src, /tantangan-dealer-hari-ini/);
+    assert.equal(modalState.title, "Tantangan dealer hari ini");
+
+    await page.keyboard.press("Escape");
+    await page.waitForFunction(() => document.querySelector("[data-hero-image-modal]")?.hidden === true);
+    const unlocked = await page.evaluate(() => document.body.classList.contains("feature-image-open"));
+    assert.equal(unlocked, false);
 
     await context.close();
   });

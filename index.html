@@ -15,7 +15,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="./styles.css?v=hapus-sudut-pandang-20260815" />
+    <link rel="stylesheet" href="./styles.css?v=tantangan-img-20260815" />
   </head>
   <body class="home-redesign">
     <header class="site-header">
@@ -128,23 +128,35 @@
       </section>
 
       <section class="home-section problem-section" id="keunggulan">
-        <div class="container narrow-heading">
+        <div class="container problem-visual-wrap">
           <div class="section-label">TANTANGAN DEALER HARI INI</div>
-          <h2>
-            Iklan makin banyak. Pameran makin sering.
-            <span class="marker-underline" data-marker-underline>
-              <span class="marker-underline-text">Konversi justru menurun?</span>
-              <svg class="marker-underline-svg" viewBox="0 0 360 20" preserveAspectRatio="none" aria-hidden="true" focusable="false">
-                <path class="marker-stroke wash" pathLength="1" d="M4 12.4 C 36 6.8, 68 16.2, 108 10.6 S 176 5.4, 224 12.8 S 292 17.2, 336 9.6 S 350 8.2, 356 11.4" />
-                <path class="marker-stroke ink" pathLength="1" d="M6 13.8 C 40 8.6, 74 16.8, 114 11.8 S 182 7.2, 228 14 S 296 16.4, 338 10.8 S 350 9.4, 355 12.6" />
-              </svg>
-            </span>
-          </h2>
-          <p>
-            Database leads dealer terus bertambah, tetapi banyak peluang menumpuk tanpa
-            tindak lanjut yang konsisten. Data pelanggan tersebar, respons terlambat,
-            dan tim sales kesulitan menentukan lead yang paling siap dikonversi.
-          </p>
+          <h2 class="visually-hidden">Tantangan dealer: follow-up lambat, lead tercecer, dan minim insight penjualan</h2>
+          <figure class="problem-visual">
+            <picture>
+              <source
+                type="image/webp"
+                srcset="./assets/tantangan-dealer-hari-ini-720.webp?v=tantangan-img-20260815 720w, ./assets/tantangan-dealer-hari-ini-1200.webp?v=tantangan-img-20260815 1200w, ./assets/tantangan-dealer-hari-ini.webp?v=tantangan-img-20260815 1536w"
+                sizes="(max-width: 760px) calc(100vw - 32px), min(1180px, calc(100vw - 48px))"
+              />
+              <img
+                data-problem-visual
+                src="./assets/tantangan-dealer-hari-ini.png?v=tantangan-img-20260815"
+                width="1536"
+                height="1024"
+                alt="Infografis tantangan dealer: follow up lambat dan tidak terkontrol, lead tercecer di WhatsApp pribadi, tidak ada monitoring performa sales, serta tidak ada insight konversi pipeline."
+                decoding="async"
+              />
+            </picture>
+            <figcaption>
+              <button
+                type="button"
+                data-hero-image-open
+                data-image-src="./assets/tantangan-dealer-hari-ini.png?v=tantangan-img-20260815"
+                data-image-alt="Infografis tantangan dealer: follow up lambat dan tidak terkontrol, lead tercecer di WhatsApp pribadi, tidak ada monitoring performa sales, serta tidak ada insight konversi pipeline."
+                data-image-title="Tantangan dealer hari ini"
+              >Buka ukuran penuh ↗</button>
+            </figcaption>
+          </figure>
         </div>
       </section>
 
@@ -307,6 +319,6 @@
         </div>
       </div>
     </div>
-    <script src="./script.js?v=e2e-hook-20260815"></script>
+    <script src="./script.js?v=tantangan-img-20260815"></script>
   </body>
 </html>

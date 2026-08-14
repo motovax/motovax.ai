@@ -244,6 +244,13 @@ for (const link of document.querySelectorAll("[data-wa]")) {
     shot.addEventListener("click", () => open(openers[0]));
   }
 
+  const problemVisual = document.querySelector("[data-problem-visual]");
+  const problemOpener = openers.find((button) => button.dataset.imageTitle === "Tantangan dealer hari ini");
+  if (problemVisual instanceof HTMLImageElement && problemOpener instanceof HTMLElement) {
+    problemVisual.style.cursor = "zoom-in";
+    problemVisual.addEventListener("click", () => open(problemOpener));
+  }
+
   modal.addEventListener("click", (event) => {
     if (event.target === modal || event.target.closest("[data-hero-image-close]")) close();
   });
@@ -304,8 +311,7 @@ for (const link of document.querySelectorAll("[data-wa]")) {
   });
 })();
 
-/** Slider skema "Cara Kerja": geser / titik untuk ganti sudut pandang. */
-(function initNativeFlowSlider() {
+(function initNativeFlowSliderRemoved() {
   const root = document.querySelector("[data-flow-slider]");
   if (!(root instanceof HTMLElement)) return;
 
