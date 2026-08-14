@@ -177,6 +177,7 @@ a {
 }
 
 .brand {
+  justify-self: start;
   font-size: 28px;
 }
 
@@ -234,6 +235,8 @@ a {
 
 .mobile-nav-trigger {
   position: relative;
+  grid-column: -2 / -1;
+  justify-self: end;
   width: 42px;
   height: 42px;
   place-items: center;

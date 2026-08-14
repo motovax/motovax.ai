@@ -195,7 +195,6 @@
             <p class="feature-hero-desc">${escapeHtml(data.heroDesc)}</p>
             ${heroBenefits ? `<ul class="feature-hero-list">${heroBenefits}</ul>` : ""}
             <div class="feature-hero-actions">
-              <a class="btn btn-primary" href="../index.html#kontak">Jadwalkan Demo <span>-></span></a>
               ${demoCta}
             </div>
           </div>
@@ -286,7 +285,6 @@
         </div>
         <div class="feature-hero-actions">
           <a class="btn btn-light" href="#" data-wa>WhatsApp Sales <span>-></span></a>
-          <a class="btn btn-secondary" href="../index.html#kontak">Jadwalkan Demo</a>
         </div>
       </div>
     </section>

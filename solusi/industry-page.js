@@ -76,7 +76,6 @@
               <h1>${escapeHtml(industry.heroTitle)}</h1>
               <p>${escapeHtml(industry.heroDesc)}</p>
               <div class="industry-hero-actions">
-                <a class="btn btn-primary" href="../hubungi-kami.html">Jadwalkan Demo <span>→</span></a>
                 <a class="btn btn-secondary" href="#kapabilitas">Lihat Kapabilitas</a>
               </div>
               <div class="industry-honesty-note">
@@ -233,7 +232,6 @@
             <p>${escapeHtml(industry.ctaDesc)}</p>
           </div>
           <div class="industry-cta-actions">
-            <a class="btn btn-light" href="../hubungi-kami.html">Jadwalkan Demo <span>→</span></a>
             <a class="industry-wa-link" href="#" data-wa>WhatsApp kami</a>
           </div>
         </div>

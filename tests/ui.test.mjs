@@ -95,6 +95,10 @@ for (const viewport of viewports) {
 
     for (const route of publicNavigationPages) {
       await page.goto(`${baseUrl}${route}`, { waitUntil: "load" });
+      const scheduleDemoLinks = await page.locator("a, button").evaluateAll((elements) =>
+        elements.filter((element) => /^Jadwalkan Demo(?:\s*(?:→|->))?$/i.test(element.textContent.replace(/\s+/g, " ").trim())).length,
+      );
+      assert.equal(scheduleDemoLinks, 0, route);
       if (viewport.width > 1024) {
         const labels = await page.locator(".site-header .nav").evaluate((nav) =>
           [...nav.children].map((item) => {
