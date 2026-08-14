@@ -20,12 +20,6 @@
 /* Homepage flow redesign — 2026-08-13 */
 .home-redesign { background: #fff; }
 .home-redesign .site-header { background: rgba(255,255,255,.94); }
-/* Beranda: tanpa hamburger / bar menu ekstra di bawah header. */
-.home-redesign .mobile-nav-trigger,
-.home-redesign .mobile-nav-panel,
-.home-redesign .mobile-nav-backdrop {
-  display: none !important;
-}
 .home-redesign .btn-large { min-height: 52px; padding: 14px 22px; border-radius: 11px; }
 .home-hero { padding: 92px 0 78px; overflow: hidden; background: radial-gradient(circle at 85% 18%,rgba(39,200,232,.18),transparent 27%),radial-gradient(circle at 54% 75%,rgba(18,103,245,.1),transparent 30%),linear-gradient(180deg,#f7fbff 0%,#fff 100%); }
 .home-hero-grid { display:grid; grid-template-columns:minmax(0,.88fr) minmax(520px,1.12fr); align-items:center; gap:68px; }
@@ -239,6 +233,7 @@ a {
 }
 
 .mobile-nav-trigger {
+  position: relative;
   width: 42px;
   height: 42px;
   place-items: center;
@@ -252,16 +247,28 @@ a {
 }
 
 .mobile-nav-trigger span {
+  position: absolute;
+  top: 50%;
+  left: 50%;
   display: block;
   width: 18px;
   height: 2px;
   border-radius: 4px;
   background: #15243c;
+  transform: translate(-50%, -50%);
   transition: transform 0.2s ease, opacity 0.2s ease;
 }
 
+.mobile-nav-trigger span:nth-child(1) {
+  transform: translate(-50%, calc(-50% - 7px));
+}
+
+.mobile-nav-trigger span:nth-child(3) {
+  transform: translate(-50%, calc(-50% + 7px));
+}
+
 .mobile-nav-trigger.is-open span:nth-child(1) {
-  transform: translateY(7px) rotate(45deg);
+  transform: translate(-50%, -50%) rotate(45deg);
 }
 
 .mobile-nav-trigger.is-open span:nth-child(2) {
@@ -269,7 +276,7 @@ a {
 }
 
 .mobile-nav-trigger.is-open span:nth-child(3) {
-  transform: translateY(-7px) rotate(-45deg);
+  transform: translate(-50%, -50%) rotate(-45deg);
 }
 
 .mobile-nav-backdrop {
@@ -958,7 +965,7 @@ body.solusi-menu-open {
   }
 
   .home-redesign .header-inner {
-    grid-template-columns: 1fr auto;
+    grid-template-columns: 1fr auto auto;
   }
 
   .nav {
@@ -11153,7 +11160,7 @@ body.demo-open {
   }
 
   .home-redesign .header-inner {
-    grid-template-columns: 1fr auto;
+    grid-template-columns: 1fr auto auto;
   }
 
   .nav {
@@ -11394,6 +11401,11 @@ body.demo-open {
   .header-inner {
     grid-template-columns: 1fr auto;
     min-height: 68px;
+  }
+
+  .home-redesign .header-inner {
+    grid-template-columns: 1fr auto auto;
+    gap: 8px;
   }
 
   .mobile-nav-panel {

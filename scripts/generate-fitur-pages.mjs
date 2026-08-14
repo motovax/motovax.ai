@@ -47,7 +47,7 @@ const template = (slug, title, description) => `<!doctype html>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="../styles.css?v=copy-20260811" />
+    <link rel="stylesheet" href="../styles.css?v=nav-parity-20260814" />
   </head>
   <body class="feature-detail-page">
     <header class="site-header">
@@ -65,9 +65,8 @@ const template = (slug, title, description) => `<!doctype html>
             </button>
             <div class="produk-mega" id="produk-mega-menu" role="region" aria-label="Menu produk Motovax" hidden data-produk-panel data-produk-mount></div>
           </div>
-          <a href="../index.html#solusi">Solusi</a>
           <a href="../index.html#cara-kerja">Cara Kerja</a>
-          <a href="../index.html#keunggulan">Keunggulan</a>
+          <a href="../index.html#solusi">Solusi</a>
           <a href="../harga.html">Harga</a>
           <a href="../hubungi-kami.html">Hubungi Kami</a>
         </nav>
@@ -101,7 +100,7 @@ const template = (slug, title, description) => `<!doctype html>
     <script>window.__FEATURE_SLUG__ = ${JSON.stringify(slug)};</script>
     <script src="./features-data.js"></script>
     <script src="./feature-page.js?v=copy-20260811"></script>
-    <script src="../script.js?v=dealer-focus-20260814"></script>
+    <script src="../script.js?v=nav-parity-20260814"></script>
   </body>
 </html>
 `;
@@ -145,7 +144,7 @@ fs.writeFileSync(
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Semua Fitur — MOTOVAX</title>
   <meta name="description" content="Jelajahi fitur Motovax untuk inventory unit, sales dealer, customer service, CRM, omnichannel, dan automasi dealer mobil." />
-  <link rel="stylesheet" href="../styles.css?v=copy-20260811" />
+  <link rel="stylesheet" href="../styles.css?v=nav-parity-20260814" />
   <link rel="icon" href="../favicon.ico" />
 </head>
 <body class="feature-detail-page">
@@ -160,9 +159,8 @@ fs.writeFileSync(
           </button>
           <div class="produk-mega" id="produk-mega-menu" role="region" aria-label="Menu produk Motovax" hidden data-produk-panel data-produk-mount></div>
         </div>
-        <a href="../index.html#solusi">Solusi</a>
         <a href="../index.html#cara-kerja">Cara Kerja</a>
-        <a href="../index.html#keunggulan">Keunggulan</a>
+        <a href="../index.html#solusi">Solusi</a>
         <a href="../harga.html">Harga</a>
         <a href="../hubungi-kami.html">Hubungi Kami</a>
       </nav>
@@ -176,7 +174,7 @@ fs.writeFileSync(
       <ul class="feature-index-list">${listItems}</ul>
     </div>
   </main>
-  <script src="../script.js?v=dealer-focus-20260814"></script>
+  <script src="../script.js?v=nav-parity-20260814"></script>
 </body>
 </html>
 `,

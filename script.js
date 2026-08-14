@@ -1050,16 +1050,12 @@ if (contactForm instanceof HTMLFormElement) {
   const headerInner = header?.querySelector(".header-inner");
   if (!(header instanceof HTMLElement) || !(headerInner instanceof HTMLElement)) return;
 
-  /* Beranda: header hanya logo + Login. Hamburger membuat bar tambahan di mobile. */
-  if (document.body.classList.contains("home-redesign")) return;
-
   let trigger = header.querySelector("[data-mobile-nav-trigger]");
-  let panel = header.querySelector("[data-mobile-nav-panel]");
-  let backdrop = header.querySelector("[data-mobile-nav-backdrop]");
+  let panel = document.querySelector("[data-mobile-nav-panel]");
+  let backdrop = document.querySelector("[data-mobile-nav-backdrop]");
 
-  /* Halaman selain beranda memakai header yang sama, tetapi markup menu mobile
-   * tidak diduplikasi ke puluhan file HTML. Bentuk menu di sini agar setiap
-   * halaman selalu mendapat navigasi mobile/tablet yang identik. */
+  /* Markup menu mobile tidak diduplikasi ke puluhan file HTML. Bentuk menu di
+   * sini agar setiap halaman selalu mendapat navigasi mobile/tablet identik. */
   if (!trigger || !panel || !backdrop) {
     const path = location.pathname.replace(/\/+$/, "") || "/";
     const nested = path.includes("/fitur/") || path.includes("/solusi/") || /\/(fitur|solusi)$/.test(path);
@@ -1090,16 +1086,15 @@ if (contactForm instanceof HTMLFormElement) {
     panel.innerHTML = `
       <nav class="mobile-nav-links">
         <a href="${root}modul.html" data-mobile-nav-close>Produk <span>→</span></a>
-        <a href="${root}solusi/otomotif.html" data-mobile-nav-close>Solusi Dealer Mobil <span>→</span></a>
         <a href="${home}#cara-kerja" data-mobile-nav-close>Cara Kerja <span>→</span></a>
-        <a href="${home}#keunggulan" data-mobile-nav-close>Keunggulan <span>→</span></a>
+        <a href="${root}solusi/otomotif.html" data-mobile-nav-close>Solusi <span>→</span></a>
         <a href="${root}harga.html" data-mobile-nav-close>Harga <span>→</span></a>
         <a href="${root}hubungi-kami.html" data-mobile-nav-close>Hubungi Kami <span>→</span></a>
       </nav>
       <a class="btn btn-primary mobile-nav-cta" href="${root}hubungi-kami.html" data-mobile-nav-close>Diskusikan Dealer Anda <span>→</span></a>`;
 
     headerInner.appendChild(trigger);
-    header.append(backdrop, panel);
+    document.body.append(backdrop, panel);
   }
 
   if (!(trigger instanceof HTMLButtonElement) || !(panel instanceof HTMLElement) || !(backdrop instanceof HTMLElement)) return;

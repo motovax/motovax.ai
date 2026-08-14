@@ -75,6 +75,62 @@ const viewports = [
   { name: "mobile", width: 390, height: 844 },
 ];
 
+const publicNavigationPages = [
+  "/index.html",
+  "/modul.html",
+  "/fitur/index.html",
+  "/fitur/aplikasi-omnichannel.html",
+  "/solusi/otomotif.html",
+  "/harga.html",
+  "/hubungi-kami.html",
+  "/kebijakan-privasi.html",
+  "/syarat-ketentuan.html",
+];
+
+for (const viewport of viewports) {
+  test(`navigasi halaman publik konsisten pada ${viewport.name}`, async () => {
+    const context = await browser.newContext({ viewport });
+    const page = await context.newPage();
+    await page.route(/https:\/\/fonts\.(?:googleapis|gstatic)\.com\//, (route) => route.abort());
+
+    for (const route of publicNavigationPages) {
+      await page.goto(`${baseUrl}${route}`, { waitUntil: "load" });
+      if (viewport.width > 1024) {
+        const labels = await page.locator(".site-header .nav").evaluate((nav) =>
+          [...nav.children].map((item) => {
+            const target = item.matches("a") ? item : item.querySelector(":scope > button");
+            return target?.textContent.replace(/\s+/g, " ").trim() || "";
+          }),
+        );
+        assert.deepEqual(labels, ["Produk", "Cara Kerja", "Solusi", "Harga", "Hubungi Kami"], route);
+      } else {
+        await page.click("[data-mobile-nav-trigger]");
+        const mobileState = await page.locator("[data-mobile-nav-panel]:not([hidden]) .mobile-nav-links > a").evaluateAll((links) => ({
+          labels: links.map((link) => link.textContent),
+          allVisible: links.every((link) => {
+            const rect = link.getBoundingClientRect();
+            return rect.width > 0 && rect.height > 0 && rect.top >= 0 && rect.bottom <= window.innerHeight;
+          }),
+          bodyLocked: document.body.classList.contains("mobile-menu-open"),
+        }));
+        assert.deepEqual(
+          mobileState.labels.map((label) => label.replace("→", "").trim()),
+          ["Produk", "Cara Kerja", "Solusi", "Harga", "Hubungi Kami"],
+          route,
+        );
+        assert.equal(mobileState.allVisible, true, route);
+        assert.equal(mobileState.bodyLocked, true, route);
+        await page.keyboard.press("Escape");
+        assert.equal(await page.locator("[data-mobile-nav-panel]").isHidden(), true, route);
+        assert.equal(await page.locator("body").evaluate((body) => body.classList.contains("mobile-menu-open")), false, route);
+      }
+      assert.equal(await noOverflow(page), true, route);
+    }
+
+    await context.close();
+  });
+}
+
 for (const viewport of viewports) {
   test(`CTA daftar membuka formulir registrasi awal kosong pada ${viewport.name}`, async () => {
     const context = await browser.newContext({ viewport });
@@ -398,7 +454,7 @@ for (const viewport of viewports) {
     } else {
       await page.click("[data-mobile-nav-trigger]");
       assert.equal(
-        await page.locator('[data-mobile-nav-panel]:not([hidden]) a', { hasText: "Solusi Dealer Mobil" }).isVisible(),
+        await page.locator('[data-mobile-nav-panel]:not([hidden]) a', { hasText: "Solusi" }).isVisible(),
         true,
       );
     }
