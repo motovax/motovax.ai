@@ -6,29 +6,33 @@
 window.MOTOVAX_FEATURES = {
   "aplikasi-omnichannel": {
     slug: "aplikasi-omnichannel",
-    title: "Aplikasi Omnichannel",
-    heroTitle: "Satu inbox omnichannel untuk semua channel chat pelanggan",
+    title: "Call Center AI Omnichannel",
+    heroTitle: "Satu workspace untuk seluruh channel dan tim layanan pelanggan",
     heroDesc:
-      "Satukan WhatsApp, Instagram DM, Facebook Messenger, dan channel lain dalam Call Center Motovax. Faneling AI / agent / MR, realtime SSE, handoff, dan aksi cepat inventori serta simulasi kredit untuk mempercepat layanan pelanggan.",
+      "Satukan WhatsApp, Instagram DM, Facebook Messenger, AI, dan agent manusia dalam Call Center Motovax. Kelola antrean, takeover, handoff ke MR, aksi inventori dan kredit, serta performa layanan dari satu workspace.",
     status: "Live",
     module: "M3 · AI Omnichannel & Call Center",
     flag: "whatsapp_ai",
     demo: "omni",
     demoHash: "omniDemo",
     category: "Aplikasi Omnichannel",
-    breadcrumbs: ["Produk", "Fitur", "Omnichannel"],
+    breadcrumbs: ["Produk", "Fitur", "Call Center AI Omnichannel"],
     capabilities: [
       {
         title: "Inbox multi-channel",
-        desc: "Kelola percakapan WhatsApp, Facebook, dan Instagram dalam satu workspace Call Center — tidak perlu bolak-balik aplikasi.",
+        desc: "Kelola percakapan WhatsApp, Facebook, dan Instagram dalam satu workspace Call Center. Pesan dan perubahan status langsung diperbarui tanpa perlu refresh.",
+      },
+      {
+        title: "Antrean & workspace agent",
+        desc: "Pisahkan percakapan yang ditangani AI, Call Center, dan Marketing Representative agar kepemilikan setiap lead selalu jelas.",
       },
       {
         title: "Faneling AI · Agent · MR",
         desc: "Chat masuk ditangani AI, dapat diambil alih Agent tanpa kehilangan konteks, lalu di-handoff ke Marketing Representative untuk follow-up dan closing.",
       },
       {
-        title: "Realtime SSE",
-        desc: "Update inbox lewat Server-Sent Events (bukan polling) agar agent melihat pesan baru secara live.",
+        title: "Notifikasi & status realtime",
+        desc: "Pesan baru, status percakapan, dan aktivitas agent langsung muncul di workspace agar pelanggan dapat ditangani lebih cepat.",
       },
       {
         title: "Handoff & takeover",
@@ -40,7 +44,7 @@ window.MOTOVAX_FEATURES = {
       },
       {
         title: "Performa omnichannel",
-        desc: "Pantau hasil channel dan performa CRM yang terhubung ke journey lead di Motovax.",
+        desc: "Pantau hasil channel, aktivitas agent, dan performa CRM yang terhubung ke journey lead di Motovax.",
       },
     ],
     howItWorks: [
@@ -53,9 +57,63 @@ window.MOTOVAX_FEATURES = {
       "Satu sumber kebenaran chat untuk sales & CS dealer",
       "AI 24/7 dengan tool native stok & kredit (bukan keyword bot)",
       "Handoff manusia tanpa kehilangan konteks",
-      "Selaras fitur Call Center di aplikasi produksi Motovax",
+      "Antrean dan kepemilikan lead lebih mudah diawasi",
     ],
-    related: ["instagram-api", "aplikasi-call-center", "agentic-ai", "aplikasi-customer-service"],
+    related: ["instagram-api", "sistem-manajemen-tiket", "agentic-ai", "manajemen-sla"],
+  },
+
+  "facebook-messenger": {
+    slug: "facebook-messenger",
+    title: "Facebook Messenger",
+    heroTitle: "Layani lead Facebook langsung dari satu workspace",
+    heroDesc:
+      "Hubungkan Facebook Messenger ke Call Center Motovax agar inquiry dari Facebook ditangani realtime oleh AI dan agent, tetap membawa konteks lead, lalu diteruskan ke MR tanpa berpindah aplikasi.",
+    status: "Live",
+    module: "M3 · Omnichannel + integrasi Meta",
+    flag: "whatsapp_ai",
+    demo: "omni",
+    demoHash: "omniDemo",
+    category: "Aplikasi Omnichannel",
+    breadcrumbs: ["Produk", "Fitur", "Facebook Messenger"],
+    capabilities: [
+      {
+        title: "Inbox Messenger terpusat",
+        desc: "Filter Facebook menampilkan percakapan Messenger dalam workspace Call Center yang sama, tanpa mencampurkan fokus agent dengan channel lain.",
+      },
+      {
+        title: "Respons AI dan takeover agent",
+        desc: "AI menangani respons awal, lalu agent dapat mengambil alih percakapan dengan konteks chat dan kebutuhan customer tetap tersimpan.",
+      },
+      {
+        title: "Routing lead ke MR",
+        desc: "Lead Messenger dapat di-handoff ke Marketing Representative lengkap dengan status, alasan, dan catatan tindak lanjut.",
+      },
+      {
+        title: "Konteks stok dan simulasi kredit",
+        desc: "Agent dapat mengecek inventori, menjalankan simulasi kredit, dan bertanya ke AI langsung dari percakapan Messenger.",
+      },
+      {
+        title: "Update percakapan realtime",
+        desc: "Pesan dan perubahan status hadir langsung di inbox melalui koneksi realtime agar respons tim lebih cepat.",
+      },
+      {
+        title: "Journey lead terukur",
+        desc: "Aktivitas dari Messenger tetap terhubung ke status lead, pipeline, dan performa omnichannel Motovax.",
+      },
+    ],
+    howItWorks: [
+      { title: "Hubungkan akun Meta", desc: "Aktifkan Facebook Messenger dari pengaturan integrasi tenant Motovax." },
+      { title: "Inquiry masuk", desc: "Pesan Facebook tampil di filter Messenger pada inbox Call Center." },
+      { title: "AI atau agent merespons", desc: "AI memberi respons awal dan agent mengambil alih saat dibutuhkan." },
+      { title: "Lanjutkan ke sales", desc: "Handoff lead ke MR atau lanjutkan tindak lanjut melalui pipeline CRM." },
+    ],
+    benefits: [
+      "Inquiry Facebook tidak tercecer di akun atau perangkat personal",
+      "Respons awal lebih cepat dengan AI dan update realtime",
+      "Takeover manusia tanpa kehilangan konteks percakapan",
+      "Lead Messenger tersambung ke MR, CRM, dan performa channel",
+    ],
+    related: ["aplikasi-omnichannel", "instagram-api", "agentic-ai", "aplikasi-crm"],
   },
 
   "instagram-api": {
@@ -514,10 +572,10 @@ window.MOTOVAX_FEATURES = {
 
   "sistem-manajemen-tiket": {
     slug: "sistem-manajemen-tiket",
-    title: "Manajemen Tiket",
-    heroTitle: "Status isu pelanggan yang tidak hilang di chat",
+    title: "Manajemen Tiket Terintegrasi",
+    heroTitle: "Ubah percakapan menjadi penanganan yang terukur",
     heroDesc:
-      "Motovax menandai dan menuntaskan percakapan lewat status lead, escalate, dan close di Call Center, dilanjutkan follow-up CRM bila diperlukan.",
+      "Buat penanganan dari chat, pantau status, eskalasikan ke PIC, dan lanjutkan follow-up melalui CRM tanpa kehilangan konteks pelanggan.",
     status: "Live",
     module: "M3 + M4",
     demo: "omni",
@@ -535,7 +593,7 @@ window.MOTOVAX_FEATURES = {
       { title: "Tutup", desc: "Close lead + catatan." },
     ],
     benefits: ["SLA lebih mudah dijaga", "Transparansi tim", "Riwayat untuk audit"],
-    related: ["manajemen-sla", "ticket-creation-integration", "aplikasi-customer-service"],
+    related: ["manajemen-sla", "aplikasi-omnichannel", "agent-scorecard"],
   },
 
   "manajemen-sla": {
@@ -645,10 +703,10 @@ window.MOTOVAX_FEATURES = {
 
   "agentic-ai": {
     slug: "agentic-ai",
-    title: "Agentic AI",
-    heroTitle: "Agen AI yang mengeksekusi pekerjaan bisnis",
+    title: "Agentic & Conversational AI",
+    heroTitle: "Percakapan AI yang dapat mengeksekusi pekerjaan bisnis",
     heroDesc:
-      "Falcon (sales/internal) dan Jasmine (customer/CS) menjalankan tool untuk stok, media, finance, CRM ops, handoff, konten, knowledge, trade-in, dan MRP.",
+      "Falcon (sales/internal) dan Jasmine (customer/CS) memahami percakapan lalu menjalankan tool untuk stok, media, finance, CRM, handoff, konten, knowledge, trade-in, dan MRP.",
     status: "Live",
     module: "M2 · Agentic AI",
     flag: "whatsapp_ai",
@@ -669,7 +727,7 @@ window.MOTOVAX_FEATURES = {
       { title: "Human-in-the-loop", desc: "Handoff saat perlu judgement manusia." },
     ],
     benefits: ["Otomasi sampai aksi selesai", "Data selalu dari sistem of record", "Siap multi-industri lewat tools"],
-    related: ["whatsapp-business-api", "chatbot", "automasi-workflow", "aplikasi-omnichannel"],
+    related: ["whatsapp-business-api", "integrasi-airene", "automasi-workflow", "aplikasi-omnichannel"],
   },
 
   "knowledge-base": {
@@ -700,36 +758,59 @@ window.MOTOVAX_FEATURES = {
 
   "automasi-workflow": {
     slug: "automasi-workflow",
-    title: "Workflow",
-    heroTitle: "Otomasi alur kerja lintas chat, CRM, dan stok",
+    title: "Automasi Workflow",
+    heroTitle: "Automasi yang bekerja sampai tugas selesai",
     heroDesc:
-      "Motovax mengotomasi lewat agent tools, faneling, auto follow CRM, workers (foto, email report), dan integrasi. Workflow builder event-driven ada di roadmap P1.",
-    status: "Live · partial builder",
-    module: "M2–M5 + platform workers",
+      "Motovax menghubungkan percakapan, CRM, inventori, laporan, dan publishing lewat agent AI, scheduler, serta worker. Tim tetap memegang kendali saat keputusan manusia dibutuhkan; builder visual no-code masih dalam roadmap.",
+    status: "Live",
+    module: "M2–M5 + platform scheduler & workers",
     demo: "automation",
     demoHash: "capabilityDemo",
     category: "Automasi Operasional & Workflow",
-    breadcrumbs: ["Produk", "Fitur", "Workflow"],
+    breadcrumbs: ["Produk", "Fitur", "Automasi Workflow"],
     capabilities: [
-      { title: "Auto follow CRM", desc: "Nudge lead stale otomatis." },
-      { title: "Workers backend", desc: "Perawatan foto, laporan, job async." },
-      { title: "Tool chains", desc: "AI merangkai beberapa aksi dalam satu percakapan." },
+      {
+        title: "Agent AI yang mengeksekusi aksi",
+        desc: "Falcon dan Jasmine tidak berhenti pada jawaban. Agent dapat mencari stok, mengirim foto, menghitung simulasi kredit, memperbarui lead, dan menjalankan tool bisnis sesuai konteks serta permission.",
+      },
+      {
+        title: "Follow-up yang berjalan otomatis",
+        desc: "Lead yang perlu ditindaklanjuti dapat masuk ke jadwal follow-up AI, sementara status aktif, overdue, dan interaksi terakhir membantu tim memusatkan perhatian pada peluang yang tepat.",
+      },
+      {
+        title: "Routing AI ke tim yang tepat",
+        desc: "Percakapan dapat berpindah dari AI ke Call Center lalu ke Marketing Representative dengan konteks, status, dan jejak handoff yang tetap tersimpan.",
+      },
+      {
+        title: "Laporan terjadwal tanpa rekap manual",
+        desc: "Jadwalkan email report beserta penerima dan attachment. Log pengiriman memberi visibilitas atas laporan yang diproses scheduler.",
+      },
+      {
+        title: "Publishing konten yang terjadwal",
+        desc: "Tim marketing dapat menyiapkan materi dari inventori, menyusun kalender posting, dan menjalankan publishing terjadwal tanpa memutus alur dari sumber data produk.",
+      },
     ],
     howItWorks: [
-      { title: "Trigger", desc: "Event chat, jadwal, atau status deal." },
-      { title: "Aksi", desc: "Tool AI / worker / notifikasi." },
-      { title: "Hasil", desc: "Update data & jejak di app." },
+      { title: "Sinyal masuk", desc: "Percakapan, jadwal, status lead, atau aktivitas operasional memulai alur." },
+      { title: "Konteks diperiksa", desc: "Agent dan layanan Motovax membaca data tenant, role, serta kondisi terbaru." },
+      { title: "Aksi dijalankan", desc: "Tool AI, scheduler, atau worker mengeksekusi tugas yang sesuai." },
+      { title: "Hasil tercatat", desc: "Data diperbarui dan pekerjaan diteruskan ke manusia saat judgement dibutuhkan." },
     ],
-    benefits: ["Kurangi kerja repetitif", "Proses lebih konsisten", "Fondasi workflow builder"],
+    benefits: [
+      "Pekerjaan rutin bergerak tanpa menunggu proses manual",
+      "AI bekerja dengan data operasional yang sama",
+      "Handoff tetap jelas dan dapat ditindaklanjuti",
+      "Jadwal dan hasil kerja lebih konsisten",
+    ],
     related: ["knowledge-base", "agentic-ai", "manajemen-deal"],
   },
 
   "aplikasi-broadcast-whatsapp": {
     slug: "aplikasi-broadcast-whatsapp",
     title: "WhatsApp Broadcast",
-    heroTitle: "Broadcast WhatsApp untuk promo & update stok",
+    heroTitle: "Campaign WhatsApp massal yang tetap relevan dan terukur",
     heroDesc:
-      "Gabungan social automation, campaign, dan WhatsApp AI Motovax untuk menyebarkan penawaran unit secara massal namun tetap personal.",
+      "Gabungkan broadcast, bulk messaging, segmentasi audiens, konten inventory, dan penanganan balasan dalam satu alur campaign WhatsApp Motovax.",
     status: "Live · flag",
     module: "M5 + M2",
     demo: "social",
@@ -737,17 +818,18 @@ window.MOTOVAX_FEATURES = {
     category: "Manajemen Campaign",
     breadcrumbs: ["Produk", "Fitur", "WhatsApp Broadcast"],
     capabilities: [
-      { title: "Promo unit", desc: "Broadcast menampilkan unit ready stock." },
-      { title: "Kalender konten", desc: "Jadwalkan posting/campaign terkait." },
-      { title: "Balasan terkelola", desc: "Reply masuk Call Center." },
+      { title: "Audiens tersegmentasi", desc: "Kirim pesan massal ke kelompok kontak yang relevan, bukan daftar acak tanpa konteks." },
+      { title: "Konten dari stok", desc: "Gunakan unit ready dan konteks cabang untuk membuat penawaran lebih relevan." },
+      { title: "Campaign terukur", desc: "Susun pesan, jalankan campaign, dan hubungkan respons ke journey lead." },
+      { title: "Balasan terkelola", desc: "Reply masuk ke Call Center AI Omnichannel untuk ditangani AI atau agent." },
     ],
     howItWorks: [
       { title: "Pilih campaign", desc: "Tentukan penawaran & audiens." },
       { title: "Broadcast", desc: "Kirim lewat channel WhatsApp." },
       { title: "Convert", desc: "AI/agent handle inbound." },
     ],
-    benefits: ["Reach luas", "Tetap terhubung stok", "Closing di CRM"],
-    related: ["wa-blast", "motovax-broadcast", "ctwa"],
+    benefits: ["Jangkauan luas tanpa copas manual", "Pesan tetap terhubung stok", "Balasan langsung masuk funnel CRM"],
+    related: ["motovax-broadcast", "ctwa", "manajemen-kontak"],
   },
 
   "aplikasi-call-center": {
@@ -855,6 +937,145 @@ window.MOTOVAX_FEATURES = {
     related: ["aplikasi-call-center", "aplikasi-customer-service", "agentic-ai"],
   },
 
+  "core-platform-agentic-ai": {
+    slug: "core-platform-agentic-ai",
+    title: "Core Platform Agentic AI",
+    heroTitle: "Fondasi terintegrasi untuk seluruh modul dan agen AI Motovax",
+    heroDesc: "Core Platform menyediakan tenant terisolasi, role dan permission, konfigurasi cabang, integrasi channel, dashboard, serta fondasi agentic AI yang dipakai seluruh modul Motovax.",
+    status: "Live",
+    module: "Core Platform",
+    category: "Platform",
+    demo: "whatsapp",
+    demoHash: "capabilityDemo",
+    breadcrumbs: ["Produk", "Core Platform", "Agentic AI"],
+    capabilities: [
+      { title: "Multi-tenant dan multi-cabang", desc: "Data, konfigurasi, branding, cabang, dan fitur dipisahkan per organisasi." },
+      { title: "Role dan permission", desc: "Akses halaman serta aksi mengikuti role pengguna dan kebijakan tenant." },
+      { title: "Integrasi channel bisnis", desc: "Hubungkan WhatsApp, Meta Business, email report, dan Developer API dari satu platform." },
+      { title: "Agentic AI dengan native tools", desc: "Agen AI menjalankan tool stok, kredit, CRM, handoff, konten, dan operasi sesuai izin." },
+    ],
+    howItWorks: [
+      { title: "Siapkan tenant", desc: "Konfigurasi organisasi, cabang, role, branding, dan modul aktif." },
+      { title: "Hubungkan integrasi", desc: "Aktifkan channel dan koneksi yang dibutuhkan operasional." },
+      { title: "Operasikan modul", desc: "Tim bekerja di workspace yang sesuai role dengan data yang saling terhubung." },
+    ],
+    benefits: ["Satu fondasi untuk seluruh modul", "Kontrol akses yang konsisten", "Konfigurasi per tenant dan cabang", "AI menjalankan aksi bisnis nyata"],
+    related: ["aplikasi-crm", "omni-jasmine-ai", "inventory-falcon-ai", "ana-ai-analytics"],
+  },
+
+  "omni-jasmine-ai": {
+    slug: "omni-jasmine-ai",
+    title: "Omni + Jasmine AI",
+    heroTitle: "Satukan channel pelanggan dengan AI dan agent manusia",
+    heroDesc: "Omni + Jasmine AI menyatukan WhatsApp, Instagram DM, dan Facebook Messenger di Call Center Motovax dengan respons AI, aksi cepat, funneling, takeover agent, serta handoff ke Marketing Representative.",
+    status: "Live",
+    module: "Omni + Jasmine AI",
+    flag: "whatsapp_ai",
+    category: "Aplikasi Omnichannel",
+    demo: "omni",
+    demoHash: "omniDemo",
+    breadcrumbs: ["Produk", "Modul", "Omni + Jasmine AI"],
+    capabilities: [
+      { title: "Inbox multi-channel", desc: "WhatsApp, Facebook Messenger, dan Instagram DM hadir di satu workspace." },
+      { title: "Jasmine AI dan takeover", desc: "AI merespons lebih dulu, lalu agent mengambil alih tanpa kehilangan konteks." },
+      { title: "Funneling dan auto routing", desc: "Lead bergerak melalui bucket AI, Call Center, dan MR dengan kepemilikan yang jelas." },
+      { title: "Aksi cepat inventori dan kredit", desc: "Agent mengecek unit dan simulasi kredit langsung dari percakapan." },
+      { title: "Analytics omnichannel", desc: "Pantau journey lead, channel, respons, dan hasil penanganan tim." },
+    ],
+    howItWorks: [
+      { title: "Pesan masuk", desc: "Percakapan dari channel aktif masuk ke inbox realtime." },
+      { title: "Jasmine merespons", desc: "AI menggunakan konteks tenant dan tool bisnis untuk membantu pelanggan." },
+      { title: "Agent mengambil alih", desc: "Call Center takeover, menjalankan aksi cepat, atau melakukan eskalasi." },
+      { title: "Handoff ke MR", desc: "Lead diteruskan dengan konteks dan riwayat lengkap untuk closing." },
+    ],
+    benefits: ["Channel pelanggan tidak tercecer", "Respons awal lebih cepat", "Handoff tanpa kehilangan konteks", "Kinerja channel dapat diukur"],
+    related: ["aplikasi-omnichannel", "facebook-messenger", "instagram-api", "aplikasi-crm"],
+  },
+
+  "inventory-falcon-ai": {
+    slug: "inventory-falcon-ai",
+    title: "Inventory + Falcon AI",
+    heroTitle: "Kelola listing multi-cabang dan cari stok lewat percakapan AI",
+    heroDesc: "Inventory + Falcon AI menggabungkan unit, stok per cabang, import Excel, foto, status, pricing, live katalog API, serta pencarian dan rekomendasi unit melalui agen AI internal.",
+    status: "Live",
+    module: "Inventory + Falcon AI",
+    flag: "inventory_management",
+    category: "Inventory Management",
+    demo: "inventory",
+    demoHash: "inventoryDemo",
+    breadcrumbs: ["Produk", "Modul", "Inventory + Falcon AI"],
+    capabilities: [
+      { title: "Listing dan stok multi-cabang", desc: "Kelola unit, status stok, pricing, foto, dokumen, serta lokasi cabang." },
+      { title: "Import dan validasi data", desc: "Import Excel mendeteksi warning, konflik identitas, dan unit ready yang hilang sebelum data diterapkan." },
+      { title: "Falcon AI pencarian stok", desc: "Tim mencari unit berdasarkan model, tahun, cabang, kilometer, harga, dan atribut lain melalui percakapan." },
+      { title: "Foto dan rekomendasi otomatis", desc: "Falcon dapat mengirim foto unit serta menawarkan alternatif atau unit serupa dari stok tenant." },
+      { title: "Live katalog API", desc: "Endpoint daftar dan detail produk menyajikan stok aktif untuk katalog eksternal." },
+    ],
+    howItWorks: [
+      { title: "Masukkan inventory", desc: "Admin mengimpor atau mengelola unit dan foto dari aplikasi." },
+      { title: "Data divalidasi", desc: "Status, cabang, identitas unit, dan pricing diperiksa sebelum disimpan." },
+      { title: "Cari dengan Falcon", desc: "Sales meminta stok spesifik dan menerima hasil yang berasal dari inventory tenant." },
+      { title: "Bagikan atau integrasikan", desc: "Foto, rekomendasi, dan katalog live digunakan pada journey penjualan." },
+    ],
+    benefits: ["Stok lintas cabang lebih terkendali", "Pencarian unit lebih cepat", "Rekomendasi berbasis data inventory", "Katalog eksternal tetap terhubung"],
+    related: ["agentic-ai", "aplikasi-crm", "ana-ai-analytics", "social-media-sora-ai"],
+  },
+
+  "ana-ai-analytics": {
+    slug: "ana-ai-analytics",
+    title: "Ana AI — Advanced Analytics",
+    heroTitle: "Ubah data operasional, finansial, dan sales menjadi keputusan",
+    heroDesc: "Ana AI Analytics menyatukan dashboard operasional, laporan finansial, performa sales, omnichannel, cabang, stok, aging, revenue, HPP, dan gross profit dalam tampilan sesuai peran.",
+    status: "Live",
+    module: "Ana AI — Advanced Analytics",
+    category: "Analytics",
+    demo: "dashboard",
+    demoHash: "dashboardDemo",
+    breadcrumbs: ["Produk", "Modul", "Ana AI Analytics"],
+    capabilities: [
+      { title: "Analitik operasional", desc: "Pantau stok lama, rata-rata hari jual, unit terjual, omzet, dan konversi lead ke booking." },
+      { title: "Analitik finansial", desc: "Lihat revenue, HPP, gross profit, margin, tren laba, dan nilai stok." },
+      { title: "Sales performance", desc: "Bandingkan pipeline, closing, produktivitas salesperson, dan performa tim." },
+      { title: "Performa cabang dan channel", desc: "Analisis hasil per cabang, sumber lead, dan channel omnichannel." },
+    ],
+    howItWorks: [
+      { title: "Data modul terhubung", desc: "Inventory, CRM, sales, dan omnichannel menjadi sumber metrik." },
+      { title: "Pilih peran dan periode", desc: "Dashboard menyesuaikan KPI serta rentang MTD, QTD, YTD, atau harian." },
+      { title: "Baca tren dan rincian", desc: "Tim menelusuri KPI hingga cabang, sales, channel, atau unit terkait." },
+    ],
+    benefits: ["KPI utama dalam satu dashboard", "Keputusan berbasis data aktual", "Perbandingan lintas cabang", "Visibilitas revenue dan margin"],
+    related: ["inventory-falcon-ai", "aplikasi-crm", "omni-jasmine-ai", "motovax-360"],
+  },
+
+  "social-media-sora-ai": {
+    slug: "social-media-sora-ai",
+    title: "Social Media + Sora AI",
+    heroTitle: "Buat, jadwalkan, publikasikan, dan ukur konten dari satu studio",
+    heroDesc: "Social Media + Sora AI menghubungkan inventory dengan content studio, pengolahan visual AI, caption, kalender posting, publikasi Facebook dan Instagram melalui Meta Business, WhatsApp content, serta ads campaign analytics.",
+    status: "Live · flag",
+    module: "Social Media + Sora AI",
+    flag: "social_media_automation",
+    category: "Manajemen Campaign",
+    demo: "social",
+    demoHash: "socialDemo",
+    breadcrumbs: ["Produk", "Modul", "Social Media + Sora AI"],
+    capabilities: [
+      { title: "Content studio dari inventory", desc: "Pilih unit ready sebagai sumber desain, harga, atribut, dan materi kampanye." },
+      { title: "Pengolahan visual dengan AI", desc: "Buat variasi materi, tingkatkan kualitas gambar, dan sesuaikan background untuk kebutuhan konten." },
+      { title: "Publish dan scheduler", desc: "Siapkan lalu publikasikan atau jadwalkan feed, reel, dan story melalui Meta Business sesuai capability aktif." },
+      { title: "WhatsApp content dan broadcast", desc: "Gunakan materi promosi untuk posting WhatsApp dan campaign pelanggan." },
+      { title: "Ads campaign analytics", desc: "Pantau campaign, klik, lead, UTM, ranking produk, dan hasil masuk ke pipeline." },
+    ],
+    howItWorks: [
+      { title: "Pilih unit atau materi", desc: "Content studio mengambil data dan foto dari inventory tenant." },
+      { title: "Susun creative", desc: "Tim mengedit desain, gambar, platform, dan caption." },
+      { title: "Jadwalkan atau publikasikan", desc: "Konten dikirim melalui integrasi channel yang sudah terhubung." },
+      { title: "Ukur hasil", desc: "Campaign insight menghubungkan performa konten dengan lead dan pipeline." },
+    ],
+    benefits: ["Produksi konten lebih cepat", "Materi konsisten dengan stok", "Jadwal tim lebih teratur", "Hasil campaign terhubung ke lead"],
+    related: ["inventory-falcon-ai", "aplikasi-broadcast-whatsapp", "aplikasi-crm", "ana-ai-analytics"],
+  },
+
   "motovax-360": {
     slug: "motovax-360",
     title: "Motovax 360",
@@ -884,3 +1105,12 @@ window.MOTOVAX_FEATURES = {
 // alias for menu title consistency
 window.MOTOVAX_FEATURES["custom-crm-report"] = window.MOTOVAX_FEATURES["personalisasi-report-sales"];
 window.MOTOVAX_FEATURES["manajemen-pipeline"] = window.MOTOVAX_FEATURES["manajemen-deal"];
+
+// URL lama tetap dipetakan ke halaman kanonik agar related link dan deep link
+// tidak menghasilkan konten duplikat.
+window.MOTOVAX_FEATURES["aplikasi-call-center"] = window.MOTOVAX_FEATURES["aplikasi-omnichannel"];
+window.MOTOVAX_FEATURES["aplikasi-customer-service"] = window.MOTOVAX_FEATURES["aplikasi-omnichannel"];
+window.MOTOVAX_FEATURES["ticket-creation-integration"] = window.MOTOVAX_FEATURES["sistem-manajemen-tiket"];
+window.MOTOVAX_FEATURES["wa-blast"] = window.MOTOVAX_FEATURES["aplikasi-broadcast-whatsapp"];
+window.MOTOVAX_FEATURES["whatsapp-bulk"] = window.MOTOVAX_FEATURES["aplikasi-broadcast-whatsapp"];
+window.MOTOVAX_FEATURES["chatbot"] = window.MOTOVAX_FEATURES["agentic-ai"];

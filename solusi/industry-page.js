@@ -86,10 +86,7 @@
 
           <div class="industry-hero-grid">
             <div class="industry-hero-copy">
-              <div class="industry-kicker-row">
-                <span class="industry-kicker">${escapeHtml(industry.name)}</span>
-                <span class="industry-readiness ${escapeHtml(industry.status)}"><i></i>${escapeHtml(industry.statusLabel)}</span>
-              </div>
+              <p class="industry-readiness-text ${escapeHtml(industry.status)}">${escapeHtml(industry.statusLabel)}</p>
               <h1>${escapeHtml(industry.heroTitle)}</h1>
               <p>${escapeHtml(industry.heroDesc)}</p>
               <div class="industry-hero-actions">
@@ -149,7 +146,6 @@
       <section class="industry-section industry-challenges">
         <div class="container">
           <div class="industry-section-head">
-            <span>TANTANGAN INDUSTRI</span>
             <h2>Apa yang menghambat ${escapeHtml(industry.audience)}?</h2>
             <p>Masalah customer journey yang dapat ditangani oleh fondasi solusi Motovax, dengan konfigurasi sesuai proses bisnis.</p>
           </div>
@@ -168,9 +164,8 @@
       <section class="industry-section industry-transform">
         <div class="container">
           <div class="industry-section-head is-light">
-            <span>TRANSFORMASI OPERASIONAL</span>
             <h2>Dari proses terpisah menjadi satu journey</h2>
-            <p>Struktur halaman mengikuti pola problem–solution, sementara isi diselaraskan dengan capability dan batas produk Motovax.</p>
+            <p>Contoh berikut menunjukkan perubahan alur kerja yang dapat diterapkan dengan kapabilitas Motovax.</p>
           </div>
           <div class="industry-transform-list">
             ${industry.transformations.map((item, index) => `
@@ -198,9 +193,8 @@
       <section class="industry-section industry-capabilities" id="kapabilitas">
         <div class="container">
           <div class="industry-section-head">
-            <span>EKOSISTEM KAPABILITAS</span>
             <h2>Modul Motovax untuk ${escapeHtml(industry.name)}</h2>
-            <p>Status di bawah merujuk kondisi codebase motovax-app saat ini, bukan sekadar daftar aspirasi.</p>
+            <p>Status di bawah merujuk kondisi produk Motovax saat ini.</p>
           </div>
           <div class="industry-status-legend" aria-label="Legenda status modul">
             <span class="live"><i></i>Live di produksi</span>
@@ -234,7 +228,6 @@
       <section class="industry-section industry-faq">
         <div class="container industry-faq-grid">
           <div class="industry-section-head">
-            <span>FREQUENTLY ASKED QUESTIONS</span>
             <h2>Pertanyaan tentang solusi ${escapeHtml(industry.name)}</h2>
             <p>Jawaban ringkas mengenai capability, status, batas scope, dan implementasi.</p>
           </div>

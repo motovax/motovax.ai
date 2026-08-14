@@ -13,6 +13,431 @@ for (const link of document.querySelectorAll("[data-wa]")) {
   }
 }
 
+/** Session portal tenant untuk menu akun beranda statis motovax.ai. */
+(function initPortalAccount() {
+  const root = document.querySelector("[data-portal-auth]");
+  if (!(root instanceof HTMLElement)) return;
+
+  const API_ORIGIN = "https://onboard.motovax.com";
+  const TOKEN_KEY = "motovax_portal_session";
+  const guest = root.querySelector("[data-portal-guest]");
+  const account = root.querySelector("[data-portal-account]");
+  const trigger = root.querySelector("[data-portal-trigger]");
+  const menu = root.querySelector("[data-portal-menu]");
+  const billing = root.querySelector("[data-portal-billing]");
+  let token = "";
+
+  const portalApi = (path, options = {}) => fetch(`${API_ORIGIN}${path}`, {
+    ...options,
+    headers: {
+      Accept: "application/json",
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+      ...(options.headers || {}),
+    },
+  }).then(async (response) => {
+    if (response.status === 204) return null;
+    const payload = await response.json().catch(() => ({}));
+    if (!response.ok) {
+      const error = new Error(payload.message || "Permintaan akun belum berhasil.");
+      error.status = response.status;
+      throw error;
+    }
+    return payload;
+  });
+
+  const setText = (selector, value) => {
+    const element = root.querySelector(selector);
+    if (element) element.textContent = value || "";
+  };
+
+  const closeMenu = () => {
+    if (!menu || !trigger) return;
+    menu.hidden = true;
+    trigger.setAttribute("aria-expanded", "false");
+  };
+
+  const renderGuest = () => {
+    if (guest) guest.hidden = false;
+    if (account) account.hidden = true;
+    closeMenu();
+  };
+
+  const renderAccount = (user) => {
+    const name = user.displayName || user.username || "Akun MOTOVAX";
+    const initials = name.split(/\s+/).filter(Boolean).map((part) => part[0]).join("").slice(0, 2).toUpperCase();
+    setText("[data-portal-name]", name);
+    setText("[data-portal-tenant]", user.tenant?.name || "Workspace");
+    setText("[data-portal-initials]", initials || "MV");
+    setText("[data-portal-menu-name]", name);
+    setText("[data-portal-menu-email]", user.email || `@${user.username}`);
+    setText("[data-portal-menu-role]", `${user.role || "Anggota"} · ${user.tenant?.name || "Tenant"}`);
+    setText("[data-portal-domain]", user.tenant?.domain || "");
+    if (billing) billing.hidden = user.canViewBilling !== true;
+    if (guest) guest.hidden = true;
+    if (account) account.hidden = false;
+  };
+
+  const fragment = new URLSearchParams(window.location.hash.replace(/^#/, ""));
+  const transferredToken = fragment.get("portal_session");
+  if (transferredToken) {
+    localStorage.setItem(TOKEN_KEY, transferredToken);
+    fragment.delete("portal_session");
+    const cleanHash = fragment.toString();
+    history.replaceState({}, "", `${location.pathname}${location.search}${cleanHash ? `#${cleanHash}` : ""}`);
+  }
+  token = transferredToken || localStorage.getItem(TOKEN_KEY) || "";
+
+  if (trigger && menu) {
+    trigger.addEventListener("click", () => {
+      const open = menu.hidden;
+      menu.hidden = !open;
+      trigger.setAttribute("aria-expanded", open ? "true" : "false");
+      if (open) menu.querySelector('[role="menuitem"]:not([hidden])')?.focus();
+    });
+    document.addEventListener("click", (event) => {
+      if (!root.contains(event.target)) closeMenu();
+    });
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape" && !menu.hidden) {
+        closeMenu();
+        trigger.focus();
+      }
+    });
+  }
+
+  root.addEventListener("click", async (event) => {
+    const destinationButton = event.target.closest?.("[data-portal-destination]");
+    if (destinationButton && root.contains(destinationButton)) {
+      destinationButton.disabled = true;
+      try {
+        const payload = await portalApi("/api/portal/workspace/enter", {
+          method: "POST",
+          body: JSON.stringify({ destination: destinationButton.dataset.portalDestination || "/" }),
+        });
+        window.location.assign(payload.redirectUrl);
+      } catch (error) {
+        if (error.status === 401) {
+          localStorage.removeItem(TOKEN_KEY);
+          renderGuest();
+        } else {
+          window.alert(error.message);
+        }
+        destinationButton.disabled = false;
+      }
+      return;
+    }
+
+    const logout = event.target.closest?.("[data-portal-logout]");
+    if (logout && root.contains(logout)) {
+      logout.disabled = true;
+      try {
+        await portalApi("/api/portal/logout", { method: "POST", body: "{}" });
+      } catch (_) {
+        // Session lokal tetap dibuang saat layanan logout tidak terjangkau.
+      }
+      localStorage.removeItem(TOKEN_KEY);
+      token = "";
+      renderGuest();
+    }
+  });
+
+  if (!token) {
+    renderGuest();
+    return;
+  }
+  portalApi("/api/portal/me")
+    .then((payload) => renderAccount(payload.user))
+    .catch((error) => {
+      if (error.status === 401) localStorage.removeItem(TOKEN_KEY);
+      renderGuest();
+    });
+})();
+
+/** Typewriter pada baris outcome hero: High Conversion / Unlimited Growth. */
+(function initTypewriterHeadline() {
+  const typed = document.querySelector("[data-typewriter]");
+  if (!(typed instanceof HTMLElement)) return;
+
+  const phrases = String(typed.getAttribute("data-phrases") || "")
+    .split("|")
+    .map((phrase) => phrase.trim())
+    .filter(Boolean);
+  if (!phrases.length) return;
+
+  const headline = typed.closest(".hero-type-headline");
+  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (headline) headline.classList.add("is-type-ready");
+
+  const showStatic = () => {
+    if (headline) headline.classList.add("is-in-view");
+  };
+
+  if (reducedMotion) {
+    typed.textContent = phrases[0];
+    showStatic();
+    return;
+  }
+
+  const typeDelay = 64;
+  const deleteDelay = 36;
+  const holdDelay = 1700;
+  const betweenDelay = 260;
+  let index = 0;
+
+  const wait = (ms) => new Promise((resolve) => window.setTimeout(resolve, ms));
+
+  async function typeText(text) {
+    for (let i = 1; i <= text.length; i += 1) {
+      typed.textContent = text.slice(0, i);
+      await wait(typeDelay);
+    }
+  }
+
+  async function deleteText() {
+    const current = typed.textContent || "";
+    for (let i = current.length - 1; i >= 0; i -= 1) {
+      typed.textContent = current.slice(0, i);
+      await wait(deleteDelay);
+    }
+  }
+
+  async function loop() {
+    await typeText(phrases[index]);
+    if (phrases.length < 2) return;
+    await wait(holdDelay);
+    await deleteText();
+    await wait(betweenDelay);
+    index = (index + 1) % phrases.length;
+    loop();
+  }
+
+  const start = async () => {
+    showStatic();
+    await wait(240);
+    if (headline) headline.classList.add("is-typing");
+    typed.textContent = "";
+    loop();
+  };
+
+  if (!("IntersectionObserver" in window)) {
+    start();
+    return;
+  }
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      for (const entry of entries) {
+        if (!entry.isIntersecting) continue;
+        observer.disconnect();
+        start();
+      }
+    },
+    { threshold: 0.4 },
+  );
+
+  observer.observe(headline || typed);
+})();
+
+/** Modal screenshot hero: ukuran penuh di halaman yang sama. */
+(function initHeroImageModal() {
+  const modal = document.querySelector("[data-hero-image-modal]");
+  const modalImg = document.querySelector("[data-hero-image-modal-img]");
+  const modalTitle = document.querySelector("[data-hero-image-modal-title]");
+  const openers = [...document.querySelectorAll("[data-hero-image-open]")];
+  if (!(modal instanceof HTMLElement) || !(modalImg instanceof HTMLImageElement) || !openers.length) return;
+
+  let trigger = null;
+  const close = () => {
+    if (modal.hidden) return;
+    modal.hidden = true;
+    document.body.classList.remove("feature-image-open");
+    modalImg.removeAttribute("src");
+    trigger?.focus();
+  };
+
+  const open = (button) => {
+    trigger = button instanceof HTMLElement ? button : openers[0];
+    const source = trigger instanceof HTMLElement ? trigger : openers[0];
+    modalImg.src = source.dataset.imageSrc || "";
+    modalImg.alt = source.dataset.imageAlt || "Screenshot Motovax Call Center ukuran penuh";
+    if (modalTitle) modalTitle.textContent = source.dataset.imageTitle || "Motovax Call Center";
+    modal.hidden = false;
+    document.body.classList.add("feature-image-open");
+    modal.querySelector("[data-hero-image-close]")?.focus();
+  };
+
+  for (const button of openers) {
+    button.addEventListener("click", () => open(button));
+  }
+
+  const shot = document.querySelector("[data-hero-shot]");
+  if (shot instanceof HTMLImageElement) {
+    shot.addEventListener("click", () => open(openers[0]));
+  }
+
+  modal.addEventListener("click", (event) => {
+    if (event.target === modal || event.target.closest("[data-hero-image-close]")) close();
+  });
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && !modal.hidden) close();
+  });
+})();
+
+/** Tab "Contoh alur nyata" di beranda: ganti kartu journey saat diklik. */
+(function initUsecaseTabs() {
+  const root = document.querySelector(".usecase-tabs");
+  if (!(root instanceof HTMLElement)) return;
+
+  const tabs = [...root.querySelectorAll("[data-usecase]")];
+  const panels = [...document.querySelectorAll("[data-usecase-panel]")];
+  if (!tabs.length || !panels.length) return;
+
+  const activate = (id) => {
+    const next = String(id || "");
+    if (!panels.some((panel) => panel.getAttribute("data-usecase-panel") === next)) return;
+
+    for (const tab of tabs) {
+      const on = tab.getAttribute("data-usecase") === next;
+      tab.classList.toggle("active", on);
+      tab.setAttribute("aria-selected", on ? "true" : "false");
+      tab.tabIndex = on ? 0 : -1;
+    }
+
+    for (const panel of panels) {
+      const on = panel.getAttribute("data-usecase-panel") === next;
+      panel.classList.toggle("is-active", on);
+      panel.hidden = !on;
+    }
+  };
+
+  root.addEventListener("click", (event) => {
+    const tab = event.target instanceof Element ? event.target.closest("[data-usecase]") : null;
+    if (!(tab instanceof HTMLElement) || !root.contains(tab)) return;
+    activate(tab.getAttribute("data-usecase"));
+  });
+
+  root.addEventListener("keydown", (event) => {
+    const current = event.target instanceof Element ? event.target.closest("[data-usecase]") : null;
+    if (!(current instanceof HTMLElement) || !root.contains(current)) return;
+
+    const index = tabs.indexOf(current);
+    let next = -1;
+    if (event.key === "ArrowDown" || event.key === "ArrowRight") next = (index + 1) % tabs.length;
+    else if (event.key === "ArrowUp" || event.key === "ArrowLeft") next = (index - 1 + tabs.length) % tabs.length;
+    else if (event.key === "Home") next = 0;
+    else if (event.key === "End") next = tabs.length - 1;
+    if (next < 0) return;
+
+    event.preventDefault();
+    const tab = tabs[next];
+    activate(tab.getAttribute("data-usecase"));
+    tab.focus();
+  });
+})();
+
+/** Slider skema "Cara Kerja": geser / titik untuk ganti sudut pandang. */
+(function initNativeFlowSlider() {
+  const root = document.querySelector("[data-flow-slider]");
+  if (!(root instanceof HTMLElement)) return;
+
+  const viewport = root.querySelector("[data-flow-viewport]");
+  const slides = [...root.querySelectorAll("[data-flow-slide]")];
+  const dots = [...root.querySelectorAll("[data-flow-dot]")];
+  const status = root.querySelector("[data-flow-status]");
+  if (!(viewport instanceof HTMLElement) || slides.length < 2) return;
+
+  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  let index = 0;
+  let drag = null;
+
+  const slideLabel = (slide) => {
+    const pov = slide.querySelector(".native-flow-pov b");
+    return (pov && pov.textContent ? pov.textContent : slide.getAttribute("aria-label") || "").trim();
+  };
+
+  const goTo = (next) => {
+    const clamped = Math.max(0, Math.min(slides.length - 1, Number(next) || 0));
+    if (clamped === index && slides[clamped].classList.contains("is-active")) return;
+    index = clamped;
+    for (const [i, slide] of slides.entries()) {
+      const on = i === index;
+      slide.classList.toggle("is-active", on);
+      slide.hidden = !on;
+      slide.setAttribute("aria-hidden", on ? "false" : "true");
+      if (on && !reducedMotion) {
+        slide.classList.remove("is-entering");
+        void slide.offsetWidth;
+        slide.classList.add("is-entering");
+      }
+    }
+    for (const [i, dot] of dots.entries()) {
+      const on = i === index;
+      dot.classList.toggle("is-active", on);
+      dot.setAttribute("aria-selected", on ? "true" : "false");
+      dot.tabIndex = on ? 0 : -1;
+    }
+    if (status instanceof HTMLElement) {
+      status.textContent = `Skema ${index + 1} dari ${slides.length}: ${slideLabel(slides[index])}`;
+    }
+  };
+
+  root.addEventListener("click", (event) => {
+    const dot = event.target instanceof Element ? event.target.closest("[data-flow-dot]") : null;
+    if (!(dot instanceof HTMLElement) || !root.contains(dot)) return;
+    goTo(dot.getAttribute("data-flow-dot"));
+  });
+
+  const moveByKey = (event, fromIndex) => {
+    let next = -1;
+    if (event.key === "ArrowRight" || event.key === "ArrowDown") next = fromIndex + 1;
+    else if (event.key === "ArrowLeft" || event.key === "ArrowUp") next = fromIndex - 1;
+    else if (event.key === "Home") next = 0;
+    else if (event.key === "End") next = slides.length - 1;
+    if (next < 0 || next >= slides.length) return false;
+    event.preventDefault();
+    goTo(next);
+    const target = dots[next];
+    if (target instanceof HTMLElement) target.focus();
+    return true;
+  };
+
+  viewport.addEventListener("keydown", (event) => moveByKey(event, index));
+  root.querySelector(".native-flow-dots")?.addEventListener("keydown", (event) => {
+    const current = event.target instanceof Element ? event.target.closest("[data-flow-dot]") : null;
+    if (!(current instanceof HTMLElement)) return;
+    moveByKey(event, dots.indexOf(current));
+  });
+
+  const startDrag = (event) => {
+    if (event.pointerType === "mouse" && event.button !== 0) return;
+    drag = { id: event.pointerId, startX: event.clientX, moved: false };
+  };
+
+  const moveDrag = (event) => {
+    if (!drag || event.pointerId !== drag.id) return;
+    if (Math.abs(event.clientX - drag.startX) > 24) drag.moved = true;
+  };
+
+  const endDrag = (event) => {
+    if (!drag || (event && event.pointerId !== drag.id)) return;
+    const delta = event.clientX - drag.startX;
+    const moved = drag.moved;
+    drag = null;
+    if (!moved || Math.abs(delta) < 40) return;
+    if (delta < 0) goTo(index + 1);
+    else goTo(index - 1);
+  };
+
+  viewport.addEventListener("pointerdown", startDrag);
+  viewport.addEventListener("pointermove", moveDrag);
+  viewport.addEventListener("pointerup", endDrag);
+  viewport.addEventListener("pointercancel", () => { drag = null; });
+
+  goTo(0);
+})();
+
+
 const contactForm = document.querySelector("[data-contact-form]");
 if (contactForm instanceof HTMLFormElement) {
   contactForm.addEventListener("submit", (event) => {
@@ -89,124 +514,85 @@ if (contactForm instanceof HTMLFormElement) {
     suite: icon('<rect x="3" y="3" width="8" height="8" rx="1.5"/><rect x="13" y="3" width="8" height="8" rx="1.5"/><rect x="3" y="13" width="8" height="8" rx="1.5"/><rect x="13" y="13" width="8" height="8" rx="1.5"/>'),
   };
 
-  /** Kapabilitas platform dan paket suite Motovax. */
+  /** Produk modular yang ditawarkan pada halaman Harga. */
   const groups = [
     {
-      id: "kapabilitas",
-      title: "Kapabilitas",
+      id: "produk",
+      title: "Produk",
       items: [
         {
-          id: "omni",
-          label: "Aplikasi Omnichannel",
-          paneTitle: "Aplikasi Omnichannel",
-          demo: { id: "omni", hash: "omniDemo", context: "omnichannel", label: "Coba Simulasi" },
+          id: "core-platform",
+          label: "Core Platform",
+          paneTitle: "Core — Platform Integrasi Agentic AI",
+          demo: { id: "whatsapp", hash: "capabilityDemo", context: "core-platform", label: "Lihat Fondasi Platform" },
           features: [
-            { title: "Omnichannel", desc: "Satu platform untuk kelola chat dari berbagai saluran", icon: "chat", href: f("aplikasi-omnichannel") },
-            { title: "Call Center", desc: "Workspace layanan omnichannel dengan AI, agent, dan handoff MR", icon: "call", href: f("aplikasi-call-center") },
-            { title: "WhatsApp Business API", desc: "Hubungkan percakapan WhatsApp ke inbox omnichannel", icon: "wa", href: f("whatsapp-business-api") },
-            { title: "Facebook Messenger", desc: "Kelola chat Facebook bersama kanal pelanggan lainnya", icon: "fb", href: f("aplikasi-omnichannel") },
-            { title: "Instagram API", desc: "Respons DM otomatis untuk tingkatkan penjualan", icon: "ig", href: f("instagram-api") },
-            { title: "Embedded Live Chat", desc: "Integrasi layanan live chat 24/7 untuk aplikasi Anda", icon: "live", href: f("embedded-live-chat") },
-            { title: "Ticket Creation Integration", desc: "Sederhanakan proses resolusi masalah pelanggan", icon: "ticket", href: f("ticket-creation-integration") },
+            { title: "Core Platform Agentic AI", desc: "Fondasi multi-tenant, akses berbasis peran, integrasi, dashboard, dan konfigurasi modul", icon: "suite", href: f("core-platform-agentic-ai") },
           ],
         },
         {
           id: "crm",
-          label: "Aplikasi CRM",
-          paneTitle: "Aplikasi CRM",
-          demo: { id: "crm", hash: "crmDemo", context: "crm", label: "Coba Simulasi" },
+          label: "CRM",
+          paneTitle: "CRM",
+          demo: { id: "crm", hash: "crmDemo", context: "crm", label: "Coba CRM" },
           features: [
-            { title: "Aplikasi CRM", desc: "Automasi proses penjualan & layanan pelanggan", icon: "crm", href: f("aplikasi-crm") },
-            { title: "Manajemen Deal", desc: "Kelola deal secara end-to-end lebih ciamik", icon: "deal", href: f("manajemen-deal") },
-            { title: "Manajemen Kontak", desc: "Kelola kontak pelanggan lebih mulus", icon: "contact", href: f("manajemen-kontak") },
-            { title: "Manajemen Goal", desc: "Mudah kelola goal dan target yang terkustomisasi", icon: "goal", href: f("manajemen-goal") },
-            { title: "Sales GPS Tracking", desc: "Pelacakan lokasi tim sales lapangan real-time", icon: "gps", href: f("sales-gps-tracking") },
-            { title: "Custom CRM Report", desc: "Buat laporan dari data CRM sesuai kebutuhan", icon: "report", href: f("personalisasi-report-sales") },
+            { title: "Lead / Customer List", desc: "Data lead dan customer terpusat dengan riwayat interaksi serta unit yang diminati", icon: "contact", href: f("manajemen-kontak") },
+            { title: "Pipeline & Customer Journey", desc: "Pantau perjalanan customer dan progres deal dari lead masuk hingga closing", icon: "deal", href: f("manajemen-deal") },
+            { title: "Analytics", desc: "Ukur performa sales, conversion, channel, dan hasil pipeline CRM", icon: "report", href: f("personalisasi-report-sales") },
+            { title: "Auto Follow Up", desc: "Aktifkan tindak lanjut customer terjadwal sebagai add-on CRM", icon: "workflow", href: f("automasi-workflow"), badge: "Add-on" },
           ],
         },
         {
-          id: "cs",
-          label: "Customer Support & Ticketing",
-          paneTitle: "Customer Support & Ticketing",
-          demo: { id: "omni", hash: "omniDemo", context: "customer-support", label: "Simulasi Customer Service" },
+          id: "omni-jasmine",
+          label: "Omni + Jasmine AI",
+          paneTitle: "Omni + Jasmine AI",
+          demo: { id: "omni", hash: "omniDemo", context: "omnichannel", label: "Coba Omnichannel" },
           features: [
-            { title: "Aplikasi Customer Service", desc: "Platform terintegrasi untuk layanan pelanggan efisien", icon: "cs", href: f("aplikasi-customer-service") },
-            { title: "Manajemen Tiket", desc: "Tangani keluhan pelanggan lebih cepat & akurat", icon: "ticket", href: f("sistem-manajemen-tiket") },
-            { title: "Manajemen SLA", desc: "Optimalkan resolusi masalah pelanggan & kinerja agen", icon: "sla", href: f("manajemen-sla") },
-            { title: "Agent Scorecard", desc: "Pantau & evaluasi kualitas layanan pelanggan lebih mudah", icon: "score", href: f("agent-scorecard") },
+            { title: "WhatsApp, Instagram & Facebook", desc: "Satukan chat pelanggan dari tiga channel dalam satu inbox Call Center", icon: "chat", href: f("omni-jasmine-ai") },
+            { title: "Omni analytic", desc: "Pantau journey lead, performa channel, respons, dan hasil penanganan tim", icon: "report", href: f("omni-jasmine-ai") },
+            { title: "Custom aksi cepat", desc: "Jalankan cek inventori, simulasi kredit, dan aksi operasional dari percakapan", icon: "workflow", href: f("omni-jasmine-ai") },
+            { title: "3 funneling & 1 auto routing", desc: "Kelola alur Jasmine AI, Call Center, dan MR dengan routing otomatis", icon: "flow", href: f("omni-jasmine-ai") },
+            { title: "AI 500 credit", desc: "Gunakan 500 kredit AI untuk respons dan dukungan percakapan Jasmine", icon: "ai", href: f("omni-jasmine-ai") },
           ],
         },
         {
-          id: "ai",
-          label: "AI & Chatbot",
-          paneTitle: "AI & Chatbot",
-          demo: { id: "falcon", hash: "falconDemo", context: "agentic-ai", label: "Coba Agentic AI" },
+          id: "inventory-falcon",
+          label: "Inventory + Falcon AI",
+          paneTitle: "Inventory + Falcon AI",
+          demo: { id: "inventory", hash: "inventoryDemo", context: "inventory", label: "Coba Inventory" },
           features: [
-            { title: "Chatbot & Conversational AI", desc: "Respons pelanggan lebih cepat dengan chatbot 24/7", icon: "bot", href: f("chatbot") },
-            { title: "Airene", desc: "Maksimalkan kinerja agen CS dengan dukungan Airene", icon: "agent", href: f("integrasi-airene") },
-            { title: "Agentic AI", desc: "Agen AI cerdas untuk proses bisnis lebih optimal", icon: "ai", href: f("agentic-ai"), badge: "New" },
+            { title: "Item / listing multi cabang", desc: "Kelola item dan listing dari seluruh cabang dalam satu inventori", icon: "shop", href: f("inventory-falcon-ai") },
+            { title: "Import listing via WhatsApp", desc: "Tambahkan data listing melalui alur WhatsApp yang terhubung ke inventori", icon: "wa", href: f("inventory-falcon-ai") },
+            { title: "Custom tagging / status & filter slicing", desc: "Atur tag, status, dan filter untuk menemukan kelompok stok yang dibutuhkan", icon: "ticket", href: f("inventory-falcon-ai") },
+            { title: "Falcon AI: searching, kirim foto & rekomendasi otomatis", desc: "Cari unit, kirim foto, dan rekomendasikan alternatif secara otomatis", icon: "ai", href: f("inventory-falcon-ai") },
+            { title: "Live katalog API", desc: "Hubungkan stok aktif ke katalog dan aplikasi eksternal melalui API", icon: "live", href: f("inventory-falcon-ai") },
+            { title: "AI 500 credit", desc: "Gunakan 500 kredit AI untuk pencarian dan bantuan operasional Falcon", icon: "ai", href: f("inventory-falcon-ai") },
           ],
         },
         {
-          id: "workflow",
-          label: "Automasi Operasional & Workflow",
-          paneTitle: "Automasi Operasional & Workflow",
-          demo: { id: "automation", hash: "capabilityDemo", context: "automation", label: "Lihat Automasi Aktif" },
+          id: "ana-analytics",
+          label: "Ana AI Analytics",
+          paneTitle: "Ana AI — Advanced Analytics",
+          demo: { id: "dashboard", hash: "dashboardDemo", context: "analytics", label: "Lihat Analytics" },
           features: [
-            { title: "Knowledge Base", desc: "Pusat informasi untuk layanan pelanggan efisien", icon: "kb", href: f("knowledge-base") },
-            { title: "Workflow", desc: "Otomatisasi alur kerja lintas tim dan sistem", icon: "workflow", href: f("automasi-workflow") },
+            { title: "Analitik operasional", desc: "Pantau aktivitas, produktivitas, dan indikator utama operasional bisnis", icon: "report", href: f("ana-ai-analytics") },
+            { title: "Analitik financial", desc: "Baca revenue, biaya, HPP, gross profit, dan tren finansial", icon: "deal", href: f("ana-ai-analytics") },
+            { title: "Analitik sales performance", desc: "Bandingkan performa sales, cabang, channel, dan hasil konversi", icon: "score", href: f("ana-ai-analytics") },
+            { title: "Additional custom analytic", desc: "Tambahkan analitik khusus sesuai KPI dan kebutuhan manajemen", icon: "workflow", href: f("ana-ai-analytics") },
           ],
         },
         {
-          id: "campaign",
-          label: "Manajemen Campaign",
-          paneTitle: "Manajemen Campaign",
-          demo: { id: "social", hash: "socialDemo", context: "broadcast", label: "Coba Campaign" },
+          id: "social-sora",
+          label: "Social Media + Sora AI",
+          paneTitle: "Social Media + Sora AI",
+          demo: { id: "social", hash: "socialDemo", context: "social", label: "Coba Social Studio" },
           features: [
-            { title: "WhatsApp Broadcast", desc: "Jangkau ribuan pelanggan secara otomatis", icon: "blast", href: f("aplikasi-broadcast-whatsapp") },
-            { title: "WhatsApp Bulk", desc: "Kirim pesan ke banyak kontak secara bersamaan", icon: "bulk", href: f("whatsapp-bulk") },
-          ],
-        },
-      ],
-    },
-    {
-      id: "suite",
-      title: "Suite Motovax",
-      items: [
-        {
-          id: "broadcast",
-          label: "Motovax Broadcast",
-          paneTitle: "Motovax Broadcast",
-          demo: { id: "social", hash: "socialDemo", context: "broadcast", label: "Coba Broadcast" },
-          features: [
-            { title: "Motovax Broadcast", desc: "Jangkau ribuan pelanggan tanpa proses manual", icon: "blast", href: f("motovax-broadcast") },
-          ],
-        },
-        {
-          id: "sales-suite",
-          label: "Motovax Sales Suite",
-          paneTitle: "Motovax Sales Suite",
-          demo: { id: "crm", hash: "crmDemo", context: "sales-suite", label: "Coba Sales Suite" },
-          features: [
-            { title: "Motovax Sales Suite", desc: "Optimalkan penjualan dengan solusi komprehensif", icon: "suite", href: f("motovax-sales-suite") },
-          ],
-        },
-        {
-          id: "service-suite",
-          label: "Motovax Service Suite",
-          paneTitle: "Motovax Service Suite",
-          demo: { id: "omni", hash: "omniDemo", context: "customer-support", label: "Coba Service Suite" },
-          features: [
-            { title: "Motovax Service Suite", desc: "Respons pelanggan lebih cepat dengan layanan optimal", icon: "cs", href: f("motovax-service-suite") },
-          ],
-        },
-        {
-          id: "suite-360",
-          label: "Motovax 360",
-          paneTitle: "Motovax 360",
-          demo: { id: "dashboard", hash: "dashboardDemo", context: "motovax-360", label: "Lihat Command Center" },
-          features: [
-            { title: "Motovax 360", desc: "Manajemen pelanggan terintegrasi untuk proses efisien", icon: "suite", href: f("motovax-360") },
+            { title: "Content studio", desc: "Susun materi promosi dan caption dari data produk dalam satu workspace", icon: "shop", href: f("social-media-sora-ai") },
+            { title: "Sora AI upscale & background edit", desc: "Tingkatkan kualitas visual dan edit latar gambar dengan bantuan AI", icon: "ai", href: f("social-media-sora-ai") },
+            { title: "Publish ke Facebook, Instagram & WhatsApp", desc: "Publikasikan konten ke channel sosial yang aktif dari satu alur", icon: "blast", href: f("social-media-sora-ai") },
+            { title: "Scheduler", desc: "Jadwalkan konten agar tayang sesuai kalender campaign", icon: "sla", href: f("social-media-sora-ai") },
+            { title: "Meta ads manager", desc: "Kelola campaign Meta dan lead template WhatsApp dari Social Studio", icon: "ads", href: f("social-media-sora-ai") },
+            { title: "Meta ads analytic by Sora", desc: "Pantau performa iklan dan insight campaign dengan bantuan AI", icon: "report", href: f("social-media-sora-ai") },
+            { title: "AI 500 credit", desc: "Gunakan 500 kredit AI untuk pembuatan dan pengolahan konten", icon: "ai", href: f("social-media-sora-ai") },
           ],
         },
       ],
@@ -214,12 +600,12 @@ if (contactForm instanceof HTMLFormElement) {
   ];
 
   const allPanes = groups.flatMap((g) => g.items);
-  const firstPaneId = allPanes[0]?.id || "omni";
+  const firstPaneId = allPanes[0]?.id || "core-platform";
 
   function renderMenuHtml() {
-    const firstGroupId = groups[0]?.id || "kapabilitas";
+    const firstGroupId = groups[0]?.id || "produk";
 
-    const tabs = `
+    const tabs = groups.length > 1 ? `
       <div class="produk-mega-tabs" role="tablist" aria-label="Kapabilitas dan Suite Motovax">
         <div class="produk-mega-tabs-inner">
           ${groups
@@ -237,7 +623,7 @@ if (contactForm instanceof HTMLFormElement) {
             )
             .join("")}
         </div>
-      </div>`;
+      </div>` : "";
 
     const sidebar = groups
       .map((group) => {
@@ -685,6 +1071,9 @@ if (contactForm instanceof HTMLFormElement) {
   const headerInner = header?.querySelector(".header-inner");
   if (!(header instanceof HTMLElement) || !(headerInner instanceof HTMLElement)) return;
 
+  /* Beranda: header hanya logo + Login. Hamburger membuat bar tambahan di mobile. */
+  if (document.body.classList.contains("home-redesign")) return;
+
   let trigger = header.querySelector("[data-mobile-nav-trigger]");
   let panel = header.querySelector("[data-mobile-nav-panel]");
   let backdrop = header.querySelector("[data-mobile-nav-backdrop]");
@@ -745,6 +1134,7 @@ if (contactForm instanceof HTMLFormElement) {
         </details>
         <a href="${home}#cara-kerja" data-mobile-nav-close>Cara Kerja <span>→</span></a>
         <a href="${home}#keunggulan" data-mobile-nav-close>Keunggulan <span>→</span></a>
+        <a href="${root}harga.html" data-mobile-nav-close>Harga <span>→</span></a>
         <a href="${root}hubungi-kami.html" data-mobile-nav-close>Hubungi Kami <span>→</span></a>
       </nav>
       <a class="btn btn-primary mobile-nav-cta" href="${root}hubungi-kami.html" data-mobile-nav-close>Diskusikan Bisnis Anda <span>→</span></a>`;

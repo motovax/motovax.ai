@@ -23,6 +23,15 @@ if (!features) {
   process.exit(1);
 }
 
+const redirects = {
+  "aplikasi-call-center": "aplikasi-omnichannel",
+  "aplikasi-customer-service": "aplikasi-omnichannel",
+  "ticket-creation-integration": "sistem-manajemen-tiket",
+  "wa-blast": "aplikasi-broadcast-whatsapp",
+  "whatsapp-bulk": "aplikasi-broadcast-whatsapp",
+  chatbot: "agentic-ai",
+};
+
 const template = (slug, title, description) => `<!doctype html>
 <html lang="id">
   <head>
@@ -30,6 +39,7 @@ const template = (slug, title, description) => `<!doctype html>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>${escapeHtml(title)} — MOTOVAX</title>
     <meta name="description" content="${escapeHtml(description)}" />
+    <link rel="canonical" href="https://motovax.ai/fitur/${escapeHtml(slug)}.html" />
     <meta name="theme-color" content="#1267f5" />
     <link rel="icon" href="../favicon.ico" sizes="any" />
     <link rel="icon" type="image/png" sizes="32x32" href="../icons/favicon-32.png" />
@@ -37,13 +47,13 @@ const template = (slug, title, description) => `<!doctype html>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="../styles.css" />
+    <link rel="stylesheet" href="../styles.css?v=copy-20260811" />
   </head>
   <body class="feature-detail-page">
     <header class="site-header">
       <div class="container header-inner">
         <a class="brand" href="../index.html#top" aria-label="MOTOVAX home">
-          <img class="brand-logo" src="../icons/logo-motovax.png" width="160" height="55" alt="MOTOVAX" />
+          <span>MOTO</span><strong>VAX</strong>
         </a>
         <nav class="nav" aria-label="Navigasi utama">
           <div class="nav-item nav-item-produk" data-produk-menu>
@@ -58,9 +68,10 @@ const template = (slug, title, description) => `<!doctype html>
           <a href="../index.html#solusi">Solusi</a>
           <a href="../index.html#cara-kerja">Cara Kerja</a>
           <a href="../index.html#keunggulan">Keunggulan</a>
+          <a href="../harga.html">Harga</a>
           <a href="../hubungi-kami.html">Hubungi Kami</a>
         </nav>
-        <a class="btn btn-primary header-cta" href="../index.html#kontak">Jadwalkan Demo <span>-></span></a>
+        <a class="btn btn-primary header-cta" href="../hubungi-kami.html">Jadwalkan Demo <span>-></span></a>
       </div>
     </header>
 
@@ -70,7 +81,7 @@ const template = (slug, title, description) => `<!doctype html>
       <div class="container footer-grid">
         <div>
           <a class="brand footer-brand" href="../index.html#top" aria-label="MOTOVAX home">
-            <img class="brand-logo" src="../icons/logo-motovax.png" width="140" height="48" alt="MOTOVAX" />
+            <span>MOTO</span><strong>VAX</strong>
           </a>
           <p>Agentic AI ERP — integrasikan operasional bisnis dengan agen AI.</p>
         </div>
@@ -89,8 +100,8 @@ const template = (slug, title, description) => `<!doctype html>
 
     <script>window.__FEATURE_SLUG__ = ${JSON.stringify(slug)};</script>
     <script src="./features-data.js"></script>
-    <script src="./feature-page.js"></script>
-    <script src="../script.js"></script>
+    <script src="./feature-page.js?v=copy-20260811"></script>
+    <script src="../script.js?v=20260806-2"></script>
   </body>
 </html>
 `;
@@ -134,14 +145,28 @@ fs.writeFileSync(
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Semua Fitur — MOTOVAX</title>
   <meta name="description" content="Jelajahi katalog fitur Motovax untuk sales, customer service, CRM, omnichannel, dan automasi bisnis." />
-  <link rel="stylesheet" href="../styles.css" />
+  <link rel="stylesheet" href="../styles.css?v=copy-20260811" />
   <link rel="icon" href="../favicon.ico" />
 </head>
 <body class="feature-detail-page">
   <header class="site-header">
     <div class="container header-inner">
-      <a class="brand" href="../index.html"><img class="brand-logo" src="../icons/logo-motovax.png" width="160" height="55" alt="MOTOVAX" /></a>
-      <a class="btn btn-primary header-cta" href="../index.html#kontak">Jadwalkan Demo</a>
+      <a class="brand" href="../index.html#top" aria-label="MOTOVAX home"><span>MOTO</span><strong>VAX</strong></a>
+      <nav class="nav" aria-label="Navigasi utama">
+        <div class="nav-item nav-item-produk" data-produk-menu>
+          <button type="button" class="nav-produk-trigger" aria-expanded="false" aria-haspopup="true" aria-controls="produk-mega-menu" data-produk-trigger>
+            Produk
+            <svg class="nav-chevron" width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 4.5 6 8l3.5-3.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <div class="produk-mega" id="produk-mega-menu" role="region" aria-label="Menu produk Motovax" hidden data-produk-panel data-produk-mount></div>
+        </div>
+        <a href="../index.html#solusi">Solusi</a>
+        <a href="../index.html#cara-kerja">Cara Kerja</a>
+        <a href="../index.html#keunggulan">Keunggulan</a>
+        <a href="../harga.html">Harga</a>
+        <a href="../hubungi-kami.html">Hubungi Kami</a>
+      </nav>
+      <a class="btn btn-primary header-cta" href="../hubungi-kami.html">Jadwalkan Demo <span>-></span></a>
     </div>
   </header>
   <main class="feature-page-section">
@@ -151,7 +176,7 @@ fs.writeFileSync(
       <ul class="feature-index-list">${listItems}</ul>
     </div>
   </main>
-  <script src="../script.js"></script>
+  <script src="../script.js?v=20260806-2"></script>
 </body>
 </html>
 `,
@@ -159,3 +184,27 @@ fs.writeFileSync(
 );
 
 console.log("done,", written.size, "feature pages + index");
+
+for (const [from, to] of Object.entries(redirects)) {
+  fs.writeFileSync(
+    path.join(outDir, `${from}.html`),
+    `<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Halaman dipindahkan — MOTOVAX</title>
+  <meta name="robots" content="noindex,follow" />
+  <meta http-equiv="refresh" content="0; url=./${escapeHtml(to)}.html" />
+  <link rel="canonical" href="https://motovax.ai/fitur/${escapeHtml(to)}.html" />
+</head>
+<body>
+  <p>Halaman ini telah dipindahkan ke <a href="./${escapeHtml(to)}.html">halaman fitur terbaru Motovax</a>.</p>
+  <script>location.replace(${JSON.stringify(`./${to}.html`)} + location.search + location.hash);</script>
+</body>
+</html>
+`,
+    "utf8",
+  );
+  console.log("redirect", `${from}.html`, "->", `${to}.html`);
+}

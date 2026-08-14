@@ -49,14 +49,14 @@ const template = (industry) => {
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="../styles.css" />
-    <link rel="stylesheet" href="./industry.css" />
+    <link rel="stylesheet" href="../styles.css?v=copy-20260811" />
+    <link rel="stylesheet" href="./industry.css?v=copy-20260811" />
   </head>
   <body class="industry-detail-page">
     <header class="site-header">
       <div class="container header-inner">
         <a class="brand" href="../index.html#top" aria-label="MOTOVAX home">
-          <img class="brand-logo" src="../icons/logo-motovax.png" width="160" height="55" alt="MOTOVAX" />
+          <span>MOTO</span><strong>VAX</strong>
         </a>
         <nav class="nav" aria-label="Navigasi utama">
           <div class="nav-item nav-item-produk" data-produk-menu>
@@ -71,9 +71,10 @@ const template = (industry) => {
           <a href="../index.html#solusi">Solusi</a>
           <a href="../index.html#cara-kerja">Cara Kerja</a>
           <a href="../index.html#keunggulan">Keunggulan</a>
+          <a href="../harga.html">Harga</a>
           <a href="../hubungi-kami.html">Hubungi Kami</a>
         </nav>
-        <a class="btn btn-primary header-cta" href="../index.html#kontak">Jadwalkan Demo <span>→</span></a>
+        <a class="btn btn-primary header-cta" href="../hubungi-kami.html">Jadwalkan Demo <span>→</span></a>
       </div>
     </header>
 
@@ -83,7 +84,7 @@ const template = (industry) => {
       <div class="container footer-grid">
         <div>
           <a class="brand footer-brand" href="../index.html#top" aria-label="MOTOVAX home">
-            <img class="brand-logo" src="../icons/logo-motovax.png" width="140" height="48" alt="MOTOVAX" />
+            <span>MOTO</span><strong>VAX</strong>
           </a>
           <p>Agentic AI ERP — integrasikan operasional bisnis dengan agen AI.</p>
         </div>
@@ -102,8 +103,8 @@ const template = (industry) => {
 
     <script>window.__INDUSTRY_SLUG__ = ${JSON.stringify(industry.slug)};</script>
     <script src="./industry-data.js"></script>
-    <script src="./industry-page.js"></script>
-    <script src="../script.js"></script>
+    <script src="./industry-page.js?v=copy-20260811"></script>
+    <script src="../script.js?v=20260806-2"></script>
   </body>
 </html>
 `;

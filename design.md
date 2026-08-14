@@ -16,8 +16,9 @@ Pola visual utama:
 
 ## Struktur Yang Diimplementasikan
 
-1. Header sticky dengan logo MOTOVAX, navigasi, dan CTA `Jadwalkan Demo`.
-2. Hero dengan badge `Road to 1,000 Units per Month`, headline, deskripsi, CTA, social proof, dan dashboard overview.
+1. Header sticky dengan logo MOTOVAX, navigasi, CTA `Login` + `Mulai Coba Sekarang` (ke `onboarding.html`).
+2. Hero dengan badge `Road to 1,000 Units per Month`, headline, deskripsi, CTA onboarding + demo, social proof, dan dashboard overview.
+2b. Halaman publik `onboarding.html` — wizard self-serve 4 langkah (akun/login → profil bisnis → modul prioritas → siap coba), design system Inter/biru Motovax, state di localStorage.
 3. Ecosystem strip untuk partner dealer, leasing, insurance, ads, payment, logistic, OEM, dan dokumen.
 4. Section solusi end-to-end berisi enam kartu:
    - Inventory Management System

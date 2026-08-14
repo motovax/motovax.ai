@@ -11,6 +11,8 @@ python -m http.server 5179
 Open `http://localhost:5179/`.
 
 - Home: `index.html` (solusi + interactive demos)
+- Login tenant: `login.html` (+ `login.js`) — autentikasi akun workspace dan handoff SSO ke aplikasi
+- Onboarding user baru: `onboarding.html` (+ `onboarding.js`) — daftar, profil dealer, modul
 - Modul breakdown: `modul.html`
 - Product map (markdown): `docs/product/modul-fitur-breakdown.md`
 

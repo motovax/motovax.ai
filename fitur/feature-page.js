@@ -190,10 +190,7 @@
         <p class="feature-breadcrumb">${crumbs}</p>
         <div class="feature-hero-grid">
           <div class="feature-hero-copy">
-            <div class="feature-hero-badges">
-              <span class="feature-badge">${escapeHtml(profile.eyebrow)}</span>
-              <span class="feature-badge ${availability.tone}">${escapeHtml(availability.label)}</span>
-            </div>
+            <p class="feature-availability ${availability.tone}">${escapeHtml(availability.label)}</p>
             <h1>${escapeHtml(data.heroTitle)}</h1>
             <p class="feature-hero-desc">${escapeHtml(data.heroDesc)}</p>
             ${heroBenefits ? `<ul class="feature-hero-list">${heroBenefits}</ul>` : ""}
@@ -214,7 +211,6 @@
     <section class="feature-page-section feature-intro-section">
       <div class="container">
         <div class="feature-section-heading centered">
-          <span>${escapeHtml(profile.sectionLabel)}</span>
           <h2>${escapeHtml(data.title)} untuk operasional yang lebih cepat dan terhubung</h2>
           <p>${escapeHtml(profile.intro)}</p>
         </div>
@@ -225,7 +221,6 @@
     <section class="feature-page-section feature-showcase-section" id="kemampuan">
       <div class="container">
         <div class="feature-section-heading centered">
-          <span>FITUR UNGGULAN</span>
           <h2>Kemampuan yang dapat dipakai tim Anda</h2>
           <p>Setiap bagian di bawah menggambarkan capability Motovax dan alur kerja yang didukungnya.</p>
         </div>
@@ -236,7 +231,6 @@
     <section class="feature-page-section feature-foundation-section">
       <div class="container">
         <div class="feature-section-heading centered light">
-          <span>MENGAPA MOTOVAX</span>
           <h2>Satu platform untuk data, tim, dan agen AI</h2>
           <p>Fondasi yang sama dipakai lintas modul agar aktivitas pelanggan dan operasional tidak terpecah.</p>
         </div>
@@ -252,7 +246,6 @@
     <section class="feature-page-section feature-process-section">
       <div class="container feature-process-grid">
         <div class="feature-section-heading">
-          <span>CARA KERJA</span>
           <h2>Dari aktivitas masuk hingga tindak lanjut</h2>
           <p>${escapeHtml(availability.detail)}</p>
           <a class="btn btn-primary" href="https://motovax.ai/hubungi-kami.html">Diskusikan kebutuhan Anda</a>
@@ -266,7 +259,6 @@
         ? `<section class="feature-page-section feature-related-section">
       <div class="container">
         <div class="feature-section-heading">
-          <span>TERHUBUNG</span>
           <h2>Fitur dan solusi terkait</h2>
           <p>Bangun alur kerja end-to-end dengan capability Motovax lainnya.</p>
         </div>
@@ -279,7 +271,6 @@
     <section class="feature-page-section feature-faq-section">
       <div class="container feature-faq-layout">
         <div class="feature-section-heading">
-          <span>FAQ</span>
           <h2>Pertanyaan tentang ${escapeHtml(data.title)}</h2>
           <p>Informasi singkat untuk membantu Anda memahami fungsi, ketersediaan, dan keterhubungan fiturnya.</p>
         </div>
@@ -290,7 +281,6 @@
     <section class="feature-page-cta">
       <div class="container feature-page-cta-inner">
         <div>
-          <span>POWER YOUR OPERATION</span>
           <h2>Siap melihat ${escapeHtml(data.title)} untuk bisnis Anda?</h2>
           <p>Jadwalkan sesi bersama tim Motovax untuk melihat alur yang paling relevan.</p>
         </div>
@@ -467,16 +457,8 @@
               <strong>${escapeHtml(preview.label)}</strong>
               <span class="feature-preview-status"><i></i> Data demo</span>
             </div>
-            <div class="feature-preview-image-shell">
-              <img
-                src="../assets/feature-previews/${escapeHtml(preview.file)}"
-                width="1440"
-                height="900"
-                alt="${escapeHtml(preview.alt)}"
-                loading="eager"
-                decoding="async"
-                fetchpriority="high"
-              >
+            <div class="feature-preview-image-shell${preview.wide ? " is-wide" : ""}">
+              ${renderPreviewImage(preview, { hero: true })}
             </div>
             <figcaption>Tampilan aplikasi Motovax dengan data yang telah dianonimkan.</figcaption>
           </div>
@@ -534,7 +516,67 @@
       alt: `Tampilan aplikasi Motovax untuk ${title} dengan data demo`,
     });
 
+    if (id === "facebook-messenger") {
+      return preview("facebook-messenger-integration-public.png", "Integrasi Facebook Messenger");
+    }
+
+    if (id === "instagram-api") {
+      return preview("instagram-integration-public.png", "Integrasi Instagram");
+    }
+
+    if (id === "manajemen-kontak") {
+      return preview("manajemen-kontak-customer-public.png", "CRM · Customer Database");
+    }
+
+    if (id === "manajemen-deal") {
+      return preview("product-crm-pipeline.png?v=20260806-deal-1", "CRM · Pipeline Deal");
+    }
+
+    if (id === "personalisasi-report-sales") {
+      return preview("report-sales-hero-public.png?v=20260806-sales-hero-1", "Report · Performa Sales");
+    }
+
+    if (id === "automasi-workflow") {
+      return preview("core-platform-native-ai-tools-public.png?v=20260810-workflow-3", "Agent AI · Chat, CRM & Inventory");
+    }
+
     return previewSetFor(id, preview)[0];
+  }
+
+  function renderPreviewImage(preview, { hero = false } = {}) {
+    const file = String(preview.file || "");
+    const pathname = file.split("?")[0];
+    const originalSrc = `../assets/feature-previews/${escapeHtml(file)}`;
+    const width = preview.width || 1440;
+    const height = preview.height || 900;
+    const loading = hero ? "eager" : "lazy";
+    const priority = hero ? "high" : "low";
+    const image = `<img
+                src="${originalSrc}"
+                width="${width}"
+                height="${height}"
+                alt="${escapeHtml(preview.alt)}"
+                loading="${loading}"
+                decoding="async"
+                fetchpriority="${priority}"
+              >`;
+
+    if (!/\.png$/i.test(pathname)) return image;
+
+    const stem = pathname.replace(/\.png$/i, "");
+    const variantBase = `../assets/feature-previews/${escapeHtml(stem)}`;
+    const variantVersion = file.includes("?")
+      ? escapeHtml(file.slice(file.indexOf("?")))
+      : "?v=20260810-img-3";
+    const sizes = hero ? "(max-width: 900px) calc(100vw - 36px), 540px" : "(max-width: 900px) calc(100vw - 36px), 560px";
+    return `<picture>
+              <source
+                type="image/webp"
+                srcset="${variantBase}-720.webp${variantVersion} 720w, ${variantBase}-1200.webp${variantVersion} 1200w"
+                sizes="${sizes}"
+              >
+              ${image}
+            </picture>`;
   }
 
   function previewSetFor(id, previewFactory) {
@@ -547,10 +589,35 @@
       analytics: previewFactory("sales-analytics.webp", "Analytics & Performance"),
     };
 
+    if (id === "core-platform-agentic-ai") {
+      return [previewFactory("core-platform-whatsapp-integrations-public.png?v=20260806-2", "Core Platform · Integrasi WhatsApp"), previews.analytics, previews.integrations];
+    }
+    if (id === "omni-jasmine-ai") {
+      return [previewFactory("omnichannel-faneling-public.png", "Omni + Jasmine AI"), previews.omni, previews.integrations];
+    }
+    if (id === "inventory-falcon-ai") {
+      return [previewFactory("product-falcon-sales.png", "Inventory + Falcon AI"), previewFactory("product-social-studio.png", "Inventory Unit"), previews.analytics];
+    }
+    if (id === "ana-ai-analytics") {
+      return [previewFactory("product-dashboard-overview.png", "Ana AI · Analytics"), previewFactory("product-dashboard-sales.png", "Sales Performance"), previewFactory("product-dashboard-locations.png", "Performa Cabang")];
+    }
+    if (id === "social-media-sora-ai") {
+      return [previewFactory("product-social-studio.png", "Social Media + Sora AI"), previewFactory("product-social-calendar.png", "Kalender Posting"), previewFactory("product-social-insight.png", "Campaign Insight")];
+    }
+
+    if (id === "whatsapp-business-api") {
+      const whatsappPreview = previewFactory("product-capability-whatsapp-connected-public.png", "WhatsApp Business API");
+      whatsappPreview.wide = true;
+      return [
+        whatsappPreview,
+        previews.omni,
+        previews.social,
+      ];
+    }
     if (/broadcast|blast|bulk|ctwa/.test(id)) {
       return [previews.social, previews.omni, previews.analytics];
     }
-    if (/instagram-api|whatsapp-business-api|centang-biru|whatsapp-business-calling|whatsapp-flows|ticket-creation-integration/.test(id)) {
+    if (/facebook-messenger|instagram-api|whatsapp-business-api|centang-biru|whatsapp-business-calling|whatsapp-flows|ticket-creation-integration/.test(id)) {
       return [previews.integrations, previews.omni, previews.social];
     }
     if (/goal|report|scorecard|motovax-360/.test(id)) {
@@ -583,7 +650,131 @@
 
     // Tiap capability diarahkan ke state produk yang relevan. Urutannya sengaja
     // semantik dan tidak bergantung pada nomor kartu/rotasi screenshot umum.
-    if (matches(/fanel/i)) {
+    if (slug === "automasi-workflow" && index === 0) {
+      preview = captured(
+        "core-platform-native-ai-tools-public.png?v=20260810-workflow-3",
+        "Jasmine · Native AI Tools",
+        "Agent AI memakai data inventori tenant untuk menjawab kebutuhan unit dan membawa percakapan menuju aksi operasional berikutnya.",
+      );
+    } else if (slug === "automasi-workflow" && index === 1) {
+      preview = captured(
+        "workflow-auto-follow-public.png?v=20260810-workflow-data-agent-1",
+        "Sales Agent · Data Agent Falcon",
+        "Data Agent Falcon memperlihatkan lead aktif, kebutuhan follow-up, status overdue, dan interaksi terakhir dalam satu halaman.",
+      );
+    } else if (slug === "automasi-workflow" && index === 2) {
+      preview = captured(
+        "omnichannel-faneling-public.png?v=20260810-workflow-3",
+        "Call Center · AI → Agent → MR",
+        "Jejak respons AI, takeover Call Center, dan handoff ke Marketing Representative tetap terlihat dalam satu percakapan.",
+      );
+    } else if (slug === "automasi-workflow" && index === 3) {
+      preview = captured(
+        "report-email-scheduler-public.png?v=20260810-workflow-3",
+        "Platform · Email Report Scheduler",
+        "Scheduler menjalankan laporan dengan frekuensi, attachment, dan daftar penerima yang sudah dikonfigurasi.",
+      );
+    } else if (slug === "automasi-workflow" && index === 4) {
+      preview = captured(
+        "product-social-calendar.png?v=20260810-workflow-3",
+        "Social Media · Kalender Posting",
+        "Materi yang disiapkan dari inventori tersusun dalam kalender agar publishing tim berjalan sesuai jadwal.",
+      );
+    } else if (slug === "personalisasi-report-sales" && index === 0) {
+      preview = captured(
+        "report-sales-trend-public.png?v=20260806-report-2",
+        "Report · Sales Trend",
+        "Pendapatan, pipeline, tingkat konversi, rata-rata deal, kecepatan closing, dan tren forecast tampil dengan data terisi.",
+      );
+    } else if (slug === "personalisasi-report-sales" && index === 1) {
+      preview = captured(
+        "report-channel-breakdown-public.png?v=20260806-report-channel-2",
+        "Report · Channel Breakdown",
+        "Percakapan aktif diturunkan ke kanal masuk, marketing source, dan campaign agar kontribusi setiap channel mudah dibandingkan.",
+      );
+    } else if (slug === "personalisasi-report-sales" && index === 2) {
+      preview = captured(
+        "report-email-scheduler-public.png",
+        "Platform · Email Report",
+        "Konfigurasi scheduler memperlihatkan subject, frekuensi, attachment, dan jumlah penerima laporan otomatis.",
+      );
+    } else if (slug === "personalisasi-report-sales" && index === 3) {
+      preview = captured(
+        "report-conversion-insight-public.png",
+        "Report · Insight Konversi",
+        "Perjalanan customer dan funnel per penanganan menghubungkan lead masuk dengan prospect, hot lead, deal, dan handover.",
+      );
+    } else if (slug === "manajemen-deal" && index === 0) {
+      preview = captured(
+        "manajemen-kontak-pipeline-public.png?v=20260806-deal-1",
+        "CRM · Board Pipeline",
+        "Deal tersusun per stage Cold, Warm, Prospect, dan Hot, lengkap dengan nilai pipeline serta hasil deal dan handover.",
+        [1854, 848],
+      );
+      preview.wide = true;
+    } else if (slug === "manajemen-deal" && index === 1) {
+      preview = captured(
+        "manajemen-kontak-customer-public.png?v=20260806-deal-1",
+        "CRM · Customer dan Unit",
+        "Customer, sumber lead, PIC sales, cabang, serta unit yang terhubung terlihat dalam satu tampilan.",
+        [1440, 900],
+      );
+    } else if (slug === "manajemen-deal" && index === 2) {
+      preview = captured(
+        "manajemen-deal-aktivitas-public.png?v=20260806-deal-2",
+        "CRM · Aktivitas Deal",
+        "Komunikasi awal dan terakhir, minat unit, deal stage, dan riwayat customer menjaga konteks follow-up hingga closing.",
+        [1440, 900],
+      );
+    } else if (slug === "manajemen-kontak" && index === 1) {
+      preview = captured(
+        "manajemen-kontak-riwayat-channel-public.png?v=20260805-2",
+        "CRM · Riwayat Channel",
+        "Riwayat chat, respons AI, takeover Call Center, dan aktivitas lead tersimpan dalam satu timeline customer.",
+        [1862, 845],
+      );
+      preview.wide = true;
+    } else if (slug === "manajemen-kontak" && index === 2) {
+      preview = captured(
+        "manajemen-kontak-pipeline-public.png?v=20260805-2",
+        "CRM · Pipeline Sales",
+        "Customer siap ditindaklanjuti di pipeline hingga deal dan handover tercatat dalam satu workspace.",
+        [1854, 848],
+      );
+      preview.wide = true;
+    } else if (slug === "core-platform-agentic-ai" && /multi-tenant|multi-cabang/i.test(capabilityTitle)) {
+      preview = captured("core-platform-multi-branch-public.png", "Core Platform · Multi-cabang", "Data inventory dan ringkasan operasional dipisahkan per cabang dalam tenant yang sama.");
+    } else if (slug === "core-platform-agentic-ai" && /role|permission/i.test(capabilityTitle)) {
+      preview = captured("core-platform-role-permission-public.png", "Core Platform · Role & Permission", "Admin mengatur hak akses per role melalui halaman edit permission yang lengkap.");
+    } else if (slug === "core-platform-agentic-ai" && /integrasi channel/i.test(capabilityTitle)) {
+      preview = captured("core-platform-whatsapp-integrations-page-public.png?v=20260806-3", "Core Platform · Integrasi Channel", "WhatsApp, Instagram, Facebook Messenger, Meta Business, dan TikTok terlihat dalam satu pusat integrasi channel.");
+    } else if (slug === "core-platform-agentic-ai" && /agentic ai|native tools/i.test(capabilityTitle)) {
+      preview = captured("core-platform-native-ai-tools-public.png?v=20260805-2", "Core Platform · Native AI Tools", "Jasmine memakai inventori tenant untuk menjawab kebutuhan unit, memperbarui konteks lead, dan mendukung takeover serta handoff sesuai role.");
+    } else if (slug === "inventory-falcon-ai" && /listing|import|validasi/i.test(capabilityTitle)) {
+      preview = captured("product-social-studio.png", "Inventory · Unit Ready", "Unit ready dari inventory tenant tersedia sebagai sumber data dan materi operasional.");
+    } else if (slug === "inventory-falcon-ai" && /falcon|foto|rekomendasi/i.test(capabilityTitle)) {
+      preview = captured("product-falcon-sales.png", "Falcon · Pencarian & Rekomendasi", "Falcon memakai inventory tenant untuk membantu pencarian, foto, dan rekomendasi unit.");
+    } else if (slug === "inventory-falcon-ai" && /katalog api/i.test(capabilityTitle)) {
+      preview = captured("product-capability-whatsapp-content.png", "Developer API · Katalog", "Capability integrasi menyediakan data produk untuk kanal eksternal melalui API.");
+    } else if (slug === "social-media-sora-ai" && /content studio|visual/i.test(capabilityTitle)) {
+      preview = captured("product-social-studio.png", "Social Media · Content Studio", "Unit inventory dipilih sebagai sumber desain dan materi konten.");
+    } else if (slug === "social-media-sora-ai" && /publish|scheduler/i.test(capabilityTitle)) {
+      preview = captured("product-social-calendar.png", "Social Media · Kalender Posting", "Konten terjadwal tersusun dalam kalender publikasi tim.");
+    } else if (slug === "social-media-sora-ai" && /analytics/i.test(capabilityTitle)) {
+      preview = captured("product-social-insight.png", "Social Media · Campaign Insight", "Klik, lead, dan hasil campaign dipantau dalam satu tampilan.");
+    } else if (slug === "facebook-messenger" && /inbox messenger/i.test(capabilityTitle)) {
+      preview = captured("facebook-messenger-inbox-public.png", "Inbox · Facebook Messenger", "Filter Facebook aktif menampilkan seluruh inquiry Messenger dalam satu antrean.");
+    } else if (slug === "facebook-messenger" && /respons ai|takeover agent/i.test(capabilityTitle)) {
+      preview = captured("facebook-messenger-ai-takeover-public.png", "Messenger · AI dan Takeover Agent", "Respons AI, takeover Call Center, dan lanjutan MR tetap tersimpan dalam satu percakapan Messenger.");
+    } else if (slug === "facebook-messenger" && /routing lead|ke mr/i.test(capabilityTitle)) {
+      preview = captured("facebook-messenger-handoff-public.png", "Messenger · Handoff ke MR", "Agent memilih MR, alasan, dan ringkasan sebelum menyerahkan lead Messenger.");
+    } else if (slug === "facebook-messenger" && /konteks stok|simulasi kredit/i.test(capabilityTitle)) {
+      preview = captured("facebook-messenger-inventory-public.png", "Messenger · Cek Inventori", "Agent mencari unit ready dan melanjutkan ke hitung kredit tanpa meninggalkan percakapan Messenger.");
+    } else if (slug === "facebook-messenger" && /realtime/i.test(capabilityTitle)) {
+      preview = captured("facebook-messenger-realtime-public.png", "Messenger · Realtime Aktif", "Status koneksi dan pesan Messenger diperbarui langsung di workspace Call Center.");
+    } else if (slug === "facebook-messenger" && /journey lead/i.test(capabilityTitle)) {
+      preview = captured("omnichannel-performance-public.png", "Analytics · Journey Lead", "Perjalanan customer dan funnel penanganan menghubungkan aktivitas channel ke hasil lead.");
+    } else if (matches(/fanel/i)) {
       preview = captured("omnichannel-faneling-public.png", "Call Center · AI → Agent → MR", "Jejak AI dan takeover Agent tetap terlihat setelah lead masuk bucket MR.");
     } else if (matches(/handoff|takeover|eskalasi/i)) {
       preview = captured("omnichannel-handoff-public.png", "Call Center · Handoff ke MR", "Agent memilih MR, alasan, dan catatan sebelum menyerahkan lead.");
@@ -630,7 +821,8 @@
         ? captured("product-falcon-management.png", "Analytics · Management", "Laporan dan tren operasional terlihat langsung pada aplikasi produksi.")
         : captured("product-falcon-sales.png", "Call Center · AI / Agent / MR", "Jejak AI, takeover agent, dan tindak lanjut MR terlihat pada aplikasi produksi.");
     } else if (matches(/whatsapp|session|flows|tool schema|governance|brand trust/i)) {
-      preview = captured("product-capability-whatsapp.png", "WhatsApp Business API", "Konfigurasi channel dan capability WhatsApp terlihat dalam workspace produk.");
+      preview = captured("product-capability-whatsapp-connected-public.png", "WhatsApp Business API", "WhatsApp Sales dan Call Center aktif dengan session serta nomor yang sudah terhubung.", [1600, 700]);
+      preview.wide = true;
     } else if (matches(/automasi|workflow|workers|tool chains/i)) {
       preview = captured("product-capability-automation.png", "Automation · Email Report", "Konfigurasi report otomatis terlihat langsung pada aplikasi produksi.");
     } else {
@@ -645,14 +837,7 @@
             <em>Data demo</em>
           </div>
           <div class="feature-showcase-preview-image${preview.wide ? " is-wide" : ""}">
-            <img
-              src="../assets/feature-previews/${escapeHtml(preview.file)}"
-              width="${preview.width || 1440}"
-              height="${preview.height || 900}"
-              alt="${escapeHtml(preview.alt)}"
-              loading="eager"
-              decoding="async"
-            >
+            ${renderPreviewImage(preview)}
           </div>
           <figcaption>
             <span>${escapeHtml(preview.caption || `${capability.title} dalam workspace Motovax`)}</span>
