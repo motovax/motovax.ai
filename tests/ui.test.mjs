@@ -226,7 +226,7 @@ for (const viewport of viewports) {
     const firstRowY = layout.cards[0].y;
     const firstRowCards = layout.cards.filter((card) => Math.abs(card.y - firstRowY) < 1);
     assert.equal(firstRowCards.length, viewport.name === "desktop" ? 3 : viewport.name === "tablet" ? 2 : 1);
-    assert.ok(firstRowCards.every((card) => Math.abs(card.height - firstRowCards[0].height) < .1));
+    assert.ok(layout.cards.every((card) => Math.abs(card.height - layout.cards[0].height) < .1));
     assert.equal(await noOverflow(page), true);
 
     await section.screenshot({ path: `/tmp/motovax-solution-cards-${viewport.name}.png` });
