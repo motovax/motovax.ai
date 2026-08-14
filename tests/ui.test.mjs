@@ -646,7 +646,7 @@ for (const viewport of viewports) {
     await page.goto(`${baseUrl}/index.html`, { waitUntil: "load" });
     assert.equal(await page.locator("[data-portal-account], [data-portal-workspace], [data-portal-billing]").count(), 0);
     assert.equal(await page.getByRole("link", { name: "Login/Daftar", exact: true }).count(), 1);
-    assert.equal(await page.getAttribute('.site-header a[href="https://onboard.motovax.com/login.html"]', "href"), "https://onboard.motovax.com/login.html");
+    assert.equal(await page.getAttribute('.site-header .header-login', "href"), "https://onboard.motovax.com/login.html?reauth=1");
     assert.equal(await noOverflow(page), true);
     await page.screenshot({ path: `/tmp/motovax-stateless-landing-${viewport.name}.png`, fullPage: false });
     await context.close();
@@ -782,6 +782,36 @@ test("kunjungan ulang ke login dan onboarding langsung melanjutkan sesi tenant",
     await context.close();
   }
 });
+
+for (const viewport of viewports) {
+  test(`CTA login meminta autentikasi ulang pada ${viewport.name}`, async () => {
+    const context = await browser.newContext({ viewport });
+    const page = await context.newPage();
+    let logoutCount = 0;
+    let enterCount = 0;
+    await page.route(/https:\/\/fonts\.(?:googleapis|gstatic)\.com\//, (route) => route.abort());
+    await page.route("**/api/portal/logout", (route) => {
+      logoutCount += 1;
+      return route.fulfill({ status: 204 });
+    });
+    await page.route("**/api/portal/workspace/enter", (route) => {
+      enterCount += 1;
+      return route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ redirectUrl: "https://dealer-test.motovax.com/magic-login?token=stale-session" }) });
+    });
+
+    await page.goto(`${baseUrl}/login.html?reauth=1`, { waitUntil: "load" });
+    await page.waitForSelector(".portal-login-auth-content:visible");
+
+    assert.equal(logoutCount, 1);
+    assert.equal(enterCount, 0);
+    assert.equal(new URL(page.url()).searchParams.has("reauth"), false);
+    assert.equal(await page.locator("[data-session-check]").isHidden(), true);
+    assert.equal(await page.locator('[data-portal-login-form] input[name="identifier"]').isVisible(), true);
+    assert.equal(await noOverflow(page), true);
+    await page.screenshot({ path: `/tmp/motovax-login-reauth-${viewport.name}.png`, fullPage: false });
+    await context.close();
+  });
+}
 
 test("session portal legacy di landing langsung handoff ke workspace", async () => {
   const context = await browser.newContext({ viewport: { width: 390, height: 844 } });

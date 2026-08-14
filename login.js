@@ -38,6 +38,14 @@
     });
   }
 
+  function revokeActivePortalSession() {
+    return fetch("/api/portal/logout", {
+      method: "POST",
+      credentials: "same-origin",
+      headers: { Accept: "application/json" },
+    });
+  }
+
   function showError(message, field) {
     errorBox.hidden = false;
     errorBox.textContent = message;
@@ -75,6 +83,7 @@
   }
 
   var oauthParams = new URLSearchParams(window.location.search);
+  var requireReauthentication = oauthParams.get("reauth") === "1";
   if (oauthParams.get("oauth") === "failed" || oauthParams.get("oauth") === "denied") {
     var oauthReason = oauthParams.get("oauth") === "denied" ? "denied" : oauthParams.get("reason");
     showError(googleErrorMessage(oauthReason));
@@ -84,14 +93,23 @@
     window.history.replaceState({}, "", window.location.pathname + (cleanQuery ? "?" + cleanQuery : "") + window.location.hash);
   }
 
-  enterActiveWorkspace()
-    .then(function (redirectUrl) { window.location.replace(redirectUrl); })
-    .catch(function (error) {
+  if (requireReauthentication) {
+    oauthParams.delete("reauth");
+    var reauthQuery = oauthParams.toString();
+    revokeActivePortalSession().finally(function () {
+      window.history.replaceState({}, "", window.location.pathname + (reauthQuery ? "?" + reauthQuery : "") + window.location.hash);
       revealLogin();
-      if (error.status && error.status !== 401) {
-        showError("Sesi tersimpan belum dapat dibuka. Silakan login kembali.");
-      }
     });
+  } else {
+    enterActiveWorkspace()
+      .then(function (redirectUrl) { window.location.replace(redirectUrl); })
+      .catch(function (error) {
+        revealLogin();
+        if (error.status && error.status !== 401) {
+          showError("Sesi tersimpan belum dapat dibuka. Silakan login kembali.");
+        }
+      });
+  }
 
   if (googleButton) {
     googleButton.addEventListener("click", function () {
