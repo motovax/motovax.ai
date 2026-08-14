@@ -15,6 +15,7 @@
   var errorBox = document.querySelector("[data-login-error]");
   var password = document.getElementById("portalPassword");
   var passwordToggle = document.querySelector("[data-password-toggle]");
+  var googleButton = document.querySelector("[data-google-login]");
 
   function showError(message, field) {
     errorBox.hidden = false;
@@ -37,6 +38,37 @@
     }
     Array.prototype.forEach.call(form.elements, function (field) { field.disabled = loading; });
     form.classList.toggle("is-loading", loading);
+  }
+
+  function googleErrorMessage(reason) {
+    if (reason === "account_not_found") {
+      return "Email Google ini belum terdaftar pada workspace MOTOVAX. Gunakan akun tenant lain atau daftar workspace baru.";
+    }
+    if (reason === "ambiguous_account") {
+      return "Email Google ini terhubung ke lebih dari satu workspace. Login memakai email dan password akun tenant yang spesifik.";
+    }
+    if (reason === "denied") return "Login Google dibatalkan. Silakan coba lagi jika Anda ingin melanjutkan.";
+    if (reason === "expired" || reason === "state") return "Sesi login Google telah berakhir. Silakan mulai lagi.";
+    if (reason === "configuration") return "Login Google sedang belum tersedia. Gunakan username/email dan password untuk sementara.";
+    return "Login Google belum berhasil. Silakan coba lagi atau gunakan password akun tenant Anda.";
+  }
+
+  var oauthParams = new URLSearchParams(window.location.search);
+  if (oauthParams.get("oauth") === "failed" || oauthParams.get("oauth") === "denied") {
+    var oauthReason = oauthParams.get("oauth") === "denied" ? "denied" : oauthParams.get("reason");
+    showError(googleErrorMessage(oauthReason));
+    oauthParams.delete("oauth");
+    oauthParams.delete("reason");
+    var cleanQuery = oauthParams.toString();
+    window.history.replaceState({}, "", window.location.pathname + (cleanQuery ? "?" + cleanQuery : "") + window.location.hash);
+  }
+
+  if (googleButton) {
+    googleButton.addEventListener("click", function () {
+      googleButton.classList.add("is-loading");
+      googleButton.setAttribute("aria-busy", "true");
+      googleButton.setAttribute("aria-label", "Mengalihkan ke login Google");
+    });
   }
 
   Array.prototype.forEach.call(form.elements, function (field) {

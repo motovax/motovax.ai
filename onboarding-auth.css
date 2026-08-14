@@ -87,6 +87,14 @@
   gap: 14px;
 }
 
+.portal-login-google {
+  min-height: 50px;
+}
+
+.portal-login-divider {
+  margin: 14px 0;
+}
+
 .portal-login-submit {
   width: 100%;
   min-height: 50px;
@@ -179,20 +187,10 @@
   }
 
   .portal-login-shell {
-    gap: 12px;
+    gap: 0;
   }
 
-  .portal-login-intro h1 {
-    margin: 7px 0 8px;
-    font-size: clamp(27px, 8vw, 32px);
-    line-height: 1;
-  }
-
-  .portal-login-intro > p {
-    display: none;
-  }
-
-  .portal-login-intro ul {
+  .portal-login-intro {
     display: none;
   }
 
@@ -216,6 +214,14 @@
 
   .portal-login-form {
     gap: 11px;
+  }
+
+  .portal-login-google {
+    min-height: 46px;
+  }
+
+  .portal-login-divider {
+    margin: 10px 0;
   }
 
   .portal-login-submit {

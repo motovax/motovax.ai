@@ -255,8 +255,16 @@ for (const viewport of viewports) {
       return route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ token: "portal-token-test-abcdefghijklmnopqrstuvwxyz123456", returnUrl: "https://motovax.ai/" }) });
     });
     await page.route("https://motovax.ai/**", (route) => route.fulfill({ status: 200, contentType: "text/html", body: "<title>Landing</title>" }));
+    await page.goto(`${baseUrl}/login.html?oauth=failed&reason=account_not_found`, { waitUntil: "load" });
+    assert.equal(await page.locator('[data-login-error]').isVisible(), true);
+    assert.match(await page.locator('[data-login-error]').textContent(), /belum terdaftar pada workspace MOTOVAX/);
+    assert.equal(new URL(page.url()).searchParams.has("oauth"), false);
+    assert.equal(await fitsViewport(page), true);
     await page.goto(`${baseUrl}/login.html`, { waitUntil: "load" });
     assert.equal(await page.getAttribute('.portal-register-prompt a', "href"), "https://onboard.motovax.com/onboarding.html?fresh=1");
+    assert.equal(await page.locator('[data-google-login]').isVisible(), true);
+    assert.equal(await page.getAttribute('[data-google-login]', "href"), "https://onboard.motovax.com/api/auth/google/start?mode=portal");
+    assert.equal(await page.getByRole("link", { name: "Login dengan Google", exact: true }).count(), 1);
     assert.equal(await page.locator('input[name="workspace"]').count(), 0);
     await page.fill('input[name="identifier"]', "owner");
     await page.click('[data-portal-login-form] button[type="submit"]');

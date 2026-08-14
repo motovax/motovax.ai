@@ -210,6 +210,7 @@ const store = {
 };
 
 let currentNonce = "";
+let googleProfileEmail = "user@example.com";
 const oauthClient = {
   generateAuthUrl(options) {
     currentNonce = options.nonce;
@@ -229,7 +230,7 @@ const oauthClient = {
       getPayload() {
         return {
           sub: "google-user-123",
-          email: "user@example.com",
+          email: googleProfileEmail,
           email_verified: true,
           name: "User Test",
           picture: "https://example.com/avatar.png",
@@ -488,6 +489,59 @@ test("callback membuat session dan endpoint me mengembalikan user", async () => 
     profile: null,
     workspaces: [],
   });
+});
+
+test("callback Google mode portal membuat sesi tenant dan mengarah ke landing", async () => {
+  googleProfileEmail = "owner@dealer.test";
+  try {
+    const start = await fetch(`${baseUrl}/api/auth/google/start?mode=portal`, {
+      redirect: "manual",
+    });
+    const stateCookie = cookieValue(start.headers.get("set-cookie"), "motovax_oauth_state");
+    const state = new URL(start.headers.get("location")).searchParams.get("state");
+    assert.match(state, /^portal\./);
+    assert.equal(stateCookie, state);
+
+    const callback = await fetch(
+      `${baseUrl}/api/auth/google/callback?code=valid-code&state=${encodeURIComponent(state)}`,
+      {
+        redirect: "manual",
+        headers: { cookie: `motovax_oauth_state=${encodeURIComponent(stateCookie)}` },
+      },
+    );
+    assert.equal(callback.status, 302);
+    const location = new URL(callback.headers.get("location"));
+    assert.equal(location.origin, "https://motovax.ai");
+    const sessionToken = new URLSearchParams(location.hash.replace(/^#/, "")).get("portal_session");
+    assert.ok(sessionToken.length >= 48);
+    assert.ok(portalSessions.has(digest(sessionToken)));
+  } finally {
+    googleProfileEmail = "user@example.com";
+  }
+});
+
+test("callback Google mode portal menolak email yang belum menjadi user tenant", async () => {
+  googleProfileEmail = "belum-terdaftar@example.com";
+  try {
+    const start = await fetch(`${baseUrl}/api/auth/google/start?mode=portal`, {
+      redirect: "manual",
+    });
+    const stateCookie = cookieValue(start.headers.get("set-cookie"), "motovax_oauth_state");
+    const state = new URL(start.headers.get("location")).searchParams.get("state");
+    const callback = await fetch(
+      `${baseUrl}/api/auth/google/callback?code=valid-code&state=${encodeURIComponent(state)}`,
+      {
+        redirect: "manual",
+        headers: { cookie: `motovax_oauth_state=${encodeURIComponent(stateCookie)}` },
+      },
+    );
+    const location = new URL(callback.headers.get("location"));
+    assert.equal(location.pathname, "/login.html");
+    assert.equal(location.searchParams.get("oauth"), "failed");
+    assert.equal(location.searchParams.get("reason"), "account_not_found");
+  } finally {
+    googleProfileEmail = "user@example.com";
+  }
 });
 
 test("availability workspace menolak nama yang sudah dipakai", async () => {

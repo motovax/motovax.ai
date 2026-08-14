@@ -378,10 +378,18 @@ function authCookieNames(config) {
   };
 }
 
-function oauthResultUrl(config, status, reason = "") {
-  const target = new URL(config.oauthSuccessUrl);
+function oauthResultUrl(config, status, reason = "", authMode = "signup") {
+  const target = authMode === "portal"
+    ? new URL("/login.html", config.publicBaseUrl)
+    : new URL(config.oauthSuccessUrl);
   target.searchParams.set("oauth", status);
   if (reason) target.searchParams.set("reason", reason);
+  return target.toString();
+}
+
+function portalOauthSuccessUrl(config, sessionToken) {
+  const target = new URL(config.portalLandingUrl || "https://motovax.ai/");
+  target.hash = new URLSearchParams({ portal_session: sessionToken }).toString();
   return target.toString();
 }
 
@@ -1304,6 +1312,20 @@ export function createApp({
     });
   }
 
+  async function issuePortalSession(req, user) {
+    const sessionToken = randomToken(48);
+    const expiresAt = new Date(Date.now() + PORTAL_SESSION_TTL_MS);
+    await store.createPortalSession({
+      appUserId: user.id,
+      tenantId: user.tenant_id,
+      sessionDigest: tokenDigest(sessionToken, config.sessionSecret),
+      userAgent: String(req.headers["user-agent"] || "").slice(0, 500),
+      ipAddress: String(req.ip || "").slice(0, 100),
+      expiresAt,
+    });
+    return { sessionToken, expiresAt };
+  }
+
   async function sendAccountEmail({ user, actionType, subject, pathName, copy }) {
     if (!emailClient) {
       const error = new Error("Layanan email belum tersedia.");
@@ -1408,16 +1430,7 @@ export function createApp({
         });
       }
       const [user] = matchedUsers;
-      const sessionToken = randomToken(48);
-      const expiresAt = new Date(Date.now() + PORTAL_SESSION_TTL_MS);
-      await store.createPortalSession({
-        appUserId: user.id,
-        tenantId: user.tenant_id,
-        sessionDigest: tokenDigest(sessionToken, config.sessionSecret),
-        userAgent: String(req.headers["user-agent"] || "").slice(0, 500),
-        ipAddress: String(req.ip || "").slice(0, 100),
-        expiresAt,
-      });
+      const { sessionToken, expiresAt } = await issuePortalSession(req, user);
       return res.json({
         authenticated: true,
         token: sessionToken,
@@ -1771,11 +1784,13 @@ export function createApp({
         });
       }
 
-      const state = randomToken(32);
+      const authMode = req.query.mode === "portal"
+        ? "portal"
+        : req.query.mode === "login" ? "login" : "signup";
+      const state = `${authMode === "portal" ? "portal." : ""}${randomToken(32)}`;
       const codeVerifier = randomToken(64);
       const nonce = randomToken(32);
       const codeChallenge = sha256(codeVerifier);
-      const authMode = req.query.mode === "login" ? "login" : "signup";
 
       await store.saveOAuthState({
         stateDigest: tokenDigest(state, config.sessionSecret),
@@ -1812,16 +1827,19 @@ export function createApp({
 
   app.get("/api/auth/google/callback", async (req, res, next) => {
     try {
+      const requestedState = String(req.query.state || "");
+      let authMode = requestedState.startsWith("portal.") ? "portal" : "signup";
+      req.oauthMode = authMode;
       const missing = missingOAuthConfig(config, store);
       if (missing.length || !client) {
-        return res.redirect(302, oauthResultUrl(config, "failed", "configuration"));
+        return res.redirect(302, oauthResultUrl(config, "failed", "configuration", authMode));
       }
 
       const requestCookies = parseCookies(req.headers.cookie);
-      const state = String(req.query.state || "");
+      const state = requestedState;
       const stateCookie = requestCookies[cookies.state] || "";
       if (!state || !safeEqual(state, stateCookie)) {
-        return res.redirect(302, oauthResultUrl(config, "failed", "state"));
+        return res.redirect(302, oauthResultUrl(config, "failed", "state", authMode));
       }
 
       const transaction = await store.takeOAuthState(
@@ -1834,15 +1852,17 @@ export function createApp({
         path: "/",
       });
       if (!transaction) {
-        return res.redirect(302, oauthResultUrl(config, "failed", "expired"));
+        return res.redirect(302, oauthResultUrl(config, "failed", "expired", authMode));
       }
+      authMode = transaction.auth_mode === "portal" ? "portal" : transaction.auth_mode;
+      req.oauthMode = authMode;
       if (req.query.error) {
-        return res.redirect(302, oauthResultUrl(config, "denied"));
+        return res.redirect(302, oauthResultUrl(config, "denied", "", authMode));
       }
 
       const code = String(req.query.code || "");
       if (!code) {
-        return res.redirect(302, oauthResultUrl(config, "failed", "code"));
+        return res.redirect(302, oauthResultUrl(config, "failed", "code", authMode));
       }
 
       const tokenResponse = await client.getToken({
@@ -1868,14 +1888,34 @@ export function createApp({
         throw new Error("Klaim identitas Google tidak valid.");
       }
 
-      const user = await store.upsertGoogleUser({
+      const googleProfile = {
         subject: payload.sub,
         email: payload.email.toLowerCase(),
         name: payload.name || payload.email.split("@")[0],
         picture: payload.picture || "",
-      });
+      };
+
+      if (authMode === "portal") {
+        if (!store.findPortalUsers || !store.createPortalSession) {
+          return res.redirect(302, oauthResultUrl(config, "failed", "configuration", authMode));
+        }
+        const candidates = await store.findPortalUsers({ identifier: googleProfile.email });
+        const matchingUsers = candidates.filter(
+          (candidate) => String(candidate.email || "").trim().toLowerCase() === googleProfile.email,
+        );
+        if (matchingUsers.length === 0) {
+          return res.redirect(302, oauthResultUrl(config, "failed", "account_not_found", authMode));
+        }
+        if (matchingUsers.length > 1 || candidates.length > 20) {
+          return res.redirect(302, oauthResultUrl(config, "failed", "ambiguous_account", authMode));
+        }
+        const { sessionToken } = await issuePortalSession(req, matchingUsers[0]);
+        return res.redirect(302, portalOauthSuccessUrl(config, sessionToken));
+      }
+
+      const user = await store.upsertGoogleUser(googleProfile);
       await issueSession(req, res, user.id);
-      return res.redirect(302, oauthResultUrl(config, "success"));
+      return res.redirect(302, oauthResultUrl(config, "success", "", authMode));
     } catch (error) {
       req.oauthError = error;
       return next(error);
@@ -1960,7 +2000,7 @@ export function createApp({
       message: error instanceof Error ? error.message : "unknown_error",
     });
     if (req.path === "/api/auth/google/callback") {
-      return res.redirect(302, oauthResultUrl(config, "failed", "server"));
+      return res.redirect(302, oauthResultUrl(config, "failed", "server", req.oauthMode));
     }
     return res.status(500).json({ error: "internal_server_error" });
   });
