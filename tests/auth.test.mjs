@@ -761,6 +761,59 @@ test("portal login tenant membuat cookie sesi dan langsung handoff workspace", a
   assert.equal(expired.status, 401);
 });
 
+test("logout workspace tenant dapat mencabut cookie portal tanpa membuka endpoint portal lain", async () => {
+  const login = await fetch(`${baseUrl}/api/portal/login`, {
+    method: "POST",
+    headers: { origin: "http://127.0.0.1", "content-type": "application/json" },
+    body: JSON.stringify({ identifier: "owner", password: "rahasia123" }),
+  });
+  assert.equal(login.status, 200);
+  const sessionToken = cookieValue(login.headers.get("set-cookie"), "motovax_portal_session");
+  assert.ok(sessionToken.length >= 48);
+
+  const tenantOrigin = "https://dealer-pro.motovax.com";
+  const preflight = await fetch(`${baseUrl}/api/portal/logout`, {
+    method: "OPTIONS",
+    headers: { origin: tenantOrigin, "access-control-request-method": "POST" },
+  });
+  assert.equal(preflight.status, 204);
+  assert.equal(preflight.headers.get("access-control-allow-origin"), tenantOrigin);
+  assert.equal(preflight.headers.get("access-control-allow-credentials"), "true");
+
+  const forbiddenEnter = await fetch(`${baseUrl}/api/portal/workspace/enter`, {
+    method: "POST",
+    headers: {
+      cookie: `motovax_portal_session=${encodeURIComponent(sessionToken)}`,
+      origin: tenantOrigin,
+      "content-type": "application/json",
+    },
+    body: "{}",
+  });
+  assert.equal(forbiddenEnter.status, 403);
+
+  const logout = await fetch(`${baseUrl}/api/portal/logout`, {
+    method: "POST",
+    headers: {
+      cookie: `motovax_portal_session=${encodeURIComponent(sessionToken)}`,
+      origin: tenantOrigin,
+    },
+  });
+  assert.equal(logout.status, 204);
+  assert.equal(logout.headers.get("access-control-allow-origin"), tenantOrigin);
+  assert.equal(logout.headers.get("access-control-allow-credentials"), "true");
+
+  const expired = await fetch(`${baseUrl}/api/portal/workspace/enter`, {
+    method: "POST",
+    headers: {
+      cookie: `motovax_portal_session=${encodeURIComponent(sessionToken)}`,
+      origin: "http://127.0.0.1",
+      "content-type": "application/json",
+    },
+    body: "{}",
+  });
+  assert.equal(expired.status, 401);
+});
+
 test("portal login memilih tenant dari password saat username dipakai di beberapa workspace", async () => {
   const response = await fetch(`${baseUrl}/api/portal/login`, {
     method: "POST",

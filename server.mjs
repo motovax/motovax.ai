@@ -1616,15 +1616,19 @@ export function createApp({
     const origin = String(req.get("origin") || "");
     const landingOrigin = new URL(config.portalLandingUrl || "https://motovax.ai/").origin;
     const authOrigin = new URL(config.publicBaseUrl).origin;
+    const tenantLogoutOrigin = req.path === "/logout"
+      && /^https:\/\/[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.motovax\.com$/i.test(origin);
     const allowed = origin === landingOrigin
       || origin === authOrigin
       || origin === "https://www.motovax.ai"
+      || tenantLogoutOrigin
       || /^http:\/\/(?:127\.0\.0\.1|localhost)(?::\d+)?$/.test(origin);
     if (origin && allowed) {
       res.set("Access-Control-Allow-Origin", origin);
       res.set("Access-Control-Allow-Headers", "Authorization, Content-Type");
       res.set("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
       res.set("Vary", "Origin");
+      if (tenantLogoutOrigin) res.set("Access-Control-Allow-Credentials", "true");
     }
     if (req.method === "OPTIONS") {
       return allowed ? res.status(204).end() : res.status(403).end();
