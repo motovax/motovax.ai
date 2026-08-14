@@ -15,7 +15,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="./styles.css?v=channel-icons-20260814" />
+    <link rel="stylesheet" href="./styles.css?v=flow-slider-20260814" />
   </head>
   <body class="home-redesign">
     <header class="site-header">
@@ -73,15 +73,45 @@
             <div class="home-hero-actions"><a class="btn btn-primary btn-large" href="https://onboard.motovax.com/onboarding.html">Mulai Sekarang <span>→</span></a></div>
             <div class="home-assurance"><span>✓ Persetujuan manusia</span><span>✓ Akses sesuai peran</span><span>✓ Multi-tenant dan multi-cabang</span></div>
           </div>
-          <div class="hero-workspace" aria-label="Ilustrasi alur kerja Motovax">
-            <div class="workspace-top"><span class="workspace-logo">M</span><div><b>Pusat Kendali Motovax</b><small>Semua kanal aktif</small></div><i>AKTIF</i></div>
-            <div class="workspace-body">
-              <div class="channel-rail" aria-hidden="true"><span class="active">WA</span><span>IG</span><span>FB</span><span>WEB</span></div>
-              <div class="conversation-card"><small>PERCAKAPAN MASUK</small><div class="chat customer">Ada unit Avanza putih di cabang terdekat?</div><div class="ai-thinking"><span>✦</span> Jasmine AI mencari inventory lintas cabang…</div><div class="chat agent">Ada 3 unit tersedia. Saya kirim foto dan simulasi kreditnya, ya.</div><div class="chat-action"><b>3 unit ditemukan</b><span>Foto terkirim · Simulasi siap</span></div></div>
-              <div class="outcome-panel"><small>HASIL OTOMATIS</small><div><span>01</span><p><b>Calon pelanggan dibuat</b><small>Minat dan kanal tercatat</small></p><i>✓</i></div><div><span>02</span><p><b>Tim penjualan ditugaskan</b><small>Konteks percakapan ikut terbawa</small></p><i>✓</i></div><div><span>03</span><p><b>Tindak lanjut aktif</b><small>Pipeline diperbarui</small></p><i>✓</i></div></div>
+          <figure class="hero-workspace" aria-label="Screenshot Motovax Call Center">
+            <div class="hero-shot-window">
+              <div class="hero-shot-topbar" aria-hidden="true">
+                <span class="hero-shot-dots"><i></i><i></i><i></i></span>
+                <strong>Motovax Call Center</strong>
+                <span class="hero-shot-status"><i></i> Data demo</span>
+              </div>
+              <div class="hero-shot-image">
+                <picture>
+                  <source
+                    type="image/webp"
+                    srcset="./assets/feature-previews/omnichannel-faneling-public-720.webp?v=hero-cc-20260814 720w, ./assets/feature-previews/omnichannel-faneling-public-1200.webp?v=hero-cc-20260814 1200w"
+                    sizes="(max-width: 520px) calc(100vw - 32px), (max-width: 1100px) min(760px, calc(100vw - 36px)), 1200px"
+                  />
+                  <img
+                    data-hero-shot
+                    src="./assets/feature-previews/omnichannel-faneling-public.png?v=hero-cc-20260814"
+                    width="1440"
+                    height="900"
+                    alt="Workspace Motovax Call Center: daftar percakapan WhatsApp, Facebook, dan Instagram, respons Jasmine AI, takeover Agent, serta handoff ke MR."
+                    decoding="async"
+                    fetchpriority="high"
+                  />
+                </picture>
+              </div>
+              <div class="hero-shot-caption">
+                <span>Inbox omnichannel, Jasmine AI, takeover Agent, dan handoff MR dalam satu workspace.</span>
+                <button
+                  type="button"
+                  data-hero-image-open
+                  data-image-src="./assets/feature-previews/omnichannel-faneling-public.png?v=hero-cc-20260814"
+                  data-image-alt="Workspace Motovax Call Center: daftar percakapan WhatsApp, Facebook, dan Instagram, respons Jasmine AI, takeover Agent, serta handoff ke MR."
+                  data-image-title="Motovax Call Center"
+                >Buka ukuran penuh ↗</button>
+              </div>
             </div>
-            <div class="floating-chip chip-ai">✦ AI bekerja 24/7</div><div class="floating-chip chip-human">● Agent mengambil alih</div>
-          </div>
+            <div class="floating-chip chip-ai">✦ Jasmine AI merespons</div>
+            <div class="floating-chip chip-human">● Agent &amp; MR mengambil alih</div>
+          </figure>
         </div>
       </section>
 
@@ -122,15 +152,67 @@
         </div>
       </section>
 
-      <section class="home-section how-section native-flow-section" id="cara-kerja">
+            <section class="home-section how-section native-flow-section" id="cara-kerja">
         <div class="container narrow-heading native-flow-heading"><div class="section-label">DARI WAWASAN MENJADI TINDAKAN</div><h2>Tentukan hasilnya. AI menjaga pekerjaan tetap berjalan.</h2><p>Motovax mengamati kejadian bisnis, memahami konteks, menyarankan langkah berikutnya, dan menjalankan tindakan yang disetujui. Tim Anda tetap memegang kendali.</p></div>
-        <div class="container native-flow" aria-label="Diagram automasi AI Motovax">
-          <div class="native-node trigger"><span class="node-icon">◉</span><div><small>PEMICU</small><b>Pelanggan menanyakan produk</b><em>WhatsApp · 09:41</em></div><i>•••</i></div>
-          <div class="native-line vertical"></div>
-          <div class="native-node ai"><span class="node-icon">✦</span><div><small>JASMINE AI</small><b>Memahami kebutuhan dan mencari konteks</b><em>Pelanggan · Inventori · CRM</em></div><i>•••</i></div>
-          <div class="native-line vertical short"></div><div class="native-decision">Inventori tersedia?</div>
-          <div class="native-branches"><div class="branch branch-yes"><span>YA</span><div class="native-node action"><span class="node-icon">▦</span><div><small>TINDAKAN</small><b>Kirim pilihan dan simulasi</b><em>Alat inventori dan keuangan</em></div></div><div class="native-node action secondary"><span class="node-icon">⌁</span><div><small>CRM</small><b>Buat lead dan tugaskan sales</b><em>Konteks tersimpan otomatis</em></div></div></div><div class="branch branch-no"><span>PERLU DITINJAU</span><div class="native-node approval"><span class="node-icon">✓</span><div><small>PERSETUJUAN MANUSIA</small><b>Sarankan inventori alternatif</b><em>Agent meninjau sebelum dikirim</em></div></div><div class="native-node action secondary"><span class="node-icon">⇄</span><div><small>ALIH TANGAN</small><b>Arahkan ke tim yang tepat</b><em>Seluruh riwayat tetap tersedia</em></div></div></div></div>
-          <div class="native-result"><span>Mengamati</span><i>→</i><span>Memahami</span><i>→</i><span>Menyarankan</span><i>→</i><span>Bertindak</span><i>→</i><strong>Belajar</strong></div>
+        <div class="container native-flow-slider" data-flow-slider>
+          <div class="native-flow-viewport" data-flow-viewport tabindex="0" role="region" aria-roledescription="carousel" aria-label="Skema automasi dari berbagai sudut pandang">
+            <article class="native-flow is-active" data-flow-slide="pelanggan" id="flow-slide-pelanggan" role="group" aria-roledescription="slide" aria-label="1 dari 5. Pelanggan menanyakan produk">
+              <p class="native-flow-pov"><span>SUDUT PANDANG</span><b>Pelanggan menanyakan produk</b></p>
+              <div class="native-node trigger"><span class="node-icon">◉</span><div><small>PEMICU</small><b>Pelanggan menanyakan produk</b><em>WhatsApp · 09:41</em></div><i>•••</i></div>
+              <div class="native-line vertical"></div>
+              <div class="native-node ai"><span class="node-icon">✦</span><div><small>JASMINE AI</small><b>Memahami kebutuhan dan mencari konteks</b><em>Pelanggan · Inventori · CRM</em></div><i>•••</i></div>
+              <div class="native-line vertical short"></div><div class="native-decision">Inventori tersedia?</div>
+              <div class="native-branches"><div class="branch branch-yes"><span>YA</span><div class="native-node action"><span class="node-icon">▦</span><div><small>TINDAKAN</small><b>Kirim pilihan dan simulasi</b><em>Alat inventori dan keuangan</em></div></div><div class="native-node action secondary"><span class="node-icon">⌁</span><div><small>CRM</small><b>Buat lead dan tugaskan sales</b><em>Konteks tersimpan otomatis</em></div></div></div><div class="branch branch-no"><span>PERLU DITINJAU</span><div class="native-node approval"><span class="node-icon">✓</span><div><small>PERSETUJUAN MANUSIA</small><b>Sarankan inventori alternatif</b><em>Agent meninjau sebelum dikirim</em></div></div><div class="native-node action secondary"><span class="node-icon">⇄</span><div><small>ALIH TANGAN</small><b>Arahkan ke tim yang tepat</b><em>Seluruh riwayat tetap tersedia</em></div></div></div></div>
+              <div class="native-result"><span>Mengamati</span><i>→</i><span>Memahami</span><i>→</i><span>Menyarankan</span><i>→</i><span>Bertindak</span><i>→</i><strong>Belajar</strong></div>
+            </article>
+            <article class="native-flow" data-flow-slide="sales" id="flow-slide-sales" role="group" aria-roledescription="slide" aria-label="2 dari 5. Sales membutuhkan data produk" hidden>
+              <p class="native-flow-pov"><span>SUDUT PANDANG</span><b>Sales membutuhkan data produk</b></p>
+              <div class="native-node trigger"><span class="node-icon">◉</span><div><small>PEMICU</small><b>Sales membutuhkan data produk</b><em>WhatsApp · 10:18</em></div><i>•••</i></div>
+              <div class="native-line vertical"></div>
+              <div class="native-node ai"><span class="node-icon">✦</span><div><small>FALCON AI</small><b>Cari stok, foto, dan alternatif</b><em>Inventori · Multi-cabang · Kredit</em></div><i>•••</i></div>
+              <div class="native-line vertical short"></div><div class="native-decision">Unit cocok tersedia?</div>
+              <div class="native-branches"><div class="branch branch-yes"><span>YA</span><div class="native-node action"><span class="node-icon">▦</span><div><small>TINDAKAN</small><b>Kirim foto, spek, dan simulasi</b><em>Alat inventori dan keuangan</em></div></div><div class="native-node action secondary"><span class="node-icon">⌁</span><div><small>CRM</small><b>Catat minat dan next action</b><em>Konteks tersimpan otomatis</em></div></div></div><div class="branch branch-no"><span>PERLU DITINJAU</span><div class="native-node approval"><span class="node-icon">✓</span><div><small>PERSETUJUAN MANUSIA</small><b>Tawarkan unit serupa</b><em>Sales meninjau sebelum dikirim</em></div></div><div class="native-node action secondary"><span class="node-icon">⇄</span><div><small>ALIH TANGAN</small><b>Eskalasi ke admin stok</b><em>Riwayat permintaan tetap ada</em></div></div></div></div>
+              <div class="native-result"><span>Mengamati</span><i>→</i><span>Memahami</span><i>→</i><span>Menyarankan</span><i>→</i><span>Bertindak</span><i>→</i><strong>Belajar</strong></div>
+            </article>
+            <article class="native-flow" data-flow-slide="management" id="flow-slide-management" role="group" aria-roledescription="slide" aria-label="3 dari 5. Management membutuhkan laporan finansial" hidden>
+              <p class="native-flow-pov"><span>SUDUT PANDANG</span><b>Management membutuhkan laporan finansial</b></p>
+              <div class="native-node trigger"><span class="node-icon">◉</span><div><small>PEMICU</small><b>Management butuh laporan finansial</b><em>WhatsApp · 08:05</em></div><i>•••</i></div>
+              <div class="native-line vertical"></div>
+              <div class="native-node ai"><span class="node-icon">✦</span><div><small>ANA AI</small><b>Susun ringkasan penjualan dan margin</b><em>Dashboard · Omzet · GP · HPP</em></div><i>•••</i></div>
+              <div class="native-line vertical short"></div><div class="native-decision">Data periode lengkap?</div>
+              <div class="native-branches"><div class="branch branch-yes"><span>YA</span><div class="native-node action"><span class="node-icon">▦</span><div><small>TINDAKAN</small><b>Kirim omzet, GP, dan tren</b><em>Analitik dan email report</em></div></div><div class="native-node action secondary"><span class="node-icon">⌁</span><div><small>JADWAL</small><b>Kirim ulang sesuai periode</b><em>Laporan masuk ke inbox</em></div></div></div><div class="branch branch-no"><span>PERLU DITINJAU</span><div class="native-node approval"><span class="node-icon">✓</span><div><small>PERSETUJUAN MANUSIA</small><b>Konfirmasi filter cabang</b><em>Management pilih cakupan data</em></div></div><div class="native-node action secondary"><span class="node-icon">⇄</span><div><small>ALIH TANGAN</small><b>Tandai metrik yang janggal</b><em>Tim keuangan meninjau</em></div></div></div></div>
+              <div class="native-result"><span>Mengamati</span><i>→</i><span>Memahami</span><i>→</i><span>Menyarankan</span><i>→</i><span>Bertindak</span><i>→</i><strong>Belajar</strong></div>
+            </article>
+            <article class="native-flow" data-flow-slide="admin" id="flow-slide-admin" role="group" aria-roledescription="slide" aria-label="4 dari 5. Admin input data via WhatsApp" hidden>
+              <p class="native-flow-pov"><span>SUDUT PANDANG</span><b>Admin input data via WhatsApp</b></p>
+              <div class="native-node trigger"><span class="node-icon">◉</span><div><small>PEMICU</small><b>Admin input data via WhatsApp</b><em>WhatsApp · 14:22</em></div><i>•••</i></div>
+              <div class="native-line vertical"></div>
+              <div class="native-node ai"><span class="node-icon">✦</span><div><small>FALCON AI</small><b>Pahami perintah dan validasi data</b><em>Inventori · Unit · Foto</em></div><i>•••</i></div>
+              <div class="native-line vertical short"></div><div class="native-decision">Data unit lengkap?</div>
+              <div class="native-branches"><div class="branch branch-yes"><span>YA</span><div class="native-node action"><span class="node-icon">▦</span><div><small>TINDAKAN</small><b>Buat atau perbarui unit stok</b><em>Alat inventori admin</em></div></div><div class="native-node action secondary"><span class="node-icon">⌁</span><div><small>KONFIRMASI</small><b>Kirim ringkasan perubahan</b><em>Admin mendapat bukti input</em></div></div></div><div class="branch branch-no"><span>PERLU DITINJAU</span><div class="native-node approval"><span class="node-icon">✓</span><div><small>PERSETUJUAN MANUSIA</small><b>Minta field yang masih kurang</b><em>Harga, foto, atau cabang</em></div></div><div class="native-node action secondary"><span class="node-icon">⇄</span><div><small>ALIH TANGAN</small><b>Tunda sampai data lengkap</b><em>Draft tetap tersimpan</em></div></div></div></div>
+              <div class="native-result"><span>Mengamati</span><i>→</i><span>Memahami</span><i>→</i><span>Menyarankan</span><i>→</i><span>Bertindak</span><i>→</i><strong>Belajar</strong></div>
+            </article>
+            <article class="native-flow" data-flow-slide="layanan" id="flow-slide-layanan" role="group" aria-roledescription="slide" aria-label="5 dari 5. Tim layanan mengalihkan percakapan" hidden>
+              <p class="native-flow-pov"><span>SUDUT PANDANG</span><b>Tim layanan mengalihkan percakapan</b></p>
+              <div class="native-node trigger"><span class="node-icon">◉</span><div><small>PEMICU</small><b>Percakapan perlu takeover manusia</b><em>Inbox · 11:07</em></div><i>•••</i></div>
+              <div class="native-line vertical"></div>
+              <div class="native-node ai"><span class="node-icon">✦</span><div><small>JASMINE AI</small><b>Siapkan ringkasan dan next action</b><em>Call Center · CRM · SLA</em></div><i>•••</i></div>
+              <div class="native-line vertical short"></div><div class="native-decision">Perlu handoff ke MR?</div>
+              <div class="native-branches"><div class="branch branch-yes"><span>YA</span><div class="native-node action"><span class="node-icon">▦</span><div><small>TINDAKAN</small><b>Alihkan ke Marketing Representative</b><em>Konteks lengkap ikut pindah</em></div></div><div class="native-node action secondary"><span class="node-icon">⌁</span><div><small>CRM</small><b>Update tahap dan PIC</b><em>Lead tetap satu profil</em></div></div></div><div class="branch branch-no"><span>PERLU DITINJAU</span><div class="native-node approval"><span class="node-icon">✓</span><div><small>PERSETUJUAN MANUSIA</small><b>Agent lanjut dengan draft balasan</b><em>Riwayat AI tetap terlihat</em></div></div><div class="native-node action secondary"><span class="node-icon">⇄</span><div><small>TIKET</small><b>Catat status dan SLA</b><em>Antrian tetap rapi</em></div></div></div></div>
+              <div class="native-result"><span>Mengamati</span><i>→</i><span>Memahami</span><i>→</i><span>Menyarankan</span><i>→</i><span>Bertindak</span><i>→</i><strong>Belajar</strong></div>
+            </article>
+          </div>
+          <div class="native-flow-nav">
+            <div class="native-flow-dots" role="tablist" aria-label="Pilih sudut pandang skema">
+              <button type="button" role="tab" id="flow-dot-pelanggan" class="is-active" aria-selected="true" aria-controls="flow-slide-pelanggan" tabindex="0" data-flow-dot="0"><span>Pelanggan</span></button>
+              <button type="button" role="tab" id="flow-dot-sales" aria-selected="false" aria-controls="flow-slide-sales" tabindex="-1" data-flow-dot="1"><span>Sales</span></button>
+              <button type="button" role="tab" id="flow-dot-management" aria-selected="false" aria-controls="flow-slide-management" tabindex="-1" data-flow-dot="2"><span>Management</span></button>
+              <button type="button" role="tab" id="flow-dot-admin" aria-selected="false" aria-controls="flow-slide-admin" tabindex="-1" data-flow-dot="3"><span>Admin</span></button>
+              <button type="button" role="tab" id="flow-dot-layanan" aria-selected="false" aria-controls="flow-slide-layanan" tabindex="-1" data-flow-dot="4"><span>Layanan</span></button>
+            </div>
+            <p class="native-flow-hint">Geser atau pilih titik untuk melihat alur lain</p>
+            <p class="visually-hidden" data-flow-status aria-live="polite">Skema 1 dari 5: Pelanggan menanyakan produk</p>
+          </div>
         </div>
       </section>
 

@@ -239,6 +239,51 @@ for (const link of document.querySelectorAll("[data-wa]")) {
   observer.observe(headline || typed);
 })();
 
+/** Modal screenshot hero: ukuran penuh di halaman yang sama. */
+(function initHeroImageModal() {
+  const modal = document.querySelector("[data-hero-image-modal]");
+  const modalImg = document.querySelector("[data-hero-image-modal-img]");
+  const modalTitle = document.querySelector("[data-hero-image-modal-title]");
+  const openers = [...document.querySelectorAll("[data-hero-image-open]")];
+  if (!(modal instanceof HTMLElement) || !(modalImg instanceof HTMLImageElement) || !openers.length) return;
+
+  let trigger = null;
+  const close = () => {
+    if (modal.hidden) return;
+    modal.hidden = true;
+    document.body.classList.remove("feature-image-open");
+    modalImg.removeAttribute("src");
+    trigger?.focus();
+  };
+
+  const open = (button) => {
+    trigger = button instanceof HTMLElement ? button : openers[0];
+    const source = trigger instanceof HTMLElement ? trigger : openers[0];
+    modalImg.src = source.dataset.imageSrc || "";
+    modalImg.alt = source.dataset.imageAlt || "Screenshot Motovax Call Center ukuran penuh";
+    if (modalTitle) modalTitle.textContent = source.dataset.imageTitle || "Motovax Call Center";
+    modal.hidden = false;
+    document.body.classList.add("feature-image-open");
+    modal.querySelector("[data-hero-image-close]")?.focus();
+  };
+
+  for (const button of openers) {
+    button.addEventListener("click", () => open(button));
+  }
+
+  const shot = document.querySelector("[data-hero-shot]");
+  if (shot instanceof HTMLImageElement) {
+    shot.addEventListener("click", () => open(openers[0]));
+  }
+
+  modal.addEventListener("click", (event) => {
+    if (event.target === modal || event.target.closest("[data-hero-image-close]")) close();
+  });
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && !modal.hidden) close();
+  });
+})();
+
 /** Tab "Contoh alur nyata" di beranda: ganti kartu journey saat diklik. */
 (function initUsecaseTabs() {
   const root = document.querySelector(".usecase-tabs");
@@ -290,6 +335,108 @@ for (const link of document.querySelectorAll("[data-wa]")) {
     tab.focus();
   });
 })();
+
+/** Slider skema "Cara Kerja": geser / titik untuk ganti sudut pandang. */
+(function initNativeFlowSlider() {
+  const root = document.querySelector("[data-flow-slider]");
+  if (!(root instanceof HTMLElement)) return;
+
+  const viewport = root.querySelector("[data-flow-viewport]");
+  const slides = [...root.querySelectorAll("[data-flow-slide]")];
+  const dots = [...root.querySelectorAll("[data-flow-dot]")];
+  const status = root.querySelector("[data-flow-status]");
+  if (!(viewport instanceof HTMLElement) || slides.length < 2) return;
+
+  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  let index = 0;
+  let drag = null;
+
+  const slideLabel = (slide) => {
+    const pov = slide.querySelector(".native-flow-pov b");
+    return (pov && pov.textContent ? pov.textContent : slide.getAttribute("aria-label") || "").trim();
+  };
+
+  const goTo = (next) => {
+    const clamped = Math.max(0, Math.min(slides.length - 1, Number(next) || 0));
+    if (clamped === index && slides[clamped].classList.contains("is-active")) return;
+    index = clamped;
+    for (const [i, slide] of slides.entries()) {
+      const on = i === index;
+      slide.classList.toggle("is-active", on);
+      slide.hidden = !on;
+      slide.setAttribute("aria-hidden", on ? "false" : "true");
+      if (on && !reducedMotion) {
+        slide.classList.remove("is-entering");
+        void slide.offsetWidth;
+        slide.classList.add("is-entering");
+      }
+    }
+    for (const [i, dot] of dots.entries()) {
+      const on = i === index;
+      dot.classList.toggle("is-active", on);
+      dot.setAttribute("aria-selected", on ? "true" : "false");
+      dot.tabIndex = on ? 0 : -1;
+    }
+    if (status instanceof HTMLElement) {
+      status.textContent = `Skema ${index + 1} dari ${slides.length}: ${slideLabel(slides[index])}`;
+    }
+  };
+
+  root.addEventListener("click", (event) => {
+    const dot = event.target instanceof Element ? event.target.closest("[data-flow-dot]") : null;
+    if (!(dot instanceof HTMLElement) || !root.contains(dot)) return;
+    goTo(dot.getAttribute("data-flow-dot"));
+  });
+
+  const moveByKey = (event, fromIndex) => {
+    let next = -1;
+    if (event.key === "ArrowRight" || event.key === "ArrowDown") next = fromIndex + 1;
+    else if (event.key === "ArrowLeft" || event.key === "ArrowUp") next = fromIndex - 1;
+    else if (event.key === "Home") next = 0;
+    else if (event.key === "End") next = slides.length - 1;
+    if (next < 0 || next >= slides.length) return false;
+    event.preventDefault();
+    goTo(next);
+    const target = dots[next];
+    if (target instanceof HTMLElement) target.focus();
+    return true;
+  };
+
+  viewport.addEventListener("keydown", (event) => moveByKey(event, index));
+  root.querySelector(".native-flow-dots")?.addEventListener("keydown", (event) => {
+    const current = event.target instanceof Element ? event.target.closest("[data-flow-dot]") : null;
+    if (!(current instanceof HTMLElement)) return;
+    moveByKey(event, dots.indexOf(current));
+  });
+
+  const startDrag = (event) => {
+    if (event.pointerType === "mouse" && event.button !== 0) return;
+    drag = { id: event.pointerId, startX: event.clientX, moved: false };
+  };
+
+  const moveDrag = (event) => {
+    if (!drag || event.pointerId !== drag.id) return;
+    if (Math.abs(event.clientX - drag.startX) > 24) drag.moved = true;
+  };
+
+  const endDrag = (event) => {
+    if (!drag || (event && event.pointerId !== drag.id)) return;
+    const delta = event.clientX - drag.startX;
+    const moved = drag.moved;
+    drag = null;
+    if (!moved || Math.abs(delta) < 40) return;
+    if (delta < 0) goTo(index + 1);
+    else goTo(index - 1);
+  };
+
+  viewport.addEventListener("pointerdown", startDrag);
+  viewport.addEventListener("pointermove", moveDrag);
+  viewport.addEventListener("pointerup", endDrag);
+  viewport.addEventListener("pointercancel", () => { drag = null; });
+
+  goTo(0);
+})();
+
 
 const contactForm = document.querySelector("[data-contact-form]");
 if (contactForm instanceof HTMLFormElement) {
