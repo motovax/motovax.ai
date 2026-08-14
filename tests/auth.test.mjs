@@ -33,6 +33,7 @@ const config = {
   sessionSecret: "test-session-secret-with-at-least-32-characters",
   databaseUrl: "postgres://test",
   tenantDomainSuffix: "motovax.com",
+  workspaceEntryBaseUrl: "https://workspace.motovax.com",
   recaptchaProjectId: "motovax-test",
   recaptchaSiteKey: "test-site-key",
   recaptchaApiKey: "test-api-key",
@@ -173,6 +174,7 @@ const store = {
         domain: "dealer-test.motovax.com",
         app_user_id: "app-user-1",
       },
+      handoffToken: "onboarding-handoff-token",
     };
   },
   async findPortalUsers({ identifier }) {
@@ -257,6 +259,13 @@ const store = {
     return {
       workspace: { domain: "dealer-test.motovax.com" },
       handoffToken: "handoff-token-1",
+    };
+  },
+  async createWorkspaceHandoff(_userId, tenantId) {
+    if (tenantId !== "tenant-1") return null;
+    return {
+      workspace: { domain: "dealer-test.motovax.com" },
+      handoffToken: "workspace-entry-token",
     };
   },
   async isSlugAvailable(slug) {
@@ -888,7 +897,31 @@ test("penyelesaian onboarding langsung merespons tanpa menunggu provisioning dom
   assert.equal(response.status, 202);
   assert.ok(responseTime < 1000, `respons selesai dalam ${responseTime}ms`);
   const payload = await response.json();
-  assert.equal(payload.workspace.ready, false);
+  assert.equal(payload.workspace.ready, true);
+  const redirectUrl = new URL(payload.workspace.redirectUrl);
+  assert.equal(redirectUrl.origin, "https://workspace.motovax.com");
+  assert.equal(redirectUrl.pathname, "/magic-login");
+  assert.equal(redirectUrl.searchParams.get("token"), "onboarding-handoff-token");
   assert.equal("portalSession" in payload, false);
   assert.ok(domainEnsureCalls.includes("dealer-test.motovax.com"));
+});
+
+test("workspace dapat dimasuki lewat host bersama tanpa menunggu HTTPS domain tenant", async () => {
+  accountState = {
+    profile: { modules: ["ims"] },
+    workspaces: [{ id: "tenant-1", name: "Dealer Test", domain: "dealer-test.motovax.com" }],
+  };
+  const response = await fetch(`${baseUrl}/api/workspaces/tenant-1/enter`, {
+    method: "POST",
+    headers: {
+      cookie: authenticatedCookie,
+      origin: "http://127.0.0.1",
+      "content-type": "application/json",
+    },
+    body: "{}",
+  });
+  assert.equal(response.status, 200);
+  const redirectUrl = new URL((await response.json()).redirectUrl);
+  assert.equal(redirectUrl.origin, "https://workspace.motovax.com");
+  assert.equal(redirectUrl.searchParams.get("token"), "workspace-entry-token");
 });

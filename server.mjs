@@ -23,7 +23,7 @@ const DOMAIN_PROVISIONING_RETRY_DELAYS_MS = [3_000, 10_000];
 const ALLOWED_MODULES = new Set(["ims", "omni", "social", "crm", "dashboard", "insight"]);
 const ALLOWED_GOALS = new Set(["conversion", "response", "inventory", "scale"]);
 const RESERVED_SLUGS = new Set([
-  "api", "app", "assets", "auth", "dss", "internal", "motovax-ai", "onboard", "status", "support", "www",
+  "api", "app", "assets", "auth", "dss", "internal", "motovax-ai", "onboard", "status", "support", "workspace", "www",
 ]);
 const MOBIX_TENANT_ID = "4c8bdcb3-c535-4ad6-b2fb-53f5361c8489";
 const BILLING_PACKAGE_DEFINITIONS = [
@@ -127,6 +127,7 @@ function readConfig(env = process.env) {
     sessionSecret: env.SESSION_SECRET || "",
     databaseUrl: env.EXTERNAL_DATABASE_URL || env.DATABASE_URL || "",
     tenantDomainSuffix: (env.TENANT_DOMAIN_SUFFIX || "motovax.com").toLowerCase(),
+    workspaceEntryBaseUrl: env.WORKSPACE_ENTRY_BASE_URL || "https://workspace.motovax.com",
     coolifyBaseUrl: String(env.COOLIFY_BASE_URL || "").replace(/\/$/, ""),
     coolifyToken: env.COOLIFY_DEPLOY_TOKEN || "",
     coolifyProductAppUuid: env.COOLIFY_PRODUCT_APP_UUID || "",
@@ -301,6 +302,7 @@ function validateConfig(config) {
   const publicUrl = new URL(config.publicBaseUrl);
   const redirectUrl = new URL(config.googleRedirectUri);
   const successUrl = new URL(config.oauthSuccessUrl);
+  const workspaceEntryUrl = new URL(config.workspaceEntryBaseUrl || "https://workspace.motovax.com");
 
   if (redirectUrl.origin !== publicUrl.origin) {
     throw new Error("GOOGLE_OAUTH_REDIRECT_URI harus memakai origin PUBLIC_BASE_URL.");
@@ -308,6 +310,16 @@ function validateConfig(config) {
   if (successUrl.origin !== publicUrl.origin) {
     throw new Error("OAUTH_SUCCESS_URL harus memakai origin PUBLIC_BASE_URL.");
   }
+  if (workspaceEntryUrl.protocol !== "https:" && workspaceEntryUrl.hostname !== "127.0.0.1" && workspaceEntryUrl.hostname !== "localhost") {
+    throw new Error("WORKSPACE_ENTRY_BASE_URL harus memakai HTTPS.");
+  }
+}
+
+function workspaceMagicLoginUrl(config, handoffToken, destination = "/") {
+  const redirect = new URL("/magic-login", config.workspaceEntryBaseUrl || "https://workspace.motovax.com");
+  redirect.searchParams.set("token", handoffToken);
+  if (destination !== "/") redirect.searchParams.set("redirect", destination);
+  return redirect.toString();
 }
 
 function randomToken(bytes = 32) {
@@ -1346,8 +1358,14 @@ export async function createPostgresStore(connectionString) {
           : { rows: [] };
         if (existingMembership.rows[0]) {
           const workspace = existingMembership.rows[0];
+          const handoffToken = randomToken(32);
+          await client.query(
+            `INSERT INTO auth_tokens (user_id, token, expires_at, is_magic_link)
+             VALUES ($1, $2, $3, TRUE)`,
+            [workspace.app_user_id, handoffToken, new Date(Date.now() + HANDOFF_TTL_MS)],
+          );
           await client.query("COMMIT");
-          return { workspace };
+          return { workspace, handoffToken };
         }
 
         const slug = normalizeSlug(profile.workspace_slug);
@@ -1432,9 +1450,16 @@ export async function createPostgresStore(connectionString) {
            WHERE user_id = $1`,
           [userId, tenantId],
         );
+        const handoffToken = randomToken(32);
+        await client.query(
+          `INSERT INTO auth_tokens (user_id, token, expires_at, is_magic_link)
+           VALUES ($1, $2, $3, TRUE)`,
+          [appUserId, handoffToken, new Date(Date.now() + HANDOFF_TTL_MS)],
+        );
         await client.query("COMMIT");
         return {
           workspace: { id: tenantId, name: profile.business_name, domain, app_user_id: appUserId },
+          handoffToken,
         };
       } catch (error) {
         try {
@@ -2220,7 +2245,8 @@ export function createApp({
           id: result.workspace.id,
           name: result.workspace.name,
           domain: result.workspace.domain,
-          ready: false,
+          ready: true,
+          redirectUrl: workspaceMagicLoginUrl(config, result.handoffToken),
         },
       });
     } catch (error) {
@@ -2268,13 +2294,10 @@ export function createApp({
       const state = await store.getAccountState(user.id);
       const selected = state.workspaces.find((item) => item.id === req.params.tenantId);
       if (!selected) return res.status(404).json({ error: "workspace_not_found" });
-      if (!(await tenantDomainReady(selected.domain))) {
-        return res.status(409).json({ error: "workspace_provisioning", message: "Workspace masih menyiapkan domain HTTPS." });
-      }
       const result = await store.createWorkspaceHandoff(user.id, req.params.tenantId);
       if (!result) return res.status(404).json({ error: "workspace_not_found" });
       return res.json({
-        redirectUrl: `https://${result.workspace.domain}/magic-login?token=${encodeURIComponent(result.handoffToken)}`,
+        redirectUrl: workspaceMagicLoginUrl(config, result.handoffToken),
       });
     } catch (error) {
       return next(error);

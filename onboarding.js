@@ -1183,7 +1183,7 @@
     if (workspaceSummary) workspaceSummary.hidden = true;
     if (workspaceActions) workspaceActions.hidden = true;
     if (readyTitle) readyTitle.textContent = "Pendaftaran berhasil";
-    if (readyCopy) readyCopy.textContent = "Akses aman sedang disiapkan. Anda langsung dialihkan saat domain workspace siap.";
+    if (readyCopy) readyCopy.textContent = "Akses aman sudah siap. Anda langsung dialihkan ke dashboard workspace dealer.";
     if (redirectDomain) redirectDomain.textContent = this.state.workspace?.domain || "workspace dealer Anda";
   };
 

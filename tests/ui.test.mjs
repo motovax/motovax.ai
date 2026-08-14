@@ -521,14 +521,21 @@ for (const viewport of viewports) {
       status: 202,
       contentType: "application/json",
       body: JSON.stringify({
-        workspace: { id: "tenant-1", name: "Dealer Maju Jaya", domain: "dealer-maju-jaya.motovax.com", ready: true },
+        workspace: {
+          id: "tenant-1",
+          name: "Dealer Maju Jaya",
+          domain: "dealer-maju-jaya.motovax.com",
+          ready: true,
+          redirectUrl: "https://workspace.motovax.com/magic-login?token=onboarding-handoff",
+        },
       }),
     }));
-    await page.route("**/api/workspaces/tenant-1/enter", async (route) => {
-      await new Promise((resolve) => setTimeout(resolve, 350));
-      return route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ redirectUrl: "https://dealer-maju-jaya.motovax.com/magic-login?token=onboarding-handoff" }) });
+    let resolveWorkspaceRedirect;
+    const workspaceRedirect = new Promise((resolve) => { resolveWorkspaceRedirect = resolve; });
+    await page.route("https://workspace.motovax.com/**", (route) => {
+      resolveWorkspaceRedirect({ url: route.request().url(), requestedAt: Date.now() });
+      return route.abort("aborted");
     });
-    await page.route("https://dealer-maju-jaya.motovax.com/**", (route) => route.fulfill({ status: 200, contentType: "text/html", body: "<title>Workspace Dealer</title>" }));
 
     await page.goto(`${baseUrl}/onboarding.html`, { waitUntil: "load" });
     await page.waitForSelector('[data-step="1"].is-active');
@@ -571,7 +578,7 @@ for (const viewport of viewports) {
     await page.waitForSelector('[data-step="3"].is-active');
 
     const redirectStartedAt = Date.now();
-    await page.click('[data-modules-form] button[type="submit"]');
+    await page.locator('[data-modules-form] button[type="submit"]').evaluate((button) => button.click());
     await page.waitForSelector('[data-step="4"].is-active');
     const result = await page.evaluate(() => ({
       overflow: document.documentElement.scrollWidth > document.documentElement.clientWidth,
@@ -594,9 +601,9 @@ for (const viewport of viewports) {
       actionsHidden: true,
     });
     await page.screenshot({ path: `/tmp/motovax-onboarding-${viewport.name}.png`, fullPage: false });
-    await page.waitForURL("https://dealer-maju-jaya.motovax.com/**");
-    assert.ok(Date.now() - redirectStartedAt < 3000);
-    assert.equal(new URL(page.url()).searchParams.get("token"), "onboarding-handoff");
+    const redirect = await workspaceRedirect;
+    assert.ok(redirect.requestedAt - redirectStartedAt < 3000);
+    assert.equal(new URL(redirect.url).searchParams.get("token"), "onboarding-handoff");
     await context.close();
   });
 
