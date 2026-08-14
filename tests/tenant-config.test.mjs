@@ -1,7 +1,11 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 
-import { buildIsolatedTenantConfig } from "../server.mjs";
+import {
+  buildIsolatedTenantConfig,
+  shouldProvisionCallCenterRole,
+  tenantRoleTemplatesForProvisioning,
+} from "../server.mjs";
 
 function profile(overrides = {}) {
   return {
@@ -77,4 +81,34 @@ test("objek konfigurasi antar-tenant tidak berbagi referensi atau profile channe
   assert.deepEqual(tenantB.social_media.design_templates, []);
   assert.notEqual(tenantA.messenger.motosocial_profile, tenantB.messenger.motosocial_profile);
   assert.notEqual(tenantA.instagram_private.motosocial_profile, tenantB.instagram_private.motosocial_profile);
+});
+
+test("role Call Center hanya diprovisi untuk modul AI Omnichannel dan bukan Mobix", () => {
+  const regularTenantId = "11111111-1111-1111-1111-111111111111";
+  const mobixTenantId = "4c8bdcb3-c535-4ad6-b2fb-53f5361c8489";
+
+  assert.equal(shouldProvisionCallCenterRole({ tenantId: regularTenantId, modules: ["omni"] }), true);
+  assert.equal(shouldProvisionCallCenterRole({ tenantId: regularTenantId, modules: ["dashboard"] }), false);
+  assert.equal(shouldProvisionCallCenterRole({ tenantId: mobixTenantId, modules: ["omni"] }), false);
+
+  const eligibleRoles = tenantRoleTemplatesForProvisioning({ tenantId: regularTenantId, modules: ["omni"] });
+  const ineligibleRoles = tenantRoleTemplatesForProvisioning({ tenantId: regularTenantId, modules: ["ims", "crm"] });
+  const mobixRoles = tenantRoleTemplatesForProvisioning({ tenantId: mobixTenantId, modules: ["omni"] });
+
+  assert.equal(eligibleRoles.some(([name]) => name === "Call Center"), true);
+  assert.equal(ineligibleRoles.some(([name]) => name === "Call Center"), false);
+  assert.equal(mobixRoles.some(([name]) => name === "Call Center"), false);
+});
+
+test("mapping Call Center awal memakai role seeded tanpa mengaktifkan Jasmine otomatis", () => {
+  const config = buildIsolatedTenantConfig({
+    tenantId: "11111111-1111-1111-1111-111111111111",
+    profile: profile({ modules: ["omni"] }),
+    callCenterRoleId: "22222222-2222-2222-2222-222222222222",
+  });
+
+  assert.deepEqual(config.whatsapp.call_center_contact_role_ids, [
+    "22222222-2222-2222-2222-222222222222",
+  ]);
+  assert.equal(config.whatsapp.jasmine_auto_assign_enabled, false);
 });

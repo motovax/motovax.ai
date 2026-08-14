@@ -21,6 +21,7 @@ const RESERVED_SLUGS = new Set([
   "api", "app", "assets", "auth", "dss", "internal", "motovax-ai", "onboard", "status", "support", "www",
 ]);
 const ONBOARDING_MEETING_TIMES = new Set(["09:00", "10:30", "13:30", "15:00"]);
+const MOBIX_TENANT_ID = "4c8bdcb3-c535-4ad6-b2fb-53f5361c8489";
 
 const FULL_TENANT_PERMISSIONS = [
   "tenant:read", "tenant:update", "user:create", "user:read", "user:update", "user:delete",
@@ -39,6 +40,29 @@ const TENANT_ROLE_TEMPLATES = [
   ["President Director", FULL_TENANT_PERMISSIONS],
   ["PIC Agent Officer", FULL_TENANT_PERMISSIONS],
 ];
+const CALL_CENTER_PERMISSIONS = [
+  "whatsapp:unit_query",
+  "whatsapp:finance_simulation",
+  "whatsapp:image_generation",
+  "whatsapp:photo_send",
+  "whatsapp:lead_own",
+  "whatsapp:handoff",
+  "analytics:sales_performance",
+];
+
+export function shouldProvisionCallCenterRole({ tenantId, modules }) {
+  return String(tenantId || "").trim().toLowerCase() !== MOBIX_TENANT_ID
+    && Array.isArray(modules)
+    && modules.includes("omni");
+}
+
+export function tenantRoleTemplatesForProvisioning({ tenantId, modules }) {
+  const templates = TENANT_ROLE_TEMPLATES.map(([name, permissions]) => [name, [...permissions]]);
+  if (shouldProvisionCallCenterRole({ tenantId, modules })) {
+    templates.push(["Call Center", [...CALL_CENTER_PERMISSIONS]]);
+  }
+  return templates;
+}
 
 function readConfig(env = process.env) {
   const publicBaseUrl = env.PUBLIC_BASE_URL || "https://onboard.motovax.com";
@@ -143,7 +167,7 @@ function normalizeEmail(value) {
   return String(value || "").trim().toLowerCase();
 }
 
-export function buildIsolatedTenantConfig({ tenantId, profile }) {
+export function buildIsolatedTenantConfig({ tenantId, profile, callCenterRoleId = "" }) {
   const modules = Array.isArray(profile?.modules) ? [...profile.modules] : [];
   const region = String(profile?.region || "").trim();
   const motosocialProfile = `motovax_${String(tenantId || "").replace(/[^a-zA-Z0-9_-]+/g, "_")}`;
@@ -172,7 +196,10 @@ export function buildIsolatedTenantConfig({ tenantId, profile }) {
     whatsapp: {
       sales_default_role_id: "",
       handoff_role_ids: [],
-      call_center_contact_role_ids: [],
+      call_center_contact_role_ids:
+        shouldProvisionCallCenterRole({ tenantId, modules }) && callCenterRoleId
+          ? [callCenterRoleId]
+          : [],
       call_center_handoff_role_ids: [],
       auto_reply_groups: [],
       area_branch_map: {},
@@ -856,7 +883,11 @@ export async function createPostgresStore(connectionString) {
 
         const tenantId = crypto.randomUUID();
         const appUserId = crypto.randomUUID();
-        const tenantConfig = buildIsolatedTenantConfig({ tenantId, profile });
+        const roleTemplates = tenantRoleTemplatesForProvisioning({ tenantId, modules: profile.modules });
+        const callCenterRoleId = roleTemplates.some(([roleName]) => roleName === "Call Center")
+          ? crypto.randomUUID()
+          : "";
+        const tenantConfig = buildIsolatedTenantConfig({ tenantId, profile, callCenterRoleId });
         await client.query(
           `INSERT INTO tenants
             (id, name, slug, description, status, config, default_ai_engine_key, created_by, created_at, updated_at)
@@ -871,8 +902,8 @@ export async function createPostgresStore(connectionString) {
         );
 
         let adminRoleId = "";
-        for (const [roleName, permissions] of TENANT_ROLE_TEMPLATES) {
-          const roleId = crypto.randomUUID();
+        for (const [roleName, permissions] of roleTemplates) {
+          const roleId = roleName === "Call Center" ? callCenterRoleId : crypto.randomUUID();
           await client.query(
             `INSERT INTO roles
               (id, tenant_id, name, seeded_name, permissions, created_at, created_by)
