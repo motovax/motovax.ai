@@ -37,6 +37,7 @@
     return {
       step: 1,
       authMode: "signup",
+      pendingVerification: null,
       onboardingMode: "self",
       account: { fullName: "", email: "", password: "" },
       business: {
@@ -91,6 +92,8 @@
           var error = new Error(payload.message || "Permintaan belum berhasil. Silakan coba lagi.");
           error.status = response.status;
           error.code = payload.error;
+          error.payload = payload;
+          error.retryAfterSeconds = payload.retryAfterSeconds;
           throw error;
         }
         return payload;
@@ -176,6 +179,7 @@
     qsa("a[href]").forEach(function (link) {
       if (
         link.matches("[data-google-login]") ||
+        link.matches("[data-verification-mailbox]") ||
         link.closest("[data-reset-form]") ||
         link.closest(".onboarding-recaptcha-disclosure")
       ) return;
@@ -202,6 +206,7 @@
     this.toastTimer = null;
     this.workspacePollTimer = null;
     this.slugCheckTimer = null;
+    this.verificationTimer = null;
     this.slugAvailability = { slug: "", available: null };
     this.slugIsAutomatic = !this.state.business.workspaceSlug;
     this.recaptchaConfigPromise = this.prepareRecaptcha();
@@ -213,6 +218,8 @@
 
     this.signupForm = qs('[data-auth-form="signup"]');
     this.resetForm = qs("[data-reset-form]");
+    this.verificationPanel = qs("[data-verification-panel]");
+    this.verifiedBanner = qs("[data-email-verified-banner]");
     this.businessForm = qs("[data-business-form]");
     this.modulesForm = qs("[data-modules-form]");
     this.goalGrid = qs("[data-goal-grid]");
@@ -324,6 +331,30 @@
       });
     }
 
+    var verificationResend = qs("[data-verification-resend]");
+    if (verificationResend) {
+      verificationResend.addEventListener("click", function () {
+        self.resendVerification();
+      });
+    }
+    var verificationChange = qs("[data-verification-change]");
+    if (verificationChange) {
+      verificationChange.addEventListener("click", function () {
+        self.changeVerificationEmail();
+      });
+    }
+    var verificationCheck = qs("[data-verification-check]");
+    if (verificationCheck) {
+      verificationCheck.addEventListener("click", function () {
+        self.checkVerificationStatus();
+      });
+    }
+    document.addEventListener("visibilitychange", function () {
+      if (!document.hidden && self.verificationPanel && !self.verificationPanel.hidden) {
+        self.checkVerificationStatus({ quiet: true });
+      }
+    });
+
     if (this.resetForm) {
       this.resetForm.addEventListener("submit", function (event) {
         event.preventDefault();
@@ -432,6 +463,8 @@
 
   OnboardingApp.prototype.setAuthMode = function () {
     this.state.authMode = "signup";
+    window.clearInterval(this.verificationTimer);
+    this.verificationTimer = null;
 
     if (this.signupForm) {
       this.signupForm.hidden = false;
@@ -439,6 +472,8 @@
       this.signupForm.setAttribute("aria-hidden", "false");
     }
     if (this.resetForm) this.resetForm.hidden = true;
+    if (this.verificationPanel) this.verificationPanel.hidden = true;
+    if (this.verifiedBanner) this.verifiedBanner.hidden = true;
     var divider = qs(".onboarding-auth-divider");
     var googleButton = qs("[data-google-login]");
     if (divider) divider.hidden = false;
@@ -446,6 +481,10 @@
 
     var lead = qs("[data-auth-lead]");
     if (lead) lead.textContent = AUTH_LEAD;
+    var kicker = qs("[data-auth-kicker]");
+    var title = qs("[data-auth-title]");
+    if (kicker) kicker.textContent = "LANGKAH 1 · AKUN";
+    if (title) title.textContent = "Buat akun baru";
 
     var googleBtn = qs("[data-google-login]");
     if (googleBtn) {
@@ -458,6 +497,163 @@
 
     this.clearErrors();
     saveState(this.state);
+  };
+
+  OnboardingApp.prototype.mailboxTarget = function (email) {
+    var domain = String(email || "").split("@")[1] || "";
+    if (/^(outlook|hotmail|live)\./i.test(domain)) return { href: "https://outlook.live.com/mail/", label: "Buka Outlook" };
+    if (/^yahoo\./i.test(domain)) return { href: "https://mail.yahoo.com/", label: "Buka Yahoo Mail" };
+    if (/^(gmail|googlemail)\.com$/i.test(domain)) return { href: "https://mail.google.com/", label: "Buka Gmail" };
+    return { href: "https://mail.google.com/", label: "Buka kotak masuk" };
+  };
+
+  OnboardingApp.prototype.showVerificationView = function (state, options) {
+    options = options || {};
+    var email = options.email || this.state.pendingVerification?.email || this.state.account?.email || "";
+    var viewState = state || "pending";
+    var title = "Cek email Anda";
+    var panelHeading = "Periksa kotak masuk";
+    var copy = "Kami mengirim link verifikasi ke:";
+    var status = options.status || "Link berlaku selama 24 jam. Anda dapat menutup halaman ini dan kembali nanti.";
+    if (viewState === "expired") {
+      title = "Link verifikasi kedaluwarsa";
+      panelHeading = "Minta link verifikasi baru";
+      copy = "Kirim link baru untuk memverifikasi:";
+      status = options.status || "Link hanya berlaku 24 jam. Kirim ulang email untuk mendapatkan link baru.";
+    } else if (viewState === "used") {
+      title = "Link ini sudah tidak berlaku";
+      panelHeading = "Gunakan link terbaru";
+      copy = "Gunakan email verifikasi terbaru untuk:";
+      status = options.status || "Link mungkin sudah digunakan atau digantikan oleh kiriman yang lebih baru.";
+    } else if (viewState === "invalid") {
+      title = "Link verifikasi tidak valid";
+      panelHeading = "Minta link verifikasi baru";
+      copy = "Minta link baru untuk memverifikasi:";
+      status = options.status || "Pastikan link disalin lengkap atau kirim ulang email verifikasi.";
+    }
+
+    if (this.signupForm) this.signupForm.hidden = true;
+    if (this.resetForm) this.resetForm.hidden = true;
+    if (this.verificationPanel) {
+      this.verificationPanel.hidden = false;
+      this.verificationPanel.dataset.state = viewState === "pending" ? "pending" : "error";
+    }
+    var divider = qs(".onboarding-auth-divider");
+    var googleButton = qs("[data-google-login]");
+    if (divider) divider.hidden = true;
+    if (googleButton) googleButton.hidden = true;
+    var kicker = qs("[data-auth-kicker]");
+    var authTitle = qs("[data-auth-title]");
+    var lead = qs("[data-auth-lead]");
+    if (kicker) kicker.textContent = "LANGKAH 1 · VERIFIKASI EMAIL";
+    if (authTitle) authTitle.textContent = title;
+    if (lead) lead.textContent = "Selesaikan verifikasi sebelum membuat workspace dealer Anda.";
+    var panelTitle = qs("[data-verification-title]");
+    var panelCopy = qs("[data-verification-copy]");
+    var panelEmail = qs("[data-verification-email]");
+    var panelStatus = qs("[data-verification-status]");
+    if (panelTitle) panelTitle.textContent = panelHeading;
+    if (panelCopy) panelCopy.textContent = copy;
+    if (panelEmail) panelEmail.textContent = email || "Alamat email pendaftaran";
+    if (panelStatus) panelStatus.textContent = status;
+    qsa("[data-verification-icon]", this.verificationPanel).forEach(function (icon) {
+      icon.hidden = icon.dataset.verificationIcon !== (viewState === "pending" ? "mail" : "error");
+    });
+    var mailbox = qs("[data-verification-mailbox]");
+    var mailboxTarget = this.mailboxTarget(email);
+    if (mailbox) {
+      mailbox.href = mailboxTarget.href;
+      var mailboxLabel = qs("[data-verification-mailbox-label]", mailbox);
+      if (mailboxLabel) mailboxLabel.textContent = mailboxTarget.label;
+    }
+    this.updateVerificationCountdown();
+    window.clearInterval(this.verificationTimer);
+    this.verificationTimer = window.setInterval(this.updateVerificationCountdown.bind(this), 1000);
+    this.verificationPanel?.scrollIntoView({ behavior: options.silent ? "auto" : "smooth", block: "nearest" });
+  };
+
+  OnboardingApp.prototype.updateVerificationCountdown = function () {
+    var button = qs("[data-verification-resend]");
+    if (!button) return;
+    var availableAt = Number(this.state.pendingVerification?.resendAvailableAt || 0);
+    var seconds = Math.max(0, Math.ceil((availableAt - Date.now()) / 1000));
+    button.disabled = seconds > 0;
+    button.textContent = seconds > 0 ? "Kirim ulang dalam " + seconds + " dtk" : "Kirim ulang email";
+  };
+
+  OnboardingApp.prototype.resendVerification = async function () {
+    var button = qs("[data-verification-resend]");
+    var status = qs("[data-verification-status]");
+    if (button) button.disabled = true;
+    if (status) status.textContent = "Mengirim email verifikasi baru…";
+    try {
+      var payload = await api("/api/auth/resend-verification", { method: "POST", body: "{}" });
+      this.state.pendingVerification = Object.assign({}, this.state.pendingVerification, {
+        email: payload.email || this.state.pendingVerification?.email || "",
+        resendAvailableAt: Date.now() + Number(payload.resendAfterSeconds || 60) * 1000,
+      });
+      saveState(this.state);
+      this.showVerificationView("pending", {
+        email: this.state.pendingVerification.email,
+        status: "Email baru sudah dikirim. Gunakan link terbaru; link sebelumnya otomatis tidak berlaku.",
+      });
+    } catch (error) {
+      if (error.status === 429 && error.retryAfterSeconds) {
+        this.state.pendingVerification = Object.assign({}, this.state.pendingVerification, {
+          resendAvailableAt: Date.now() + Number(error.retryAfterSeconds) * 1000,
+        });
+        saveState(this.state);
+      }
+      if (status) status.textContent = friendlySubmitError(error, "Email belum dapat dikirim ulang. Silakan coba lagi.");
+      this.updateVerificationCountdown();
+    }
+  };
+
+  OnboardingApp.prototype.changeVerificationEmail = async function () {
+    var button = qs("[data-verification-change]");
+    var status = qs("[data-verification-status]");
+    if (button) button.disabled = true;
+    if (status) status.textContent = "Membatalkan pendaftaran lama…";
+    try {
+      await api("/api/auth/pending-signup", { method: "DELETE", body: "{}" });
+      this.state.pendingVerification = null;
+      this.state.account.email = "";
+      saveState(this.state);
+      this.setAuthMode();
+      if (this.signupForm?.email) {
+        this.signupForm.email.value = "";
+        this.signupForm.email.focus({ preventScroll: true });
+      }
+    } catch (error) {
+      if (status) status.textContent = friendlySubmitError(error, "Alamat email belum dapat diganti. Silakan coba lagi.");
+    } finally {
+      if (button) button.disabled = false;
+    }
+  };
+
+  OnboardingApp.prototype.checkVerificationStatus = async function (options) {
+    options = options || {};
+    var button = qs("[data-verification-check]");
+    var status = qs("[data-verification-status]");
+    if (button) button.disabled = true;
+    if (!options.quiet && status) status.textContent = "Memeriksa status verifikasi…";
+    try {
+      var payload = await api("/api/auth/me");
+      if (!payload?.authenticated || !payload.user) throw Object.assign(new Error("Email belum terverifikasi."), { status: 401 });
+      this.state.pendingVerification = null;
+      this.applyAccountPayload(payload);
+      saveState(this.state);
+      if (this.verifiedBanner) this.verifiedBanner.hidden = false;
+      this.goTo(this.state.business.businessName ? 3 : 2);
+    } catch (error) {
+      if (error.status === 401) {
+        if (!options.quiet && status) status.textContent = "Email belum terverifikasi. Klik link pada email terbaru lalu periksa kembali.";
+      } else if (status) {
+        status.textContent = friendlySubmitError(error, "Status belum dapat diperiksa. Coba lagi beberapa saat.");
+      }
+    } finally {
+      if (button) button.disabled = false;
+    }
   };
 
   OnboardingApp.prototype.showResetForm = function () {
@@ -575,11 +771,18 @@
         body: JSON.stringify({ fullName: fullName, email: email, password: password }),
       });
       if (payload.verificationRequired) {
-        this.showToast("Periksa email Anda", "Klik tautan verifikasi untuk melanjutkan onboarding.");
+        this.state.account = { fullName: fullName, email: payload.email || email, provider: "password" };
+        this.state.pendingVerification = {
+          email: payload.email || email,
+          resendAvailableAt: Date.now() + Number(payload.resendAfterSeconds || 60) * 1000,
+        };
+        saveState(this.state);
         clearPasswordFields(form);
+        this.showVerificationView("pending", { email: this.state.pendingVerification.email });
         return;
       }
       this.applyAccountPayload(payload);
+      this.state.pendingVerification = null;
       clearPasswordFields(form);
       this.state.authMode = "signup";
       saveState(this.state);
@@ -648,10 +851,6 @@
       this.showToast("Pendaftaran Google belum berhasil", "Silakan coba lagi atau hubungi tim MOTOVAX.");
       return;
     }
-    if (emailStatus === "invalid") {
-      this.showToast("Tautan verifikasi tidak valid", "Minta tautan baru dengan mengulangi proses daftar.");
-    }
-
     fetch("/api/auth/me", {
       credentials: "same-origin",
       headers: { Accept: "application/json" },
@@ -663,14 +862,9 @@
       })
       .then(function (payload) {
         if (!payload || !payload.authenticated || !payload.user) {
-          self.state = defaultState();
-          self.slugIsAutomatic = true;
-          saveState(self.state);
-          self.hydrate();
-          self.goTo(1, { silent: true });
-          if (params.get("reset") === "1" && params.get("token")) self.showResetForm();
-          return;
+          return self.restorePendingSignup(emailStatus, params);
         }
+        self.state.pendingVerification = null;
         self.applyAccountPayload(payload);
         self.state.authMode = "signup";
         saveState(self.state);
@@ -687,7 +881,7 @@
           var query = params.toString();
           window.history.replaceState({}, "", window.location.pathname + (query ? "?" + query : ""));
         } else if (emailStatus === "verified") {
-          self.showToast("Email berhasil diverifikasi", "Lanjut lengkapi profil dealer Anda.");
+          if (self.verifiedBanner) self.verifiedBanner.hidden = false;
           params.delete("email");
           var emailQuery = params.toString();
           window.history.replaceState({}, "", window.location.pathname + (emailQuery ? "?" + emailQuery : ""));
@@ -697,6 +891,41 @@
         if (oauthStatus === "success") {
           self.showToast("Session belum dapat dimuat", "Muat ulang halaman atau coba daftar kembali.");
         }
+      });
+  };
+
+  OnboardingApp.prototype.restorePendingSignup = function (emailStatus, params) {
+    var self = this;
+    return api("/api/auth/pending-signup")
+      .then(function (payload) {
+        self.state.account = Object.assign({}, self.state.account, { email: payload.email, provider: "password" });
+        self.state.pendingVerification = {
+          email: payload.email,
+          resendAvailableAt: Date.now() + Number(payload.resendAfterSeconds || 0) * 1000,
+        };
+        saveState(self.state);
+        self.goTo(1, { silent: true });
+        var view = ["expired", "used", "invalid"].indexOf(emailStatus) !== -1 ? emailStatus : "pending";
+        self.showVerificationView(view, { email: payload.email, silent: true });
+        if (emailStatus) {
+          params.delete("email");
+          var query = params.toString();
+          window.history.replaceState({}, "", window.location.pathname + (query ? "?" + query : ""));
+        }
+        return true;
+      })
+      .catch(function (error) {
+        if (error.status !== 401) throw error;
+        self.state = defaultState();
+        self.slugIsAutomatic = true;
+        saveState(self.state);
+        self.hydrate();
+        self.goTo(1, { silent: true });
+        if (params.get("reset") === "1" && params.get("token")) self.showResetForm();
+        if (["expired", "used", "invalid"].indexOf(emailStatus) !== -1) {
+          self.showToast("Link verifikasi tidak dapat digunakan", "Daftar kembali untuk mendapatkan link verifikasi baru.");
+        }
+        return false;
       });
   };
 
@@ -932,7 +1161,11 @@
     }
     this.selectIndustry("automotive");
     this.selectGoal(this.state.goal || "conversion");
-    this.setAuthMode();
+    if (this.state.pendingVerification?.email) {
+      this.showVerificationView("pending", { email: this.state.pendingVerification.email, silent: true });
+    } else {
+      this.setAuthMode();
+    }
 
     var selected = this.state.modules || [];
     qsa('input[name="modules"]').forEach(function (input) {

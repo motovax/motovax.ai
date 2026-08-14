@@ -80,19 +80,65 @@ const store = {
   async findPasswordUser(email) {
     return passwordUsers.get(email) || null;
   },
+  async findPasswordUserById(userId) {
+    return [...passwordUsers.values()].find((user) => user.id === userId) || null;
+  },
   async saveActionToken(record) {
-    actionTokens.set(`${record.actionType}:${record.digest}`, record.userId);
+    for (const token of actionTokens.values()) {
+      if (token.userId === record.userId && token.actionType === record.actionType && !token.usedAt) {
+        token.usedAt = Date.now();
+      }
+    }
+    actionTokens.set(`${record.actionType}:${record.digest}`, {
+      ...record,
+      createdAt: Date.now(),
+      usedAt: null,
+    });
+  },
+  async findActionToken({ digest, actionType }) {
+    const token = actionTokens.get(`${actionType}:${digest}`);
+    if (!token || token.usedAt || new Date(token.expiresAt).getTime() <= Date.now()) return null;
+    return token.userId;
+  },
+  async getActionTokenStatus({ digest, actionType }) {
+    const token = actionTokens.get(`${actionType}:${digest}`);
+    if (!token) return "invalid";
+    if (token.usedAt) return "used";
+    if (new Date(token.expiresAt).getTime() <= Date.now()) return "expired";
+    return "active";
+  },
+  async getActionTokenResendDelay({ userId, actionType, cooldownSeconds }) {
+    const latest = [...actionTokens.values()]
+      .filter((token) => token.userId === userId && token.actionType === actionType)
+      .reduce((max, token) => Math.max(max, token.createdAt), 0);
+    return Math.max(0, Math.ceil((latest + cooldownSeconds * 1000 - Date.now()) / 1000));
   },
   async takeActionToken({ digest, actionType }) {
     const key = `${actionType}:${digest}`;
-    const userId = actionTokens.get(key);
-    actionTokens.delete(key);
+    const token = actionTokens.get(key);
+    if (!token || token.usedAt || new Date(token.expiresAt).getTime() <= Date.now()) return null;
+    token.usedAt = Date.now();
+    const userId = token.userId;
     if (userId && actionType === "verify_email") {
       for (const user of passwordUsers.values()) {
         if (user.id === userId) user.email_verified = true;
       }
+      for (const pendingToken of actionTokens.values()) {
+        if (pendingToken.userId === userId && pendingToken.actionType === "pending_signup" && !pendingToken.usedAt) {
+          pendingToken.usedAt = Date.now();
+        }
+      }
     }
     return userId || null;
+  },
+  async deletePendingPasswordUser(userId) {
+    const entry = [...passwordUsers.entries()].find(([, user]) => user.id === userId);
+    if (!entry || entry[1].email_verified) return false;
+    passwordUsers.delete(entry[0]);
+    for (const [key, token] of actionTokens.entries()) {
+      if (token.userId === userId) actionTokens.delete(key);
+    }
+    return true;
   },
   async updatePassword(userId, passwordHash) {
     for (const user of passwordUsers.values()) {
@@ -370,14 +416,66 @@ test("daftar dan login email/password memakai kredensial nyata", async () => {
   const signupBody = await signup.json();
   assert.equal(signupBody.email, "password@example.com");
   assert.equal(signupBody.verificationRequired, true);
+  assert.equal(signupBody.resendAfterSeconds, 60);
   assert.equal(sentEmails.length, 1);
   assert.equal(sentEmails[0].from, "MOTOVAX <onboarding@motovax.ai>");
+  assert.match(sentEmails[0].text, /Verifikasi Email:/);
+  assert.match(sentEmails[0].text, /berlaku selama 24 jam/);
+  assert.match(sentEmails[0].html, /^<!doctype html>/);
+  assert.match(sentEmails[0].html, /role="presentation"/);
+  assert.match(sentEmails[0].html, /Platform Dealer Mobil/);
+  assert.match(sentEmails[0].html, />Verifikasi Email<\/a>/);
+  assert.match(sentEmails[0].html, /berlaku selama <strong>24 jam<\/strong>/);
+  assert.match(sentEmails[0].html, /logo-motovax\.png\?v=email-20260814/);
+  assert.doesNotMatch(sentEmails[0].html, /<script/i);
+
+  const pendingSignup = cookieValue(signup.headers.get("set-cookie"), "motovax_pending_signup");
+  assert.ok(pendingSignup);
+  const pending = await fetch(`${baseUrl}/api/auth/pending-signup`, {
+    headers: { cookie: `motovax_pending_signup=${encodeURIComponent(pendingSignup)}` },
+  });
+  assert.equal(pending.status, 200);
+  assert.equal((await pending.json()).email, "password@example.com");
+
+  const resendDuringCooldown = await fetch(`${baseUrl}/api/auth/resend-verification`, {
+    method: "POST",
+    headers: {
+      "content-type": "application/json",
+      origin: "http://127.0.0.1",
+      cookie: `motovax_pending_signup=${encodeURIComponent(pendingSignup)}`,
+    },
+    body: "{}",
+  });
+  assert.equal(resendDuringCooldown.status, 429);
+  assert.ok((await resendDuringCooldown.json()).retryAfterSeconds > 0);
 
   const verificationUrl = sentEmails[0].text.match(/http:\/\/127\.0\.0\.1\/api\/auth\/verify-email\?token=[^\s]+/)[0];
   const verificationTarget = new URL(verificationUrl);
-  const verification = await fetch(`${baseUrl}${verificationTarget.pathname}${verificationTarget.search}`, { redirect: "manual" });
+  const firstTokenDigest = digest(verificationTarget.searchParams.get("token"));
+  actionTokens.get(`verify_email:${firstTokenDigest}`).createdAt = Date.now() - 61_000;
+
+  const resent = await fetch(`${baseUrl}/api/auth/resend-verification`, {
+    method: "POST",
+    headers: {
+      "content-type": "application/json",
+      origin: "http://127.0.0.1",
+      cookie: `motovax_pending_signup=${encodeURIComponent(pendingSignup)}`,
+    },
+    body: "{}",
+  });
+  assert.equal(resent.status, 202);
+  assert.equal(sentEmails.length, 2);
+
+  const superseded = await fetch(`${baseUrl}${verificationTarget.pathname}${verificationTarget.search}`, { redirect: "manual" });
+  assert.equal(superseded.status, 302);
+  assert.match(superseded.headers.get("location"), /email=used/);
+
+  const resentVerificationUrl = sentEmails[1].text.match(/http:\/\/127\.0\.0\.1\/api\/auth\/verify-email\?token=[^\s]+/)[0];
+  const resentVerificationTarget = new URL(resentVerificationUrl);
+  const verification = await fetch(`${baseUrl}${resentVerificationTarget.pathname}${resentVerificationTarget.search}`, { redirect: "manual" });
   assert.equal(verification.status, 302);
   assert.match(verification.headers.get("location"), /email=verified/);
+  assert.match(verification.headers.get("set-cookie"), /motovax_pending_signup=;/);
 
   const invalid = await fetch(`${baseUrl}/api/auth/login`, {
     method: "POST",
@@ -433,6 +531,39 @@ test("daftar dan login email/password memakai kredensial nyata", async () => {
     body: JSON.stringify({ email: "password@example.com", password: "rahasia456" }),
   });
   assert.equal(loginWithUpdatedPassword.status, 200);
+});
+
+test("pendaftaran manual dapat dibatalkan untuk mengganti email", async () => {
+  const signup = await fetch(`${baseUrl}/api/auth/signup`, {
+    method: "POST",
+    headers: { "content-type": "application/json", origin: "http://127.0.0.1" },
+    body: JSON.stringify({
+      fullName: "Email Lama",
+      email: "ganti-email@example.com",
+      password: "rahasia123",
+    }),
+  });
+  assert.equal(signup.status, 202);
+  const pendingSignup = cookieValue(signup.headers.get("set-cookie"), "motovax_pending_signup");
+  const verificationUrl = sentEmails.at(-1).text.match(/http:\/\/127\.0\.0\.1\/api\/auth\/verify-email\?token=[^\s]+/)[0];
+  const verificationTarget = new URL(verificationUrl);
+  actionTokens.get(`verify_email:${digest(verificationTarget.searchParams.get("token"))}`).expiresAt = new Date(Date.now() - 1_000);
+  const expired = await fetch(`${baseUrl}${verificationTarget.pathname}${verificationTarget.search}`, { redirect: "manual" });
+  assert.equal(expired.status, 302);
+  assert.match(expired.headers.get("location"), /email=expired/);
+
+  const cancel = await fetch(`${baseUrl}/api/auth/pending-signup`, {
+    method: "DELETE",
+    headers: {
+      "content-type": "application/json",
+      origin: "http://127.0.0.1",
+      cookie: `motovax_pending_signup=${encodeURIComponent(pendingSignup)}`,
+    },
+    body: "{}",
+  });
+  assert.equal(cancel.status, 204);
+  assert.equal(passwordUsers.has("ganti-email@example.com"), false);
+  assert.match(cancel.headers.get("set-cookie"), /motovax_pending_signup=;/);
 });
 
 test("callback menolak state yang tidak cocok", async () => {
