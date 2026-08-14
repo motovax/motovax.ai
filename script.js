@@ -13,16 +13,74 @@ for (const link of document.querySelectorAll("[data-wa]")) {
   }
 }
 
-/** Menampilkan baris headline berurutan dan menggambar underline saat masuk viewport. */
-(function initCascadeHeadlines() {
-  const headlines = document.querySelectorAll("[data-cascade-headline]");
-  if (!headlines.length) return;
+/** Typewriter pada baris outcome hero: High Conversion / Unlimited Growth. */
+(function initTypewriterHeadline() {
+  const typed = document.querySelector("[data-typewriter]");
+  if (!(typed instanceof HTMLElement)) return;
 
+  const phrases = String(typed.getAttribute("data-phrases") || "")
+    .split("|")
+    .map((phrase) => phrase.trim())
+    .filter(Boolean);
+  if (!phrases.length) return;
+
+  const headline = typed.closest(".hero-type-headline");
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  for (const headline of headlines) headline.classList.add("is-cascade-ready");
+  if (headline) headline.classList.add("is-type-ready");
 
-  if (reducedMotion || !("IntersectionObserver" in window)) {
-    for (const headline of headlines) headline.classList.add("is-in-view");
+  const showStatic = () => {
+    if (headline) headline.classList.add("is-in-view");
+  };
+
+  if (reducedMotion) {
+    typed.textContent = phrases[0];
+    showStatic();
+    return;
+  }
+
+  const typeDelay = 64;
+  const deleteDelay = 36;
+  const holdDelay = 1700;
+  const betweenDelay = 260;
+  let index = 0;
+
+  const wait = (ms) => new Promise((resolve) => window.setTimeout(resolve, ms));
+
+  async function typeText(text) {
+    for (let i = 1; i <= text.length; i += 1) {
+      typed.textContent = text.slice(0, i);
+      await wait(typeDelay);
+    }
+  }
+
+  async function deleteText() {
+    const current = typed.textContent || "";
+    for (let i = current.length - 1; i >= 0; i -= 1) {
+      typed.textContent = current.slice(0, i);
+      await wait(deleteDelay);
+    }
+  }
+
+  async function loop() {
+    await typeText(phrases[index]);
+    if (phrases.length < 2) return;
+    await wait(holdDelay);
+    await deleteText();
+    await wait(betweenDelay);
+    index = (index + 1) % phrases.length;
+    loop();
+  }
+
+  const start = async () => {
+    showStatic();
+    await wait(240);
+    if (headline) headline.classList.add("is-typing");
+    typed.textContent = "";
+    loop();
+  };
+
+  if (!("IntersectionObserver" in window)) {
+    start();
     return;
   }
 
@@ -30,14 +88,14 @@ for (const link of document.querySelectorAll("[data-wa]")) {
     (entries) => {
       for (const entry of entries) {
         if (!entry.isIntersecting) continue;
-        entry.target.classList.add("is-in-view");
-        observer.unobserve(entry.target);
+        observer.disconnect();
+        start();
       }
     },
-    { threshold: 0.45 },
+    { threshold: 0.4 },
   );
 
-  for (const headline of headlines) observer.observe(headline);
+  observer.observe(headline || typed);
 })();
 
 const contactForm = document.querySelector("[data-contact-form]");
