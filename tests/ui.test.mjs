@@ -116,6 +116,8 @@ for (const viewport of viewports) {
     assert.equal(await page.inputValue('[data-auth-form="signup"] input[name="email"]'), "");
     assert.equal(await page.locator('[data-step="4"]').isHidden(), true);
     assert.equal(await page.getByText("Jadwalkan demo live", { exact: false }).count(), 0);
+    assert.equal(await page.getByRole("link", { name: "Jadwalkan Demo", exact: true }).count(), 0);
+    assert.equal(await page.getByRole("link", { name: "Kembali ke beranda", exact: false }).count(), 1);
     assert.equal(await page.evaluate(() => JSON.parse(localStorage.getItem("motovax_onboarding_v1")).workspace), null);
     assert.equal(await noOverflow(page), true);
     await page.screenshot({ path: `/tmp/motovax-fresh-registration-${viewport.name}.png`, fullPage: false });
