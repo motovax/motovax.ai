@@ -251,6 +251,14 @@ for (const link of document.querySelectorAll("[data-wa]")) {
     problemVisual.addEventListener("click", () => open(problemOpener));
   }
 
+  for (const visual of document.querySelectorAll("[data-usecase-visual]")) {
+    if (!(visual instanceof HTMLImageElement)) continue;
+    const opener = visual.closest("figure")?.querySelector("[data-hero-image-open]");
+    if (!(opener instanceof HTMLElement)) continue;
+    visual.style.cursor = "zoom-in";
+    visual.addEventListener("click", () => open(opener));
+  }
+
   modal.addEventListener("click", (event) => {
     if (event.target === modal || event.target.closest("[data-hero-image-close]")) close();
   });
@@ -259,55 +267,83 @@ for (const link of document.querySelectorAll("[data-wa]")) {
   });
 })();
 
-/** Tab "Contoh alur nyata" di beranda: ganti kartu journey saat diklik. */
-(function initUsecaseTabs() {
-  const root = document.querySelector(".usecase-tabs");
+/** Slider "Contoh alur nyata": teks kiri, foto kanan, 3 use case. */
+(function initUsecaseSlider() {
+  const root = document.querySelector("[data-usecase-slider]");
   if (!(root instanceof HTMLElement)) return;
 
   const tabs = [...root.querySelectorAll("[data-usecase]")];
-  const panels = [...document.querySelectorAll("[data-usecase-panel]")];
+  const panels = [...root.querySelectorAll("[data-usecase-panel]")];
+  const prev = root.querySelector("[data-usecase-prev]");
+  const next = root.querySelector("[data-usecase-next]");
   if (!tabs.length || !panels.length) return;
 
-  const activate = (id) => {
-    const next = String(id || "");
-    if (!panels.some((panel) => panel.getAttribute("data-usecase-panel") === next)) return;
+  const ids = panels.map((panel) => panel.getAttribute("data-usecase-panel")).filter(Boolean);
+  let index = Math.max(0, ids.indexOf(panels.find((panel) => !panel.hidden)?.getAttribute("data-usecase-panel") || ids[0]));
+
+  const activate = (id, { focusTab = false } = {}) => {
+    const nextId = String(id || "");
+    const nextIndex = ids.indexOf(nextId);
+    if (nextIndex < 0) return;
+    index = nextIndex;
 
     for (const tab of tabs) {
-      const on = tab.getAttribute("data-usecase") === next;
+      const on = tab.getAttribute("data-usecase") === nextId;
       tab.classList.toggle("active", on);
       tab.setAttribute("aria-selected", on ? "true" : "false");
       tab.tabIndex = on ? 0 : -1;
+      if (on && focusTab) tab.focus();
     }
 
     for (const panel of panels) {
-      const on = panel.getAttribute("data-usecase-panel") === next;
+      const on = panel.getAttribute("data-usecase-panel") === nextId;
       panel.classList.toggle("is-active", on);
       panel.hidden = !on;
     }
   };
 
-  root.addEventListener("click", (event) => {
+  const step = (delta) => activate(ids[(index + delta + ids.length) % ids.length]);
+
+  root.querySelector(".usecase-tabs")?.addEventListener("click", (event) => {
     const tab = event.target instanceof Element ? event.target.closest("[data-usecase]") : null;
     if (!(tab instanceof HTMLElement) || !root.contains(tab)) return;
     activate(tab.getAttribute("data-usecase"));
   });
 
-  root.addEventListener("keydown", (event) => {
+  root.querySelector(".usecase-tabs")?.addEventListener("keydown", (event) => {
     const current = event.target instanceof Element ? event.target.closest("[data-usecase]") : null;
     if (!(current instanceof HTMLElement) || !root.contains(current)) return;
 
-    const index = tabs.indexOf(current);
-    let next = -1;
-    if (event.key === "ArrowDown" || event.key === "ArrowRight") next = (index + 1) % tabs.length;
-    else if (event.key === "ArrowUp" || event.key === "ArrowLeft") next = (index - 1 + tabs.length) % tabs.length;
-    else if (event.key === "Home") next = 0;
-    else if (event.key === "End") next = tabs.length - 1;
-    if (next < 0) return;
+    const currentIndex = tabs.indexOf(current);
+    let nextIndex = -1;
+    if (event.key === "ArrowDown" || event.key === "ArrowRight") nextIndex = (currentIndex + 1) % tabs.length;
+    else if (event.key === "ArrowUp" || event.key === "ArrowLeft") nextIndex = (currentIndex - 1 + tabs.length) % tabs.length;
+    else if (event.key === "Home") nextIndex = 0;
+    else if (event.key === "End") nextIndex = tabs.length - 1;
+    if (nextIndex < 0) return;
 
     event.preventDefault();
-    const tab = tabs[next];
-    activate(tab.getAttribute("data-usecase"));
-    tab.focus();
+    activate(tabs[nextIndex].getAttribute("data-usecase"), { focusTab: true });
+  });
+
+  prev?.addEventListener("click", () => step(-1));
+  next?.addEventListener("click", () => step(1));
+
+  let pointerX = null;
+  root.addEventListener("pointerdown", (event) => {
+    if (event.pointerType === "mouse" && event.button !== 0) return;
+    if (event.target instanceof Element && event.target.closest("button, a")) return;
+    pointerX = event.clientX;
+  });
+  root.addEventListener("pointerup", (event) => {
+    if (pointerX == null) return;
+    const delta = event.clientX - pointerX;
+    pointerX = null;
+    if (Math.abs(delta) < 48) return;
+    step(delta < 0 ? 1 : -1);
+  });
+  root.addEventListener("pointercancel", () => {
+    pointerX = null;
   });
 })();
 

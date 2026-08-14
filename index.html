@@ -15,7 +15,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="./styles.css?v=tantangan-img-20260815" />
+    <link rel="stylesheet" href="./styles.css?v=usecase-slider-20260815" />
   </head>
   <body class="home-redesign">
     <header class="site-header">
@@ -225,49 +225,174 @@
         </div>
       </section>
 
-      <section class="home-section usecase-section">
-        <div class="container usecase-layout">
-          <div class="usecase-copy">
-            <div class="section-label">CONTOH ALUR NYATA</div>
-            <h2>Satu pertanyaan pelanggan, banyak pekerjaan selesai otomatis.</h2>
-            <p>Pilih alur yang paling dekat dengan operasional Anda. Setiap alur tetap terhubung pada satu profil customer dan sumber data.</p>
-            <div class="usecase-tabs" role="tablist" aria-label="Contoh alur nyata">
-              <button class="active" type="button" role="tab" id="usecase-tab-sales" aria-selected="true" aria-controls="usecase-panel-sales" tabindex="0" data-usecase="sales">Penjualan unit <span aria-hidden="true">→</span></button>
-              <button type="button" role="tab" id="usecase-tab-service" aria-selected="false" aria-controls="usecase-panel-service" tabindex="-1" data-usecase="service">Layanan pelanggan <span aria-hidden="true">→</span></button>
-              <button type="button" role="tab" id="usecase-tab-crm" aria-selected="false" aria-controls="usecase-panel-crm" tabindex="-1" data-usecase="crm">Follow-up CRM <span aria-hidden="true">→</span></button>
-            </div>
+      <section class="home-section usecase-section" id="contoh-alur">
+        <div class="container usecase-slider" data-usecase-slider>
+          <header class="usecase-heading">
+            <h2>CONTOH ALUR NYATA</h2>
+          </header>
+
+          <div class="usecase-viewport">
+            <article class="usecase-slide is-active" id="usecase-panel-falcon" role="tabpanel" aria-labelledby="usecase-tab-falcon" data-usecase-panel="falcon">
+              <div class="usecase-copy">
+                <p class="usecase-kicker">USE CASE: DSS Motor</p>
+                <h3>Falcon IMS</h3>
+                <p class="usecase-lead">Implementasi Falcon &amp; AI (WhatsApp-based)</p>
+                <div class="usecase-block">
+                  <span>Terintegrasi dengan</span>
+                  <ul>
+                    <li>Inventory Management</li>
+                    <li>AI Sales Assistant</li>
+                  </ul>
+                </div>
+                <div class="usecase-impact">
+                  <span>Impact</span>
+                  <ul>
+                    <li>Sales process lebih cepat &amp; terstruktur</li>
+                    <li>Tim sales terbantu AI dalam closing</li>
+                    <li>Data lebih akurat &amp; real-time</li>
+                  </ul>
+                </div>
+              </div>
+              <figure class="usecase-photo">
+                <picture>
+                  <source
+                    type="image/webp"
+                    srcset="./assets/usecase/falcon-ims-dss-motor-720.webp?v=usecase-slider-20260815 720w, ./assets/usecase/falcon-ims-dss-motor-1200.webp?v=usecase-slider-20260815 1200w"
+                    sizes="(max-width: 760px) calc(100vw - 32px), (max-width: 1100px) min(480px, calc(52vw - 24px)), 760px"
+                  />
+                  <img
+                    data-usecase-visual
+                    src="./assets/usecase/falcon-ims-dss-motor.png?v=usecase-slider-20260815"
+                    width="1510"
+                    height="1042"
+                    alt="Percakapan WhatsApp DSS Motor AI Falcon: lead baru terdaftar otomatis dan stok unit dicari lewat Inventory Management."
+                    decoding="async"
+                  />
+                </picture>
+                <figcaption>
+                  <button
+                    type="button"
+                    data-hero-image-open
+                    data-image-src="./assets/usecase/falcon-ims-dss-motor.png?v=usecase-slider-20260815"
+                    data-image-alt="Percakapan WhatsApp DSS Motor AI Falcon: lead baru terdaftar otomatis dan stok unit dicari lewat Inventory Management."
+                    data-image-title="Falcon IMS — DSS Motor"
+                  >Buka ukuran penuh ↗</button>
+                </figcaption>
+              </figure>
+            </article>
+
+            <article class="usecase-slide" id="usecase-panel-social" role="tabpanel" aria-labelledby="usecase-tab-social" data-usecase-panel="social" hidden>
+              <div class="usecase-copy">
+                <p class="usecase-kicker">USE CASE: Mobix by DSSM</p>
+                <h3>Automated Social Media from Inventory</h3>
+                <p class="usecase-lead">Automasi posting &amp; marketing</p>
+                <div class="usecase-block">
+                  <span>Kapabilitas</span>
+                  <ul>
+                    <li>AI Background generator</li>
+                    <li>Schedule posting</li>
+                    <li>1 platform to post it all</li>
+                  </ul>
+                </div>
+                <div class="usecase-impact">
+                  <span>Impact</span>
+                  <ul>
+                    <li>Konsistensi konten meningkat</li>
+                    <li>Hemat waktu tim marketing</li>
+                    <li>Inventory lebih cepat terjual</li>
+                  </ul>
+                </div>
+              </div>
+              <figure class="usecase-photo">
+                <picture>
+                  <source
+                    type="image/webp"
+                    srcset="./assets/usecase/social-media-mobix-dssm-720.webp?v=usecase-slider-20260815 720w, ./assets/usecase/social-media-mobix-dssm-1200.webp?v=usecase-slider-20260815 1200w"
+                    sizes="(max-width: 760px) calc(100vw - 32px), (max-width: 1100px) min(480px, calc(52vw - 24px)), 760px"
+                  />
+                  <img
+                    data-usecase-visual
+                    src="./assets/usecase/social-media-mobix-dssm.png?v=usecase-slider-20260815"
+                    width="1510"
+                    height="1042"
+                    alt="Studio konten Mobix: pilih unit dari inventori, generate background AI, lalu jadwalkan posting ke Instagram, Facebook, TikTok, dan WhatsApp."
+                    decoding="async"
+                  />
+                </picture>
+                <figcaption>
+                  <button
+                    type="button"
+                    data-hero-image-open
+                    data-image-src="./assets/usecase/social-media-mobix-dssm.png?v=usecase-slider-20260815"
+                    data-image-alt="Studio konten Mobix: pilih unit dari inventori, generate background AI, lalu jadwalkan posting ke Instagram, Facebook, TikTok, dan WhatsApp."
+                    data-image-title="Automated Social Media — Mobix by DSSM"
+                  >Buka ukuran penuh ↗</button>
+                </figcaption>
+              </figure>
+            </article>
+
+            <article class="usecase-slide" id="usecase-panel-omni" role="tabpanel" aria-labelledby="usecase-tab-omni" data-usecase-panel="omni" hidden>
+              <div class="usecase-copy">
+                <p class="usecase-kicker">USE CASE: DSF</p>
+                <h3>Omnichannel call center AI</h3>
+                <p class="usecase-lead">Automasi lead capture, nurture, hingga distribusi</p>
+                <div class="usecase-block">
+                  <span>Kapabilitas</span>
+                  <ul>
+                    <li>AI Jasmine sales agent</li>
+                    <li>1 Dashboard to manage</li>
+                  </ul>
+                </div>
+                <div class="usecase-impact">
+                  <span>Impact</span>
+                  <ul>
+                    <li>Lead tertangkap, ter-nurture, lalu terdistribusi otomatis</li>
+                    <li>Tim sales terima konteks lengkap dari Jasmine</li>
+                    <li>Semua kanal dan status lead di satu dashboard</li>
+                  </ul>
+                </div>
+              </div>
+              <figure class="usecase-photo">
+                <picture>
+                  <source
+                    type="image/webp"
+                    srcset="./assets/usecase/omnichannel-dsf-720.webp?v=usecase-slider-20260815 720w, ./assets/usecase/omnichannel-dsf-1200.webp?v=usecase-slider-20260815 1200w"
+                    sizes="(max-width: 760px) calc(100vw - 32px), (max-width: 1100px) min(480px, calc(52vw - 24px)), 760px"
+                  />
+                  <img
+                    data-usecase-visual
+                    src="./assets/usecase/omnichannel-dsf.png?v=usecase-slider-20260815"
+                    width="1510"
+                    height="1042"
+                    alt="Dashboard omnichannel DSF: inbox percakapan, simulasi kredit, detail lead, dan distribusi ke tim sales dari satu layar."
+                    decoding="async"
+                  />
+                </picture>
+                <figcaption>
+                  <button
+                    type="button"
+                    data-hero-image-open
+                    data-image-src="./assets/usecase/omnichannel-dsf.png?v=usecase-slider-20260815"
+                    data-image-alt="Dashboard omnichannel DSF: inbox percakapan, simulasi kredit, detail lead, dan distribusi ke tim sales dari satu layar."
+                    data-image-title="Omnichannel Call Center AI — DSF"
+                  >Buka ukuran penuh ↗</button>
+                </figcaption>
+              </figure>
+            </article>
           </div>
-          <div class="journey-stage">
-            <article class="journey-card is-active" id="usecase-panel-sales" role="tabpanel" aria-labelledby="usecase-tab-sales" data-usecase-panel="sales">
-              <div class="journey-head"><span>ALUR PENJUALAN UNIT</span><i>Berjalan 24/7</i></div>
-              <ol>
-                <li><span>1</span><div><b>Pelanggan bertanya lewat WhatsApp</b><p>AI mengenali kebutuhan, lokasi, dan preferensi.</p></div></li>
-                <li><span>2</span><div><b>Falcon mencari stok terkini</b><p>Unit yang cocok, pilihan lain, foto, dan simulasi disiapkan.</p></div></li>
-                <li><span>3</span><div><b>Calon pelanggan masuk ke CRM</b><p>Minat dan riwayat percakapan tersimpan otomatis.</p></div></li>
-                <li><span>4</span><div><b>Tim penjualan melanjutkan percakapan</b><p>Tim menerima konteks lengkap beserta tindakan berikutnya.</p></div></li>
-              </ol>
-              <div class="journey-result"><span>HASIL</span><b>Lebih sedikit input manual. Tindak lanjut dapat dilakukan lebih cepat.</b></div>
-            </article>
-            <article class="journey-card" id="usecase-panel-service" role="tabpanel" aria-labelledby="usecase-tab-service" data-usecase-panel="service" hidden>
-              <div class="journey-head"><span>ALUR LAYANAN PELANGGAN</span><i>Berjalan 24/7</i></div>
-              <ol>
-                <li><span>1</span><div><b>Pelanggan menghubungi lewat WhatsApp, Instagram, atau Messenger</b><p>Semua kanal masuk ke satu inbox omnichannel.</p></div></li>
-                <li><span>2</span><div><b>Jasmine AI merespons pertanyaan rutin</b><p>Intent, SLA, dan konteks percakapan dikenali otomatis.</p></div></li>
-                <li><span>3</span><div><b>Agent mengambil alih saat diperlukan</b><p>Takeover manusia dengan riwayat lengkap, tanpa pelanggan mengulang cerita.</p></div></li>
-                <li><span>4</span><div><b>Tiket dan profil customer tetap tersambung</b><p>Status, handoff, dan tindak lanjut tercatat di satu tempat.</p></div></li>
-              </ol>
-              <div class="journey-result"><span>HASIL</span><b>Antrian lebih rapi. Agent menerima konteks lengkap saat takeover.</b></div>
-            </article>
-            <article class="journey-card" id="usecase-panel-crm" role="tabpanel" aria-labelledby="usecase-tab-crm" data-usecase-panel="crm" hidden>
-              <div class="journey-head"><span>ALUR FOLLOW-UP CRM</span><i>Autopilot</i></div>
-              <ol>
-                <li><span>1</span><div><b>Lead yang belum closing tetap masuk pipeline</b><p>Percakapan, minat, dan tahap tersimpan otomatis di CRM.</p></div></li>
-                <li><span>2</span><div><b>Program follow-up berjalan sesuai tahap</b><p>Pengingat dan pesan terjadwal mengikuti guideline sales Anda.</p></div></li>
-                <li><span>3</span><div><b>Respons pelanggan kembali ke profil yang sama</b><p>Tidak ada lead terlewat hanya karena follow-up manual tertunda.</p></div></li>
-                <li><span>4</span><div><b>Tim mendapat next action yang jelas</b><p>Sales melanjutkan percakapan yang sudah hangat, bukan mencari catatan.</p></div></li>
-              </ol>
-              <div class="journey-result"><span>HASIL</span><b>Lead tidak terlupakan. Tim fokus pada percakapan yang siap ditindaklanjuti.</b></div>
-            </article>
+
+          <div class="usecase-controls">
+            <button type="button" class="usecase-arrow" data-usecase-prev aria-label="Alur sebelumnya">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6 9 12l6 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+            <div class="usecase-tabs" role="tablist" aria-label="Contoh alur nyata">
+              <button class="active" type="button" role="tab" id="usecase-tab-falcon" aria-selected="true" aria-controls="usecase-panel-falcon" tabindex="0" data-usecase="falcon">Falcon IMS</button>
+              <button type="button" role="tab" id="usecase-tab-social" aria-selected="false" aria-controls="usecase-panel-social" tabindex="-1" data-usecase="social">Social Media</button>
+              <button type="button" role="tab" id="usecase-tab-omni" aria-selected="false" aria-controls="usecase-panel-omni" tabindex="-1" data-usecase="omni">Omnichannel AI</button>
+            </div>
+            <button type="button" class="usecase-arrow" data-usecase-next aria-label="Alur berikutnya">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
           </div>
         </div>
       </section>
@@ -319,6 +444,6 @@
         </div>
       </div>
     </div>
-    <script src="./script.js?v=tantangan-img-20260815"></script>
+    <script src="./script.js?v=usecase-slider-20260815"></script>
   </body>
 </html>
