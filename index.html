@@ -15,7 +15,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="./styles.css?v=channel-icons-20260814" />
+    <link rel="stylesheet" href="./styles.css?v=hero-cc-20260814" />
   </head>
   <body class="home-redesign">
     <header class="site-header">
@@ -57,15 +57,45 @@
             <div class="home-hero-actions"><a class="btn btn-primary btn-large" href="https://onboard.motovax.com/onboarding.html">Mulai Sekarang <span>→</span></a></div>
             <div class="home-assurance"><span>✓ Persetujuan manusia</span><span>✓ Akses sesuai peran</span><span>✓ Multi-tenant dan multi-cabang</span></div>
           </div>
-          <div class="hero-workspace" aria-label="Ilustrasi alur kerja Motovax">
-            <div class="workspace-top"><span class="workspace-logo">M</span><div><b>Pusat Kendali Motovax</b><small>Semua kanal aktif</small></div><i>AKTIF</i></div>
-            <div class="workspace-body">
-              <div class="channel-rail" aria-hidden="true"><span class="active">WA</span><span>IG</span><span>FB</span><span>WEB</span></div>
-              <div class="conversation-card"><small>PERCAKAPAN MASUK</small><div class="chat customer">Ada unit Avanza putih di cabang terdekat?</div><div class="ai-thinking"><span>✦</span> Jasmine AI mencari inventory lintas cabang…</div><div class="chat agent">Ada 3 unit tersedia. Saya kirim foto dan simulasi kreditnya, ya.</div><div class="chat-action"><b>3 unit ditemukan</b><span>Foto terkirim · Simulasi siap</span></div></div>
-              <div class="outcome-panel"><small>HASIL OTOMATIS</small><div><span>01</span><p><b>Calon pelanggan dibuat</b><small>Minat dan kanal tercatat</small></p><i>✓</i></div><div><span>02</span><p><b>Tim penjualan ditugaskan</b><small>Konteks percakapan ikut terbawa</small></p><i>✓</i></div><div><span>03</span><p><b>Tindak lanjut aktif</b><small>Pipeline diperbarui</small></p><i>✓</i></div></div>
+          <figure class="hero-workspace" aria-label="Screenshot Motovax Call Center">
+            <div class="hero-shot-window">
+              <div class="hero-shot-topbar" aria-hidden="true">
+                <span class="hero-shot-dots"><i></i><i></i><i></i></span>
+                <strong>Motovax Call Center</strong>
+                <span class="hero-shot-status"><i></i> Data demo</span>
+              </div>
+              <div class="hero-shot-image">
+                <picture>
+                  <source
+                    type="image/webp"
+                    srcset="./assets/feature-previews/omnichannel-faneling-public-720.webp?v=hero-cc-20260814 720w, ./assets/feature-previews/omnichannel-faneling-public-1200.webp?v=hero-cc-20260814 1200w"
+                    sizes="(max-width: 1100px) min(760px, calc(100vw - 36px)), min(720px, 52vw)"
+                  />
+                  <img
+                    data-hero-shot
+                    src="./assets/feature-previews/omnichannel-faneling-public.png?v=hero-cc-20260814"
+                    width="1440"
+                    height="900"
+                    alt="Workspace Motovax Call Center: daftar percakapan WhatsApp, Facebook, dan Instagram, respons Jasmine AI, takeover Agent, serta handoff ke MR."
+                    decoding="async"
+                    fetchpriority="high"
+                  />
+                </picture>
+              </div>
+              <div class="hero-shot-caption">
+                <span>Inbox omnichannel, Jasmine AI, takeover Agent, dan handoff MR dalam satu workspace.</span>
+                <button
+                  type="button"
+                  data-hero-image-open
+                  data-image-src="./assets/feature-previews/omnichannel-faneling-public.png?v=hero-cc-20260814"
+                  data-image-alt="Workspace Motovax Call Center: daftar percakapan WhatsApp, Facebook, dan Instagram, respons Jasmine AI, takeover Agent, serta handoff ke MR."
+                  data-image-title="Motovax Call Center"
+                >Buka ukuran penuh ↗</button>
+              </div>
             </div>
-            <div class="floating-chip chip-ai">✦ AI bekerja 24/7</div><div class="floating-chip chip-human">● Agent mengambil alih</div>
-          </div>
+            <div class="floating-chip chip-ai">✦ Jasmine AI merespons</div>
+            <div class="floating-chip chip-human">● Agent &amp; MR mengambil alih</div>
+          </figure>
         </div>
       </section>
 
@@ -210,6 +240,20 @@
     </main>
 
     <footer class="footer"><div class="container footer-grid"><div><a class="brand footer-brand" href="#top"><span>MOTO</span><strong>VAX</strong></a><p>Platform bisnis berbasis AI untuk menyatukan percakapan, data, dan tim dalam satu alur kerja.</p></div><div><h3>Produk</h3><a href="./modul.html">Semua Produk</a><a href="./fitur/agentic-ai.html">Agentic AI</a><a href="./harga.html">Harga</a></div><div><h3>Perusahaan</h3><a href="./hubungi-kami.html">Hubungi Kami</a><a href="./kebijakan-privasi.html">Kebijakan Privasi</a><a href="./syarat-ketentuan.html">Syarat & Ketentuan</a></div><div><h3>Kontak</h3><p>hello@motovax.ai</p><a href="#" data-wa>WhatsApp kami →</a></div></div><div class="copyright">&copy; <span data-year></span> MOTOVAX. Hak cipta dilindungi.</div></footer>
-    <script src="./script.js?v=usecase-tabs-20260814"></script>
+    <div class="feature-image-modal" data-hero-image-modal hidden role="dialog" aria-modal="true" aria-labelledby="heroImageModalTitle">
+      <div class="feature-image-modal-panel">
+        <header>
+          <div>
+            <span>SCREENSHOT PRODUK</span>
+            <strong id="heroImageModalTitle" data-hero-image-modal-title>Motovax Call Center</strong>
+          </div>
+          <button type="button" data-hero-image-close aria-label="Tutup screenshot">×</button>
+        </header>
+        <div class="feature-image-modal-scroll">
+          <img data-hero-image-modal-img src="" alt="">
+        </div>
+      </div>
+    </div>
+    <script src="./script.js?v=hero-cc-20260814"></script>
   </body>
 </html>

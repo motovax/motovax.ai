@@ -98,6 +98,51 @@ for (const link of document.querySelectorAll("[data-wa]")) {
   observer.observe(headline || typed);
 })();
 
+/** Modal screenshot hero: ukuran penuh di halaman yang sama. */
+(function initHeroImageModal() {
+  const modal = document.querySelector("[data-hero-image-modal]");
+  const modalImg = document.querySelector("[data-hero-image-modal-img]");
+  const modalTitle = document.querySelector("[data-hero-image-modal-title]");
+  const openers = [...document.querySelectorAll("[data-hero-image-open]")];
+  if (!(modal instanceof HTMLElement) || !(modalImg instanceof HTMLImageElement) || !openers.length) return;
+
+  let trigger = null;
+  const close = () => {
+    if (modal.hidden) return;
+    modal.hidden = true;
+    document.body.classList.remove("feature-image-open");
+    modalImg.removeAttribute("src");
+    trigger?.focus();
+  };
+
+  const open = (button) => {
+    trigger = button instanceof HTMLElement ? button : openers[0];
+    const source = trigger instanceof HTMLElement ? trigger : openers[0];
+    modalImg.src = source.dataset.imageSrc || "";
+    modalImg.alt = source.dataset.imageAlt || "Screenshot Motovax Call Center ukuran penuh";
+    if (modalTitle) modalTitle.textContent = source.dataset.imageTitle || "Motovax Call Center";
+    modal.hidden = false;
+    document.body.classList.add("feature-image-open");
+    modal.querySelector("[data-hero-image-close]")?.focus();
+  };
+
+  for (const button of openers) {
+    button.addEventListener("click", () => open(button));
+  }
+
+  const shot = document.querySelector("[data-hero-shot]");
+  if (shot instanceof HTMLImageElement) {
+    shot.addEventListener("click", () => open(openers[0]));
+  }
+
+  modal.addEventListener("click", (event) => {
+    if (event.target === modal || event.target.closest("[data-hero-image-close]")) close();
+  });
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && !modal.hidden) close();
+  });
+})();
+
 /** Tab "Contoh alur nyata" di beranda: ganti kartu journey saat diklik. */
 (function initUsecaseTabs() {
   const root = document.querySelector(".usecase-tabs");
