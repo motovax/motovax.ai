@@ -19138,7 +19138,8 @@ body.feature-image-open { overflow: hidden; }
   white-space: nowrap;
 }
 
-.portal-account-menu > button {
+.portal-account-menu > button,
+.portal-account-menu > a {
   display: grid;
   gap: 3px;
   min-height: 51px;
@@ -19153,7 +19154,9 @@ body.feature-image-open { overflow: hidden; }
 }
 
 .portal-account-menu > button:hover,
-.portal-account-menu > button:focus-visible {
+.portal-account-menu > button:focus-visible,
+.portal-account-menu > a:hover,
+.portal-account-menu > a:focus-visible {
   outline: none;
   background: #edf4ff;
 }
@@ -19163,12 +19166,14 @@ body.feature-image-open { overflow: hidden; }
   opacity: 0.6;
 }
 
-.portal-account-menu > button span {
+.portal-account-menu > button span,
+.portal-account-menu > a span {
   font-size: 12px;
   font-weight: 800;
 }
 
-.portal-account-menu > button small {
+.portal-account-menu > button small,
+.portal-account-menu > a small {
   overflow: hidden;
   color: #7c899b;
   font-size: 10px;

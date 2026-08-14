@@ -15,7 +15,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="./styles.css?v=flow-slider-20260814" />
+    <link rel="stylesheet" href="./styles.css?v=portal-account-pages-20260814" />
   </head>
   <body class="home-redesign">
     <header class="site-header">
@@ -38,9 +38,9 @@
             </button>
             <div class="portal-account-menu" role="menu" data-portal-menu hidden>
               <div class="portal-account-summary"><b data-portal-menu-name>Akun</b><span data-portal-menu-email></span><small data-portal-menu-role></small></div>
-              <button type="button" role="menuitem" data-portal-destination="/settings/account"><span>Profil akun</span><small>Nama, email, dan password</small></button>
-              <button type="button" role="menuitem" data-portal-billing data-portal-destination="/billing"><span>Billing</span><small>Langganan dan penggunaan</small></button>
-              <button class="portal-workspace-action" type="button" role="menuitem" data-portal-destination="/"><span>Buka workspace</span><small data-portal-domain></small></button>
+              <a role="menuitem" href="./profile.html"><span>Profil akun</span><small>Identitas dan workspace Anda</small></a>
+              <a role="menuitem" href="./billing.html" data-portal-billing><span>Billing</span><small>Langganan dan penggunaan</small></a>
+              <button class="portal-workspace-action" type="button" role="menuitem" data-portal-workspace><span>Buka workspace</span><small data-portal-domain></small></button>
               <button class="portal-logout-action" type="button" role="menuitem" data-portal-logout><span>Logout</span><small>Keluar dari motovax.ai</small></button>
             </div>
           </div>
@@ -70,7 +70,7 @@
               </span>
             </h1>
             <p>Motovax membantu dealer mobil mengubah lead menjadi test drive dan penjualan unit lewat omnichannel yang terintegrasi dengan inventori, CRM, dan AI. Setiap sales bekerja dari stok serta riwayat pelanggan yang sama.</p>
-            <div class="home-hero-actions"><a class="btn btn-primary btn-large" href="https://onboard.motovax.com/onboarding.html">Mulai Sekarang <span>→</span></a></div>
+            <div class="home-hero-actions"><a class="btn btn-primary btn-large" href="https://onboard.motovax.com/onboarding.html?fresh=1">Mulai Sekarang <span>→</span></a></div>
             <div class="home-assurance"><span>✓ Persetujuan manusia</span><span>✓ Akses sesuai peran</span><span>✓ Multi-tenant dan multi-cabang</span></div>
           </div>
           <figure class="hero-workspace" aria-label="Screenshot Motovax Call Center">
@@ -285,7 +285,7 @@
             <div class="section-label">SETUP MANDIRI, TANPA RIBET</div>
             <h2>Workspace Anda siap dalam 3 langkah simpel.</h2>
             <p>Tak perlu menunggu bantuan konfigurasi. Ikuti onboarding singkat, lengkapi profil dealer, lalu pilih modul yang dibutuhkan tim Anda.</p>
-            <a class="btn btn-primary btn-large" href="https://onboard.motovax.com/onboarding.html">Mulai setup sekarang <span>→</span></a>
+            <a class="btn btn-primary btn-large" href="https://onboard.motovax.com/onboarding.html?fresh=1">Mulai setup sekarang <span>→</span></a>
             <small><b>✓</b> Bisa diubah kembali kapan saja</small>
           </div>
           <ol class="start-steps">
@@ -308,7 +308,7 @@
         </div>
       </section>
 
-      <section class="home-cta"><div class="container"><div><span>SIAP MEMPERCEPAT PENJUALAN DEALER ANDA?</span><h2>Gerakkan lead dari percakapan menuju test drive dan closing.</h2><p>Buat akun Motovax dan satukan kanal, stok unit, sales, serta follow-up dealer Anda mulai sekarang.</p></div><div><a class="btn btn-light btn-large" href="https://onboard.motovax.com/onboarding.html">Mulai Sekarang <span>→</span></a><small>Mulai onboarding dealer Anda</small></div></div></section>
+      <section class="home-cta"><div class="container"><div><span>SIAP MEMPERCEPAT PENJUALAN DEALER ANDA?</span><h2>Gerakkan lead dari percakapan menuju test drive dan closing.</h2><p>Buat akun Motovax dan satukan kanal, stok unit, sales, serta follow-up dealer Anda mulai sekarang.</p></div><div><a class="btn btn-light btn-large" href="https://onboard.motovax.com/onboarding.html?fresh=1">Mulai Sekarang <span>→</span></a><small>Mulai onboarding dealer Anda</small></div></div></section>
     </main>
 
     <footer class="footer"><div class="container footer-grid"><div><a class="brand footer-brand" href="#top"><span>MOTO</span><strong>VAX</strong></a><p>Platform AI untuk menyatukan stok unit, lead, sales, dan operasional dealer mobil.</p></div><div><h3>Produk</h3><a href="./modul.html">Semua Produk</a><a href="./fitur/agentic-ai.html">Agentic AI</a><a href="./harga.html">Harga</a></div><div><h3>Perusahaan</h3><a href="./hubungi-kami.html">Hubungi Kami</a><a href="./kebijakan-privasi.html">Kebijakan Privasi</a><a href="./syarat-ketentuan.html">Syarat & Ketentuan</a></div><div><h3>Kontak</h3><p>hello@motovax.ai</p><a href="#" data-wa>WhatsApp kami →</a></div></div><div class="copyright">&copy; <span data-year></span> MOTOVAX. Hak cipta dilindungi.</div></footer>
@@ -326,6 +326,6 @@
         </div>
       </div>
     </div>
-    <script src="./script.js?v=portal-direct-20260814"></script>
+    <script src="./script.js?v=portal-account-pages-20260814"></script>
   </body>
 </html>

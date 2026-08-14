@@ -80,7 +80,6 @@ for (const link of document.querySelectorAll("[data-wa]")) {
 
   const fragment = new URLSearchParams(window.location.hash.replace(/^#/, ""));
   const transferredToken = fragment.get("portal_session");
-  const requestedAction = fragment.get("portal_action");
   if (transferredToken) {
     localStorage.setItem(TOKEN_KEY, transferredToken);
     fragment.delete("portal_session");
@@ -109,13 +108,13 @@ for (const link of document.querySelectorAll("[data-wa]")) {
   }
 
   root.addEventListener("click", async (event) => {
-    const destinationButton = event.target.closest?.("[data-portal-destination]");
-    if (destinationButton && root.contains(destinationButton)) {
-      destinationButton.disabled = true;
+    const workspaceButton = event.target.closest?.("[data-portal-workspace]");
+    if (workspaceButton && root.contains(workspaceButton)) {
+      workspaceButton.disabled = true;
       try {
         const payload = await portalApi("/api/portal/workspace/enter", {
           method: "POST",
-          body: JSON.stringify({ destination: destinationButton.dataset.portalDestination || "/" }),
+          body: JSON.stringify({ destination: "/" }),
         });
         window.location.assign(payload.redirectUrl);
       } catch (error) {
@@ -125,7 +124,7 @@ for (const link of document.querySelectorAll("[data-wa]")) {
         } else {
           window.alert(error.message);
         }
-        destinationButton.disabled = false;
+        workspaceButton.disabled = false;
       }
       return;
     }
@@ -155,19 +154,6 @@ for (const link of document.querySelectorAll("[data-wa]")) {
       if (error.status === 401) localStorage.removeItem(TOKEN_KEY);
       renderGuest();
     });
-
-  if (transferredToken && requestedAction === "enter_workspace") {
-    portalApi("/api/portal/workspace/enter", {
-      method: "POST",
-      body: JSON.stringify({ destination: "/" }),
-    })
-      .then((payload) => window.location.assign(payload.redirectUrl))
-      .catch((error) => {
-        loadAccount();
-        if (error.status !== 401) window.alert(error.message);
-      });
-    return;
-  }
 
   loadAccount();
 })();

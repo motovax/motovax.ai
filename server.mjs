@@ -914,6 +914,53 @@ export async function createPostgresStore(connectionString) {
       return result.rows[0] || null;
     },
 
+    async getPortalBilling(tenantId) {
+      const [tenantResult, membersResult] = await Promise.all([
+        pool.query(
+          `SELECT id, name, COALESCE(config, '{}'::jsonb) AS config
+           FROM tenants
+           WHERE id = $1 AND status = 'active'`,
+          [tenantId],
+        ),
+        pool.query(
+          `SELECT u.id, COALESCE(NULLIF(BTRIM(u.display_name), ''), u.username) AS display_name,
+             u.username,
+             COALESCE(string_agg(DISTINCT r.name, ', ' ORDER BY r.name), '') AS roles
+           FROM users u
+           LEFT JOIN user_roles ur ON ur.user_id = u.id
+           LEFT JOIN roles r ON r.id = ur.role_id
+           WHERE u.tenant_id = $1
+           GROUP BY u.id, u.display_name, u.username
+           ORDER BY COALESCE(NULLIF(BTRIM(u.display_name), ''), u.username), u.username`,
+          [tenantId],
+        ),
+      ]);
+      const tenant = tenantResult.rows[0];
+      if (!tenant) return null;
+      const tenantConfig = tenant.config || {};
+      const features = tenantConfig.features || {};
+      const periodStart = new Date();
+      periodStart.setUTCDate(1);
+      periodStart.setUTCHours(0, 0, 0, 0);
+      const periodEnd = new Date(periodStart);
+      periodEnd.setUTCMonth(periodEnd.getUTCMonth() + 1);
+      return {
+        tenant_id: tenant.id,
+        tenant_name: tenant.name,
+        period_start: periodStart.toISOString(),
+        period_end: periodEnd.toISOString(),
+        member_count: membersResult.rowCount,
+        max_users: Number(tenantConfig.max_users || 0),
+        max_listings: Number(tenantConfig.max_listings || 0),
+        enabled_features: Object.entries(features)
+          .filter(([, enabled]) => enabled === true)
+          .map(([key]) => key),
+        members: membersResult.rows,
+        billing_configured: false,
+        invoice_status: "not_configured",
+      };
+    },
+
     async revokePortalSession(sessionDigest) {
       await pool.query("DELETE FROM portal_auth_sessions WHERE token_digest = $1", [sessionDigest]);
     },
@@ -1388,6 +1435,22 @@ export function createApp({
       const user = await authenticatedPortalUser(req);
       if (!user) return res.status(401).json({ authenticated: false });
       return res.json({ authenticated: true, user: publicPortalUser(user) });
+    } catch (error) {
+      return next(error);
+    }
+  });
+
+  app.get("/api/portal/billing", async (req, res, next) => {
+    try {
+      const user = await authenticatedPortalUser(req);
+      if (!user) return res.status(401).json({ error: "not_authenticated" });
+      if (!publicPortalUser(user).canViewBilling) {
+        return res.status(403).json({ error: "billing_forbidden", message: "Akun ini tidak memiliki akses billing." });
+      }
+      if (!store?.getPortalBilling) return res.status(503).json({ error: "service_unavailable" });
+      const billing = await store.getPortalBilling(user.tenant_id);
+      if (!billing) return res.status(404).json({ error: "workspace_not_found" });
+      return res.json(billing);
     } catch (error) {
       return next(error);
     }
@@ -1878,7 +1941,7 @@ export function createApp({
   app.get("/", (req, res, next) => {
     const authHost = new URL(config.publicBaseUrl).hostname;
     if (authHost === "onboard.motovax.com" && req.hostname === authHost) {
-      return res.redirect(302, "/onboarding.html");
+      return res.redirect(302, "/onboarding.html?fresh=1");
     }
     return next();
   });

@@ -176,6 +176,21 @@ const store = {
   async findPortalSession(sessionDigest) {
     return portalSessions.get(sessionDigest) || null;
   },
+  async getPortalBilling(tenantId) {
+    return {
+      tenant_id: tenantId,
+      tenant_name: "Dealer Test",
+      period_start: "2026-08-01T00:00:00.000Z",
+      period_end: "2026-09-01T00:00:00.000Z",
+      member_count: 1,
+      max_users: 25,
+      max_listings: 500,
+      enabled_features: ["inventory_management", "crm_autopilot", "billing_menu"],
+      members: [{ id: "app-user-1", display_name: "Owner Dealer", username: "owner", roles: "Admin" }],
+      billing_configured: false,
+      invoice_status: "not_configured",
+    };
+  },
   async revokePortalSession(sessionDigest) {
     portalSessions.delete(sessionDigest);
   },
@@ -512,6 +527,15 @@ test("portal login tenant membawa profil, billing, logout, dan handoff workspace
   assert.equal(me.status, 200);
   assert.equal(me.headers.get("access-control-allow-origin"), "https://motovax.ai");
   assert.equal((await me.json()).user.role, "Admin");
+
+  const billing = await fetch(`${baseUrl}/api/portal/billing`, {
+    headers: { authorization, origin: "https://motovax.ai" },
+  });
+  assert.equal(billing.status, 200);
+  const billingPayload = await billing.json();
+  assert.equal(billingPayload.tenant_name, "Dealer Test");
+  assert.equal(billingPayload.member_count, 1);
+  assert.deepEqual(billingPayload.enabled_features, ["inventory_management", "crm_autopilot", "billing_menu"]);
 
   const enter = await fetch(`${baseUrl}/api/portal/workspace/enter`, {
     method: "POST",

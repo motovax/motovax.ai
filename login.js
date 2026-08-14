@@ -82,7 +82,6 @@
         if (target.origin !== LANDING_ORIGIN) target = new URL(LANDING_ORIGIN + "/");
         target.hash = new URLSearchParams({
           portal_session: payload.token,
-          portal_action: "enter_workspace",
         }).toString();
         window.location.assign(target.toString());
       })
