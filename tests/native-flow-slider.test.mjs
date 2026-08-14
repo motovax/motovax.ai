@@ -136,12 +136,14 @@ for (const viewport of viewports) {
     const first = await measure(page);
     const sectionCopy = await page.evaluate(() => ({
       title: document.querySelector("#cara-kerja h2")?.textContent?.replace(/\s+/g, " ").trim(),
+      eyebrow: document.querySelector("#cara-kerja .section-label")?.textContent?.trim() || "",
       stages: [...document.querySelectorAll(".e2e-stage-head h3")].map((el) => el.textContent.trim()),
       labels: [...document.querySelectorAll(".e2e-stage-head small")].map((el) => el.textContent.trim()),
     }));
-    assert.match(sectionCopy.title || "", /Satu platform untuk membantu bisnis mendapatkan customer/i);
-    assert.deepEqual(sectionCopy.stages, ["Sora AI", "Jasmine AI", "Autopilot CRM"]);
-    assert.deepEqual(sectionCopy.labels, ["ATTRACT", "CONVERT", "RETAIN & CLOSE"]);
+    assert.match(sectionCopy.title || "", /Dari minat sampai closing/i);
+    assert.equal(sectionCopy.eyebrow, "", "label ALUR END-TO-END harus dihapus");
+    assert.deepEqual(sectionCopy.stages, ["Attract", "Convert", "Retain & Close"]);
+    assert.deepEqual(sectionCopy.labels, ["SORA AI", "JASMINE AI", "AUTOPILOT CRM"]);
     assert.equal(first.slide, "pelanggan");
     assert.equal(first.heading, "Pelanggan menanyakan produk");
     assert.equal(first.dots, 5);
