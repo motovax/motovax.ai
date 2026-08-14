@@ -3224,6 +3224,37 @@ i.tel,
   font-weight: 800;
 }
 
+.ecosystem {
+  padding: 30px 0 18px;
+}
+
+.ecosystem h2 {
+  text-align: center;
+  font-size: 16px;
+  margin: 0 0 16px;
+}
+
+.partner-strip {
+  display: grid;
+  grid-template-columns: repeat(8, minmax(0, 1fr));
+  gap: 13px;
+}
+
+.partner-strip div {
+  min-height: 58px;
+  display: grid;
+  place-items: center;
+  text-align: center;
+  border: 1px solid #e2ebf6;
+  border-radius: 11px;
+  background: #fff;
+  box-shadow: var(--shadow-soft);
+  color: #1c2738;
+  font-size: 12px;
+  font-weight: 800;
+  padding: 10px;
+}
+
 .section {
   padding: 70px 0;
 }
@@ -3248,12 +3279,6 @@ i.tel,
 .section-head p {
   margin: 0;
   color: var(--muted);
-}
-
-#solusi .section-head p {
-  max-width: 820px;
-  margin-inline: auto;
-  line-height: 1.7;
 }
 
 .feature-grid {
@@ -11083,6 +11108,10 @@ body.demo-open {
     grid-template-columns: 1fr;
   }
 
+  .partner-strip {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
   .workflow-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -11179,6 +11208,10 @@ body.demo-open {
   .dash-grid,
   .bottom-dash-grid {
     grid-template-columns: 1fr;
+  }
+
+  .partner-strip {
+    grid-template-columns: repeat(2, 1fr);
   }
 
   .demo-topbar {
@@ -11448,6 +11481,7 @@ body.demo-open {
 
   .kpi-row,
   .feature-grid,
+  .partner-strip,
   .benefit-grid,
   .result-grid,
   .workflow-grid,
