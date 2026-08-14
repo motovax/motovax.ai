@@ -127,6 +127,86 @@ for (const link of document.querySelectorAll("[data-wa]")) {
   observer.observe(headline || typed);
 })();
 
+/** Garis bawahi spidol merah: tergambar saat masuk viewport, bisa digaris ulang dengan pointer. */
+(function initMarkerUnderline() {
+  const marks = [...document.querySelectorAll("[data-marker-underline]")];
+  if (!marks.length) return;
+
+  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  const pathsOf = (el) => [...el.querySelectorAll(".marker-stroke")];
+
+  const clearScrub = (el) => {
+    el.classList.remove("is-scrubbing");
+    for (const path of pathsOf(el)) path.style.strokeDashoffset = "";
+  };
+
+  const draw = (el) => {
+    clearScrub(el);
+    el.classList.add("is-drawn");
+  };
+
+  const hideStroke = (el) => {
+    el.classList.remove("is-drawn");
+    clearScrub(el);
+  };
+
+  const redraw = (el) => {
+    if (reducedMotion) {
+      draw(el);
+      return;
+    }
+    hideStroke(el);
+    void el.offsetWidth;
+    requestAnimationFrame(() => draw(el));
+  };
+
+  const scrubTo = (el, clientX) => {
+    const rect = el.getBoundingClientRect();
+    if (!rect.width) return;
+    const progress = Math.min(1, Math.max(0, (clientX - rect.left) / rect.width));
+    el.classList.add("is-scrubbing");
+    el.classList.add("is-drawn");
+    for (const path of pathsOf(el)) {
+      path.style.strokeDashoffset = String(1 - progress);
+    }
+  };
+
+  for (const el of marks) {
+    if (reducedMotion) {
+      draw(el);
+      continue;
+    }
+
+    el.classList.add("is-animatable");
+    hideStroke(el);
+
+    if ("IntersectionObserver" in window) {
+      const observer = new IntersectionObserver(
+        (entries) => {
+          for (const entry of entries) {
+            if (!entry.isIntersecting) continue;
+            draw(el);
+          }
+        },
+        { threshold: 0.55 },
+      );
+      observer.observe(el);
+    } else {
+      draw(el);
+    }
+
+    el.addEventListener("pointerenter", (event) => {
+      if (event.pointerType === "mouse") hideStroke(el);
+    });
+    el.addEventListener("pointermove", (event) => {
+      if (event.pointerType === "mouse" || event.buttons) scrubTo(el, event.clientX);
+    });
+    el.addEventListener("pointerleave", () => draw(el));
+    el.addEventListener("click", () => redraw(el));
+  }
+})();
+
 /** Modal screenshot hero: ukuran penuh di halaman yang sama. */
 (function initHeroImageModal() {
   const modal = document.querySelector("[data-hero-image-modal]");
