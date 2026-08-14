@@ -127,7 +127,16 @@ for (const viewport of viewports) {
       profilePayload = route.request().postDataJSON();
       return route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ profile: profilePayload, domain: `${profilePayload.workspaceSlug}.motovax.com` }) });
     });
-    await page.route("**/api/onboarding/complete", (route) => route.fulfill({ status: 202, contentType: "application/json", body: JSON.stringify({ workspace: { id: "tenant-1", name: "Dealer Maju Jaya", domain: "dealer-maju-jaya.motovax.com", ready: false } }) }));
+    const workspaceReady = viewport.name === "desktop";
+    await page.route("**/api/onboarding/complete", (route) => route.fulfill({
+      status: 202,
+      contentType: "application/json",
+      body: JSON.stringify({
+        workspace: { id: "tenant-1", name: "Dealer Maju Jaya", domain: "dealer-maju-jaya.motovax.com", ready: workspaceReady },
+        portalSession: { token: `portal-onboarding-${viewport.name}`, returnUrl: "https://motovax.ai/" },
+      }),
+    }));
+    await page.route("https://motovax.ai/**", (route) => route.fulfill({ status: 200, contentType: "text/html", body: "<title>Landing</title>" }));
 
     await page.goto(`${baseUrl}/onboarding.html`, { waitUntil: "load" });
     await page.waitForSelector('[data-step="1"].is-active');
@@ -179,6 +188,10 @@ for (const viewport of viewports) {
     }));
     assert.deepEqual(result, { overflow: false, industry: "Dealer mobil", branches: "Belum ditentukan", railActive: "4" });
     await page.screenshot({ path: `/tmp/motovax-onboarding-${viewport.name}.png`, fullPage: false });
+    await page.waitForURL("https://motovax.ai/**");
+    const onboardingFragment = new URLSearchParams(new URL(page.url()).hash.replace(/^#/, ""));
+    assert.equal(onboardingFragment.get("portal_session"), `portal-onboarding-${viewport.name}`);
+    assert.equal(onboardingFragment.has("portal_action"), false);
     await context.close();
   });
 

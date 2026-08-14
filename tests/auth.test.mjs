@@ -116,6 +116,16 @@ const store = {
   async getAccountState() {
     return accountState;
   },
+  async provisionWorkspace() {
+    return {
+      workspace: {
+        id: "tenant-1",
+        name: "Dealer Test",
+        domain: "dealer-test.motovax.com",
+        app_user_id: "app-user-1",
+      },
+    };
+  },
   async findPortalUsers({ identifier }) {
     const owner = {
       id: "app-user-1",
@@ -244,6 +254,7 @@ before(async () => {
       }
       return { score: 0.9 };
     },
+    productDomainEnsurer: async () => {},
   });
   await new Promise((resolve) => {
     server = app.listen(0, "127.0.0.1", resolve);
@@ -560,4 +571,31 @@ test("penyelesaian onboarding ditolak sebelum provisioning tanpa token reCAPTCHA
   assert.equal(response.status, 400);
   assert.equal((await response.json()).error, "recaptcha_invalid");
   assert.deepEqual(recaptchaTokens, [""]);
+});
+
+test("penyelesaian onboarding membuat sesi portal untuk redirect login otomatis", async () => {
+  accountState = { profile: { modules: ["ims"] }, workspaces: [] };
+  const response = await fetch(`${baseUrl}/api/onboarding/complete`, {
+    method: "POST",
+    headers: {
+      cookie: authenticatedCookie,
+      origin: "http://127.0.0.1",
+      "content-type": "application/json",
+    },
+    body: JSON.stringify({ recaptchaToken: "valid-recaptcha-token" }),
+  });
+  assert.equal(response.status, 202);
+  const payload = await response.json();
+  assert.equal(payload.workspace.ready, false);
+  assert.equal(payload.portalSession.returnUrl, "https://motovax.ai/");
+  assert.ok(payload.portalSession.token.length >= 48);
+
+  const me = await fetch(`${baseUrl}/api/portal/me`, {
+    headers: {
+      authorization: `Bearer ${payload.portalSession.token}`,
+      origin: "https://motovax.ai",
+    },
+  });
+  assert.equal(me.status, 200);
+  assert.equal((await me.json()).authenticated, true);
 });

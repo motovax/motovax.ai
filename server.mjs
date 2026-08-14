@@ -1160,6 +1160,7 @@ export function createApp({
   oauthClient = null,
   mailer = undefined,
   recaptchaVerifier = verifyRecaptchaToken,
+  productDomainEnsurer = ensureProductDomain,
 } = {}) {
   validateConfig(config);
   const app = express();
@@ -1620,13 +1621,28 @@ export function createApp({
       }
       await recaptchaVerifier(config, String(req.body?.recaptchaToken || ""));
       const result = await store.provisionWorkspace({ userId: user.id, suffix: config.tenantDomainSuffix });
-      await ensureProductDomain(config, result.workspace.domain);
+      await productDomainEnsurer(config, result.workspace.domain);
+      const portalToken = randomToken(48);
+      const portalExpiresAt = new Date(Date.now() + PORTAL_SESSION_TTL_MS);
+      await store.createPortalSession({
+        appUserId: result.workspace.app_user_id,
+        tenantId: result.workspace.id,
+        sessionDigest: tokenDigest(portalToken, config.sessionSecret),
+        userAgent: String(req.headers["user-agent"] || "").slice(0, 500),
+        ipAddress: String(req.ip || "").slice(0, 100),
+        expiresAt: portalExpiresAt,
+      });
       return res.status(202).json({
         workspace: {
           id: result.workspace.id,
           name: result.workspace.name,
           domain: result.workspace.domain,
           ready: false,
+        },
+        portalSession: {
+          token: portalToken,
+          expiresAt: portalExpiresAt.toISOString(),
+          returnUrl: config.portalLandingUrl || "https://motovax.ai/",
         },
       });
     } catch (error) {

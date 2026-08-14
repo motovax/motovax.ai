@@ -800,14 +800,31 @@
       this.state.step = 4;
       saveState(this.state);
       this.renderSummary();
-      this.showToast("Tenant berhasil dibuat", "Domain aplikasi sedang disiapkan. Halaman ini akan memperbarui status otomatis.");
       this.goTo(4);
-      this.waitForWorkspace();
+      this.showToast("Pendaftaran berhasil", "Akun Anda sudah aktif. Mengarahkan ke motovax.ai dalam kondisi login.");
+      this.redirectToPortal(payload.portalSession);
     } catch (error) {
       this.showError(form, friendlySubmitError(error, "Workspace belum berhasil dibuat. Pilihan Anda tetap tersimpan; silakan coba lagi."));
     } finally {
       setFormLoading(form, false);
     }
+  };
+
+  OnboardingApp.prototype.redirectToPortal = function (portalSession) {
+    if (!portalSession || !portalSession.token) {
+      this.waitForWorkspace();
+      return;
+    }
+    var target;
+    try {
+      target = new URL(portalSession.returnUrl || "https://motovax.ai/");
+    } catch (_error) {
+      target = new URL("https://motovax.ai/");
+    }
+    target.hash = new URLSearchParams({ portal_session: portalSession.token }).toString();
+    window.setTimeout(function () {
+      window.location.assign(target.toString());
+    }, 700);
   };
 
   OnboardingApp.prototype.enterWorkspace = async function () {
@@ -910,8 +927,8 @@
     var readyCopy = qs("[data-ready-copy]");
     if (workspaceSummary) workspaceSummary.hidden = false;
     if (workspaceActions) workspaceActions.hidden = false;
-    if (readyTitle) readyTitle.textContent = "Workspace Anda siap digunakan";
-    if (readyCopy) readyCopy.textContent = "Tenant, domain, akun owner, dan konfigurasi awal berhasil dibuat.";
+    if (readyTitle) readyTitle.textContent = "Pendaftaran berhasil";
+    if (readyCopy) readyCopy.textContent = "Akun Anda sudah aktif. Anda akan diarahkan ke motovax.ai dalam kondisi login.";
 
     if (nameEl) nameEl.textContent = biz.businessName || "Dealer Anda";
     if (userEl) {
