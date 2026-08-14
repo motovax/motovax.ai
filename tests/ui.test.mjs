@@ -150,6 +150,7 @@ for (const viewport of viewports) {
     const page = await context.newPage();
     let logoutCount = 0;
     let meCount = 0;
+    let workspaceEnterCount = 0;
     await page.route(/https:\/\/fonts\.(?:googleapis|gstatic)\.com\//, (route) => route.abort());
     await page.route("**/api/config", (route) => route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ recaptcha: { enabled: true, siteKey: "test", action: "complete_onboarding" } }) }));
     await page.route("**/api/auth/logout", (route) => {
@@ -165,6 +166,10 @@ for (const viewport of viewports) {
         workspaces: [{ id: "tenant-demo", name: "Tenant Demo", domain: "tenant-demo.motovax.com", ready: true }],
       }) });
     });
+    await page.route("**/api/portal/workspace/enter", (route) => {
+      workspaceEnterCount += 1;
+      return route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ redirectUrl: "https://tenant-demo.motovax.com/magic-login?token=stale-register-session" }) });
+    });
 
     await page.goto(`${baseUrl}/onboarding.html?fresh=1`, { waitUntil: "load" });
     await page.waitForFunction(() => !new URL(window.location.href).searchParams.has("fresh"));
@@ -172,6 +177,7 @@ for (const viewport of viewports) {
 
     assert.equal(logoutCount, 1);
     assert.equal(meCount, 0);
+    assert.equal(workspaceEnterCount, 0);
     assert.equal(await page.inputValue('[data-auth-form="signup"] input[name="fullName"]'), "");
     assert.equal(await page.inputValue('[data-auth-form="signup"] input[name="email"]'), "");
     assert.equal(await page.locator('[data-step="4"]').isHidden(), true);
@@ -612,7 +618,7 @@ for (const viewport of viewports) {
     assert.equal(await fitsViewport(page), true);
     await page.goto(`${baseUrl}/login.html`, { waitUntil: "load" });
     await page.waitForSelector(".portal-login-auth-content:visible");
-    assert.equal(await page.getAttribute('.portal-register-prompt a', "href"), "https://onboard.motovax.com/onboarding.html");
+    assert.equal(await page.getAttribute('.portal-register-prompt a', "href"), "https://onboard.motovax.com/onboarding.html?fresh=1");
     assert.equal(await page.locator('[data-google-login]').isVisible(), true);
     assert.equal(await page.getAttribute('[data-google-login]', "href"), "https://onboard.motovax.com/api/auth/google/start?mode=portal");
     assert.equal(await page.getByRole("link", { name: "Login dengan Google", exact: true }).count(), 1);
@@ -647,6 +653,7 @@ for (const viewport of viewports) {
     assert.equal(await page.locator("[data-portal-account], [data-portal-workspace], [data-portal-billing]").count(), 0);
     assert.equal(await page.getByRole("link", { name: "Login/Daftar", exact: true }).count(), 1);
     assert.equal(await page.getAttribute('.site-header .header-login', "href"), "https://onboard.motovax.com/login.html?reauth=1");
+    assert.equal(await page.locator('a[href="https://onboard.motovax.com/onboarding.html?fresh=1"]').count(), 3);
     assert.equal(await noOverflow(page), true);
     await page.screenshot({ path: `/tmp/motovax-stateless-landing-${viewport.name}.png`, fullPage: false });
     await context.close();
