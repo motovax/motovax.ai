@@ -698,7 +698,7 @@ export async function createPostgresStore(connectionString) {
       }
     },
 
-    async createPasswordUser({ email, fullName, passwordHash }) {
+    async createPasswordUser({ email, fullName, passwordHash, authenticatedUserId = "" }) {
       const client = await pool.connect();
       try {
         await client.query("BEGIN");
@@ -707,7 +707,7 @@ export async function createPostgresStore(connectionString) {
           [email],
         );
         let user = existing.rows[0];
-        if (user?.password_hash && user.email_verified) {
+        if (user?.email_verified && user.id !== authenticatedUserId) {
           const conflict = new Error("Akun dengan email tersebut sudah terdaftar.");
           conflict.code = "account_exists";
           throw conflict;
@@ -1442,11 +1442,22 @@ export function createApp({
       if (password.length < 8 || password.length > 200 || !/[A-Za-z]/.test(password) || !/\d/.test(password)) {
         return res.status(400).json({ error: "weak_password", message: "Password minimal 8 karakter dan harus berisi huruf serta angka." });
       }
+      const signedInUser = await authenticatedUser(req);
       const user = await store.createPasswordUser({
         email,
         fullName,
         passwordHash: await hashPassword(password),
+        authenticatedUserId: signedInUser?.id || "",
       });
+      if (user.email_verified) {
+        const state = await store.getAccountState(user.id);
+        return res.json({
+          authenticated: true,
+          accountUpdated: true,
+          user: publicUser({ ...user, provider: signedInUser?.provider }),
+          ...state,
+        });
+      }
       await sendAccountEmail({
         user,
         actionType: "verify_email",

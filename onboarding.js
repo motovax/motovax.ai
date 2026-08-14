@@ -550,7 +550,10 @@
       clearPasswordFields(form);
       this.state.authMode = "signup";
       saveState(this.state);
-      this.showToast("Akun berhasil dibuat", "Lanjut isi profil dealer Anda.");
+      this.showToast(
+        payload.accountUpdated ? "Perubahan akun disimpan" : "Akun berhasil dibuat",
+        "Lanjut isi profil dealer Anda.",
+      );
       this.goTo(2);
     } catch (error) {
       this.showError(form, friendlySubmitError(error, "Akun belum berhasil dibuat. Periksa isian lalu coba lagi."));

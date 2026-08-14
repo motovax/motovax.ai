@@ -93,12 +93,36 @@ for (const viewport of viewports) {
     await page.route(/https:\/\/fonts\.(?:googleapis|gstatic)\.com\//, (route) => route.abort());
     await page.route("**/api/auth/me", (route) => route.fulfill({ status: 401, contentType: "application/json", body: JSON.stringify({ authenticated: false }) }));
     await page.route("**/api/config", (route) => route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ recaptcha: { enabled: true, siteKey: "test", action: "complete_onboarding" } }) }));
-    await page.route("**/api/auth/signup", (route) => route.fulfill({ status: 201, contentType: "application/json", body: JSON.stringify({ authenticated: true, user: { id: "owner-1", email: "owner@dealer.test", fullName: "Owner Dealer", provider: "password" } }) }));
+    let signupCount = 0;
+    let profilePayload;
+    await page.route("**/api/auth/signup", (route) => {
+      signupCount += 1;
+      const accountPayload = route.request().postDataJSON();
+      const savedProfile = profilePayload ? {
+        business_name: profilePayload.businessName,
+        workspace_slug: profilePayload.workspaceSlug,
+        branch_count: profilePayload.branchCount,
+        region: profilePayload.region,
+        description: profilePayload.description,
+        modules: profilePayload.modules,
+        goal: profilePayload.goal,
+      } : null;
+      return route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          authenticated: true,
+          accountUpdated: signupCount > 1,
+          user: { id: "owner-1", email: accountPayload.email, fullName: accountPayload.fullName, provider: "password" },
+          profile: savedProfile,
+          workspaces: [],
+        }),
+      });
+    });
     await page.route("**/api/onboarding/slug?**", (route) => {
       const slug = new URL(route.request().url()).searchParams.get("slug");
       return route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ slug, available: true, domain: `${slug}.motovax.com` }) });
     });
-    let profilePayload;
     await page.route("**/api/onboarding/profile", (route) => {
       profilePayload = route.request().postDataJSON();
       return route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ profile: profilePayload, domain: `${profilePayload.workspaceSlug}.motovax.com` }) });
@@ -129,6 +153,21 @@ for (const viewport of viewports) {
     assert.equal(profilePayload.industry, "automotive");
     assert.equal(profilePayload.branchCount, "");
     assert.equal(profilePayload.region, "");
+
+    await page.click('[data-step="3"] [data-step-back]');
+    await page.waitForSelector('[data-step="2"].is-active');
+    await page.click('[data-step="2"] [data-step-back]');
+    await page.waitForSelector('[data-step="1"].is-active');
+    await page.fill('[data-auth-form="signup"] input[name="fullName"]', "Owner Dealer Diperbarui");
+    await page.fill('[data-auth-form="signup"] input[name="password"]', "rahasia456");
+    await page.fill('[data-auth-form="signup"] input[name="passwordConfirm"]', "rahasia456");
+    await page.click('[data-auth-form="signup"] button[type="submit"]');
+    await page.waitForSelector('[data-step="2"].is-active');
+    assert.equal(signupCount, 2);
+    assert.equal(await page.locator('[data-auth-form="signup"] [data-form-error]').isHidden(), true);
+    assert.equal(await page.inputValue('[data-business-form] input[name="businessName"]'), "Dealer Maju Jaya");
+    await page.click('[data-business-form] button[type="submit"]');
+    await page.waitForSelector('[data-step="3"].is-active');
 
     await page.click('[data-modules-form] button[type="submit"]');
     await page.waitForSelector('[data-step="4"].is-active');

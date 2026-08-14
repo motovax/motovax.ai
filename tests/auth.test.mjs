@@ -64,20 +64,16 @@ const store = {
       avatar_url: profile.picture,
     };
   },
-  async createPasswordUser({ email, fullName, passwordHash }) {
-    if (passwordUsers.has(email)) {
+  async createPasswordUser({ email, fullName, passwordHash, authenticatedUserId = "" }) {
+    const existing = passwordUsers.get(email);
+    if (existing?.email_verified && existing.id !== authenticatedUserId) {
       const error = new Error("Akun dengan email tersebut sudah terdaftar.");
       error.code = "account_exists";
       throw error;
     }
-    const user = {
-      id: crypto.randomUUID(),
-      email,
-      full_name: fullName,
-      avatar_url: "",
-      password_hash: passwordHash,
-      email_verified: false,
-    };
+    const user = existing || { id: crypto.randomUUID(), email, avatar_url: "", email_verified: false };
+    user.full_name = fullName;
+    user.password_hash = passwordHash;
     passwordUsers.set(email, user);
     return user;
   },
@@ -104,11 +100,14 @@ const store = {
     }
   },
   async createSession(record) {
+    const passwordUser = [...passwordUsers.values()].find((user) => user.id === record.userId);
     sessions.set(record.sessionDigest, {
       id: record.userId,
-      email: "user@example.com",
-      full_name: "User Test",
-      avatar_url: "https://example.com/avatar.png",
+      email: passwordUser?.email || "user@example.com",
+      full_name: passwordUser?.full_name || "User Test",
+      avatar_url: passwordUser?.avatar_url || "https://example.com/avatar.png",
+      password_hash: passwordUser?.password_hash || "",
+      provider: passwordUser ? "password" : "google",
     });
   },
   async findSession(digest) {
@@ -367,6 +366,46 @@ test("daftar dan login email/password memakai kredensial nyata", async () => {
   });
   assert.equal(login.status, 200);
   assert.equal((await login.json()).authenticated, true);
+
+  const loginSession = cookieValue(login.headers.get("set-cookie"), "motovax_session");
+  const sentEmailCount = sentEmails.length;
+  const updateFromStepOne = await fetch(`${baseUrl}/api/auth/signup`, {
+    method: "POST",
+    headers: {
+      "content-type": "application/json",
+      origin: "http://127.0.0.1",
+      cookie: `motovax_session=${encodeURIComponent(loginSession)}`,
+    },
+    body: JSON.stringify({
+      fullName: "Password User Diperbarui",
+      email: "password@example.com",
+      password: "rahasia456",
+    }),
+  });
+  assert.equal(updateFromStepOne.status, 200);
+  const updatePayload = await updateFromStepOne.json();
+  assert.equal(updatePayload.authenticated, true);
+  assert.equal(updatePayload.accountUpdated, true);
+  assert.equal(updatePayload.user.fullName, "Password User Diperbarui");
+  assert.equal(sentEmails.length, sentEmailCount);
+
+  const duplicateWithoutOwnerSession = await fetch(`${baseUrl}/api/auth/signup`, {
+    method: "POST",
+    headers: { "content-type": "application/json", origin: "http://127.0.0.1" },
+    body: JSON.stringify({
+      fullName: "Bukan Pemilik",
+      email: "password@example.com",
+      password: "rahasia789",
+    }),
+  });
+  assert.equal(duplicateWithoutOwnerSession.status, 409);
+
+  const loginWithUpdatedPassword = await fetch(`${baseUrl}/api/auth/login`, {
+    method: "POST",
+    headers: { "content-type": "application/json", origin: "http://127.0.0.1" },
+    body: JSON.stringify({ email: "password@example.com", password: "rahasia456" }),
+  });
+  assert.equal(loginWithUpdatedPassword.status, 200);
 });
 
 test("callback menolak state yang tidak cocok", async () => {
