@@ -18,8 +18,8 @@
       <section class="industry-missing">
         <div class="container">
           <span>404</span>
-          <h1>Solusi industri tidak ditemukan</h1>
-          <p>Halaman yang Anda cari belum tersedia.</p>
+          <h1>Solusi dealer tidak ditemukan</h1>
+          <p>Halaman yang Anda cari tidak tersedia.</p>
           <a class="btn btn-primary" href="../index.html">Kembali ke beranda</a>
         </div>
       </section>`;
@@ -28,10 +28,7 @@
 
   const statusMap = {
     live: { label: "Live di produksi", className: "live" },
-    foundation: { label: "Fondasi live", className: "foundation" },
-    adapt: { label: "Perlu adaptasi vertical", className: "adapt" },
     partial: { label: "Partial", className: "partial" },
-    roadmap: { label: "Roadmap", className: "roadmap" },
   };
 
   const modules = industry.moduleRefs.map(([id, status, note]) => ({
@@ -40,25 +37,14 @@
     note,
   }));
 
-  const related = Object.values(window.MOTOVAX_INDUSTRIES || {})
-    .filter((item) => item.slug !== industry.slug)
-    .sort((a, b) => {
-      if (industry.slug !== "otomotif" && a.slug === "otomotif") return -1;
-      if (industry.slug !== "property" && b.slug === "property") return -1;
-      return a.name.localeCompare(b.name, "id");
-    })
-    .slice(0, 3);
-
   const faqs = [
     {
       question: `Apa itu solusi Motovax untuk ${industry.name}?`,
-      answer: `Solusi ini memetakan fondasi produk Motovax—AI omnichannel, CRM, automasi, dashboard, dan platform—ke kebutuhan ${industry.audience}. Status setiap modul ditampilkan agar terlihat mana yang sudah live, menjadi fondasi, atau masih membutuhkan adaptasi vertical.`,
+      answer: `Solusi Motovax menyatukan inventory unit, AI omnichannel, CRM, automasi konten, dan dashboard untuk kebutuhan ${industry.audience}. Status setiap modul menunjukkan capability yang tersedia saat ini.`,
     },
     {
       question: "Fitur mana yang benar-benar tersedia saat ini?",
-      answer: industry.status === "live"
-        ? "Otomotif adalah vertical utama Motovax. IMS, Agentic AI, AI Omnichannel & Call Center, CRM Autopilot, Social Media & Ads Automation, serta dashboard tersedia di codebase produksi; beberapa modul aktif berdasarkan feature flag tenant dan finance masih partial."
-        : "Fondasi AI Omnichannel & Call Center, Agentic AI, Autopilot CRM, Social Media & Ads Automation, dashboard, multi-tenant, RBAC, integrasi, dan Developer API ada di codebase. Terminologi, entity, pipeline, tool AI, dan KPI khusus industri tetap perlu discovery serta konfigurasi/adaptasi.",
+      answer: "IMS, Agentic AI, AI Omnichannel & Call Center, CRM Autopilot, Social Media & Ads Automation, serta dashboard tersedia di produk; beberapa modul aktif berdasarkan feature flag tenant dan finance masih partial.",
     },
     {
       question: `Apakah Motovax menggantikan seluruh sistem inti ${industry.name}?`,
@@ -66,7 +52,7 @@
     },
     {
       question: "Bagaimana proses implementasinya?",
-      answer: "Implementasi dimulai dengan pemetaan channel, customer journey, role, sumber data, dan KPI. Setelah itu tim menentukan modul fondasi yang bisa langsung dikonfigurasi, integrasi yang dibutuhkan, serta scope adaptasi/new build sebelum go-live.",
+      answer: "Implementasi dimulai dengan pemetaan cabang, channel lead, customer journey, role tim dealer, format stocklist, dan KPI. Tim lalu menentukan modul aktif, integrasi, serta tahapan migrasi sebelum go-live.",
     },
   ];
 
@@ -90,12 +76,11 @@
               <h1>${escapeHtml(industry.heroTitle)}</h1>
               <p>${escapeHtml(industry.heroDesc)}</p>
               <div class="industry-hero-actions">
-                <a class="btn btn-primary" href="../index.html#kontak">Jadwalkan Demo <span>→</span></a>
                 <a class="btn btn-secondary" href="#kapabilitas">Lihat Kapabilitas</a>
               </div>
               <div class="industry-honesty-note">
                 <span aria-hidden="true">i</span>
-                <p><strong>Status transparan.</strong> “Fondasi live” berarti modul ada di motovax-app saat ini; pack dan workflow khusus industri tetap memerlukan konfigurasi.</p>
+                <p><strong>Status transparan.</strong> Modul bertanda live tersedia di produk; aktivasi tetap mengikuti feature flag dan konfigurasi dealer.</p>
               </div>
             </div>
 
@@ -110,7 +95,7 @@
                   <div class="industry-visual-title">
                     <span>${escapeHtml(industry.name)}</span>
                     <h2>${escapeHtml(industry.visualTitle)}</h2>
-                    <p>Ilustrasi alur konfigurasi</p>
+                    <p>Ilustrasi alur penjualan dealer</p>
                   </div>
                   <div class="industry-journey">
                     ${industry.journey.map((step, index) => `
@@ -147,7 +132,7 @@
         <div class="container">
           <div class="industry-section-head">
             <h2>Apa yang menghambat ${escapeHtml(industry.audience)}?</h2>
-            <p>Masalah customer journey yang dapat ditangani oleh fondasi solusi Motovax, dengan konfigurasi sesuai proses bisnis.</p>
+            <p>Masalah customer journey dealer yang ditangani Motovax dari data stok hingga tindak lanjut sales.</p>
           </div>
           <div class="industry-challenge-grid">
             ${industry.challenges.map((challenge, index) => `
@@ -181,7 +166,7 @@
                   </div>
                   <div class="industry-compare-arrow" aria-hidden="true">→</div>
                   <div class="industry-after">
-                    <small>DENGAN FONDASI MOTOVAX</small>
+                    <small>DENGAN MOTOVAX</small>
                     <p>${escapeHtml(item.after)}</p>
                   </div>
                 </div>
@@ -198,13 +183,11 @@
           </div>
           <div class="industry-status-legend" aria-label="Legenda status modul">
             <span class="live"><i></i>Live di produksi</span>
-            <span class="foundation"><i></i>Fondasi live</span>
-            <span class="adapt"><i></i>Perlu adaptasi vertical</span>
             <span class="partial"><i></i>Partial</span>
           </div>
           <div class="industry-module-grid">
             ${modules.map((module) => {
-              const status = statusMap[module.status] || statusMap.adapt;
+              const status = statusMap[module.status] || statusMap.partial;
               return `
                 <a class="industry-module-card" href="${escapeHtml(module.href)}">
                   <header>
@@ -241,26 +224,6 @@
         </div>
       </section>
 
-      <section class="industry-related">
-        <div class="container">
-          <div class="industry-related-head">
-            <div>
-              <span>SOLUSI LAINNYA</span>
-              <h2>Jelajahi industri lain</h2>
-            </div>
-            <a href="../index.html#solusi">Lihat menu solusi <span>→</span></a>
-          </div>
-          <div class="industry-related-grid">
-            ${related.map((item) => `
-              <a href="./${escapeHtml(item.slug)}.html">
-                <span>${escapeHtml(item.name.slice(0, 2).toUpperCase())}</span>
-                <div><h3>${escapeHtml(item.name)}</h3><p>${escapeHtml(item.heroTitle)}</p></div>
-                <b>→</b>
-              </a>`).join("")}
-          </div>
-        </div>
-      </section>
-
       <section class="industry-cta">
         <div class="container">
           <div>
@@ -269,8 +232,13 @@
             <p>${escapeHtml(industry.ctaDesc)}</p>
           </div>
           <div class="industry-cta-actions">
-            <a class="btn btn-light" href="../index.html#kontak">Jadwalkan Demo <span>→</span></a>
-            <a class="industry-wa-link" href="#" data-wa>WhatsApp kami</a>
+            <a class="industry-wa-link" href="#" data-wa>
+              <svg class="industry-wa-icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M20.5 3.5A11.8 11.8 0 0 0 12.1 0C5.6 0 .3 5.3.3 11.8c0 2.1.5 4.1 1.6 5.9L.2 24l6.5-1.7a11.8 11.8 0 0 0 5.4 1.4h.1c6.5 0 11.8-5.3 11.8-11.8 0-3.2-1.2-6.1-3.5-8.4Zm-8.3 18.2h-.1c-1.8 0-3.5-.5-5-1.4l-.4-.2-3.8 1 1-3.7-.2-.4a9.8 9.8 0 1 1 8.5 4.7Zm5.4-7.3c-.3-.1-1.8-.9-2.1-1-.3-.1-.5-.1-.7.2l-1 1.2c-.2.2-.4.2-.7.1-1.9-.9-3.2-1.7-4.5-3.9-.3-.5.3-.5.9-1.6.1-.2.1-.4 0-.6l-.9-2.2c-.2-.5-.5-.4-.7-.4h-.6c-.2 0-.6.1-.9.4-.3.4-1.2 1.2-1.2 3s1.3 3.5 1.5 3.7c.2.2 2.6 4 6.4 5.6 2.4 1 3.4 1.1 4.7.9.8-.1 1.8-.7 2-1.4.3-.7.3-1.3.2-1.4-.1-.2-.3-.2-.6-.4Z"/>
+              </svg>
+              <span>Hubungi Kami</span>
+              <span class="industry-wa-arrow" aria-hidden="true">→</span>
+            </a>
           </div>
         </div>
       </section>

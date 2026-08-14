@@ -6,7 +6,7 @@
     <title>Mulai Coba MOTOVAX — Onboarding User Baru</title>
     <meta
       name="description"
-      content="Daftar akun, isi profil bisnis, pilih modul prioritas, dan mulai coba MOTOVAX dalam hitungan menit."
+      content="Daftar akun, isi profil dealer, pilih modul prioritas, dan mulai coba MOTOVAX dalam hitungan menit."
     />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -14,8 +14,8 @@
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="./styles.css?v=workspace-disabled-20260812" />
-    <link rel="stylesheet" href="./onboarding-auth.css?v=password-eye-20260812" />
+    <link rel="stylesheet" href="./styles.css?v=direct-workspace-20260814" />
+    <link rel="stylesheet" href="./onboarding-auth.css?v=email-verification-20260814" />
   </head>
   <body class="onboarding-body">
     <header class="site-header onboarding-header">
@@ -25,7 +25,6 @@
         </a>
         <div class="onboarding-header-actions">
           <a class="onboarding-link-muted" href="https://motovax.ai/">← Kembali ke beranda</a>
-          <a class="btn btn-secondary header-cta" href="https://motovax.ai/#kontak">Jadwalkan Demo</a>
         </div>
       </div>
     </header>
@@ -34,11 +33,11 @@
       <div class="container onboarding-shell">
         <aside class="onboarding-aside" aria-label="Ringkasan onboarding">
           <h1>
-            Mulai integrasikan bisnis Anda dengan Agentic AI
+            Mulai integrasikan dealer mobil Anda dengan Agentic AI
           </h1>
           <p>
-            Bangun tim AI yang memahami bisnis Anda, menjalankan alur kerja, dan membantu tim
-            bergerak lebih cepat dalam satu Command Center MOTOVAX.
+            Bangun tim AI yang memahami operasional dealer mobil Anda, menjalankan alur kerja,
+            dan membantu tim bergerak lebih cepat dalam satu Command Center MOTOVAX.
           </p>
 
           <ol class="onboarding-rail" data-onboarding-rail aria-label="Progress langkah">
@@ -52,29 +51,22 @@
             <li data-rail-step="2">
               <i>2</i>
               <div>
-                <b>Cara onboarding</b>
-                <small>Mandiri atau bersama tim</small>
+                <b>Profil dealer</b>
+                <small>Dealer &amp; workspace</small>
               </div>
             </li>
             <li data-rail-step="3">
               <i>3</i>
               <div>
-                <b>Profil bisnis</b>
-                <small>Organisasi &amp; cabang</small>
+                <b>Modul prioritas</b>
+                <small>Fokus first value</small>
               </div>
             </li>
             <li data-rail-step="4">
               <i>4</i>
               <div>
-                <b>Modul prioritas</b>
-                <small>Fokus first value</small>
-              </div>
-            </li>
-            <li data-rail-step="5">
-              <i>5</i>
-              <div>
                 <b>Siap coba</b>
-                <small>Workspace atau meeting</small>
+                <small>Workspace dealer</small>
               </div>
             </li>
           </ol>
@@ -91,7 +83,7 @@
               <span>✓</span>
               <div>
                 <b>Personalisasi cepat</b>
-                <small>KPI &amp; modul menyesuaikan industri bisnis Anda.</small>
+                <small>KPI &amp; modul disiapkan untuk operasional dealer mobil.</small>
               </div>
             </li>
             <li>
@@ -112,8 +104,8 @@
           <!-- STEP 1: Auth -->
           <div class="onboarding-step is-active" data-step="1">
             <header class="onboarding-step-head">
-              <span>LANGKAH 1 · AKUN</span>
-              <h2 id="onboardingPanelTitle">Buat akun baru</h2>
+              <span data-auth-kicker>LANGKAH 1 · AKUN</span>
+              <h2 id="onboardingPanelTitle" data-auth-title>Buat akun baru</h2>
               <p data-auth-lead>
                 Buat akun Motovax menggunakan email kerja atau akun Google Anda.
               </p>
@@ -169,6 +161,37 @@
                 <button type="submit" class="btn btn-primary" data-loading-label="Membuat akun…">Lanjut ke profil <span>→</span></button>
               </div>
             </form>
+
+            <section class="email-verification" data-verification-panel data-state="pending" aria-labelledby="emailVerificationTitle" hidden>
+              <div class="email-verification-icon" aria-hidden="true">
+                <svg data-verification-icon="mail" viewBox="0 0 48 48"><path d="M7 13.5h34v23H7z"/><path d="m8 15 16 13 16-13"/></svg>
+                <svg data-verification-icon="success" viewBox="0 0 48 48" hidden><circle cx="24" cy="24" r="18"/><path d="m16 24 5.2 5.2L33 17.8"/></svg>
+                <svg data-verification-icon="error" viewBox="0 0 48 48" hidden><circle cx="24" cy="24" r="18"/><path d="M24 15v11M24 33h.01"/></svg>
+              </div>
+              <div class="email-verification-copy">
+                <h3 id="emailVerificationTitle" data-verification-title>Periksa kotak masuk</h3>
+                <p data-verification-copy>Kami mengirim link verifikasi ke:</p>
+                <strong data-verification-email>nama@perusahaan.com</strong>
+              </div>
+              <ol class="email-verification-steps" data-verification-steps>
+                <li><span>1</span><p>Buka email terbaru dari <b>MOTOVAX</b>.</p></li>
+                <li><span>2</span><p>Klik <b>Verifikasi email</b>. Link berlaku 24 jam.</p></li>
+                <li><span>3</span><p>Kembali ke halaman ini untuk melanjutkan profil dealer.</p></li>
+              </ol>
+              <p class="email-verification-status" data-verification-status role="status" aria-live="polite"></p>
+              <div class="email-verification-actions">
+                <a class="btn btn-primary" data-verification-mailbox href="https://mail.google.com/" target="_blank" rel="noopener noreferrer">
+                  <span data-verification-mailbox-label>Buka kotak masuk</span><span>↗</span>
+                </a>
+                <button class="btn btn-secondary" type="button" data-verification-check>Saya sudah verifikasi</button>
+              </div>
+              <div class="email-verification-secondary">
+                <button type="button" data-verification-resend>Kirim ulang email</button>
+                <span aria-hidden="true">•</span>
+                <button type="button" data-verification-change>Ganti alamat email</button>
+              </div>
+              <p class="email-verification-help">Tidak menemukan email? Periksa folder spam atau promosi. Link lama otomatis tidak berlaku setelah email baru dikirim.</p>
+            </section>
 
             <form class="onboarding-form" data-reset-form hidden novalidate>
               <div class="onboarding-field">
@@ -232,86 +255,23 @@
             </a>
           </div>
 
-          <!-- STEP 2: Onboarding path -->
+          <!-- STEP 2: Dealer profile -->
           <div class="onboarding-step" data-step="2" hidden>
             <header class="onboarding-step-head">
-              <span>LANGKAH 2 · CARA ONBOARDING</span>
-              <h2>Pilih cara memulai Motovax</h2>
-              <p>Lanjutkan sendiri sekarang atau jadwalkan sesi bersama tim Motovax.</p>
+              <span>LANGKAH 2 · PROFIL DEALER</span>
+              <h2>Ceritakan dealer Anda</h2>
+              <p>Data ini digunakan untuk membuat workspace dan konfigurasi awal tenant dealer mobil Anda.</p>
             </header>
 
-            <div class="onboarding-path-grid">
-              <button type="button" class="onboarding-path-card" data-onboarding-choice="self">
-                <span class="onboarding-path-icon">01</span>
-                <strong>Onboarding sendiri</strong>
-                <small>Isi profil, pilih modul, dan buat workspace langsung dari portal ini.</small>
-                <b>Lanjutkan mandiri →</b>
-              </button>
-              <button type="button" class="onboarding-path-card" data-onboarding-choice="team">
-                <span class="onboarding-path-icon">02</span>
-                <strong>Bersama tim Motovax</strong>
-                <small>Pilih jadwal untuk membahas kebutuhan, modul, dan konfigurasi awal.</small>
-                <b>Pilih jadwal →</b>
-              </button>
+            <div class="email-verified-banner" data-email-verified-banner role="status" hidden>
+              <span aria-hidden="true">✓</span>
+              <p><b>Email berhasil diverifikasi.</b> Sekarang lengkapi profil dealer Anda.</p>
             </div>
-
-            <div class="onboarding-step-actions onboarding-path-actions" data-path-actions>
-              <button type="button" class="btn btn-secondary" data-path-back-account>← Kembali</button>
-            </div>
-
-            <form class="onboarding-form onboarding-meeting-form" data-meeting-form hidden novalidate>
-              <div class="onboarding-meeting-head">
-                <div>
-                  <span>JADWALKAN MEETING</span>
-                  <h3>Pilih waktu yang nyaman</h3>
-                  <p>Pilih hari Senin–Jumat dalam zona waktu WIB.</p>
-                </div>
-                <button type="button" class="onboarding-link-button" data-meeting-cancel>Ganti pilihan</button>
-              </div>
-              <div class="onboarding-form-row">
-                <label>
-                  <span>Tanggal meeting</span>
-                  <input type="date" name="date" required />
-                </label>
-                <label>
-                  <span>Waktu (WIB)</span>
-                  <select name="time" required>
-                    <option value="">Pilih waktu</option>
-                    <option value="09:00">09.00 WIB</option>
-                    <option value="10:30">10.30 WIB</option>
-                    <option value="13:30">13.30 WIB</option>
-                    <option value="15:00">15.00 WIB</option>
-                  </select>
-                </label>
-              </div>
-              <p class="onboarding-form-error" data-form-error role="alert" aria-live="assertive" hidden></p>
-              <div class="onboarding-step-actions">
-                <button type="button" class="btn btn-secondary" data-meeting-back-account>← Kembali</button>
-                <small class="onboarding-hint">
-                  Tim Motovax akan mengirim konfirmasi dan detail meeting ke email akun Anda.
-                  <span class="onboarding-recaptcha-disclosure">
-                    This site is protected by reCAPTCHA and the Google
-                    <a href="https://policies.google.com/privacy">Privacy Policy</a> and
-                    <a href="https://policies.google.com/terms">Terms of Service</a> apply.
-                  </span>
-                </small>
-                <button type="submit" class="btn btn-primary" data-loading-label="Mengirim jadwal…">Ajukan jadwal meeting <span>→</span></button>
-              </div>
-            </form>
-          </div>
-
-          <!-- STEP 3: Business -->
-          <div class="onboarding-step" data-step="3" hidden>
-            <header class="onboarding-step-head">
-              <span>LANGKAH 3 · PROFIL BISNIS</span>
-              <h2>Ceritakan bisnis Anda</h2>
-              <p>Data ini digunakan untuk membuat workspace dan konfigurasi awal tenant Anda.</p>
-            </header>
 
             <form class="onboarding-form" data-business-form novalidate>
               <label>
                 <span>Nama bisnis / brand</span>
-                <input type="text" name="businessName" placeholder="Contoh: PT Nusantara Digital" required />
+                <input type="text" name="businessName" placeholder="Contoh: Dealer Mobil Nusantara" required />
               </label>
 
               <label>
@@ -321,55 +281,30 @@
                   <span>.motovax.com</span>
                 </div>
                 <small class="onboarding-field-help" id="workspaceSlugStatus" data-slug-status aria-live="polite">
-                  Isi sendiri 3–40 karakter: huruf kecil, angka, dan tanda hubung.
+                  Otomatis dibuat dari nama bisnis; Anda tetap dapat mengubahnya.
                 </small>
               </label>
 
               <div class="onboarding-form-row">
                 <label>
-                  <span>Jumlah cabang / lokasi</span>
-                  <select name="branchCount" required>
+                  <span>Jumlah cabang / lokasi <em>(opsional)</em></span>
+                  <select name="branchCount">
+                    <option value="" selected>Belum ditentukan</option>
                     <option value="1">1 lokasi</option>
                     <option value="2-3">2–3 lokasi</option>
-                    <option value="4-10" selected>4–10 lokasi</option>
+                    <option value="4-10">4–10 lokasi</option>
                     <option value="10+">Lebih dari 10</option>
                   </select>
                 </label>
                 <label>
-                  <span>Kota / wilayah utama</span>
-                  <input type="text" name="region" placeholder="Contoh: Jabodetabek" required />
+                  <span>Kota / wilayah utama <em>(opsional)</em></span>
+                  <input type="text" name="region" placeholder="Contoh: Jabodetabek" />
                 </label>
               </div>
 
-              <fieldset class="onboarding-choice-field">
-                <legend>Industri</legend>
-                <div class="onboarding-choice-grid" role="listbox" aria-label="Pilih industri" data-industry-grid>
-                  <button type="button" role="option" class="onboarding-choice-card is-active" data-industry="general" aria-selected="true">
-                    <span class="onboarding-choice-icon">GN</span>
-                    <b>Umum / Lainnya</b>
-                    <small>Template generik multi-industri</small>
-                  </button>
-                  <button type="button" role="option" class="onboarding-choice-card" data-industry="automotive" aria-selected="false">
-                    <span class="onboarding-choice-icon">OT</span>
-                    <b>Otomotif</b>
-                    <small>Stok, cabang, lead sales</small>
-                  </button>
-                  <button type="button" role="option" class="onboarding-choice-card" data-industry="property" aria-selected="false">
-                    <span class="onboarding-choice-icon">PR</span>
-                    <b>Properti</b>
-                    <small>Inquiry → booking → closing</small>
-                  </button>
-                  <button type="button" role="option" class="onboarding-choice-card" data-industry="retail" aria-selected="false">
-                    <span class="onboarding-choice-icon">RT</span>
-                    <b>Retail</b>
-                    <small>Sell-through &amp; outlet</small>
-                  </button>
-                </div>
-              </fieldset>
-
               <label>
                 <span>Deskripsi singkat <em>(opsional)</em></span>
-                <textarea name="description" rows="2" maxlength="240" placeholder="Contoh: Retail multi-cabang, fokus omnichannel &amp; follow-up lead…"></textarea>
+                <textarea name="description" rows="2" maxlength="240" placeholder="Contoh: Dealer mobil multi-cabang, fokus omnichannel &amp; follow-up lead…"></textarea>
               </label>
 
               <p class="onboarding-form-error" data-form-error role="alert" aria-live="assertive" hidden></p>
@@ -380,10 +315,10 @@
             </form>
           </div>
 
-          <!-- STEP 4: Modules -->
-          <div class="onboarding-step" data-step="4" hidden>
+          <!-- STEP 3: Modules -->
+          <div class="onboarding-step" data-step="3" hidden>
             <header class="onboarding-step-head">
-              <span>LANGKAH 4 · MODUL PRIORITAS</span>
+              <span>LANGKAH 3 · MODUL PRIORITAS</span>
               <h2>Apa yang ingin Anda coba dulu?</h2>
               <p>Pilih minimal satu. Pilihan ini menjadi konfigurasi awal workspace Anda.</p>
             </header>
@@ -462,28 +397,43 @@
             </form>
           </div>
 
-          <!-- STEP 5: Ready -->
-          <div class="onboarding-step" data-step="5" hidden>
+          <!-- STEP 4: Ready -->
+          <div class="onboarding-step" data-step="4" hidden>
             <header class="onboarding-step-head">
-              <span>LANGKAH 5 · SIAP</span>
-              <h2 data-ready-title>Workspace Anda siap digunakan</h2>
-              <p data-ready-copy>Tenant, domain, akun owner, dan konfigurasi awal berhasil dibuat.</p>
+              <span>LANGKAH 4 · SIAP</span>
+              <h2 data-ready-title>Pendaftaran berhasil</h2>
+              <p data-ready-copy>Akun Anda sudah aktif. Anda akan langsung diarahkan ke workspace dealer.</p>
             </header>
+
+            <div class="onboarding-redirect-card" data-redirect-state role="status" aria-live="polite" aria-busy="true" hidden>
+              <div class="onboarding-redirect-loader" aria-hidden="true">
+                <span></span>
+                <i>✓</i>
+              </div>
+              <span class="onboarding-redirect-kicker">WORKSPACE TERCATAT</span>
+              <h3>Mengalihkan ke workspace Anda</h3>
+              <p>
+                Domain <strong data-redirect-domain>workspace dealer Anda</strong> diproses aman di latar belakang.
+                Dashboard dibuka sekarang melalui akses tenant yang sudah siap.
+              </p>
+              <div class="onboarding-redirect-progress" aria-hidden="true"><span></span></div>
+              <small>Membuka dashboard workspace dealer…</small>
+            </div>
 
             <div class="onboarding-success-card" data-workspace-summary>
               <div class="onboarding-success-hero">
                 <span class="onboarding-success-badge" data-workspace-status>Menyiapkan domain</span>
-                <h3 data-summary-name>Bisnis Anda</h3>
+                <h3 data-summary-name>Dealer Anda</h3>
                 <p data-summary-user>Siap masuk sebagai owner</p>
               </div>
               <dl class="onboarding-summary-grid">
                 <div>
-                  <dt>Industri</dt>
-                  <dd data-summary-industry>Umum / Lainnya</dd>
+                  <dt>Fokus operasional</dt>
+                  <dd data-summary-industry>Dealer mobil</dd>
                 </div>
                 <div>
                   <dt>Lokasi</dt>
-                  <dd data-summary-branches>4–10</dd>
+                  <dd data-summary-branches>Belum ditentukan</dd>
                 </div>
                 <div>
                   <dt>Wilayah</dt>
@@ -504,43 +454,8 @@
               </div>
             </div>
 
-            <div class="onboarding-success-card onboarding-meeting-summary" data-meeting-summary hidden>
-              <div class="onboarding-success-hero">
-                <span class="onboarding-success-badge">MENUNGGU KONFIRMASI TIM</span>
-                <h3>Jadwal pilihan Anda sudah diterima</h3>
-                <p data-meeting-user>Konfirmasi akan dikirim melalui email.</p>
-              </div>
-              <dl class="onboarding-summary-grid">
-                <div>
-                  <dt>Tanggal &amp; waktu</dt>
-                  <dd data-meeting-datetime>—</dd>
-                </div>
-                <div>
-                  <dt>Zona waktu</dt>
-                  <dd>WIB · Asia/Jakarta</dd>
-                </div>
-                <div>
-                  <dt>Status</dt>
-                  <dd>Menunggu konfirmasi tim Motovax</dd>
-                </div>
-              </dl>
-            </div>
-
-            <div class="onboarding-ready-actions" data-workspace-actions>
-              <button class="btn btn-primary" type="button" data-open-workspace disabled>
-                Masuk ke workspace <span>→</span>
-              </button>
-              <a class="btn btn-secondary" href="https://motovax.ai/#kontak">
-                Jadwalkan demo live
-              </a>
-            </div>
-            <div class="onboarding-ready-actions" data-meeting-actions hidden>
-              <button class="btn btn-primary" type="button" data-change-meeting>
-                Ubah jadwal pilihan
-              </button>
-              <a class="btn btn-secondary" href="https://motovax.ai/">
-                Kembali ke motovax.ai
-              </a>
+            <div class="onboarding-ready-actions" data-workspace-actions hidden>
+              <button class="btn btn-primary" type="button" data-open-workspace hidden>Coba alihkan kembali <span>→</span></button>
             </div>
           </div>
         </section>
@@ -565,7 +480,7 @@
       </div>
     </div>
 
-    <script src="./script.js?v=onb-20260808b"></script>
-    <script src="./onboarding.js?v=password-eye-20260812"></script>
+    <script src="./script.js?v=direct-workspace-20260814"></script>
+    <script src="./onboarding.js?v=shared-entry-20260814"></script>
   </body>
 </html>

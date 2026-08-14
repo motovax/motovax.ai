@@ -31,6 +31,7 @@ test("konfigurasi tenant baru terisolasi dan integrasi gagal tertutup", () => {
     crm_autopilot: true,
     one_dashboard: false,
     data_insight: false,
+    billing_menu: true,
   });
   assert.equal(config.ai.additional_prompt, "");
   assert.equal(config.ai.eval_schedule.auto_run_enabled, false);
@@ -65,6 +66,7 @@ test("setiap pilihan modul onboarding memiliki feature flag sendiri", () => {
     crm_autopilot: true,
     one_dashboard: true,
     data_insight: true,
+    billing_menu: true,
   });
 });
 
@@ -98,6 +100,9 @@ test("role Call Center hanya diprovisi untuk modul AI Omnichannel dan bukan Mobi
   assert.equal(eligibleRoles.some(([name]) => name === "Call Center"), true);
   assert.equal(ineligibleRoles.some(([name]) => name === "Call Center"), false);
   assert.equal(mobixRoles.some(([name]) => name === "Call Center"), false);
+  assert.equal(eligibleRoles.find(([name]) => name === "Admin")[1].includes("billing:read"), true);
+  assert.equal(eligibleRoles.find(([name]) => name === "Management")[1].includes("billing:read"), true);
+  assert.equal(eligibleRoles.find(([name]) => name === "PIC Agent Officer")[1].includes("billing:read"), false);
 });
 
 test("mapping Call Center awal memakai role seeded tanpa mengaktifkan Jasmine otomatis", () => {

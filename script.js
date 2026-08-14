@@ -13,7 +13,36 @@ for (const link of document.querySelectorAll("[data-wa]")) {
   }
 }
 
-/** Typewriter pada baris outcome hero: High Conversion / Unlimited Growth. */
+/** Kompatibilitas session lama: handoff langsung, tanpa portal akun di landing. */
+(function continueLegacyPortalHandoff() {
+  const fragment = new URLSearchParams(window.location.hash.replace(/^#/, ""));
+  const transferredToken = fragment.get("portal_session");
+  if (!transferredToken) return;
+  fragment.delete("portal_session");
+  fragment.delete("portal_action");
+  const cleanHash = fragment.toString();
+  history.replaceState({}, "", `${location.pathname}${location.search}${cleanHash ? `#${cleanHash}` : ""}`);
+
+  fetch("https://onboard.motovax.com/api/portal/workspace/enter", {
+    method: "POST",
+    headers: {
+      Accept: "application/json",
+      Authorization: `Bearer ${transferredToken}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ destination: "/" }),
+  })
+    .then(async (response) => {
+      const payload = await response.json().catch(() => ({}));
+      if (!response.ok || !payload.redirectUrl) throw new Error("Session lama tidak dapat dilanjutkan.");
+      window.location.replace(payload.redirectUrl);
+    })
+    .catch(() => {
+      window.location.replace("https://onboard.motovax.com/login.html");
+    });
+})();
+
+/** Typewriter pada outcome dealer: test drive dan penjualan unit. */
 (function initTypewriterHeadline() {
   const typed = document.querySelector("[data-typewriter]");
   if (!(typed instanceof HTMLElement)) return;
@@ -309,7 +338,7 @@ if (contactForm instanceof HTMLFormElement) {
       "Halo MOTOVAX, saya ingin berkonsultasi.",
       "",
       `Nama: ${value("name")}`,
-      `Perusahaan/dealer: ${value("company")}`,
+      `Dealer/dealer group: ${value("company")}`,
       `Email: ${value("email")}`,
       `Nomor WhatsApp: ${value("phone")}`,
       `Kebutuhan: ${value("need")}`,
@@ -433,7 +462,7 @@ if (contactForm instanceof HTMLFormElement) {
           paneTitle: "Ana AI — Advanced Analytics",
           demo: { id: "dashboard", hash: "dashboardDemo", context: "analytics", label: "Lihat Analytics" },
           features: [
-            { title: "Analitik operasional", desc: "Pantau aktivitas, produktivitas, dan indikator utama operasional bisnis", icon: "report", href: f("ana-ai-analytics") },
+            { title: "Analitik operasional", desc: "Pantau aktivitas, produktivitas, dan indikator utama dealer", icon: "report", href: f("ana-ai-analytics") },
             { title: "Analitik financial", desc: "Baca revenue, biaya, HPP, gross profit, dan tren finansial", icon: "deal", href: f("ana-ai-analytics") },
             { title: "Analitik sales performance", desc: "Bandingkan performa sales, cabang, channel, dan hasil konversi", icon: "score", href: f("ana-ai-analytics") },
             { title: "Additional custom analytic", desc: "Tambahkan analitik khusus sesuai KPI dan kebutuhan manajemen", icon: "workflow", href: f("ana-ai-analytics") },
@@ -704,10 +733,54 @@ if (contactForm instanceof HTMLFormElement) {
   });
 })();
 
-/**
- * Mega menu Solusi — struktur Industri & Roles mengikuti qontak.com/Solusi.
- * Industri ditambah Otomotif dan Property; role HR tidak ditampilkan.
- */
+const dealerSolutionNavigation = Object.freeze({
+  outcomes: [
+    {
+      title: "Tangkap & respons setiap lead",
+      desc: "Satukan WhatsApp, Instagram, dan Facebook dengan AI serta takeover manusia.",
+      capability: "AI Omnichannel + Agentic AI",
+      icon: "lead",
+      href: "aplikasi-omnichannel.html",
+    },
+    {
+      title: "Percepat follow-up hingga closing",
+      desc: "Jaga lead tetap bergerak dan arahkan sales ke tindakan terbaik berikutnya.",
+      capability: "Autopilot CRM + handoff sales",
+      icon: "closing",
+      href: "aplikasi-crm.html",
+    },
+    {
+      title: "Putar stok lebih cepat",
+      desc: "Pantau stok dan aging lintas cabang serta bantu tim menemukan unit yang tepat.",
+      capability: "Inventory Management + Falcon AI",
+      icon: "inventory",
+      href: "inventory-falcon-ai.html",
+    },
+    {
+      title: "Aktifkan kampanye dari stok",
+      desc: "Ubah data unit menjadi konten dan kampanye yang relevan di setiap channel.",
+      capability: "Social Media & Ads Automation",
+      icon: "campaign",
+      href: "social-media-sora-ai.html",
+    },
+    {
+      title: "Kendalikan performa semua cabang",
+      desc: "Baca funnel, channel, sales, stok, margin, dan cabang dalam satu tampilan.",
+      capability: "One Dashboard & Analytics",
+      icon: "analytics",
+      href: "ana-ai-analytics.html",
+    },
+  ],
+  roles: [
+    { title: "Owner & Manajemen", href: "motovax-360.html" },
+    { title: "Sales", href: "motovax-sales-suite.html" },
+    { title: "Call Center", href: "motovax-service-suite.html" },
+    { title: "Marketing", href: "motovax-broadcast.html" },
+    { title: "Operasional", href: "inventory-falcon-ai.html" },
+  ],
+});
+
+/** Mega menu Solusi — outcome dealer sebagai jalur utama, role sebagai jalur sekunder. */
 (function initSolusiMegaMenu() {
   const solusiLinks = [...document.querySelectorAll('.nav > a[href*="#solusi"]')].filter(
     (link) => link.textContent.trim() === "Solusi",
@@ -718,77 +791,41 @@ if (contactForm instanceof HTMLFormElement) {
   const inNestedDir = path.includes("/fitur/") || path.includes("/solusi/") || /\/(fitur|solusi)$/.test(path);
   const fiturPrefix = inNestedDir ? "../fitur/" : "./fitur/";
   const solusiPrefix = path.includes("/solusi/") || /\/solusi$/.test(path) ? "./" : inNestedDir ? "../solusi/" : "./solusi/";
-  const home = inNestedDir ? "../index.html#" : path.endsWith("modul.html") ? "./index.html#" : "#";
+  const contactHref = inNestedDir ? "../hubungi-kami.html" : "./hubungi-kami.html";
 
   const icon = (paths) =>
     `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${paths}</svg>`;
 
   const icons = {
-    education: icon('<path d="M4 5.5A3.5 3.5 0 0 1 7.5 2H20v17H7.5A3.5 3.5 0 0 0 4 22z"/><path d="M4 5.5v13A3.5 3.5 0 0 1 7.5 15H20"/>'),
-    finance: icon('<path d="m3 9 9-5 9 5"/><path d="M5 10v8m5-8v8m4-8v8m5-8v8M3 21h18"/>'),
-    health: icon('<path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8z"/><path d="M8 12h2l1-2 2 4 1-2h2"/>'),
-    travel: icon('<path d="m22 2-7 20-4-9-9-4z"/><path d="M22 2 11 13"/>'),
-    hotel: icon('<path d="M3 21V8l9-5 9 5v13"/><path d="M8 21v-5h8v5M8 10h.01M12 10h.01M16 10h.01"/>'),
-    logistics: icon('<path d="M3 6h11v11H3zM14 10h4l3 3v4h-7z"/><circle cx="7" cy="19" r="2"/><circle cx="18" cy="19" r="2"/>'),
-    fmcg: icon('<path d="m12 2 9 5-9 5-9-5z"/><path d="m3 7 9 5 9-5v10l-9 5-9-5z"/><path d="M12 12v10"/>'),
-    retail: icon('<path d="M4 10h16v11H4zM3 10l2-6h14l2 6"/><path d="M8 21v-6h8v6M7 10a2 2 0 0 0 4 0m0 0a2 2 0 0 0 4 0m0 0a2 2 0 0 0 4 0"/>'),
-    tech: icon('<path d="m8 9-4 3 4 3m8-6 4 3-4 3M14 5l-4 14"/>'),
-    outsourcing: icon('<path d="M4 14v-3a8 8 0 0 1 16 0v3"/><path d="M4 14a3 3 0 0 0 3 3h1v-6H7a3 3 0 0 0-3 3zm16 0a3 3 0 0 1-3 3h-1v-6h1a3 3 0 0 1 3 3zM16 19c-1 2-3 2-5 2"/>'),
     automotive: icon('<path d="M5 16 3.5 14.5 5 10l2-4h10l2 4 1.5 4.5L19 16"/><path d="M5 10h14M6 16h12M7 19v2m10-2v2"/><circle cx="7.5" cy="14" r="1"/><circle cx="16.5" cy="14" r="1"/>'),
-    property: icon('<path d="m3 11 9-8 9 8"/><path d="M5 10v11h14V10M9 21v-7h6v7"/>'),
-    sales: icon('<path d="M4 19V9m6 10V5m6 14v-7m4 7H2"/><path d="m5 7 5-4 5 3 5-4"/>'),
-    service: icon('<path d="M12 3a8 8 0 0 0-8 8v3a3 3 0 0 0 3 3h1v-7H7a3 3 0 0 0-3 3m16 0a3 3 0 0 0-3-3h-1v7h1a3 3 0 0 0 3-3z"/><path d="M16 19c-1 2-3 2-5 2"/>'),
-    marketing: icon('<path d="M3 11v4h4l9 4V7l-9 4z"/><path d="M7 15l2 5h3M19 9c1 1 1 4 0 5"/>'),
-    operations: icon('<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1-2.8 2.8-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.6V21h-4v-.1a1.7 1.7 0 0 0-1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1L4.2 17l.1-.1a1.7 1.7 0 0 0 .3-1.9A1.7 1.7 0 0 0 3 14H3v-4h.1a1.7 1.7 0 0 0 1.6-1 1.7 1.7 0 0 0-.3-1.9L4.2 7 7 4.2l.1.1A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1-1.6V3h4v.1a1.7 1.7 0 0 0 1 1.6 1.7 1.7 0 0 0 1.9-.3l.1-.1L19.8 7l-.1.1a1.7 1.7 0 0 0-.3 1.9 1.7 1.7 0 0 0 1.6 1h.1v4H21a1.7 1.7 0 0 0-1.6 1z"/>'),
+    lead: icon('<path d="M4 5.5h16v11H9l-5 4v-15Z"/><path d="M8 9h8m-8 3.5h5"/>'),
+    closing: icon('<path d="M4 19V9m6 10V5m6 14v-7m4 7H2"/><path d="m5 7 5-4 5 3 5-4"/>'),
+    inventory: icon('<path d="m4 8 8-4 8 4-8 4-8-4Z"/><path d="M4 8v8l8 4 8-4V8M12 12v8"/>'),
+    campaign: icon('<path d="M3 10v4h4l9 4V6l-9 4H3Z"/><path d="m7 14 2 6h3m7-12c1 1 1 5 0 6"/>'),
+    analytics: icon('<path d="M4 20V12m5 8V7m5 13v-5m5 5V4"/><path d="m4 9 5-4 5 3 5-5"/>'),
   };
 
-  const groups = [
-    {
-      id: "industri",
-      title: "Industri",
-      items: [
-        { title: "Pendidikan", desc: "Fondasi inquiry dan admission", icon: "education", slug: "pendidikan", status: "adapt", statusLabel: "Adaptif", href: `${solusiPrefix}pendidikan.html` },
-        { title: "Keuangan", desc: "Fondasi engagement nasabah", icon: "finance", slug: "keuangan", status: "adapt", statusLabel: "Adaptif", href: `${solusiPrefix}keuangan.html` },
-        { title: "Kesehatan", desc: "Fondasi layanan dan inquiry pasien", icon: "health", slug: "kesehatan", status: "adapt", statusLabel: "Adaptif", href: `${solusiPrefix}kesehatan.html` },
-        { title: "Tour & Travel", desc: "Fondasi inquiry dan booking", icon: "travel", slug: "tour-travel", status: "adapt", statusLabel: "Adaptif", href: `${solusiPrefix}tour-travel.html` },
-        { title: "Perhotelan", desc: "Fondasi reservasi dan layanan tamu", icon: "hotel", slug: "perhotelan", status: "adapt", statusLabel: "Adaptif", href: `${solusiPrefix}perhotelan.html` },
-        { title: "Logistik", desc: "Fondasi customer service pengiriman", icon: "logistics", slug: "logistik", status: "adapt", statusLabel: "Adaptif", href: `${solusiPrefix}logistik.html` },
-        { title: "FMCG", desc: "Fondasi engagement channel partner", icon: "fmcg", slug: "fmcg", status: "adapt", statusLabel: "Adaptif", href: `${solusiPrefix}fmcg.html` },
-        { title: "Ritel", desc: "Fondasi conversational sales", icon: "retail", slug: "ritel", status: "adapt", statusLabel: "Adaptif", href: `${solusiPrefix}ritel.html` },
-        { title: "Teknologi Informasi", desc: "Fondasi B2B sales dan support", icon: "tech", slug: "teknologi-informasi", status: "adapt", statusLabel: "Adaptif", href: `${solusiPrefix}teknologi-informasi.html` },
-        { title: "Outsourcing", desc: "Fondasi operasi layanan multi-klien", icon: "outsourcing", slug: "outsourcing", status: "adapt", statusLabel: "Adaptif", href: `${solusiPrefix}outsourcing.html` },
-        { title: "Otomotif", desc: "Stok hingga closing terintegrasi", icon: "automotive", slug: "otomotif", status: "live", statusLabel: "Live", href: `${solusiPrefix}otomotif.html` },
-        { title: "Property", desc: "Fondasi lead hingga site visit", icon: "property", slug: "property", status: "adapt", statusLabel: "Adaptif", href: `${solusiPrefix}property.html` },
-      ],
-    },
-    {
-      id: "roles",
-      title: "Roles",
-      items: [
-        { title: "Sales", desc: "Lacak penjualan barang", icon: "sales", href: `${fiturPrefix}motovax-sales-suite.html` },
-        { title: "Customer Service", desc: "Kelola pelayanan pelanggan", icon: "service", href: `${fiturPrefix}motovax-service-suite.html` },
-        { title: "Marketing", desc: "Atur pemasaran produk", icon: "marketing", href: `${fiturPrefix}motovax-broadcast.html` },
-        { title: "Operasional", desc: "Otomatiskan proses operasional", icon: "operations", href: `${fiturPrefix}automasi-workflow.html` },
-      ],
-    },
-  ];
-
-  const renderItems = (group) => group.items
+  const renderOutcomes = () => dealerSolutionNavigation.outcomes
     .map((item) => {
-      const isCurrent = Boolean(item.slug && (path.endsWith(`/solusi/${item.slug}`) || path.endsWith(`/solusi/${item.slug}.html`)));
       return `
-      <a class="solusi-mega-item${isCurrent ? " is-current" : ""}" href="${item.href}"${isCurrent ? ' aria-current="page"' : ""} data-solusi-close>
+      <a class="solusi-mega-item solusi-outcome-item" href="${fiturPrefix}${item.href}" data-solusi-close>
         <span class="solusi-mega-icon">${icons[item.icon]}</span>
         <span class="solusi-mega-meta">
-          <span class="solusi-mega-title-row">
-            <strong>${item.title}</strong>
-            ${item.statusLabel ? `<span class="solusi-mega-status ${item.status}">${item.statusLabel}</span>` : ""}
-          </span>
+          <strong>${item.title}</strong>
           <small>${item.desc}</small>
+          <em>${item.capability}</em>
         </span>
         <svg class="solusi-mega-arrow" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </a>`;
     })
+    .join("");
+
+  const renderRoles = () => dealerSolutionNavigation.roles
+    .map((role) => `
+      <a href="${fiturPrefix}${role.href}" data-solusi-close>
+        <span>${role.title}</span>
+        <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>`)
     .join("");
 
   const renderMenu = (id) => `
@@ -798,26 +835,35 @@ if (contactForm instanceof HTMLFormElement) {
         <path d="M2.5 4.5 6 8l3.5-3.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
     </button>
-    <div class="produk-mega solusi-mega" id="${id}" role="region" aria-label="Menu solusi berdasarkan industri dan peran" hidden data-solusi-panel>
-      <div class="produk-mega-tabs">
-        <div class="produk-mega-tabs-inner" role="tablist" aria-label="Kategori solusi">
-          ${groups.map((group, index) => `
-            <button type="button" class="produk-mega-tab${index === 0 ? " is-active" : ""}" id="${id}-tab-${group.id}" role="tab" aria-selected="${index === 0 ? "true" : "false"}" aria-controls="${id}-panel-${group.id}" data-solusi-tab="${group.id}">${group.title}</button>`).join("")}
-        </div>
-      </div>
+    <div class="produk-mega solusi-mega" id="${id}" role="region" aria-label="Menu solusi dealer mobil berdasarkan kebutuhan bisnis" hidden data-solusi-panel>
       <div class="solusi-mega-content">
-        ${groups.map((group, index) => `
-          <section class="solusi-mega-panel${index === 0 ? " is-active" : ""}" id="${id}-panel-${group.id}" role="tabpanel" aria-labelledby="${id}-tab-${group.id}" data-solusi-panel-content="${group.id}" ${index === 0 ? "" : "hidden"}>
-            <div class="solusi-mega-heading">
-              <span>Solusi</span>
-              <h3>${group.title}</h3>
+        <div class="solusi-mega-heading">
+          <span>Solusi dealer mobil</span>
+          <h3>Apa yang ingin dealer Anda tingkatkan?</h3>
+        </div>
+        <div class="solusi-mega-layout">
+          <div class="solusi-mega-grid">${renderOutcomes()}</div>
+          <aside class="solusi-mega-aside" aria-label="Gambaran lengkap dan solusi berdasarkan tim">
+            <a class="solusi-mega-overview" href="${solusiPrefix}otomotif.html" data-solusi-close>
+              <span class="solusi-mega-icon">${icons.automotive}</span>
+              <span>
+                <small>PLATFORM TERPADU</small>
+                <strong>Lihat solusi dealer secara menyeluruh</strong>
+                <em>Dari stok dan lead hingga follow-up serta keputusan manajemen.</em>
+              </span>
+              <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </a>
+            <div class="solusi-role-group">
+              <span>Jelajahi berdasarkan tim</span>
+              <div>${renderRoles()}</div>
             </div>
-            <div class="solusi-mega-grid solusi-mega-grid-${group.id}">${renderItems(group)}</div>
-            <a class="solusi-mega-contact" href="${home}kontak" data-solusi-close>
-              Belum menemukan yang Anda cari? <strong>Diskusikan kebutuhan bisnis Anda</strong>
+            <a class="solusi-mega-contact" href="${contactHref}" data-solusi-close>
+              <span>Belum yakin harus mulai dari mana?</span>
+              <strong>Diskusikan target dealer Anda</strong>
               <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </a>
-          </section>`).join("")}
+          </aside>
+        </div>
       </div>
     </div>`;
 
@@ -873,19 +919,6 @@ if (contactForm instanceof HTMLFormElement) {
     document.body.classList.remove("solusi-menu-open");
   };
 
-  const setActiveTab = (menu, groupId) => {
-    for (const tab of menu.querySelectorAll("[data-solusi-tab]")) {
-      const active = tab.getAttribute("data-solusi-tab") === groupId;
-      tab.classList.toggle("is-active", active);
-      tab.setAttribute("aria-selected", active ? "true" : "false");
-    }
-    for (const panel of menu.querySelectorAll("[data-solusi-panel-content]")) {
-      const active = panel.getAttribute("data-solusi-panel-content") === groupId;
-      panel.classList.toggle("is-active", active);
-      panel.hidden = !active;
-    }
-  };
-
   for (const menu of menus) {
     const trigger = menu.querySelector("[data-solusi-trigger]");
     trigger?.addEventListener("click", (event) => {
@@ -898,13 +931,6 @@ if (contactForm instanceof HTMLFormElement) {
     menu.addEventListener("click", (event) => {
       const target = event.target;
       if (!(target instanceof Element)) return;
-      const tab = target.closest("[data-solusi-tab]");
-      if (tab) {
-        event.preventDefault();
-        event.stopPropagation();
-        setActiveTab(menu, tab.getAttribute("data-solusi-tab") || "industri");
-        return;
-      }
       if (target.closest("[data-solusi-close]")) requestAnimationFrame(() => closeMenu(menu));
     });
   }
@@ -917,7 +943,10 @@ if (contactForm instanceof HTMLFormElement) {
     closeAll();
   });
   document.addEventListener("keydown", (event) => {
-    if (event.key === "Escape") closeAll();
+    if (event.key !== "Escape") return;
+    const openTrigger = document.querySelector("[data-solusi-menu].is-open [data-solusi-trigger]");
+    closeAll();
+    if (openTrigger instanceof HTMLElement) openTrigger.focus();
   });
   document.addEventListener("motovax:nav-menu-open", (event) => {
     if (event.detail?.source !== "solusi") closeAll();
@@ -930,36 +959,18 @@ if (contactForm instanceof HTMLFormElement) {
   const headerInner = header?.querySelector(".header-inner");
   if (!(header instanceof HTMLElement) || !(headerInner instanceof HTMLElement)) return;
 
-  /* Beranda: header hanya logo + Login. Hamburger membuat bar tambahan di mobile. */
-  if (document.body.classList.contains("home-redesign")) return;
-
   let trigger = header.querySelector("[data-mobile-nav-trigger]");
-  let panel = header.querySelector("[data-mobile-nav-panel]");
-  let backdrop = header.querySelector("[data-mobile-nav-backdrop]");
+  let panel = document.querySelector("[data-mobile-nav-panel]");
+  let backdrop = document.querySelector("[data-mobile-nav-backdrop]");
 
-  /* Halaman selain beranda memakai header yang sama, tetapi markup menu mobile
-   * tidak diduplikasi ke puluhan file HTML. Bentuk menu di sini agar setiap
-   * halaman selalu mendapat navigasi mobile/tablet yang identik. */
+  /* Seluruh halaman memakai header yang sama, tetapi markup menu mobile tidak
+   * diduplikasi ke puluhan file HTML. Bentuk menu di sini agar setiap halaman,
+   * termasuk beranda, selalu mendapat navigasi mobile/tablet yang identik. */
   if (!trigger || !panel || !backdrop) {
     const path = location.pathname.replace(/\/+$/, "") || "/";
     const nested = path.includes("/fitur/") || path.includes("/solusi/") || /\/(fitur|solusi)$/.test(path);
     const root = nested ? "../" : "./";
     const home = `${root}index.html`;
-    const industries = [
-      ["Otomotif", "Live", "otomotif"],
-      ["Property", "Adaptif", "property"],
-      ["Pendidikan", "Adaptif", "pendidikan"],
-      ["Keuangan", "Adaptif", "keuangan"],
-      ["Kesehatan", "Adaptif", "kesehatan"],
-      ["Tour & Travel", "Adaptif", "tour-travel"],
-      ["Perhotelan", "Adaptif", "perhotelan"],
-      ["Logistik", "Adaptif", "logistik"],
-      ["FMCG", "Adaptif", "fmcg"],
-      ["Ritel", "Adaptif", "ritel"],
-      ["Teknologi Informasi", "Adaptif", "teknologi-informasi"],
-      ["Outsourcing", "Adaptif", "outsourcing"],
-    ];
-
     trigger = document.createElement("button");
     trigger.className = "mobile-nav-trigger";
     trigger.type = "button";
@@ -985,21 +996,40 @@ if (contactForm instanceof HTMLFormElement) {
     panel.innerHTML = `
       <nav class="mobile-nav-links">
         <a href="${root}modul.html" data-mobile-nav-close>Produk <span>→</span></a>
-        <details>
-          <summary>Solusi berdasarkan industri <span>+</span></summary>
-          <div class="mobile-solutions-grid">
-            ${industries.map(([name, status, slug]) => `<a href="${root}solusi/${slug}.html" data-mobile-nav-close>${name} <small>${status}</small></a>`).join("")}
+        <a href="${home}#cara-kerja" data-mobile-nav-close>Cara Kerja <span>→</span></a>
+        <details class="mobile-solutions">
+          <summary>Solusi <span aria-hidden="true">+</span></summary>
+          <div class="mobile-solutions-body">
+            <a class="mobile-solutions-overview" href="${root}solusi/otomotif.html" data-mobile-nav-close>
+              <small>PLATFORM TERPADU</small>
+              <strong>Solusi dealer secara menyeluruh</strong>
+              <span>Dari stok dan lead hingga keputusan manajemen.</span>
+            </a>
+            <p>Berdasarkan kebutuhan dealer</p>
+            <div class="mobile-solutions-grid">
+              ${dealerSolutionNavigation.outcomes.map((item) => `
+                <a href="${root}fitur/${item.href}" data-mobile-nav-close>
+                  <strong>${item.title}</strong>
+                  <small>${item.capability}</small>
+                </a>`).join("")}
+            </div>
+            <div class="mobile-solution-roles">
+              <p>Berdasarkan tim</p>
+              <div>
+                ${dealerSolutionNavigation.roles.map((role) => `<a href="${root}fitur/${role.href}" data-mobile-nav-close>${role.title}</a>`).join("")}
+              </div>
+            </div>
           </div>
         </details>
-        <a href="${home}#cara-kerja" data-mobile-nav-close>Cara Kerja <span>→</span></a>
-        <a href="${home}#keunggulan" data-mobile-nav-close>Keunggulan <span>→</span></a>
         <a href="${root}harga.html" data-mobile-nav-close>Harga <span>→</span></a>
         <a href="${root}hubungi-kami.html" data-mobile-nav-close>Hubungi Kami <span>→</span></a>
       </nav>
-      <a class="btn btn-primary mobile-nav-cta" href="${root}hubungi-kami.html" data-mobile-nav-close>Diskusikan Bisnis Anda <span>→</span></a>`;
+      <a class="btn btn-primary mobile-nav-cta" href="${root}hubungi-kami.html" data-mobile-nav-close>Diskusikan Dealer Anda <span>→</span></a>`;
 
     headerInner.appendChild(trigger);
-    header.append(backdrop, panel);
+    /* Letakkan layer fixed di body agar backdrop-filter pada sticky header tidak
+     * menjadikannya containing block setinggi header. */
+    document.body.append(backdrop, panel);
   }
 
   if (!(trigger instanceof HTMLButtonElement) || !(panel instanceof HTMLElement) || !(backdrop instanceof HTMLElement)) return;
@@ -7787,7 +7817,7 @@ function makeDashboardShell({
         title: channelsLabel,
         description:
           channelsDesc ||
-          `Pantau kontribusi tiap channel masuk ke pipeline dan closing bisnis Anda.`,
+          `Pantau kontribusi tiap channel masuk ke pipeline dan closing dealer Anda.`,
         widgets: dashboardNavViewWidgets.channels,
         role: null,
         revenueKicker: "REVENUE CHANNEL",
@@ -7805,7 +7835,7 @@ function makeDashboardShell({
       title: sidebarTitle || "Satu data, beda kebutuhan",
       copy:
         sidebarCopy ||
-        `Menu kiri menyesuaikan industri. Buka tiap view untuk layout ${loc.toLocaleLowerCase("id")}, sales, dan channel.`,
+        `Menu kiri menyesuaikan role dealer. Buka tiap view untuk layout ${loc.toLocaleLowerCase("id")}, sales, dan channel.`,
     },
   };
 }
@@ -8268,7 +8298,7 @@ const dashboardVerticalPresets = {
         type: "info",
         icon: "i",
         title: "Sesuaikan highlight board",
-        copy: "Edit prioritas di panel personalisasi agar relevan bisnis Anda.",
+        copy: "Edit prioritas di panel personalisasi agar relevan dengan dealer Anda.",
       },
     ],
   },
@@ -8420,10 +8450,10 @@ Object.assign(
     locationWord: "Lokasi",
     salesLabel: "Sales Performance",
     channelsLabel: "Channel Mix",
-    overviewDesc: "Ringkasan generik multi-lokasi — sesuaikan highlight untuk bisnis Anda.",
+    overviewDesc: "Ringkasan operasional multi-cabang — sesuaikan highlight untuk dealer Anda.",
     salesDesc: "Pipeline dan produktivitas tim sales generik.",
     locationsDesc: "Komparasi performa tiap lokasi operasional.",
-    channelsDesc: "Bauran channel lead/order generik untuk demo multi-industri.",
+    channelsDesc: "Bauran channel lead dealer dari WhatsApp, website, marketplace, dan referral.",
     sidebarTitle: "Dashboard custom",
     sidebarCopy: "Layout menu menyesuaikan deskripsi bisnis yang Anda isi di onboarding.",
   }),
@@ -9089,7 +9119,7 @@ class OneDashboardDemo {
     const bannerCopy = this.root.querySelector("[data-dashboard-banner-copy]");
     if (bannerTitle) {
       bannerTitle.textContent = this.businessDescription
-        ? `Layout “${view.title}” untuk bisnis Anda`
+        ? `Layout “${view.title}” untuk dealer Anda`
         : `Layout menu: ${view.title}`;
     }
     if (bannerCopy) {

@@ -195,7 +195,6 @@
             <p class="feature-hero-desc">${escapeHtml(data.heroDesc)}</p>
             ${heroBenefits ? `<ul class="feature-hero-list">${heroBenefits}</ul>` : ""}
             <div class="feature-hero-actions">
-              <a class="btn btn-primary" href="../index.html#kontak">Jadwalkan Demo <span>-></span></a>
               ${demoCta}
             </div>
           </div>
@@ -281,12 +280,11 @@
     <section class="feature-page-cta">
       <div class="container feature-page-cta-inner">
         <div>
-          <h2>Siap melihat ${escapeHtml(data.title)} untuk bisnis Anda?</h2>
+          <h2>Siap melihat ${escapeHtml(data.title)} untuk dealer Anda?</h2>
           <p>Jadwalkan sesi bersama tim Motovax untuk melihat alur yang paling relevan.</p>
         </div>
         <div class="feature-hero-actions">
           <a class="btn btn-light" href="#" data-wa>WhatsApp Sales <span>-></span></a>
-          <a class="btn btn-secondary" href="../index.html#kontak">Jadwalkan Demo</a>
         </div>
       </div>
     </section>
@@ -436,13 +434,13 @@
       return {
         label: "Solusi terintegrasi",
         tone: "live",
-        detail: "Solusi ini menyatukan beberapa modul Motovax. Aktivasi dan alurnya dapat disesuaikan dengan kebutuhan organisasi.",
+        detail: "Solusi ini menyatukan beberapa modul Motovax. Aktivasi dan alurnya dapat disesuaikan dengan kebutuhan dealer dan cabang.",
       };
     }
     return {
       label: "Tersedia di Motovax",
       tone: "live",
-      detail: "Capability utama tersedia dan dapat dikonfigurasi mengikuti role, cabang, channel, serta modul yang digunakan organisasi.",
+      detail: "Capability utama tersedia dan dapat dikonfigurasi mengikuti role, cabang, channel, serta modul yang digunakan dealer.",
     };
   }
 
@@ -856,16 +854,16 @@
       {
         question: `Apa kemampuan utama ${feature.title}?`,
         answer: capNames
-          ? `${feature.title} mencakup ${capNames}. Detail aktivasi mengikuti kebutuhan dan konfigurasi organisasi.`
+          ? `${feature.title} mencakup ${capNames}. Detail aktivasi mengikuti kebutuhan dan konfigurasi dealer.`
           : `${feature.title} membantu menyederhanakan proses operasional dalam platform Motovax.`,
       },
       {
         question: `Bagaimana alur kerja ${feature.title}?`,
         answer: flowNames
-          ? `Alur utamanya adalah ${flowNames}. Tim dapat menyesuaikan penerapannya dengan proses bisnis yang berjalan.`
-          : "Alur kerja disusun dari aktivitas masuk, pemrosesan, hingga tindak lanjut di workspace Motovax.",
+          ? `Alur utamanya adalah ${flowNames}. Tim dapat menyesuaikan penerapannya dengan proses dealer yang berjalan.`
+          : "Alur kerja disusun dari aktivitas lead masuk, pemrosesan, hingga tindak lanjut di workspace dealer.",
       },
-      { question: `Siapa yang cocok menggunakan ${feature.title}?`, answer: `${feature.title} relevan untuk ${productProfile.roles.join(", ")} sesuai pembagian role dan tanggung jawab di organisasi.` },
+      { question: `Siapa yang cocok menggunakan ${feature.title}?`, answer: `${feature.title} relevan untuk ${productProfile.roles.join(", ")} sesuai pembagian role dan tanggung jawab di dealer.` },
       { question: `Apakah ${feature.title} sudah tersedia?`, answer: `${available.label}. ${available.detail}` },
       {
         question: `Fitur apa yang terhubung dengan ${feature.title}?`,
