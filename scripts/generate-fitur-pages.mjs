@@ -83,7 +83,7 @@ const template = (slug, title, description) => `<!doctype html>
           <a class="brand footer-brand" href="../index.html#top" aria-label="MOTOVAX home">
             <span>MOTO</span><strong>VAX</strong>
           </a>
-          <p>Agentic AI ERP — integrasikan operasional bisnis dengan agen AI.</p>
+          <p>Platform AI untuk stok, lead, sales, dan operasional dealer mobil.</p>
         </div>
         <div>
           <h3>Produk</h3>
@@ -101,7 +101,7 @@ const template = (slug, title, description) => `<!doctype html>
     <script>window.__FEATURE_SLUG__ = ${JSON.stringify(slug)};</script>
     <script src="./features-data.js"></script>
     <script src="./feature-page.js?v=copy-20260811"></script>
-    <script src="../script.js?v=20260806-2"></script>
+    <script src="../script.js?v=dealer-focus-20260814"></script>
   </body>
 </html>
 `;
@@ -144,7 +144,7 @@ fs.writeFileSync(
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Semua Fitur — MOTOVAX</title>
-  <meta name="description" content="Jelajahi katalog fitur Motovax untuk sales, customer service, CRM, omnichannel, dan automasi bisnis." />
+  <meta name="description" content="Jelajahi fitur Motovax untuk inventory unit, sales dealer, customer service, CRM, omnichannel, dan automasi dealer mobil." />
   <link rel="stylesheet" href="../styles.css?v=copy-20260811" />
   <link rel="icon" href="../favicon.ico" />
 </head>
@@ -176,7 +176,7 @@ fs.writeFileSync(
       <ul class="feature-index-list">${listItems}</ul>
     </div>
   </main>
-  <script src="../script.js?v=20260806-2"></script>
+  <script src="../script.js?v=dealer-focus-20260814"></script>
 </body>
 </html>
 `,

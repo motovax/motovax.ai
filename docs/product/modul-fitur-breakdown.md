@@ -1,8 +1,8 @@
 # Breakdown Modul & Fitur Motovax
 
-**Posisi produk:** Agentic AI ERP — platform multi-tenant yang mengintegrasikan operasional bisnis dengan agen AI (WhatsApp, omnichannel, otomasi).  
-**Vertical utama hari ini:** Dealer otomotif (contoh tenant: Mobix).  
-**Arah:** Modul yang sama dapat digeneralisasi ke industri lain (properti, ritel, jasa) lewat konfigurasi tenant + agent tools + dashboard multi-vertical.
+**Posisi produk:** platform AI untuk dealer mobil yang mengintegrasikan inventory unit, lead, sales, WhatsApp, omnichannel, CRM, dan otomasi.
+**Fokus produk:** Dealer mobil, termasuk dealer group dan operasional multi-cabang (contoh tenant: Mobix).
+**Arah:** Memperdalam customer journey dealer dari stok dan lead hingga test drive, closing, trade-in, serta after-sales.
 
 Dokumen ini memetakan **apa yang sudah ada di produksi** (`motovax-app`) dan **apa yang masuk akal dibangun** sebagai perluasan ERP agentic. Sumber: feature flags tenant, route frontend, sidebar, backend services, dan tool agent WhatsApp.
 
@@ -176,10 +176,10 @@ Suite memakai demo yang sama dengan konteks terdekat: Broadcast → `#socialDemo
 - Knowledge base tenant
 - Workflow builder event-driven
 
-### P2 (multi-industri)
+### P2 (operasional dealer end-to-end)
 
-- Properti, ritel/F&B, jasa/education, generic SMB  
-- Prinsip: satu platform data + agent tools + RBAC
+- Aftersales, service reminder, dan customer retention
+- Komisi sales, procurement unit, serta integrasi leasing dan asuransi
 
 ### P3 (platform GTM)
 
@@ -209,7 +209,7 @@ Suite memakai demo yang sama dengan konteks terdekat: Broadcast → `#socialDemo
 | Aftersales / service | 🔲 Bisa |
 | HR & komisi | 🔲 Bisa |
 | Workflow no-code | 🔲 Bisa |
-| Multi-industry packs | 🔲 Bisa |
+| Aftersales & service retention | 🔲 Roadmap |
 | Voice AI | 🔲 Bisa |
 | Billing SaaS self-serve | 🔲 Bisa |
 

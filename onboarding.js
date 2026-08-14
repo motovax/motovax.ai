@@ -550,7 +550,7 @@
       clearPasswordFields(form);
       this.state.authMode = "signup";
       saveState(this.state);
-      this.showToast("Akun berhasil dibuat", "Lanjut isi profil bisnis Anda.");
+      this.showToast("Akun berhasil dibuat", "Lanjut isi profil dealer Anda.");
       this.goTo(2);
     } catch (error) {
       this.showError(form, friendlySubmitError(error, "Akun belum berhasil dibuat. Periksa isian lalu coba lagi."));
@@ -651,7 +651,7 @@
           var query = params.toString();
           window.history.replaceState({}, "", window.location.pathname + (query ? "?" + query : ""));
         } else if (emailStatus === "verified") {
-          self.showToast("Email berhasil diverifikasi", "Lanjut lengkapi profil bisnis Anda.");
+          self.showToast("Email berhasil diverifikasi", "Lanjut lengkapi profil dealer Anda.");
           params.delete("email");
           var emailQuery = params.toString();
           window.history.replaceState({}, "", window.location.pathname + (emailQuery ? "?" + emailQuery : ""));
@@ -910,7 +910,7 @@
     if (readyTitle) readyTitle.textContent = "Workspace Anda siap digunakan";
     if (readyCopy) readyCopy.textContent = "Tenant, domain, akun owner, dan konfigurasi awal berhasil dibuat.";
 
-    if (nameEl) nameEl.textContent = biz.businessName || "Bisnis Anda";
+    if (nameEl) nameEl.textContent = biz.businessName || "Dealer Anda";
     if (userEl) {
       userEl.textContent = acc.fullName
         ? acc.fullName + " · " + (acc.email || "")

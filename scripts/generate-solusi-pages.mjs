@@ -86,7 +86,7 @@ const template = (industry) => {
           <a class="brand footer-brand" href="../index.html#top" aria-label="MOTOVAX home">
             <span>MOTO</span><strong>VAX</strong>
           </a>
-          <p>Agentic AI ERP — integrasikan operasional bisnis dengan agen AI.</p>
+          <p>Platform AI untuk stok, lead, sales, dan operasional dealer mobil.</p>
         </div>
         <div>
           <h3>Produk</h3>
@@ -104,7 +104,7 @@ const template = (industry) => {
     <script>window.__INDUSTRY_SLUG__ = ${JSON.stringify(industry.slug)};</script>
     <script src="./industry-data.js"></script>
     <script src="./industry-page.js?v=copy-20260811"></script>
-    <script src="../script.js?v=20260806-2"></script>
+    <script src="../script.js?v=dealer-focus-20260814"></script>
   </body>
 </html>
 `;
@@ -117,4 +117,4 @@ for (const industry of Object.values(industries)) {
   console.log("wrote", path.relative(root, target));
 }
 
-console.log(`done, ${Object.keys(industries).length} halaman solusi industri`);
+console.log(`done, ${Object.keys(industries).length} halaman solusi dealer mobil`);
