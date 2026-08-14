@@ -214,6 +214,43 @@ for (const viewport of viewports) {
     assert.equal(await page.locator("[data-portal-menu]").isHidden(), true);
     await context.close();
   });
+
+  test(`positioning dealer mobil konsisten pada ${viewport.name}`, async () => {
+    const context = await browser.newContext({ viewport });
+    const page = await context.newPage();
+    await page.route(/https:\/\/fonts\.(?:googleapis|gstatic)\.com\//, (route) => route.abort());
+
+    await page.goto(`${baseUrl}/index.html`, { waitUntil: "load" });
+    assert.equal(
+      await page.locator("[data-typewriter]").getAttribute("data-phrases"),
+      "More Test Drives.|More Unit Sales.",
+    );
+    assert.equal(await noOverflow(page), true);
+
+    await page.goto(`${baseUrl}/solusi/otomotif.html`, { waitUntil: "load" });
+    await page.waitForSelector("[data-industry-root] h1");
+    const bodyText = await page.locator("body").innerText();
+    assert.match(bodyText, /dealer mobil/i);
+    assert.doesNotMatch(bodyText, /Pendidikan|Keuangan|Kesehatan|Tour & Travel|Perhotelan|Logistik|FMCG|Ritel|Outsourcing|Property/i);
+
+    if (viewport.width > 900) {
+      await page.click("[data-solusi-trigger]");
+      assert.equal(
+        await page.locator('[data-solusi-panel]:not([hidden]) .solusi-mega-item', { hasText: "Solusi Dealer Mobil" }).isVisible(),
+        true,
+      );
+    } else {
+      await page.click("[data-mobile-nav-trigger]");
+      assert.equal(
+        await page.locator('[data-mobile-nav-panel]:not([hidden]) a', { hasText: "Solusi Dealer Mobil" }).isVisible(),
+        true,
+      );
+    }
+
+    assert.equal(await noOverflow(page), true);
+    await page.screenshot({ path: `/tmp/motovax-dealer-positioning-${viewport.name}.png`, fullPage: false });
+    await context.close();
+  });
 }
 
 test("session portal dari login langsung melakukan handoff ke workspace tenant", async () => {

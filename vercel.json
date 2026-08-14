@@ -5,7 +5,18 @@
     { "source": "/fitur/ticket-creation-integration.html", "destination": "/fitur/sistem-manajemen-tiket.html", "permanent": true },
     { "source": "/fitur/wa-blast.html", "destination": "/fitur/aplikasi-broadcast-whatsapp.html", "permanent": true },
     { "source": "/fitur/whatsapp-bulk.html", "destination": "/fitur/aplikasi-broadcast-whatsapp.html", "permanent": true },
-    { "source": "/fitur/chatbot.html", "destination": "/fitur/agentic-ai.html", "permanent": true }
+    { "source": "/fitur/chatbot.html", "destination": "/fitur/agentic-ai.html", "permanent": true },
+    { "source": "/solusi/pendidikan.html", "destination": "/solusi/otomotif.html", "permanent": true },
+    { "source": "/solusi/keuangan.html", "destination": "/solusi/otomotif.html", "permanent": true },
+    { "source": "/solusi/kesehatan.html", "destination": "/solusi/otomotif.html", "permanent": true },
+    { "source": "/solusi/tour-travel.html", "destination": "/solusi/otomotif.html", "permanent": true },
+    { "source": "/solusi/perhotelan.html", "destination": "/solusi/otomotif.html", "permanent": true },
+    { "source": "/solusi/logistik.html", "destination": "/solusi/otomotif.html", "permanent": true },
+    { "source": "/solusi/fmcg.html", "destination": "/solusi/otomotif.html", "permanent": true },
+    { "source": "/solusi/ritel.html", "destination": "/solusi/otomotif.html", "permanent": true },
+    { "source": "/solusi/teknologi-informasi.html", "destination": "/solusi/otomotif.html", "permanent": true },
+    { "source": "/solusi/outsourcing.html", "destination": "/solusi/otomotif.html", "permanent": true },
+    { "source": "/solusi/property.html", "destination": "/solusi/otomotif.html", "permanent": true }
   ],
   "cleanUrls": true,
   "trailingSlash": false

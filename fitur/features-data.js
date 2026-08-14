@@ -726,7 +726,7 @@ window.MOTOVAX_FEATURES = {
       { title: "Percakapan", desc: "User request → pilih tool → hasil ke chat." },
       { title: "Human-in-the-loop", desc: "Handoff saat perlu judgement manusia." },
     ],
-    benefits: ["Otomasi sampai aksi selesai", "Data selalu dari sistem of record", "Siap multi-industri lewat tools"],
+    benefits: ["Otomasi sampai aksi selesai", "Data selalu dari sistem dealer", "Tool AI memahami stok dan alur dealer"],
     related: ["whatsapp-business-api", "integrasi-airene", "automasi-workflow", "aplikasi-omnichannel"],
   },
 
@@ -1090,7 +1090,7 @@ window.MOTOVAX_FEATURES = {
       { title: "Satu data", desc: "Unit, lead, chat, campaign saling terkait." },
       { title: "Satu journey", desc: "Dari awareness sampai aftersales light." },
       { title: "Multi-tenant SaaS", desc: "IAM, config, API, workers." },
-      { title: "Siap multi-industri", desc: "Generalisasi lewat tools & config." },
+      { title: "Siap multi-cabang", desc: "Data, role, dan dashboard dealer dipisahkan per cabang." },
     ],
     howItWorks: [
       { title: "Aktifkan modul", desc: "Sesuai feature flag tenant." },
