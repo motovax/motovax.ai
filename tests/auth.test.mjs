@@ -770,6 +770,11 @@ test("logout workspace tenant dapat mencabut cookie portal tanpa membuka endpoin
   assert.equal(login.status, 200);
   const sessionToken = cookieValue(login.headers.get("set-cookie"), "motovax_portal_session");
   assert.ok(sessionToken.length >= 48);
+  const authSessionToken = "tenant-logout-auth-session-token-1234567890";
+  await store.createSession({
+    userId: "40aa7e34-66fd-42d9-b586-93e65607b670",
+    sessionDigest: digest(authSessionToken),
+  });
 
   const tenantOrigin = "https://dealer-pro.motovax.com";
   const preflight = await fetch(`${baseUrl}/api/portal/logout`, {
@@ -794,13 +799,19 @@ test("logout workspace tenant dapat mencabut cookie portal tanpa membuka endpoin
   const logout = await fetch(`${baseUrl}/api/portal/logout`, {
     method: "POST",
     headers: {
-      cookie: `motovax_portal_session=${encodeURIComponent(sessionToken)}`,
+      cookie: `motovax_session=${encodeURIComponent(authSessionToken)}; motovax_portal_session=${encodeURIComponent(sessionToken)}`,
       origin: tenantOrigin,
     },
   });
   assert.equal(logout.status, 204);
   assert.equal(logout.headers.get("access-control-allow-origin"), tenantOrigin);
   assert.equal(logout.headers.get("access-control-allow-credentials"), "true");
+
+  const expiredAuth = await fetch(`${baseUrl}/api/auth/me`, {
+    headers: { cookie: `motovax_session=${encodeURIComponent(authSessionToken)}` },
+  });
+  assert.equal(expiredAuth.status, 401);
+  assert.deepEqual(await expiredAuth.json(), { authenticated: false });
 
   const expired = await fetch(`${baseUrl}/api/portal/workspace/enter`, {
     method: "POST",

@@ -1902,10 +1902,20 @@ export function createApp({
         await store.revokePortalSession(tokenDigest(match[1], config.sessionSecret));
       }
       const requestCookies = parseCookies(req.headers.cookie);
+      const authSessionToken = requestCookies[cookies.session];
+      if (authSessionToken && store?.revokeSession && config.sessionSecret) {
+        await store.revokeSession(tokenDigest(authSessionToken, config.sessionSecret));
+      }
       const cookieToken = requestCookies[cookies.portalSession];
       if (cookieToken && store?.revokePortalSession && config.sessionSecret) {
         await store.revokePortalSession(tokenDigest(cookieToken, config.sessionSecret));
       }
+      res.clearCookie(cookies.session, {
+        httpOnly: true,
+        secure: cookies.secure,
+        sameSite: "lax",
+        path: "/",
+      });
       res.clearCookie(cookies.portalSession, {
         httpOnly: true,
         secure: cookies.secure,
