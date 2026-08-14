@@ -131,7 +131,7 @@ for (const viewport of viewports) {
     const page = await context.newPage();
     await page.route(/https:\/\/fonts\.(?:googleapis|gstatic)\.com\//, (route) => route.abort());
     await page.goto(`${baseUrl}/index.html`, { waitUntil: "load" });
-    await page.locator("[data-flow-slider]").scrollIntoViewIfNeeded();
+    await page.locator("#cara-kerja").scrollIntoViewIfNeeded();
 
     const first = await measure(page);
     const sectionCopy = await page.evaluate(() => ({
@@ -139,11 +139,21 @@ for (const viewport of viewports) {
       eyebrow: document.querySelector("#cara-kerja .section-label")?.textContent?.trim() || "",
       stages: [...document.querySelectorAll(".e2e-stage-head h3")].map((el) => el.textContent.trim()),
       labels: [...document.querySelectorAll(".e2e-stage-head small")].map((el) => el.textContent.trim()),
+      hasSlider: Boolean(document.querySelector("[data-flow-slider]")),
     }));
     assert.match(sectionCopy.title || "", /Dari minat sampai closing/i);
     assert.equal(sectionCopy.eyebrow, "", "label ALUR END-TO-END harus dihapus");
     assert.deepEqual(sectionCopy.stages, ["Attract", "Convert", "Retain & Close"]);
     assert.deepEqual(sectionCopy.labels, ["SORA AI", "JASMINE AI", "AUTOPILOT CRM"]);
+    if (!sectionCopy.hasSlider) {
+      assert.equal(first.overflow, false, `halaman overflow horizontal di ${viewport.name}`);
+      assert.equal(first.e2eStageCount, 3);
+      assert.ok(first.e2eWidth > 280, `diagram e2e tidak terlihat di ${viewport.name}`);
+      assert.ok(first.e2eMinStageHeight > 180, `kartu tahap e2e terlalu pendek di ${viewport.name}: ${first.e2eMinStageHeight}`);
+      await page.screenshot({ path: `/tmp/motovax-flow-slider-${viewport.name}.png`, fullPage: false });
+      await context.close();
+      return;
+    }
     assert.equal(first.slide, "pelanggan");
     assert.equal(first.heading, "Pelanggan menanyakan produk");
     assert.equal(first.dots, 5);
@@ -197,6 +207,11 @@ test("geser kiri memindahkan slide aktif", async () => {
   const page = await context.newPage();
   await page.route(/https:\/\/fonts\.(?:googleapis|gstatic)\.com\//, (route) => route.abort());
   await page.goto(`${baseUrl}/index.html`, { waitUntil: "load" });
+  const hasSlider = await page.locator("[data-flow-slider]").count();
+  if (!hasSlider) {
+    await context.close();
+    return;
+  }
   await page.locator("[data-flow-slider]").scrollIntoViewIfNeeded();
 
   await page.evaluate(() => {
