@@ -98,6 +98,58 @@ for (const link of document.querySelectorAll("[data-wa]")) {
   observer.observe(headline || typed);
 })();
 
+/** Tab "Contoh alur nyata" di beranda: ganti kartu journey saat diklik. */
+(function initUsecaseTabs() {
+  const root = document.querySelector(".usecase-tabs");
+  if (!(root instanceof HTMLElement)) return;
+
+  const tabs = [...root.querySelectorAll("[data-usecase]")];
+  const panels = [...document.querySelectorAll("[data-usecase-panel]")];
+  if (!tabs.length || !panels.length) return;
+
+  const activate = (id) => {
+    const next = String(id || "");
+    if (!panels.some((panel) => panel.getAttribute("data-usecase-panel") === next)) return;
+
+    for (const tab of tabs) {
+      const on = tab.getAttribute("data-usecase") === next;
+      tab.classList.toggle("active", on);
+      tab.setAttribute("aria-selected", on ? "true" : "false");
+      tab.tabIndex = on ? 0 : -1;
+    }
+
+    for (const panel of panels) {
+      const on = panel.getAttribute("data-usecase-panel") === next;
+      panel.classList.toggle("is-active", on);
+      panel.hidden = !on;
+    }
+  };
+
+  root.addEventListener("click", (event) => {
+    const tab = event.target instanceof Element ? event.target.closest("[data-usecase]") : null;
+    if (!(tab instanceof HTMLElement) || !root.contains(tab)) return;
+    activate(tab.getAttribute("data-usecase"));
+  });
+
+  root.addEventListener("keydown", (event) => {
+    const current = event.target instanceof Element ? event.target.closest("[data-usecase]") : null;
+    if (!(current instanceof HTMLElement) || !root.contains(current)) return;
+
+    const index = tabs.indexOf(current);
+    let next = -1;
+    if (event.key === "ArrowDown" || event.key === "ArrowRight") next = (index + 1) % tabs.length;
+    else if (event.key === "ArrowUp" || event.key === "ArrowLeft") next = (index - 1 + tabs.length) % tabs.length;
+    else if (event.key === "Home") next = 0;
+    else if (event.key === "End") next = tabs.length - 1;
+    if (next < 0) return;
+
+    event.preventDefault();
+    const tab = tabs[next];
+    activate(tab.getAttribute("data-usecase"));
+    tab.focus();
+  });
+})();
+
 const contactForm = document.querySelector("[data-contact-form]");
 if (contactForm instanceof HTMLFormElement) {
   contactForm.addEventListener("submit", (event) => {
