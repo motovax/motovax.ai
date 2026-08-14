@@ -731,6 +731,9 @@ if (contactForm instanceof HTMLFormElement) {
   const headerInner = header?.querySelector(".header-inner");
   if (!(header instanceof HTMLElement) || !(headerInner instanceof HTMLElement)) return;
 
+  /* Beranda: header hanya logo + Login. Hamburger membuat bar tambahan di mobile. */
+  if (document.body.classList.contains("home-redesign")) return;
+
   let trigger = header.querySelector("[data-mobile-nav-trigger]");
   let panel = header.querySelector("[data-mobile-nav-panel]");
   let backdrop = header.querySelector("[data-mobile-nav-backdrop]");
