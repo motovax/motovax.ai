@@ -80,9 +80,11 @@ for (const link of document.querySelectorAll("[data-wa]")) {
 
   const fragment = new URLSearchParams(window.location.hash.replace(/^#/, ""));
   const transferredToken = fragment.get("portal_session");
+  const requestedAction = fragment.get("portal_action");
   if (transferredToken) {
     localStorage.setItem(TOKEN_KEY, transferredToken);
     fragment.delete("portal_session");
+    fragment.delete("portal_action");
     const cleanHash = fragment.toString();
     history.replaceState({}, "", `${location.pathname}${location.search}${cleanHash ? `#${cleanHash}` : ""}`);
   }
@@ -146,12 +148,28 @@ for (const link of document.querySelectorAll("[data-wa]")) {
     renderGuest();
     return;
   }
-  portalApi("/api/portal/me")
+
+  const loadAccount = () => portalApi("/api/portal/me")
     .then((payload) => renderAccount(payload.user))
     .catch((error) => {
       if (error.status === 401) localStorage.removeItem(TOKEN_KEY);
       renderGuest();
     });
+
+  if (transferredToken && requestedAction === "enter_workspace") {
+    portalApi("/api/portal/workspace/enter", {
+      method: "POST",
+      body: JSON.stringify({ destination: "/" }),
+    })
+      .then((payload) => window.location.assign(payload.redirectUrl))
+      .catch((error) => {
+        loadAccount();
+        if (error.status !== 401) window.alert(error.message);
+      });
+    return;
+  }
+
+  loadAccount();
 })();
 
 /** Typewriter pada baris outcome hero: High Conversion / Unlimited Growth. */

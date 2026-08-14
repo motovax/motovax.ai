@@ -79,6 +79,10 @@ function noOverflow(page) {
   return page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth);
 }
 
+function fitsViewport(page) {
+  return page.evaluate(() => document.documentElement.scrollHeight <= window.innerHeight);
+}
+
 for (const viewport of viewports) {
   test(`onboarding dealer mandiri responsif pada ${viewport.name}`, async () => {
     const context = await browser.newContext({ viewport });
@@ -151,19 +155,28 @@ for (const viewport of viewports) {
     await page.route("https://motovax.ai/**", (route) => route.fulfill({ status: 200, contentType: "text/html", body: "<title>Landing</title>" }));
     await page.goto(`${baseUrl}/login.html`, { waitUntil: "load" });
     assert.equal(await page.getAttribute('.portal-register-prompt a', "href"), "https://onboard.motovax.com/");
-    await page.fill('input[name="workspace"]', "dealer-test");
+    assert.equal(await page.locator('input[name="workspace"]').count(), 0);
     await page.fill('input[name="identifier"]', "owner");
+    await page.click('[data-portal-login-form] button[type="submit"]');
+    assert.equal(await page.locator('[data-login-error]').isVisible(), true);
+    assert.equal(await fitsViewport(page), true);
     await page.fill('#portalPassword', "rahasia123");
     await page.click('[data-password-toggle]');
     assert.equal(await page.getAttribute('#portalPassword', "type"), "text");
     await page.click('[data-password-toggle]');
     assert.equal(await noOverflow(page), true);
+    assert.equal(await fitsViewport(page), true);
     await page.evaluate(() => window.scrollTo(0, 0));
+    assert.equal(await page.evaluate(() => window.scrollY), 0);
     await page.screenshot({ path: `/tmp/motovax-login-${viewport.name}.png`, fullPage: false });
     const response = page.waitForResponse((item) => item.url().endsWith("/api/portal/login"));
     await page.click('[data-portal-login-form] button[type="submit"]');
     await response;
-    assert.deepEqual(loginPayload, { workspace: "dealer-test", identifier: "owner", password: "rahasia123" });
+    await page.waitForURL("https://motovax.ai/**");
+    assert.deepEqual(loginPayload, { identifier: "owner", password: "rahasia123" });
+    const loginFragment = new URLSearchParams(new URL(page.url()).hash.replace(/^#/, ""));
+    assert.equal(loginFragment.get("portal_session"), "portal-token-test-abcdefghijklmnopqrstuvwxyz123456");
+    assert.equal(loginFragment.get("portal_action"), "enter_workspace");
     await context.close();
   });
 
@@ -202,3 +215,41 @@ for (const viewport of viewports) {
     await context.close();
   });
 }
+
+test("session portal dari login langsung melakukan handoff ke workspace tenant", async () => {
+  const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
+  const page = await context.newPage();
+  const token = "portal-token-test-abcdefghijklmnopqrstuvwxyz123456";
+  let enterPayload;
+  let authorization;
+  await page.route("https://onboard.motovax.com/api/portal/workspace/enter", (route) => {
+    const corsHeaders = {
+      "access-control-allow-origin": baseUrl,
+      "access-control-allow-headers": "Authorization, Content-Type",
+      "access-control-allow-methods": "GET, POST, OPTIONS",
+    };
+    if (route.request().method() === "OPTIONS") return route.fulfill({ status: 204, headers: corsHeaders });
+    enterPayload = route.request().postDataJSON();
+    authorization = route.request().headers().authorization;
+    return route.fulfill({
+      status: 200,
+      headers: corsHeaders,
+      contentType: "application/json",
+      body: JSON.stringify({ redirectUrl: "https://dealer-test.motovax.com/magic-login?token=handoff-token" }),
+    });
+  });
+  await page.route("https://dealer-test.motovax.com/**", (route) => route.fulfill({
+    status: 200,
+    contentType: "text/html",
+    body: "<title>Workspace Dealer Test</title>",
+  }));
+
+  await page.goto(`${baseUrl}/index.html#portal_session=${token}&portal_action=enter_workspace`, { waitUntil: "domcontentloaded" });
+  await page.waitForURL("https://dealer-test.motovax.com/**");
+  assert.deepEqual(enterPayload, { destination: "/" });
+  assert.equal(authorization, `Bearer ${token}`);
+  const storage = await context.storageState();
+  const landingStorage = storage.origins.find((item) => item.origin === baseUrl)?.localStorage || [];
+  assert.equal(landingStorage.find((item) => item.name === "motovax_portal_session")?.value, token);
+  await context.close();
+});

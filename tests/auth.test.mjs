@@ -17,6 +17,7 @@ let accountState = { profile: null, workspaces: [] };
 const recaptchaTokens = [];
 const portalSessions = new Map();
 let portalPasswordHash = "";
+let otherPortalPasswordHash = "";
 
 const config = {
   nodeEnv: "test",
@@ -116,9 +117,8 @@ const store = {
   async getAccountState() {
     return accountState;
   },
-  async findPortalUser({ workspace, identifier }) {
-    if (workspace.slug !== "dealer-test" || identifier !== "owner") return null;
-    return {
+  async findPortalUsers({ identifier }) {
+    const owner = {
       id: "app-user-1",
       username: "owner",
       display_name: "Owner Dealer",
@@ -132,6 +132,23 @@ const store = {
       role: "Admin",
       permissions: ["billing:read", "tenant:read"],
     };
+    if (identifier === "owner" || identifier === "owner@dealer.test") return [owner];
+    const other = {
+      ...owner,
+      id: "app-user-2",
+      username: "shared",
+      email: "other@dealer.test",
+      password_hash: otherPortalPasswordHash,
+      tenant_id: "tenant-2",
+      tenant_name: "Dealer Lain",
+      domain: "dealer-lain.motovax.com",
+    };
+    if (identifier === "shared") return [{ ...owner, username: "shared" }, other];
+    if (identifier === "ambiguous") return [
+      { ...owner, username: "ambiguous" },
+      { ...other, username: "ambiguous", password_hash: portalPasswordHash },
+    ];
+    return [];
   },
   async createPortalSession(record) {
     portalSessions.set(record.sessionDigest, {
@@ -213,6 +230,7 @@ function digest(value) {
 
 before(async () => {
   portalPasswordHash = await bcrypt.hash("rahasia123", 4);
+  otherPortalPasswordHash = await bcrypt.hash("password-lain", 4);
   const app = createApp({
     config,
     store,
@@ -427,7 +445,7 @@ test("portal login tenant membawa profil, billing, logout, dan handoff workspace
   const login = await fetch(`${baseUrl}/api/portal/login`, {
     method: "POST",
     headers: { origin: "http://127.0.0.1", "content-type": "application/json" },
-    body: JSON.stringify({ workspace: "dealer-test", identifier: "owner", password: "rahasia123" }),
+    body: JSON.stringify({ identifier: "owner", password: "rahasia123" }),
   });
   assert.equal(login.status, 200);
   const loginPayload = await login.json();
@@ -466,6 +484,27 @@ test("portal login tenant membawa profil, billing, logout, dan handoff workspace
     headers: { authorization, origin: "https://motovax.ai" },
   });
   assert.equal(expired.status, 401);
+});
+
+test("portal login memilih tenant dari password saat username dipakai di beberapa workspace", async () => {
+  const response = await fetch(`${baseUrl}/api/portal/login`, {
+    method: "POST",
+    headers: { origin: "http://127.0.0.1", "content-type": "application/json" },
+    body: JSON.stringify({ identifier: "shared", password: "rahasia123" }),
+  });
+  assert.equal(response.status, 200);
+  const payload = await response.json();
+  assert.equal(payload.user.tenant.domain, "dealer-test.motovax.com");
+});
+
+test("portal login menolak kredensial ambigu di beberapa workspace", async () => {
+  const response = await fetch(`${baseUrl}/api/portal/login`, {
+    method: "POST",
+    headers: { origin: "http://127.0.0.1", "content-type": "application/json" },
+    body: JSON.stringify({ identifier: "ambiguous", password: "rahasia123" }),
+  });
+  assert.equal(response.status, 409);
+  assert.equal((await response.json()).error, "ambiguous_account");
 });
 
 test("penyelesaian onboarding ditolak sebelum provisioning tanpa token reCAPTCHA valid", async () => {

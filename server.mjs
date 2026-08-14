@@ -256,15 +256,6 @@ function normalizeSlug(value) {
     .replace(/-+$/g, "");
 }
 
-function normalizeWorkspace(value, suffix = "motovax.com") {
-  const raw = String(value || "").trim().toLowerCase().replace(/^https?:\/\//, "").split(/[/?#]/)[0];
-  const normalizedSuffix = String(suffix || "motovax.com").toLowerCase();
-  const slug = normalizeSlug(raw.endsWith(`.${normalizedSuffix}`)
-    ? raw.slice(0, -(normalizedSuffix.length + 1))
-    : raw.split(".")[0]);
-  return { slug, domain: `${slug}.${normalizedSuffix}` };
-}
-
 function publicUser(row) {
   return {
     id: row.id,
@@ -837,7 +828,7 @@ export async function createPostgresStore(connectionString) {
       };
     },
 
-    async findPortalUser({ workspace, identifier }) {
+    async findPortalUsers({ identifier }) {
       const result = await pool.query(
         `SELECT
            u.id,
@@ -867,14 +858,18 @@ export async function createPostgresStore(connectionString) {
          LEFT JOIN roles r ON r.id = ur.role_id
          LEFT JOIN onboarding_memberships om ON om.app_user_id = u.id AND om.tenant_id = t.id
          LEFT JOIN onboarding_users ou ON ou.id = om.user_id
-         WHERE (LOWER(d.domain) = LOWER($1) OR LOWER(t.slug) = LOWER($2))
-           AND (LOWER(u.username) = LOWER($3) OR LOWER(COALESCE(u.email, '')) = LOWER($3))
+         WHERE LOWER(u.username) = LOWER($1)
+            OR LOWER(COALESCE(u.email, '')) = LOWER($1)
          GROUP BY u.id, u.username, u.display_name, u.email, u.password_hash,
                   ou.password_hash, t.id, t.name, t.config, d.domain
-         LIMIT 1`,
-        [workspace.domain, workspace.slug, identifier],
+         ORDER BY
+           CASE WHEN LOWER(COALESCE(u.email, '')) = LOWER($1) THEN 0 ELSE 1 END,
+           t.name,
+           u.id
+         LIMIT 21`,
+        [identifier],
       );
-      return result.rows[0] || null;
+      return result.rows;
     },
 
     async createPortalSession({ appUserId, tenantId, sessionDigest, userAgent, ipAddress, expiresAt }) {
@@ -1334,28 +1329,37 @@ export function createApp({
   app.post("/api/portal/login", async (req, res, next) => {
     try {
       if (!assertSameOrigin(req, res) || !checkAuthRateLimit(req, res)) return;
-      if (!store || !config.sessionSecret || !store.findPortalUser || !store.createPortalSession) {
+      if (!store || !config.sessionSecret || !store.findPortalUsers || !store.createPortalSession) {
         return res.status(503).json({ error: "service_unavailable" });
       }
-      const workspace = normalizeWorkspace(req.body?.workspace, config.tenantDomainSuffix);
       const identifier = String(req.body?.identifier || "").trim().toLowerCase();
       const password = String(req.body?.password || "");
-      if (workspace.slug.length < 2 || identifier.length < 2 || password.length < 1) {
+      if (identifier.length < 2 || password.length < 1) {
         return res.status(400).json({
           error: "invalid_login",
-          message: "Lengkapi workspace, username atau email, dan password Anda.",
+          message: "Lengkapi username atau email dan password Anda.",
         });
       }
-      const user = await store.findPortalUser({ workspace, identifier });
-      const valid = user
-        ? await verifyTenantPassword(password, user.password_hash, user.onboarding_password_hash)
-        : false;
-      if (!valid) {
+      const candidates = await store.findPortalUsers({ identifier });
+      const matchedUsers = [];
+      for (const candidate of candidates.slice(0, 21)) {
+        if (await verifyTenantPassword(password, candidate.password_hash, candidate.onboarding_password_hash)) {
+          matchedUsers.push(candidate);
+        }
+      }
+      if (matchedUsers.length === 0) {
         return res.status(401).json({
           error: "invalid_credentials",
-          message: "Workspace, username/email, atau password tidak sesuai.",
+          message: "Username/email atau password tidak sesuai.",
         });
       }
+      if (matchedUsers.length > 1 || candidates.length > 20) {
+        return res.status(409).json({
+          error: "ambiguous_account",
+          message: "Akun cocok dengan lebih dari satu workspace. Gunakan alamat email akun yang unik atau hubungi admin.",
+        });
+      }
+      const [user] = matchedUsers;
       const sessionToken = randomToken(48);
       const expiresAt = new Date(Date.now() + PORTAL_SESSION_TTL_MS);
       await store.createPortalSession({

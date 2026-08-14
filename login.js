@@ -59,10 +59,8 @@
 
   form.addEventListener("submit", function (event) {
     event.preventDefault();
-    var workspace = form.elements.workspace.value.trim();
     var identifier = form.elements.identifier.value.trim();
     var passwordValue = form.elements.password.value;
-    if (workspace.length < 2) return showError("Masukkan nama workspace tenant Anda.", form.elements.workspace);
     if (identifier.length < 2) return showError("Masukkan username atau email akun tenant Anda.", form.elements.identifier);
     if (!passwordValue) return showError("Masukkan password akun tenant Anda.", form.elements.password);
 
@@ -71,7 +69,7 @@
       method: "POST",
       credentials: "same-origin",
       headers: { Accept: "application/json", "Content-Type": "application/json" },
-      body: JSON.stringify({ workspace: workspace, identifier: identifier, password: passwordValue }),
+      body: JSON.stringify({ identifier: identifier, password: passwordValue }),
     })
       .then(function (response) {
         return response.json().catch(function () { return {}; }).then(function (payload) {
@@ -82,7 +80,10 @@
       .then(function (payload) {
         var target = new URL(payload.returnUrl || LANDING_ORIGIN + "/");
         if (target.origin !== LANDING_ORIGIN) target = new URL(LANDING_ORIGIN + "/");
-        target.hash = "portal_session=" + encodeURIComponent(payload.token);
+        target.hash = new URLSearchParams({
+          portal_session: payload.token,
+          portal_action: "enter_workspace",
+        }).toString();
         window.location.assign(target.toString());
       })
       .catch(function (error) {

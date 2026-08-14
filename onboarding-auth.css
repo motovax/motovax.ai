@@ -5,21 +5,23 @@
 .portal-login-body {
   display: flex;
   min-height: 100vh;
+  min-height: 100dvh;
   flex-direction: column;
 }
 
 .portal-login-page {
   display: grid;
   flex: 1;
+  min-height: 0;
   align-items: center;
-  padding: clamp(32px, 7vw, 88px) 0;
+  padding: clamp(18px, 3.5vh, 34px) 0;
 }
 
 .portal-login-shell {
   display: grid;
   grid-template-columns: minmax(0, 0.92fr) minmax(420px, 0.72fr);
   align-items: center;
-  gap: clamp(44px, 8vw, 112px);
+  gap: clamp(36px, 6vw, 82px);
 }
 
 .portal-login-intro {
@@ -34,8 +36,8 @@
 }
 
 .portal-login-intro h1 {
-  margin: 16px 0 18px;
-  font-size: clamp(38px, 5vw, 64px);
+  margin: 12px 0 14px;
+  font-size: clamp(36px, 4.4vw, 58px);
   line-height: 1.02;
   letter-spacing: -0.055em;
 }
@@ -44,14 +46,14 @@
   max-width: 520px;
   margin: 0;
   color: #607086;
-  font-size: 17px;
-  line-height: 1.7;
+  font-size: 16px;
+  line-height: 1.55;
 }
 
 .portal-login-intro ul {
   display: grid;
   gap: 13px;
-  margin: 28px 0 0;
+  margin: 20px 0 0;
   padding: 0;
   list-style: none;
   color: #334155;
@@ -78,11 +80,11 @@
 
 .portal-login-panel {
   min-height: 0;
-  padding: 34px;
+  padding: 28px;
 }
 
 .portal-login-form {
-  gap: 17px;
+  gap: 14px;
 }
 
 .portal-login-submit {
@@ -94,8 +96,8 @@
 .portal-register-prompt {
   display: grid;
   gap: 6px;
-  margin-top: 22px;
-  padding: 17px;
+  margin-top: 16px;
+  padding: 13px;
   border: 1px solid #dbe7f5;
   border-radius: 12px;
   background: #f6f9fd;
@@ -114,7 +116,7 @@
 }
 
 .portal-login-help {
-  margin: 18px 0 0;
+  margin: 12px 0 0;
   color: #7b8799;
   font-size: 11px;
   line-height: 1.5;
@@ -127,13 +129,17 @@
 }
 
 .portal-login-footer {
-  padding-top: 20px;
+  padding: 0 0 14px;
 }
 
 @media (max-width: 900px) {
+  .portal-login-page {
+    padding: 18px 0;
+  }
+
   .portal-login-shell {
     grid-template-columns: 1fr;
-    gap: 34px;
+    gap: 18px;
   }
 
   .portal-login-intro {
@@ -143,42 +149,102 @@
 
   .portal-login-intro > p {
     margin-inline: auto;
+    font-size: 14px;
   }
 
   .portal-login-intro ul {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
+    gap: 8px 16px;
+    margin-top: 14px;
+    font-size: 12px;
+  }
+
+  .portal-login-intro li span {
+    width: 22px;
+    height: 22px;
   }
 
   .portal-login-panel {
     width: min(560px, 100%);
     margin-inline: auto;
+    padding: 24px;
   }
 }
 
 @media (max-width: 560px) {
   .portal-login-page {
-    align-items: start;
-    padding: 24px 0 42px;
+    padding: 12px 0;
+  }
+
+  .portal-login-shell {
+    gap: 12px;
   }
 
   .portal-login-intro h1 {
-    font-size: clamp(34px, 11vw, 44px);
+    margin: 7px 0 8px;
+    font-size: clamp(27px, 8vw, 32px);
+    line-height: 1;
   }
 
   .portal-login-intro > p {
-    font-size: 15px;
+    display: none;
   }
 
   .portal-login-intro ul {
-    display: grid;
-    justify-content: start;
-    text-align: left;
+    display: none;
   }
 
   .portal-login-panel {
-    padding: 24px 18px;
+    padding: 18px 16px;
+  }
+
+  .portal-login-panel .onboarding-step-head {
+    margin-bottom: 14px;
+  }
+
+  .portal-login-panel .onboarding-step-head h2 {
+    margin: 5px 0;
+    font-size: 22px;
+  }
+
+  .portal-login-panel .onboarding-step-head p {
+    font-size: 12px;
+    line-height: 1.4;
+  }
+
+  .portal-login-form {
+    gap: 11px;
+  }
+
+  .portal-login-submit {
+    min-height: 46px;
+  }
+
+  .portal-register-prompt {
+    gap: 3px;
+    margin-top: 11px;
+    padding: 9px;
+  }
+
+  .portal-login-help {
+    margin-top: 8px;
+    font-size: 10px;
+  }
+
+  .portal-login-footer {
+    padding-bottom: 8px;
+  }
+
+  .portal-login-footer .container {
+    justify-content: center;
+    gap: 5px 14px;
+    font-size: 10px;
+  }
+
+  .portal-login-footer .container > span:first-child {
+    display: none;
   }
 }
 

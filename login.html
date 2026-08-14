@@ -8,8 +8,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="./styles.css?v=portal-login-20260814" />
-    <link rel="stylesheet" href="./onboarding-auth.css?v=portal-login-20260814" />
+    <link rel="stylesheet" href="./styles.css?v=portal-login-compact-20260814" />
+    <link rel="stylesheet" href="./onboarding-auth.css?v=portal-login-compact-20260814" />
   </head>
   <body class="onboarding-body portal-login-body">
     <header class="site-header onboarding-header">
@@ -38,21 +38,13 @@
           <header class="onboarding-step-head">
             <span>LOGIN TENANT</span>
             <h2 id="portalLoginTitle">Selamat datang kembali</h2>
-            <p>Gunakan workspace, username atau email, dan password akun tenant Anda.</p>
+            <p>Gunakan username atau email dan password akun tenant Anda. Workspace akan dikenali otomatis.</p>
           </header>
 
           <form class="onboarding-form portal-login-form" data-portal-login-form novalidate>
             <label>
-              <span>Nama workspace</span>
-              <div class="onboarding-domain-input">
-                <input type="text" name="workspace" autocomplete="organization" placeholder="dealer-nusantara" maxlength="100" required />
-                <span>.motovax.com</span>
-              </div>
-              <small class="onboarding-field-help">Boleh diisi nama singkat atau domain workspace lengkap.</small>
-            </label>
-            <label>
               <span>Username atau email</span>
-              <input type="text" name="identifier" autocomplete="username" placeholder="nama.user" maxlength="254" required />
+              <input type="text" name="identifier" autocomplete="username" placeholder="nama.user atau nama@dealer.com" maxlength="254" required autofocus />
             </label>
             <div class="onboarding-field">
               <label for="portalPassword">Password</label>
@@ -66,7 +58,7 @@
             </div>
             <p class="onboarding-form-error" data-login-error role="alert" aria-live="assertive" hidden></p>
             <button type="submit" class="btn btn-primary portal-login-submit" data-loading-label="Memeriksa akun…">
-              <span>Login ke akun</span><span aria-hidden="true">→</span>
+              <span>Login ke workspace</span><span aria-hidden="true">→</span>
             </button>
           </form>
 
@@ -82,6 +74,6 @@
     <footer class="onboarding-footer portal-login-footer">
       <div class="container"><span>© <span data-year></span> MOTOVAX</span><a href="https://motovax.ai/kebijakan-privasi.html">Kebijakan Privasi</a><a href="https://motovax.ai/syarat-ketentuan.html">Syarat &amp; Ketentuan</a></div>
     </footer>
-    <script src="./login.js?v=portal-login-20260814"></script>
+    <script src="./login.js?v=portal-login-compact-20260814"></script>
   </body>
 </html>
