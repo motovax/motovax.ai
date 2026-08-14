@@ -18,6 +18,8 @@ const PORTAL_SESSION_TTL_MS = 30 * 24 * 60 * 60 * 1000;
 const HANDOFF_TTL_MS = 60 * 1000;
 const EMAIL_VERIFICATION_TTL_MS = 24 * 60 * 60 * 1000;
 const EMAIL_VERIFICATION_RESEND_COOLDOWN_SECONDS = 60;
+const DOMAIN_PROVISIONING_TIMEOUT_MS = 3_000;
+const DOMAIN_PROVISIONING_RETRY_DELAYS_MS = [3_000, 10_000];
 const ALLOWED_MODULES = new Set(["ims", "omni", "social", "crm", "dashboard", "insight"]);
 const ALLOWED_GOALS = new Set(["conversion", "response", "inventory", "scale"]);
 const RESERVED_SLUGS = new Set([
@@ -431,9 +433,10 @@ async function ensureProductDomain(config, domain) {
     Accept: "application/json",
     "Content-Type": "application/json",
   };
+  const signal = AbortSignal.timeout(DOMAIN_PROVISIONING_TIMEOUT_MS);
   let added = false;
   for (let attempt = 0; attempt < 3; attempt += 1) {
-    const currentResponse = await fetch(endpoint, { headers });
+    const currentResponse = await fetch(endpoint, { headers, signal });
     if (!currentResponse.ok) throw new Error("Tidak dapat membaca konfigurasi domain aplikasi.");
     const current = await currentResponse.json();
     const domains = String(current.fqdn || current.domains || "")
@@ -446,6 +449,7 @@ async function ensureProductDomain(config, domain) {
       const updateResponse = await fetch(endpoint, {
         method: "PATCH",
         headers,
+        signal,
         body: JSON.stringify({ domains: domains.join(",") }),
       });
       if (updateResponse.ok) {
@@ -460,22 +464,22 @@ async function ensureProductDomain(config, domain) {
     }
     break;
   }
-  if (await tenantDomainReady(domain)) return;
-  if (added || !(await tenantDomainReady(domain))) {
-    const restartResponse = await fetch(`${endpoint}/restart`, { method: "POST", headers });
-    if (!restartResponse.ok) {
-      const error = new Error("Konfigurasi domain tersimpan, tetapi aplikasi belum dapat memuat ulang routing.");
-      error.code = "domain_provisioning_failed";
-      throw error;
-    }
+  if (await tenantDomainReady(domain, signal)) return;
+  const restartResponse = await fetch(`${endpoint}/restart`, { method: "POST", headers, signal });
+  if (!restartResponse.ok) {
+    const error = new Error(added
+      ? "Konfigurasi domain tersimpan, tetapi aplikasi belum dapat memuat ulang routing."
+      : "Aplikasi belum dapat memuat ulang routing domain tenant.");
+    error.code = "domain_provisioning_failed";
+    throw error;
   }
 }
 
-async function tenantDomainReady(domain) {
+async function tenantDomainReady(domain, signal = AbortSignal.timeout(DOMAIN_PROVISIONING_TIMEOUT_MS)) {
   try {
     const response = await fetch(`https://${domain}/api/tenant/public-info`, {
       headers: { Accept: "application/json" },
-      signal: AbortSignal.timeout(3_000),
+      signal,
     });
     return response.ok;
   } catch {
@@ -581,7 +585,7 @@ export async function verifyRecaptchaToken(config, token, fetchImpl = fetch) {
           expectedAction: config.recaptchaAction,
         },
       }),
-      signal: AbortSignal.timeout(8_000),
+      signal: AbortSignal.timeout(2_500),
     });
   } catch {
     const error = new Error("Layanan verifikasi keamanan sedang tidak tersedia. Coba lagi.");
@@ -628,7 +632,8 @@ export async function createPostgresStore(connectionString) {
     connectionString: databaseUrl.toString(),
     max: 5,
     idleTimeoutMillis: 30_000,
-    connectionTimeoutMillis: 10_000,
+    connectionTimeoutMillis: 2_800,
+    query_timeout: 2_800,
   });
 
   await pool.query(`
@@ -1258,6 +1263,8 @@ export async function createPostgresStore(connectionString) {
       const client = await pool.connect();
       try {
         await client.query("BEGIN");
+        await client.query("SET LOCAL lock_timeout = '1200ms'");
+        await client.query("SET LOCAL statement_timeout = '2800ms'");
         const profileResult = await client.query(
           `SELECT p.*, u.email, u.full_name
            FROM onboarding_profiles p
@@ -1321,17 +1328,24 @@ export async function createPostgresStore(connectionString) {
           [crypto.randomUUID(), tenantId, domain],
         );
 
-        let adminRoleId = "";
-        for (const [roleName, permissions] of roleTemplates) {
-          const roleId = roleName === "Call Center" ? callCenterRoleId : crypto.randomUUID();
-          await client.query(
-            `INSERT INTO roles
-              (id, tenant_id, name, seeded_name, permissions, created_at, created_by)
-             VALUES ($1, $2, $3::varchar, $3::text, $4::jsonb, NOW(), NULL)`,
-            [roleId, tenantId, roleName, JSON.stringify(permissions)],
-          );
-          if (roleName === "Admin") adminRoleId = roleId;
-        }
+        const roleRecords = roleTemplates.map(([roleName, permissions]) => ({
+          id: roleName === "Call Center" ? callCenterRoleId : crypto.randomUUID(),
+          name: roleName,
+          permissions,
+        }));
+        const adminRoleId = roleRecords.find((role) => role.name === "Admin")?.id || "";
+        const roleParams = [tenantId];
+        const roleValues = roleRecords.map((role) => {
+          const start = roleParams.length + 1;
+          roleParams.push(role.id, role.name, JSON.stringify(role.permissions));
+          return `($${start}, $1, $${start + 1}::varchar, $${start + 1}::text, $${start + 2}::jsonb, NOW(), NULL)`;
+        });
+        await client.query(
+          `INSERT INTO roles
+            (id, tenant_id, name, seeded_name, permissions, created_at, created_by)
+           VALUES ${roleValues.join(", ")}`,
+          roleParams,
+        );
 
         let username = normalizeSlug(profile.full_name).replace(/-/g, ".") || profile.email.split("@")[0];
         username = username.slice(0, 80);
@@ -1368,7 +1382,11 @@ export async function createPostgresStore(connectionString) {
           workspace: { id: tenantId, name: profile.business_name, domain, app_user_id: appUserId },
         };
       } catch (error) {
-        await client.query("ROLLBACK");
+        try {
+          await client.query("ROLLBACK");
+        } catch {
+          // Koneksi/statement timeout tidak boleh menahan respons error onboarding.
+        }
         throw error;
       } finally {
         client.release();
@@ -1457,6 +1475,42 @@ export function createApp({
         )
       : null);
   const emailClient = mailer === undefined ? createMailer(config) : mailer;
+  const activeDomainProvisioning = new Set();
+
+  function provisionDomainInBackground(domain, attempt = 0) {
+    const key = String(domain || "").trim().toLowerCase();
+    if (!key || activeDomainProvisioning.has(key)) return;
+    activeDomainProvisioning.add(key);
+
+    let timeoutId;
+    const timeout = new Promise((_, reject) => {
+      timeoutId = setTimeout(() => {
+        const error = new Error("Provisioning domain melewati batas 3 detik.");
+        error.code = "domain_provisioning_timeout";
+        reject(error);
+      }, DOMAIN_PROVISIONING_TIMEOUT_MS);
+      timeoutId.unref?.();
+    });
+
+    Promise.race([
+      Promise.resolve().then(() => productDomainEnsurer(config, key)),
+      timeout,
+    ]).catch((error) => {
+      const retryDelay = DOMAIN_PROVISIONING_RETRY_DELAYS_MS[attempt];
+      if (retryDelay !== undefined) {
+        const retryTimer = setTimeout(() => provisionDomainInBackground(key, attempt + 1), retryDelay);
+        retryTimer.unref?.();
+        return;
+      }
+      console.error("Provisioning domain tenant belum berhasil setelah retry.", {
+        domain: key,
+        code: error?.code || error?.name || "unknown_error",
+      });
+    }).finally(() => {
+      clearTimeout(timeoutId);
+      activeDomainProvisioning.delete(key);
+    });
+  }
 
   if (config.trustProxy) app.set("trust proxy", 1);
   app.disable("x-powered-by");
@@ -2068,7 +2122,6 @@ export function createApp({
       }
       await recaptchaVerifier(config, String(req.body?.recaptchaToken || ""));
       const result = await store.provisionWorkspace({ userId: user.id, suffix: config.tenantDomainSuffix });
-      await productDomainEnsurer(config, result.workspace.domain);
       const portalToken = randomToken(48);
       const portalExpiresAt = new Date(Date.now() + PORTAL_SESSION_TTL_MS);
       await store.createPortalSession({
@@ -2079,6 +2132,7 @@ export function createApp({
         ipAddress: String(req.ip || "").slice(0, 100),
         expiresAt: portalExpiresAt,
       });
+      provisionDomainInBackground(result.workspace.domain);
       return res.status(202).json({
         workspace: {
           id: result.workspace.id,
@@ -2101,6 +2155,12 @@ export function createApp({
       }
       if (error?.code === "recaptcha_unavailable") {
         return res.status(503).json({ error: error.code, message: error.message });
+      }
+      if (["55P03", "57014", "ETIMEDOUT"].includes(error?.code)) {
+        return res.status(503).json({
+          error: "workspace_timeout",
+          message: "Persiapan workspace melewati batas waktu aman. Silakan coba lagi; proses bersifat idempoten.",
+        });
       }
       if (["domain_provisioning_unavailable", "domain_provisioning_failed"].includes(error?.code)) {
         return res.status(503).json({ error: error.code, message: error.message });
