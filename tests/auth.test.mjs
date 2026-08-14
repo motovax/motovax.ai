@@ -16,6 +16,8 @@ let authenticatedCookie = "";
 let accountState = { profile: null, workspaces: [] };
 const recaptchaTokens = [];
 const portalSessions = new Map();
+const domainEnsureCalls = [];
+let domainEnsureHandler = async () => {};
 let portalPasswordHash = "";
 let otherPortalPasswordHash = "";
 
@@ -316,7 +318,10 @@ before(async () => {
       }
       return { score: 0.9 };
     },
-    productDomainEnsurer: async () => {},
+    productDomainEnsurer: (...args) => {
+      domainEnsureCalls.push(args[1]);
+      return domainEnsureHandler(...args);
+    },
   });
   await new Promise((resolve) => {
     server = app.listen(0, "127.0.0.1", resolve);
@@ -782,8 +787,10 @@ test("penyelesaian onboarding ditolak sebelum provisioning tanpa token reCAPTCHA
   assert.deepEqual(recaptchaTokens, [""]);
 });
 
-test("penyelesaian onboarding membuat sesi portal untuk redirect login otomatis", async () => {
+test("penyelesaian onboarding langsung membuat sesi portal tanpa menunggu provisioning domain", async () => {
   accountState = { profile: { modules: ["ims"] }, workspaces: [] };
+  domainEnsureHandler = () => new Promise(() => {});
+  const startedAt = Date.now();
   const response = await fetch(`${baseUrl}/api/onboarding/complete`, {
     method: "POST",
     headers: {
@@ -793,11 +800,15 @@ test("penyelesaian onboarding membuat sesi portal untuk redirect login otomatis"
     },
     body: JSON.stringify({ recaptchaToken: "valid-recaptcha-token" }),
   });
+  const responseTime = Date.now() - startedAt;
+  domainEnsureHandler = async () => {};
   assert.equal(response.status, 202);
+  assert.ok(responseTime < 1000, `respons selesai dalam ${responseTime}ms`);
   const payload = await response.json();
   assert.equal(payload.workspace.ready, false);
   assert.equal(payload.portalSession.returnUrl, "https://motovax.ai/");
   assert.ok(payload.portalSession.token.length >= 48);
+  assert.ok(domainEnsureCalls.includes("dealer-test.motovax.com"));
 
   const me = await fetch(`${baseUrl}/api/portal/me`, {
     headers: {

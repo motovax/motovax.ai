@@ -21,6 +21,9 @@
   };
   var AUTH_LEAD = "Buat akun Motovax menggunakan email kerja atau akun Google Anda.";
   var GOOGLE_AUTH_ORIGIN = "https://onboard.motovax.com";
+  var FINAL_SETUP_TIMEOUT_MS = 3000;
+  var REDIRECT_DELAY_MS = 650;
+  var REDIRECT_FALLBACK_MS = 2600;
   function loadState() {
     try {
       var raw = localStorage.getItem(STORAGE_KEY);
@@ -80,6 +83,17 @@
 
   function api(path, options) {
     options = options || {};
+    var timeoutMs = Number(options.timeoutMs || 0);
+    delete options.timeoutMs;
+    var timeoutId = null;
+    var controller = null;
+    if (timeoutMs > 0 && !options.signal) {
+      controller = new AbortController();
+      options.signal = controller.signal;
+      timeoutId = window.setTimeout(function () {
+        controller.abort();
+      }, timeoutMs);
+    }
     options.credentials = "same-origin";
     options.headers = Object.assign(
       { Accept: "application/json", "Content-Type": "application/json" },
@@ -100,9 +114,40 @@
       });
     }).catch(function (error) {
       if (error && typeof error.status === "number") throw error;
+      if (error && error.name === "AbortError") {
+        var timeoutError = new Error("Proses melewati batas waktu. Silakan coba lagi; data yang sudah tersimpan tetap aman.");
+        timeoutError.code = "request_timeout";
+        throw timeoutError;
+      }
       var networkError = new Error("Koneksi ke server terputus. Periksa internet Anda, lalu coba lagi.");
       networkError.code = "network_error";
       throw networkError;
+    }).finally(function () {
+      if (timeoutId) window.clearTimeout(timeoutId);
+    });
+  }
+
+  function withTimeout(promise, timeoutMs, message) {
+    return new Promise(function (resolve, reject) {
+      var settled = false;
+      var timeoutId = window.setTimeout(function () {
+        if (settled) return;
+        settled = true;
+        var error = new Error(message || "Proses melewati batas waktu. Silakan coba lagi.");
+        error.code = "request_timeout";
+        reject(error);
+      }, Math.max(1, timeoutMs));
+      Promise.resolve(promise).then(function (value) {
+        if (settled) return;
+        settled = true;
+        window.clearTimeout(timeoutId);
+        resolve(value);
+      }, function (error) {
+        if (settled) return;
+        settled = true;
+        window.clearTimeout(timeoutId);
+        reject(error);
+      });
     });
   }
 
@@ -128,6 +173,7 @@
   function friendlySubmitError(error, fallback) {
     if (!error) return fallback || "Proses belum berhasil. Silakan coba lagi.";
     if (error.code === "network_error") return error.message;
+    if (error.code === "request_timeout") return error.message;
     if (error.status === 401) return "Sesi Anda sudah berakhir. Muat ulang halaman, lalu masuk atau daftar kembali.";
     if (error.status === 429) return "Terlalu banyak percobaan. Tunggu beberapa menit sebelum mencoba kembali.";
     if (error.status >= 500) return "Layanan sedang mengalami gangguan. Data Anda belum dikirim; silakan coba lagi beberapa saat.";
@@ -207,6 +253,8 @@
     this.workspacePollTimer = null;
     this.slugCheckTimer = null;
     this.verificationTimer = null;
+    this.redirectSafetyTimer = null;
+    this.isRedirecting = false;
     this.slugAvailability = { slug: "", available: null };
     this.slugIsAutomatic = !this.state.business.workspaceSlug;
     this.recaptchaConfigPromise = this.prepareRecaptcha();
@@ -240,7 +288,7 @@
   OnboardingApp.prototype.startFreshRegistration = function (params) {
     var self = this;
     setFormLoading(this.signupForm, true);
-    api("/api/auth/logout", { method: "POST", body: "{}" })
+    api("/api/auth/logout", { method: "POST", body: "{}", timeoutMs: FINAL_SETUP_TIMEOUT_MS })
       .then(function () {
         try {
           localStorage.removeItem(STORAGE_KEY);
@@ -255,13 +303,15 @@
         var query = params.toString();
         window.history.replaceState({}, "", window.location.pathname + (query ? "?" + query : "") + window.location.hash);
         self.isFreshRegistration = false;
-        setFormLoading(self.signupForm, false);
       })
       .catch(function (error) {
         self.showError(
           self.signupForm,
           friendlySubmitError(error, "Sesi pendaftaran sebelumnya belum dapat diakhiri. Muat ulang halaman untuk mencoba lagi."),
         );
+      })
+      .finally(function () {
+        setFormLoading(self.signupForm, false);
       });
   };
 
@@ -279,12 +329,21 @@
       });
   };
 
-  OnboardingApp.prototype.getRecaptchaToken = async function () {
-    var config = await this.recaptchaConfigPromise;
+  OnboardingApp.prototype.getRecaptchaToken = async function (timeoutMs) {
+    var availableMs = Math.max(1, Number(timeoutMs || FINAL_SETUP_TIMEOUT_MS));
+    var startedAt = Date.now();
+    var remainingTime = function () {
+      return Math.max(1, availableMs - (Date.now() - startedAt));
+    };
+    var config = await withTimeout(
+      this.recaptchaConfigPromise,
+      remainingTime(),
+      "Verifikasi keamanan belum siap dalam 3 detik. Silakan coba lagi.",
+    );
     if (!config || !config.enabled || !window.grecaptcha || !window.grecaptcha.enterprise) {
       throw new Error(config && config.error || "Proteksi keamanan belum siap. Muat ulang halaman dan coba lagi.");
     }
-    return new Promise(function (resolve, reject) {
+    return withTimeout(new Promise(function (resolve, reject) {
       window.grecaptcha.enterprise.ready(function () {
         window.grecaptcha.enterprise.execute(config.siteKey, { action: config.action })
           .then(resolve)
@@ -292,7 +351,7 @@
             reject(new Error("Verifikasi keamanan gagal. Muat ulang halaman dan coba lagi."));
           });
       });
-    });
+    }), remainingTime(), "Verifikasi keamanan melewati batas 3 detik. Silakan coba lagi.");
   };
 
   OnboardingApp.prototype.bind = function () {
@@ -1020,9 +1079,10 @@
     }
   };
 
-  OnboardingApp.prototype.saveProfile = function () {
+  OnboardingApp.prototype.saveProfile = function (timeoutMs) {
     return api("/api/onboarding/profile", {
       method: "POST",
+      timeoutMs: timeoutMs,
       body: JSON.stringify({
         businessName: this.state.business.businessName,
         workspaceSlug: this.state.business.workspaceSlug,
@@ -1049,11 +1109,16 @@
 
     this.state.modules = checked;
     setFormLoading(form, true);
+    var startedAt = Date.now();
+    var remainingTime = function () {
+      return Math.max(1, FINAL_SETUP_TIMEOUT_MS - (Date.now() - startedAt));
+    };
     try {
-      await this.saveProfile();
-      var recaptchaToken = await this.getRecaptchaToken();
+      await this.saveProfile(remainingTime());
+      var recaptchaToken = await this.getRecaptchaToken(remainingTime());
       var payload = await api("/api/onboarding/complete", {
         method: "POST",
+        timeoutMs: remainingTime(),
         body: JSON.stringify({ recaptchaToken: recaptchaToken }),
       });
       this.state.workspace = payload.workspace;
@@ -1063,8 +1128,8 @@
       saveState(this.state);
       this.renderSummary();
       this.goTo(4);
-      this.showToast("Pendaftaran berhasil", "Akun Anda sudah aktif. Mengarahkan ke motovax.ai dalam kondisi login.");
-      this.redirectToPortal(payload.portalSession);
+      this.showRedirectState();
+      this.redirectToPortal(payload.portalSession, remainingTime());
     } catch (error) {
       this.showError(form, friendlySubmitError(error, "Workspace belum berhasil dibuat. Pilihan Anda tetap tersimpan; silakan coba lagi."));
     } finally {
@@ -1072,21 +1137,55 @@
     }
   };
 
-  OnboardingApp.prototype.redirectToPortal = function (portalSession) {
-    if (!portalSession || !portalSession.token) {
-      this.waitForWorkspace();
-      return;
-    }
+  OnboardingApp.prototype.showRedirectState = function () {
+    this.isRedirecting = true;
+    var redirectState = qs("[data-redirect-state]");
+    var workspaceSummary = qs("[data-workspace-summary]");
+    var workspaceActions = qs("[data-workspace-actions]");
+    var readyTitle = qs("[data-ready-title]");
+    var readyCopy = qs("[data-ready-copy]");
+    var redirectDomain = qs("[data-redirect-domain]");
+    window.clearTimeout(this.toastTimer);
+    if (this.toast) this.toast.hidden = true;
+    if (redirectState) redirectState.hidden = false;
+    if (workspaceSummary) workspaceSummary.hidden = true;
+    if (workspaceActions) workspaceActions.hidden = true;
+    if (readyTitle) readyTitle.textContent = "Pendaftaran berhasil";
+    if (readyCopy) readyCopy.textContent = "Akses aman sedang disiapkan. Anda langsung dialihkan tanpa menunggu domain workspace aktif.";
+    if (redirectDomain) redirectDomain.textContent = this.state.workspace?.domain || "workspace dealer Anda";
+  };
+
+  OnboardingApp.prototype.redirectToPortal = function (portalSession, timeoutMs) {
     var target;
     try {
-      target = new URL(portalSession.returnUrl || "https://motovax.ai/");
+      target = new URL(portalSession?.returnUrl || "https://motovax.ai/");
+      if (target.protocol !== "https:" && !/^http:\/\/(?:127\.0\.0\.1|localhost)(?::\d+)?$/.test(target.origin)) {
+        throw new Error("Portal URL tidak aman.");
+      }
     } catch (_error) {
       target = new URL("https://motovax.ai/");
     }
-    target.hash = new URLSearchParams({ portal_session: portalSession.token }).toString();
+    if (portalSession?.token) {
+      target.hash = new URLSearchParams({ portal_session: portalSession.token }).toString();
+    }
+    var targetUrl = target.toString();
+    var redirectWindow = Math.max(1, Math.min(REDIRECT_FALLBACK_MS, Number(timeoutMs || REDIRECT_FALLBACK_MS)));
+    var initialDelay = Math.min(REDIRECT_DELAY_MS, Math.max(1, redirectWindow - 100));
+    var navigate = function (replace) {
+      try {
+        if (replace) window.location.replace(targetUrl);
+        else window.location.assign(targetUrl);
+      } catch (_error) {
+        window.location.href = targetUrl;
+      }
+    };
+    window.clearTimeout(this.redirectSafetyTimer);
     window.setTimeout(function () {
-      window.location.assign(target.toString());
-    }, 700);
+      navigate(false);
+    }, initialDelay);
+    this.redirectSafetyTimer = window.setTimeout(function () {
+      navigate(true);
+    }, redirectWindow);
   };
 
   OnboardingApp.prototype.enterWorkspace = async function () {
@@ -1191,6 +1290,9 @@
     var workspaceActions = qs("[data-workspace-actions]");
     var readyTitle = qs("[data-ready-title]");
     var readyCopy = qs("[data-ready-copy]");
+    var redirectState = qs("[data-redirect-state]");
+    this.isRedirecting = false;
+    if (redirectState) redirectState.hidden = true;
     if (workspaceSummary) workspaceSummary.hidden = false;
     if (workspaceActions) workspaceActions.hidden = false;
     if (readyTitle) readyTitle.textContent = "Pendaftaran berhasil";
