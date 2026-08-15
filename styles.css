@@ -451,15 +451,20 @@
 }
 .usecase-copy h3 {
   margin: 16px 0 0;
-  font-size: clamp(28px, 3.4vw, 42px);
+  font-size: clamp(26px, 3.2vw, 40px);
   line-height: 1.12;
   letter-spacing: -0.04em;
+  overflow-wrap: break-word;
+  text-wrap: balance;
 }
 .usecase-copy .usecase-lead {
   margin: 14px 0 0;
   color: #d4e6ff;
   font-size: 16px;
   line-height: 1.6;
+}
+.usecase-copy .usecase-lead + .usecase-lead {
+  margin-top: 6px;
 }
 .usecase-block,
 .usecase-impact {

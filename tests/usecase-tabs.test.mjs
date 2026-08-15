@@ -84,7 +84,7 @@ const viewports = [
 const cases = [
   {
     id: "falcon",
-    heading: "Falcon IMS",
+    heading: "AI Sales Assistant & Sales Automation",
     body: "Implementasi Falcon",
     image: "falcon-ims-dss-motor",
     useCase: "DSS Motor",
@@ -98,7 +98,7 @@ const cases = [
   },
   {
     id: "omni",
-    heading: "Omnichannel call center AI",
+    heading: "AI-Driven Lead Conversion",
     body: "AI Jasmine sales agent",
     image: "omnichannel-dsf",
     useCase: "DSF",
