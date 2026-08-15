@@ -127,6 +127,86 @@ for (const link of document.querySelectorAll("[data-wa]")) {
   observer.observe(headline || typed);
 })();
 
+/** Garis bawahi spidol merah: tergambar saat masuk viewport, bisa digaris ulang dengan pointer. */
+(function initMarkerUnderline() {
+  const marks = [...document.querySelectorAll("[data-marker-underline]")];
+  if (!marks.length) return;
+
+  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  const pathsOf = (el) => [...el.querySelectorAll(".marker-stroke")];
+
+  const clearScrub = (el) => {
+    el.classList.remove("is-scrubbing");
+    for (const path of pathsOf(el)) path.style.strokeDashoffset = "";
+  };
+
+  const draw = (el) => {
+    clearScrub(el);
+    el.classList.add("is-drawn");
+  };
+
+  const hideStroke = (el) => {
+    el.classList.remove("is-drawn");
+    clearScrub(el);
+  };
+
+  const redraw = (el) => {
+    if (reducedMotion) {
+      draw(el);
+      return;
+    }
+    hideStroke(el);
+    void el.offsetWidth;
+    requestAnimationFrame(() => draw(el));
+  };
+
+  const scrubTo = (el, clientX) => {
+    const rect = el.getBoundingClientRect();
+    if (!rect.width) return;
+    const progress = Math.min(1, Math.max(0, (clientX - rect.left) / rect.width));
+    el.classList.add("is-scrubbing");
+    el.classList.add("is-drawn");
+    for (const path of pathsOf(el)) {
+      path.style.strokeDashoffset = String(1 - progress);
+    }
+  };
+
+  for (const el of marks) {
+    if (reducedMotion) {
+      draw(el);
+      continue;
+    }
+
+    el.classList.add("is-animatable");
+    hideStroke(el);
+
+    if ("IntersectionObserver" in window) {
+      const observer = new IntersectionObserver(
+        (entries) => {
+          for (const entry of entries) {
+            if (!entry.isIntersecting) continue;
+            draw(el);
+          }
+        },
+        { threshold: 0.55 },
+      );
+      observer.observe(el);
+    } else {
+      draw(el);
+    }
+
+    el.addEventListener("pointerenter", (event) => {
+      if (event.pointerType === "mouse") hideStroke(el);
+    });
+    el.addEventListener("pointermove", (event) => {
+      if (event.pointerType === "mouse" || event.buttons) scrubTo(el, event.clientX);
+    });
+    el.addEventListener("pointerleave", () => draw(el));
+    el.addEventListener("click", () => redraw(el));
+  }
+})();
+
 /** Modal screenshot hero: ukuran penuh di halaman yang sama. */
 (function initHeroImageModal() {
   const modal = document.querySelector("[data-hero-image-modal]");
@@ -164,6 +244,21 @@ for (const link of document.querySelectorAll("[data-wa]")) {
     shot.addEventListener("click", () => open(openers[0]));
   }
 
+  const problemVisual = document.querySelector("[data-problem-visual]");
+  const problemOpener = openers.find((button) => button.dataset.imageTitle === "Tantangan dealer hari ini");
+  if (problemVisual instanceof HTMLImageElement && problemOpener instanceof HTMLElement) {
+    problemVisual.style.cursor = "zoom-in";
+    problemVisual.addEventListener("click", () => open(problemOpener));
+  }
+
+  for (const visual of document.querySelectorAll("[data-usecase-visual]")) {
+    if (!(visual instanceof HTMLImageElement)) continue;
+    const opener = visual.closest("figure")?.querySelector("[data-hero-image-open]");
+    if (!(opener instanceof HTMLElement)) continue;
+    visual.style.cursor = "zoom-in";
+    visual.addEventListener("click", () => open(opener));
+  }
+
   modal.addEventListener("click", (event) => {
     if (event.target === modal || event.target.closest("[data-hero-image-close]")) close();
   });
@@ -172,159 +267,85 @@ for (const link of document.querySelectorAll("[data-wa]")) {
   });
 })();
 
-/** Tab "Contoh alur nyata" di beranda: ganti kartu journey saat diklik. */
-(function initUsecaseTabs() {
-  const root = document.querySelector(".usecase-tabs");
+/** Slider "Contoh alur nyata": teks kiri, foto kanan, 3 use case. */
+(function initUsecaseSlider() {
+  const root = document.querySelector("[data-usecase-slider]");
   if (!(root instanceof HTMLElement)) return;
 
   const tabs = [...root.querySelectorAll("[data-usecase]")];
-  const panels = [...document.querySelectorAll("[data-usecase-panel]")];
+  const panels = [...root.querySelectorAll("[data-usecase-panel]")];
+  const prev = root.querySelector("[data-usecase-prev]");
+  const next = root.querySelector("[data-usecase-next]");
   if (!tabs.length || !panels.length) return;
 
-  const activate = (id) => {
-    const next = String(id || "");
-    if (!panels.some((panel) => panel.getAttribute("data-usecase-panel") === next)) return;
+  const ids = panels.map((panel) => panel.getAttribute("data-usecase-panel")).filter(Boolean);
+  let index = Math.max(0, ids.indexOf(panels.find((panel) => !panel.hidden)?.getAttribute("data-usecase-panel") || ids[0]));
+
+  const activate = (id, { focusTab = false } = {}) => {
+    const nextId = String(id || "");
+    const nextIndex = ids.indexOf(nextId);
+    if (nextIndex < 0) return;
+    index = nextIndex;
 
     for (const tab of tabs) {
-      const on = tab.getAttribute("data-usecase") === next;
+      const on = tab.getAttribute("data-usecase") === nextId;
       tab.classList.toggle("active", on);
       tab.setAttribute("aria-selected", on ? "true" : "false");
       tab.tabIndex = on ? 0 : -1;
+      if (on && focusTab) tab.focus();
     }
 
     for (const panel of panels) {
-      const on = panel.getAttribute("data-usecase-panel") === next;
+      const on = panel.getAttribute("data-usecase-panel") === nextId;
       panel.classList.toggle("is-active", on);
       panel.hidden = !on;
     }
   };
 
-  root.addEventListener("click", (event) => {
+  const step = (delta) => activate(ids[(index + delta + ids.length) % ids.length]);
+
+  root.querySelector(".usecase-tabs")?.addEventListener("click", (event) => {
     const tab = event.target instanceof Element ? event.target.closest("[data-usecase]") : null;
     if (!(tab instanceof HTMLElement) || !root.contains(tab)) return;
     activate(tab.getAttribute("data-usecase"));
   });
 
-  root.addEventListener("keydown", (event) => {
+  root.querySelector(".usecase-tabs")?.addEventListener("keydown", (event) => {
     const current = event.target instanceof Element ? event.target.closest("[data-usecase]") : null;
     if (!(current instanceof HTMLElement) || !root.contains(current)) return;
 
-    const index = tabs.indexOf(current);
-    let next = -1;
-    if (event.key === "ArrowDown" || event.key === "ArrowRight") next = (index + 1) % tabs.length;
-    else if (event.key === "ArrowUp" || event.key === "ArrowLeft") next = (index - 1 + tabs.length) % tabs.length;
-    else if (event.key === "Home") next = 0;
-    else if (event.key === "End") next = tabs.length - 1;
-    if (next < 0) return;
+    const currentIndex = tabs.indexOf(current);
+    let nextIndex = -1;
+    if (event.key === "ArrowDown" || event.key === "ArrowRight") nextIndex = (currentIndex + 1) % tabs.length;
+    else if (event.key === "ArrowUp" || event.key === "ArrowLeft") nextIndex = (currentIndex - 1 + tabs.length) % tabs.length;
+    else if (event.key === "Home") nextIndex = 0;
+    else if (event.key === "End") nextIndex = tabs.length - 1;
+    if (nextIndex < 0) return;
 
     event.preventDefault();
-    const tab = tabs[next];
-    activate(tab.getAttribute("data-usecase"));
-    tab.focus();
-  });
-})();
-
-/** Slider skema "Cara Kerja": geser / titik untuk ganti sudut pandang. */
-(function initNativeFlowSlider() {
-  const root = document.querySelector("[data-flow-slider]");
-  if (!(root instanceof HTMLElement)) return;
-
-  const viewport = root.querySelector("[data-flow-viewport]");
-  const slides = [...root.querySelectorAll("[data-flow-slide]")];
-  const dots = [...root.querySelectorAll("[data-flow-dot]")];
-  const status = root.querySelector("[data-flow-status]");
-  if (!(viewport instanceof HTMLElement) || slides.length < 2) return;
-
-  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  let index = 0;
-  let drag = null;
-
-  const slideLabel = (slide) => {
-    const pov = slide.querySelector(".native-flow-pov b");
-    return (pov && pov.textContent ? pov.textContent : slide.getAttribute("aria-label") || "").trim();
-  };
-
-  const goTo = (next) => {
-    const clamped = Math.max(0, Math.min(slides.length - 1, Number(next) || 0));
-    if (clamped === index && slides[clamped].classList.contains("is-active")) return;
-    index = clamped;
-    for (const [i, slide] of slides.entries()) {
-      const on = i === index;
-      slide.classList.toggle("is-active", on);
-      slide.hidden = !on;
-      slide.setAttribute("aria-hidden", on ? "false" : "true");
-      if (on && !reducedMotion) {
-        slide.classList.remove("is-entering");
-        void slide.offsetWidth;
-        slide.classList.add("is-entering");
-      }
-    }
-    for (const [i, dot] of dots.entries()) {
-      const on = i === index;
-      dot.classList.toggle("is-active", on);
-      dot.setAttribute("aria-selected", on ? "true" : "false");
-      dot.tabIndex = on ? 0 : -1;
-    }
-    if (status instanceof HTMLElement) {
-      status.textContent = `Skema ${index + 1} dari ${slides.length}: ${slideLabel(slides[index])}`;
-    }
-  };
-
-  root.addEventListener("click", (event) => {
-    const dot = event.target instanceof Element ? event.target.closest("[data-flow-dot]") : null;
-    if (!(dot instanceof HTMLElement) || !root.contains(dot)) return;
-    goTo(dot.getAttribute("data-flow-dot"));
+    activate(tabs[nextIndex].getAttribute("data-usecase"), { focusTab: true });
   });
 
-  const moveByKey = (event, fromIndex) => {
-    let next = -1;
-    if (event.key === "ArrowRight" || event.key === "ArrowDown") next = fromIndex + 1;
-    else if (event.key === "ArrowLeft" || event.key === "ArrowUp") next = fromIndex - 1;
-    else if (event.key === "Home") next = 0;
-    else if (event.key === "End") next = slides.length - 1;
-    if (next < 0 || next >= slides.length) return false;
-    event.preventDefault();
-    goTo(next);
-    const target = dots[next];
-    if (target instanceof HTMLElement) target.focus();
-    return true;
-  };
+  prev?.addEventListener("click", () => step(-1));
+  next?.addEventListener("click", () => step(1));
 
-  viewport.addEventListener("keydown", (event) => moveByKey(event, index));
-  root.querySelector(".native-flow-dots")?.addEventListener("keydown", (event) => {
-    const current = event.target instanceof Element ? event.target.closest("[data-flow-dot]") : null;
-    if (!(current instanceof HTMLElement)) return;
-    moveByKey(event, dots.indexOf(current));
-  });
-
-  const startDrag = (event) => {
+  let pointerX = null;
+  root.addEventListener("pointerdown", (event) => {
     if (event.pointerType === "mouse" && event.button !== 0) return;
-    drag = { id: event.pointerId, startX: event.clientX, moved: false };
-  };
-
-  const moveDrag = (event) => {
-    if (!drag || event.pointerId !== drag.id) return;
-    if (Math.abs(event.clientX - drag.startX) > 24) drag.moved = true;
-  };
-
-  const endDrag = (event) => {
-    if (!drag || (event && event.pointerId !== drag.id)) return;
-    const delta = event.clientX - drag.startX;
-    const moved = drag.moved;
-    drag = null;
-    if (!moved || Math.abs(delta) < 40) return;
-    if (delta < 0) goTo(index + 1);
-    else goTo(index - 1);
-  };
-
-  viewport.addEventListener("pointerdown", startDrag);
-  viewport.addEventListener("pointermove", moveDrag);
-  viewport.addEventListener("pointerup", endDrag);
-  viewport.addEventListener("pointercancel", () => { drag = null; });
-
-  goTo(0);
+    if (event.target instanceof Element && event.target.closest("button, a")) return;
+    pointerX = event.clientX;
+  });
+  root.addEventListener("pointerup", (event) => {
+    if (pointerX == null) return;
+    const delta = event.clientX - pointerX;
+    pointerX = null;
+    if (Math.abs(delta) < 48) return;
+    step(delta < 0 ? 1 : -1);
+  });
+  root.addEventListener("pointercancel", () => {
+    pointerX = null;
+  });
 })();
-
 
 const contactForm = document.querySelector("[data-contact-form]");
 if (contactForm instanceof HTMLFormElement) {

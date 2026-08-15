@@ -82,48 +82,136 @@ const viewports = [
 ];
 
 const cases = [
-  { id: "sales", heading: "ALUR PENJUALAN UNIT", body: "Falcon mencari stok terkini" },
-  { id: "service", heading: "ALUR LAYANAN PELANGGAN", body: "Jasmine AI merespons pertanyaan rutin" },
-  { id: "crm", heading: "ALUR FOLLOW-UP CRM", body: "Program follow-up berjalan sesuai tahap" },
+  {
+    id: "falcon",
+    heading: "AI Sales Assistant & Sales Automation",
+    body: "Implementasi Falcon",
+    image: "falcon-ims-dss-motor",
+    useCase: "DSS Motor",
+  },
+  {
+    id: "social",
+    heading: "Automated Social Media from Inventory",
+    body: "AI Background generator",
+    image: "social-media-mobix-dssm",
+    useCase: "Mobix by DSSM",
+  },
+  {
+    id: "omni",
+    heading: "AI-Driven Lead Conversion",
+    body: "AI Jasmine sales agent",
+    image: "omnichannel-dsf",
+    useCase: "DSF",
+  },
 ];
 
+async function slideState(page, id) {
+  return page.evaluate((slideId) => {
+    const tab = document.querySelector(`[data-usecase="${slideId}"]`);
+    const panel = document.querySelector(`[data-usecase-panel="${slideId}"]`);
+    const img = panel?.querySelector("[data-usecase-visual]");
+    const copy = panel?.querySelector(".usecase-copy");
+    const photo = panel?.querySelector(".usecase-photo");
+    const visiblePanels = [...document.querySelectorAll("[data-usecase-panel]")]
+      .filter((el) => !el.hidden && el.getBoundingClientRect().height > 0)
+      .map((el) => el.getAttribute("data-usecase-panel"));
+    const tabRect = tab.getBoundingClientRect();
+    const copyRect = copy?.getBoundingClientRect();
+    const photoRect = photo?.getBoundingClientRect();
+    return {
+      selected: tab?.getAttribute("aria-selected"),
+      active: tab?.classList.contains("active"),
+      hidden: Boolean(panel?.hidden),
+      heading: panel?.querySelector("h3")?.textContent,
+      kicker: panel?.querySelector(".usecase-kicker")?.textContent,
+      body: panel?.textContent,
+      currentSrc: img instanceof HTMLImageElement ? img.currentSrc : "",
+      naturalWidth: img instanceof HTMLImageElement ? img.naturalWidth : 0,
+      copyLeft: copyRect?.left ?? 0,
+      photoLeft: photoRect?.left ?? 0,
+      copyTop: copyRect?.top ?? 0,
+      photoTop: photoRect?.top ?? 0,
+      visiblePanels,
+      tabHeight: tabRect.height,
+      overflow: document.documentElement.scrollWidth > document.documentElement.clientWidth,
+    };
+  }, id);
+}
+
 for (const viewport of viewports) {
-  test(`tab contoh alur nyata berubah pada ${viewport.name}`, async () => {
+  test(`slider contoh alur nyata berubah pada ${viewport.name}`, async () => {
     const context = await browser.newContext({ viewport });
     const page = await context.newPage();
     await page.route(/https:\/\/fonts\.(?:googleapis|gstatic)\.com\//, (route) => route.abort());
     await page.goto(`${baseUrl}/index.html`, { waitUntil: "load" });
     await page.locator(".usecase-section").scrollIntoViewIfNeeded();
 
+    const title = await page.locator(".usecase-heading h2").textContent();
+    assert.equal(title?.trim(), "CONTOH ALUR NYATA");
+
+    const visual = await page.evaluate(() => {
+      const section = document.querySelector(".usecase-section");
+      const flow = document.querySelector(".native-flow-section");
+      const photo = document.querySelector(".usecase-photo img");
+      const sectionStyle = section ? getComputedStyle(section) : null;
+      const flowStyle = flow ? getComputedStyle(flow) : null;
+      const photoStyle = photo ? getComputedStyle(photo) : null;
+      return {
+        sectionBg: sectionStyle?.backgroundImage || sectionStyle?.backgroundColor || "",
+        flowBg: flowStyle?.backgroundImage || flowStyle?.backgroundColor || "",
+        photoBg: photoStyle?.backgroundColor || "",
+      };
+    });
+    assert.match(visual.sectionBg, /rgb\(18,\s*103,\s*245\)/, "section use case harus memakai biru Motovax yang sama");
+    assert.match(visual.flowBg, /rgb\(18,\s*103,\s*245\)/, "section di atas harus tetap biru Motovax");
+    assert.equal(visual.sectionBg, visual.flowBg, "background biru use case harus sama dengan hirarki di atasnya");
+    assert.ok(!/rgb\(0,\s*0,\s*0\)|#000/.test(visual.photoBg), "foto tidak boleh berlatar hitam");
+
     for (const item of cases) {
       await page.click(`[data-usecase="${item.id}"]`);
-      const state = await page.evaluate((id) => {
-        const tab = document.querySelector(`[data-usecase="${id}"]`);
-        const panel = document.querySelector(`[data-usecase-panel="${id}"]`);
-        const visiblePanels = [...document.querySelectorAll("[data-usecase-panel]")]
-          .filter((el) => !el.hidden && el.getBoundingClientRect().height > 0)
-          .map((el) => el.getAttribute("data-usecase-panel"));
-        const tabRect = tab.getBoundingClientRect();
-        return {
-          selected: tab?.getAttribute("aria-selected"),
-          active: tab?.classList.contains("active"),
-          hidden: Boolean(panel?.hidden),
-          heading: panel?.querySelector(".journey-head span")?.textContent,
-          body: panel?.textContent,
-          visiblePanels,
-          tabHeight: tabRect.height,
-          overflow: document.documentElement.scrollWidth > document.documentElement.clientWidth,
-        };
-      }, item.id);
+      const img = page.locator(`[data-usecase-panel="${item.id}"] [data-usecase-visual]`);
+      await img.evaluate((el) => el instanceof HTMLImageElement ? el.decode() : null).catch(() => {});
+      const state = await slideState(page, item.id);
 
       assert.equal(state.selected, "true");
       assert.equal(state.active, true);
       assert.equal(state.hidden, false);
       assert.equal(state.heading, item.heading);
+      assert.match(state.kicker || "", new RegExp(item.useCase));
       assert.match(state.body, new RegExp(item.body));
+      assert.match(state.currentSrc, new RegExp(item.image));
+      assert.ok(state.naturalWidth > 0, `gambar ${item.id} belum ter-decode`);
       assert.deepEqual(state.visiblePanels, [item.id]);
       assert.ok(state.tabHeight >= 44, `target sentuh tab ${item.id} terlalu kecil`);
       assert.equal(state.overflow, false);
+
+      if (viewport.name === "mobile") {
+        assert.ok(state.photoTop >= state.copyTop, "di mobile foto harus di bawah teks");
+      } else {
+        assert.ok(state.copyLeft < state.photoLeft, "teks harus di kiri, foto di kanan");
+      }
+    }
+
+    await page.click("[data-usecase-next]");
+    const afterNext = await page.evaluate(() =>
+      document.querySelector("[data-usecase-panel]:not([hidden])")?.getAttribute("data-usecase-panel"),
+    );
+    assert.equal(afterNext, "falcon");
+
+    await page.click("[data-usecase-prev]");
+    const afterPrev = await page.evaluate(() =>
+      document.querySelector("[data-usecase-panel]:not([hidden])")?.getAttribute("data-usecase-panel"),
+    );
+    assert.equal(afterPrev, "omni");
+
+    if (viewport.name === "mobile") {
+      await page.click(`[data-usecase-panel="omni"] [data-hero-image-open]`);
+      const modal = page.locator("[data-hero-image-modal]");
+      await modal.waitFor({ state: "visible" });
+      assert.equal(await page.locator("body").evaluate((body) => body.classList.contains("feature-image-open")), true);
+      await page.keyboard.press("Escape");
+      assert.equal(await modal.isHidden(), true);
+      assert.equal(await page.locator("body").evaluate((body) => body.classList.contains("feature-image-open")), false);
     }
 
     await page.screenshot({ path: `/tmp/motovax-usecase-${viewport.name}.png`, fullPage: false });
