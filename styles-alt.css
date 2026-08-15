@@ -588,6 +588,15 @@
 }
 
 @media (max-width: 480px) {
+  .alt-howto-copy .alt-hook {
+    display: block;
+    width: 100%;
+  }
+
+  .alt-howto-copy .alt-hook b {
+    margin-right: 4px;
+  }
+
   .alt-preview-links {
     width: 100%;
   }
