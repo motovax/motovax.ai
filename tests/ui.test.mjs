@@ -192,6 +192,46 @@ for (const viewport of viewports) {
 }
 
 for (const viewport of viewports) {
+  test(`section kenapa more sales konsisten pada ${viewport.name}`, async () => {
+    const context = await browser.newContext({ viewport });
+    const page = await context.newPage();
+    await page.route(/https:\/\/fonts\.(?:googleapis|gstatic)\.com\//, (route) => route.abort());
+    await page.goto(`${baseUrl}/index.html`, { waitUntil: "load" });
+
+    const section = page.locator("#kenapa-lebih-sales");
+    await section.scrollIntoViewIfNeeded();
+    const layout = await page.evaluate(() => {
+      const why = document.querySelector("#kenapa-lebih-sales");
+      const channel = document.querySelector(".channel-strip");
+      const problem = document.querySelector("#keunggulan");
+      const cards = [...why.querySelectorAll(".why-grid article")].map((card) => {
+        const rect = card.getBoundingClientRect();
+        return { x: rect.x, y: rect.y, width: rect.width, height: rect.height };
+      });
+      const firstRowY = cards[0].y;
+      return {
+        orderOk: Boolean(channel.compareDocumentPosition(why) & Node.DOCUMENT_POSITION_FOLLOWING)
+          && Boolean(why.compareDocumentPosition(problem) & Node.DOCUMENT_POSITION_FOLLOWING),
+        heading: why.querySelector("h2")?.textContent.trim(),
+        cards,
+        firstRowCount: cards.filter((card) => Math.abs(card.y - firstRowY) < 1).length,
+        overflow: document.documentElement.scrollWidth > document.documentElement.clientWidth,
+      };
+    });
+
+    assert.equal(layout.orderOk, true);
+    assert.equal(layout.heading, "Lebih banyak sales karena lead tidak bocor.");
+    assert.equal(layout.cards.length, 4);
+    assert.equal(layout.firstRowCount, viewport.name === "desktop" ? 4 : viewport.name === "tablet" ? 2 : 1);
+    assert.equal(layout.overflow, false);
+    assert.ok(layout.cards.every((card) => card.width > 0 && card.height > 0));
+
+    await section.screenshot({ path: `/tmp/motovax-why-section-${viewport.name}.png` });
+    await context.close();
+  });
+}
+
+for (const viewport of viewports) {
   test(`kartu kapabilitas homepage konsisten pada ${viewport.name}`, async () => {
     const context = await browser.newContext({ viewport });
     const page = await context.newPage();
