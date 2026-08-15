@@ -1454,3 +1454,283 @@
     width: 100%;
   }
 }
+
+/*
+ * Auth shell 2026-08-15
+ * Halaman daftar dan login memakai satu fokus utama: kartu autentikasi terpusat
+ * di atas kanvas biru muda, mengikuti referensi visual onboarding publik.
+ */
+.onboarding-body {
+  display: flex;
+  min-height: 100vh;
+  min-height: 100dvh;
+  flex-direction: column;
+  background:
+    radial-gradient(760px 320px at 92% 8%, rgba(72, 207, 240, 0.16), transparent 64%),
+    radial-gradient(680px 360px at 8% 18%, rgba(41, 112, 238, 0.1), transparent 66%),
+    linear-gradient(180deg, #f4f8fe 0%, #ffffff 62%, #f8fbff 100%);
+}
+
+.onboarding-header {
+  position: relative;
+  flex: 0 0 auto;
+  border-bottom-color: rgba(229, 237, 247, 0.72);
+  background: #fff;
+  backdrop-filter: none;
+}
+
+.onboarding-header .header-inner,
+.onboarding-header-inner {
+  width: min(calc(100% - 40px), 1080px);
+  min-height: 82px;
+}
+
+.onboarding-header .brand {
+  font-size: 25px;
+}
+
+.onboarding-page {
+  display: flex;
+  flex: 1 0 auto;
+  padding: 28px 0 36px;
+}
+
+.onboarding-shell {
+  width: min(calc(100% - 40px), 900px);
+  grid-template-columns: minmax(0, 1fr);
+  align-content: start;
+  gap: 18px;
+}
+
+.onboarding-aside {
+  position: static;
+  top: auto;
+  padding: 0;
+}
+
+.onboarding-rail {
+  width: min(100%, 800px);
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  margin: 0 auto;
+}
+
+.onboarding-rail li {
+  position: relative;
+  grid-template-columns: 38px minmax(0, 1fr);
+  gap: 10px;
+  min-width: 0;
+  padding: 10px 11px;
+  border: 0;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.38);
+}
+
+.onboarding-rail li i {
+  width: 38px;
+  height: 38px;
+  border-radius: 11px;
+}
+
+.onboarding-rail li b {
+  overflow: hidden;
+  font-size: 13px;
+  line-height: 1.25;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.onboarding-rail li small {
+  overflow: hidden;
+  margin-top: 3px;
+  font-size: 11px;
+  line-height: 1.25;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.onboarding-rail li.is-active {
+  border-color: transparent;
+  background: rgba(255, 255, 255, 0.82);
+  box-shadow: 0 10px 24px rgba(56, 91, 139, 0.08);
+}
+
+.onboarding-rail li.is-active::after {
+  content: "";
+  position: absolute;
+  right: 12px;
+  bottom: -7px;
+  left: 12px;
+  height: 2px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #1267f5, #43c9ef);
+}
+
+.onboarding-panel {
+  width: min(100%, 720px);
+  min-height: 0;
+  margin-inline: auto;
+  padding: 28px;
+  border-color: rgba(218, 229, 242, 0.88);
+  border-radius: 16px;
+  box-shadow:
+    0 24px 56px rgba(50, 78, 119, 0.1),
+    0 5px 16px rgba(50, 78, 119, 0.05);
+}
+
+.onboarding-progress {
+  margin: -28px -28px 22px;
+}
+
+.onboarding-footer {
+  flex: 0 0 auto;
+  padding: 8px 0 22px;
+}
+
+.onboarding-footer .container {
+  width: min(calc(100% - 40px), 1080px);
+}
+
+.portal-login-page {
+  flex: 1 0 auto;
+  padding: 24px 0 30px;
+}
+
+.portal-login-shell {
+  width: min(calc(100% - 40px), 1080px);
+  grid-template-columns: minmax(0, 1fr);
+  justify-items: center;
+  gap: 0;
+}
+
+.portal-login-panel {
+  width: min(100%, 540px);
+  min-height: 0;
+  padding: 28px 30px;
+}
+
+.portal-login-footer {
+  padding: 0 0 18px;
+}
+
+@media (max-width: 900px) {
+  .onboarding-header .header-inner,
+  .onboarding-header-inner,
+  .onboarding-footer .container,
+  .portal-login-shell {
+    width: min(calc(100% - 48px), 1080px);
+  }
+
+  .onboarding-shell {
+    width: min(calc(100% - 48px), 900px);
+  }
+
+  .portal-login-page {
+    padding: 24px 0 28px;
+  }
+
+  .portal-login-panel {
+    width: min(100%, 540px);
+    padding: 26px 28px;
+  }
+}
+
+@media (max-width: 720px) {
+  .onboarding-header .header-inner,
+  .onboarding-header-inner {
+    width: min(calc(100% - 32px), 1080px);
+    min-height: 64px;
+  }
+
+  .onboarding-header .brand {
+    font-size: 22px;
+  }
+
+  .onboarding-page {
+    padding: 16px 0 26px;
+  }
+
+  .onboarding-shell,
+  .onboarding-footer .container,
+  .portal-login-shell {
+    width: min(calc(100% - 32px), 900px);
+  }
+
+  .onboarding-shell {
+    gap: 14px;
+  }
+
+  .onboarding-rail {
+    gap: 6px;
+  }
+
+  .onboarding-rail li {
+    display: flex;
+    min-height: 46px;
+    padding: 4px;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.46);
+  }
+
+  .onboarding-rail li > div {
+    display: none;
+  }
+
+  .onboarding-rail li i {
+    width: 38px;
+    height: 38px;
+    flex: 0 0 38px;
+  }
+
+  .onboarding-rail li.is-active::after {
+    right: 8px;
+    bottom: -5px;
+    left: 8px;
+  }
+
+  .onboarding-panel {
+    width: 100%;
+    padding: 20px 16px 16px;
+    border-radius: 14px;
+  }
+
+  .onboarding-progress {
+    margin: -20px -16px 18px;
+  }
+
+  .onboarding-footer {
+    padding-bottom: max(18px, env(safe-area-inset-bottom));
+  }
+
+  .portal-login-page {
+    padding: 14px 0 18px;
+  }
+
+  .portal-login-panel {
+    padding: 20px 18px;
+  }
+
+  .portal-login-footer {
+    padding-bottom: max(10px, env(safe-area-inset-bottom));
+  }
+}
+
+@media (max-width: 390px) {
+  .onboarding-header .header-inner,
+  .onboarding-header-inner,
+  .onboarding-shell,
+  .onboarding-footer .container,
+  .portal-login-shell {
+    width: min(calc(100% - 24px), 900px);
+  }
+
+  .onboarding-link-muted {
+    max-width: 158px;
+    font-size: 11px;
+  }
+
+  .portal-login-panel {
+    padding-inline: 14px;
+  }
+}
