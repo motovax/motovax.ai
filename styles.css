@@ -648,6 +648,122 @@
   }
 }
 
+.clients-section {
+  padding: 56px 0 64px;
+  background: #fff;
+  border-top: 1px solid #e8eef6;
+}
+.clients-inner {
+  display: grid;
+  gap: 28px;
+  justify-items: center;
+  text-align: center;
+}
+.clients-heading {
+  max-width: 640px;
+}
+.clients-heading .section-label {
+  margin: 0;
+}
+.clients-heading h2 {
+  margin: 10px 0 0;
+  font-size: clamp(26px, 3.2vw, 36px);
+  line-height: 1.18;
+  letter-spacing: -0.04em;
+}
+.clients-logos {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 20px 36px;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.clients-logos li {
+  display: grid;
+  place-items: center;
+  min-width: 120px;
+  min-height: 88px;
+  padding: 12px 18px;
+}
+.clients-logos img {
+  display: block;
+  width: auto;
+  max-width: 168px;
+  height: 64px;
+  object-fit: contain;
+}
+.clients-more {
+  min-width: 0;
+}
+.clients-more span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 8px 18px;
+  border: 1px dashed #c5d4e8;
+  border-radius: 99px;
+  color: #4b5d78;
+  background: #f6f9fd;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+}
+
+@media (max-width: 1100px) {
+  .clients-section {
+    padding: 48px 0 56px;
+  }
+  .clients-logos {
+    gap: 14px 24px;
+  }
+  .clients-logos img {
+    max-width: 148px;
+    height: 56px;
+  }
+}
+
+@media (max-width: 760px) {
+  .clients-section {
+    padding: 40px 0 48px;
+  }
+  .clients-heading h2 {
+    font-size: clamp(24px, 7vw, 30px);
+  }
+  .clients-logos {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px 12px;
+  }
+  .clients-logos li {
+    min-width: 0;
+    min-height: 80px;
+    padding: 10px 8px;
+  }
+  .clients-logos img {
+    max-width: min(140px, 100%);
+    height: 52px;
+  }
+  .clients-more {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 480px) {
+  .clients-logos {
+    grid-template-columns: 1fr;
+    gap: 4px;
+  }
+  .clients-more {
+    grid-column: auto;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .hero-type-headline.is-type-ready .hero-type-static { opacity:1; transform:none; }
   .hero-type-headline.is-in-view .hero-type-static,
