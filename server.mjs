@@ -18,6 +18,7 @@ const PORTAL_SESSION_TTL_MS = 30 * 24 * 60 * 60 * 1000;
 const HANDOFF_TTL_MS = 60 * 1000;
 const EMAIL_VERIFICATION_TTL_MS = 24 * 60 * 60 * 1000;
 const EMAIL_VERIFICATION_RESEND_COOLDOWN_SECONDS = 60;
+const PORTAL_PASSWORD_RESET_TTL_MS = 30 * 60 * 1000;
 const DOMAIN_PROVISIONING_TIMEOUT_MS = 3_000;
 const DOMAIN_PROVISIONING_RETRY_DELAYS_MS = [3_000, 10_000];
 const ALLOWED_MODULES = new Set(["ims", "omni", "social", "crm", "dashboard", "insight"]);
@@ -332,6 +333,45 @@ function sha256(value) {
 
 function tokenDigest(value, secret) {
   return crypto.createHmac("sha256", secret).update(value).digest("hex");
+}
+
+function portalPasswordFingerprint(user) {
+  return sha256(`${String(user?.password_hash || "")}|${String(user?.onboarding_password_hash || "")}`);
+}
+
+function issuePortalPasswordResetToken(user, secret, now = Date.now()) {
+  const payload = Buffer.from(JSON.stringify({
+    version: 1,
+    userId: String(user.id || ""),
+    tenantId: String(user.tenant_id || ""),
+    expiresAt: now + PORTAL_PASSWORD_RESET_TTL_MS,
+    passwordFingerprint: portalPasswordFingerprint(user),
+  })).toString("base64url");
+  return `${payload}.${tokenDigest(payload, secret)}`;
+}
+
+function verifyPortalPasswordResetToken(token, secret, now = Date.now()) {
+  const [payload, signature, extra] = String(token || "").split(".");
+  if (!payload || !signature || extra || !/^[a-f0-9]{64}$/i.test(signature)) return null;
+  const expected = Buffer.from(tokenDigest(payload, secret), "hex");
+  const actual = Buffer.from(signature, "hex");
+  if (expected.length !== actual.length || !crypto.timingSafeEqual(expected, actual)) return null;
+  try {
+    const parsed = JSON.parse(Buffer.from(payload, "base64url").toString("utf8"));
+    if (
+      parsed?.version !== 1
+      || typeof parsed.userId !== "string"
+      || !parsed.userId
+      || typeof parsed.tenantId !== "string"
+      || !parsed.tenantId
+      || typeof parsed.passwordFingerprint !== "string"
+      || typeof parsed.expiresAt !== "number"
+      || parsed.expiresAt <= now
+    ) return null;
+    return parsed;
+  } catch {
+    return null;
+  }
 }
 
 async function hashPassword(password) {
@@ -1155,6 +1195,83 @@ export async function createPostgresStore(connectionString) {
       return result.rows;
     },
 
+    async findPortalPasswordResetCandidates({ email, domain = "" }) {
+      const result = await pool.query(
+        `SELECT
+           u.id,
+           u.tenant_id,
+           u.username,
+           COALESCE(NULLIF(BTRIM(u.display_name), ''), u.username) AS display_name,
+           u.email,
+           COALESCE(u.password_hash, '') AS password_hash,
+           COALESCE(ou.password_hash, '') AS onboarding_password_hash,
+           t.name AS tenant_name,
+           d.domain
+         FROM users u
+         JOIN tenants t ON t.id = u.tenant_id AND t.status = 'active'
+         JOIN tenant_domains d ON d.tenant_id = t.id AND d.is_primary = TRUE
+         LEFT JOIN onboarding_memberships om ON om.app_user_id = u.id AND om.tenant_id = t.id
+         LEFT JOIN onboarding_users ou ON ou.id = om.user_id
+         WHERE LOWER(COALESCE(u.email, '')) = LOWER($1)
+           AND ($2 = '' OR LOWER(d.domain) = LOWER($2))
+         ORDER BY t.name, u.id
+         LIMIT 5`,
+        [email, domain],
+      );
+      return result.rows;
+    },
+
+    async findPortalPasswordResetUser({ userId, tenantId }) {
+      const result = await pool.query(
+        `SELECT
+           u.id,
+           u.tenant_id,
+           u.username,
+           COALESCE(NULLIF(BTRIM(u.display_name), ''), u.username) AS display_name,
+           u.email,
+           COALESCE(u.password_hash, '') AS password_hash,
+           COALESCE(ou.password_hash, '') AS onboarding_password_hash,
+           t.name AS tenant_name,
+           d.domain
+         FROM users u
+         JOIN tenants t ON t.id = u.tenant_id AND t.status = 'active'
+         JOIN tenant_domains d ON d.tenant_id = t.id AND d.is_primary = TRUE
+         LEFT JOIN onboarding_memberships om ON om.app_user_id = u.id AND om.tenant_id = t.id
+         LEFT JOIN onboarding_users ou ON ou.id = om.user_id
+         WHERE u.id = $1 AND u.tenant_id = $2
+         LIMIT 1`,
+        [userId, tenantId],
+      );
+      return result.rows[0] || null;
+    },
+
+    async updatePortalUserPassword({ userId, tenantId, passwordHash }) {
+      const client = await pool.connect();
+      try {
+        await client.query("BEGIN");
+        const updated = await client.query(
+          `UPDATE users
+           SET password_hash = $3, updated_at = NOW()
+           WHERE id = $1 AND tenant_id = $2
+           RETURNING id`,
+          [userId, tenantId, passwordHash],
+        );
+        if (!updated.rowCount) {
+          await client.query("ROLLBACK");
+          return false;
+        }
+        await client.query("DELETE FROM auth_tokens WHERE user_id = $1", [userId]);
+        await client.query("DELETE FROM portal_auth_sessions WHERE app_user_id = $1 AND tenant_id = $2", [userId, tenantId]);
+        await client.query("COMMIT");
+        return true;
+      } catch (error) {
+        await client.query("ROLLBACK");
+        throw error;
+      } finally {
+        client.release();
+      }
+    },
+
     async createPortalSession({ appUserId, tenantId, sessionDigest, userAgent, ipAddress, expiresAt }) {
       await pool.query("DELETE FROM portal_auth_sessions WHERE expires_at <= NOW()");
       await pool.query(
@@ -1779,6 +1896,32 @@ export function createApp({
     });
   }
 
+  async function sendPortalPasswordResetEmail(user) {
+    if (!emailClient) {
+      const error = new Error("Layanan email belum tersedia.");
+      error.code = "email_unavailable";
+      throw error;
+    }
+    const token = issuePortalPasswordResetToken(user, config.sessionSecret);
+    const target = new URL("/login.html", config.publicBaseUrl);
+    target.searchParams.set("reset", "1");
+    target.searchParams.set("token", token);
+    const emailContent = buildAccountEmail({
+      displayName: user.display_name || user.username || user.email,
+      copy: `Gunakan tautan berikut untuk membuat password baru akun workspace ${user.tenant_name} (${user.domain}).`,
+      targetUrl: target.toString(),
+      actionType: "reset_password",
+      publicBaseUrl: config.publicBaseUrl,
+    });
+    await emailClient.sendMail({
+      from: `MOTOVAX <${config.authEmailFrom}>`,
+      to: user.email,
+      subject: `Reset password workspace ${user.tenant_name}`,
+      text: emailContent.text,
+      html: emailContent.html,
+    });
+  }
+
   app.use((req, res, next) => {
     res.set({
       "X-Content-Type-Options": "nosniff",
@@ -1869,6 +2012,66 @@ export function createApp({
         expiresAt: expiresAt.toISOString(),
         redirectUrl: redirect.toString(),
       });
+    } catch (error) {
+      return next(error);
+    }
+  });
+
+  app.post("/api/portal/forgot-password", async (req, res, next) => {
+    try {
+      if (!assertSameOrigin(req, res) || !checkAuthRateLimit(req, res)) return;
+      if (!store?.findPortalPasswordResetCandidates || !config.sessionSecret) {
+        return res.status(503).json({ error: "service_unavailable" });
+      }
+      if (!emailClient) {
+        return res.status(503).json({ error: "email_unavailable", message: "Layanan email belum tersedia." });
+      }
+      const email = normalizeEmail(req.body?.email);
+      const workspace = String(req.body?.workspace || "").trim().toLowerCase();
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        return res.status(400).json({ error: "invalid_email", message: "Masukkan alamat email akun yang valid." });
+      }
+      if (workspace && !new RegExp(`^[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\\.${config.tenantDomainSuffix.replaceAll(".", "\\.")}$`, "i").test(workspace)) {
+        return res.status(400).json({ error: "invalid_workspace", message: "Domain workspace tidak valid." });
+      }
+      const candidates = await store.findPortalPasswordResetCandidates({ email, domain: workspace });
+      for (const candidate of candidates) {
+        await sendPortalPasswordResetEmail(candidate);
+      }
+      return res.status(202).json({ message: "Jika email terdaftar, tautan reset telah dikirim." });
+    } catch (error) {
+      if (error?.code === "email_unavailable") return res.status(503).json({ error: error.code, message: error.message });
+      return next(error);
+    }
+  });
+
+  app.post("/api/portal/reset-password", async (req, res, next) => {
+    try {
+      if (!assertSameOrigin(req, res) || !checkAuthRateLimit(req, res)) return;
+      if (!store?.findPortalPasswordResetUser || !store?.updatePortalUserPassword || !config.sessionSecret) {
+        return res.status(503).json({ error: "service_unavailable" });
+      }
+      const password = String(req.body?.password || "");
+      if (password.length < 8 || password.length > 200 || !/[A-Za-z]/.test(password) || !/\d/.test(password)) {
+        return res.status(400).json({ error: "weak_password", message: "Password minimal 8 karakter dan harus berisi huruf serta angka." });
+      }
+      const reset = verifyPortalPasswordResetToken(req.body?.token, config.sessionSecret);
+      if (!reset) {
+        return res.status(400).json({ error: "invalid_token", message: "Tautan reset tidak valid atau sudah kedaluwarsa." });
+      }
+      const user = await store.findPortalPasswordResetUser({ userId: reset.userId, tenantId: reset.tenantId });
+      if (!user || portalPasswordFingerprint(user) !== reset.passwordFingerprint) {
+        return res.status(400).json({ error: "invalid_token", message: "Tautan reset tidak valid atau sudah digunakan." });
+      }
+      const updated = await store.updatePortalUserPassword({
+        userId: user.id,
+        tenantId: user.tenant_id,
+        passwordHash: await bcrypt.hash(password, 10),
+      });
+      if (!updated) {
+        return res.status(400).json({ error: "invalid_token", message: "Akun workspace tidak lagi tersedia." });
+      }
+      return res.json({ message: "Password berhasil diperbarui. Silakan login dengan password baru." });
     } catch (error) {
       return next(error);
     }

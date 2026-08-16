@@ -4,20 +4,38 @@
   var AUTH_ORIGIN = "https://onboard.motovax.com";
   var local = window.location.hostname === "127.0.0.1" || window.location.hostname === "localhost";
   if (!local && window.location.origin !== AUTH_ORIGIN) {
-    window.location.replace(AUTH_ORIGIN + "/login.html");
+    window.location.replace(AUTH_ORIGIN + "/login.html" + window.location.search);
     return;
   }
 
   var year = document.querySelector("[data-year]");
   if (year) year.textContent = String(new Date().getFullYear());
-  var form = document.querySelector("[data-portal-login-form]");
-  var errorBox = document.querySelector("[data-login-error]");
-  var password = document.getElementById("portalPassword");
-  var passwordToggle = document.querySelector("[data-password-toggle]");
+
+  var loginView = document.querySelector("[data-login-view]");
+  var forgotView = document.querySelector("[data-forgot-view]");
+  var resetView = document.querySelector("[data-reset-view]");
+  var loginForm = document.querySelector("[data-portal-login-form]");
+  var forgotForm = document.querySelector("[data-forgot-form]");
+  var resetForm = document.querySelector("[data-reset-form]");
+  var loginError = document.querySelector("[data-login-error]");
+  var loginStatus = document.querySelector("[data-login-status]");
+  var forgotError = document.querySelector("[data-forgot-error]");
+  var forgotStatus = document.querySelector("[data-forgot-status]");
+  var resetError = document.querySelector("[data-reset-error]");
   var googleButton = document.querySelector("[data-google-login]");
+  var params = new URLSearchParams(window.location.search);
+  var workspace = String(params.get("workspace") || "").trim().toLowerCase();
+  var resetToken = String(params.get("token") || "");
+  var recoveryMode = params.get("forgot") === "1" || (params.get("reset") === "1" && resetToken);
 
   function revealLogin() {
     document.body.classList.remove("is-session-checking");
+  }
+
+  function showView(view) {
+    loginView.hidden = view !== "login";
+    forgotView.hidden = view !== "forgot";
+    resetView.hidden = view !== "reset";
   }
 
   function enterActiveWorkspace() {
@@ -46,16 +64,24 @@
     });
   }
 
-  function showError(message, field) {
-    errorBox.hidden = false;
-    errorBox.textContent = message;
+  function showError(box, message, field) {
+    box.hidden = false;
+    box.textContent = message;
     if (field) {
       field.setAttribute("aria-invalid", "true");
       field.focus({ preventScroll: true });
     }
   }
 
-  function setLoading(loading) {
+  function clearFeedback(form, errorBox) {
+    errorBox.hidden = true;
+    errorBox.textContent = "";
+    Array.prototype.forEach.call(form.elements, function (field) {
+      field.removeAttribute("aria-invalid");
+    });
+  }
+
+  function setLoading(form, loading) {
     var button = form.querySelector('button[type="submit"]');
     if (loading) {
       button.dataset.originalHtml = button.innerHTML;
@@ -67,6 +93,56 @@
     }
     Array.prototype.forEach.call(form.elements, function (field) { field.disabled = loading; });
     form.classList.toggle("is-loading", loading);
+  }
+
+  function requestJSON(path, body) {
+    return fetch(path, {
+      method: "POST",
+      credentials: "same-origin",
+      headers: { Accept: "application/json", "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    }).then(function (response) {
+      return response.json().catch(function () { return {}; }).then(function (payload) {
+        if (!response.ok) {
+          var error = new Error(payload.message || "Permintaan belum berhasil. Silakan coba lagi.");
+          error.status = response.status;
+          throw error;
+        }
+        return payload;
+      });
+    });
+  }
+
+  function showLogin(message) {
+    showView("login");
+    clearFeedback(loginForm, loginError);
+    if (loginStatus) {
+      loginStatus.hidden = !message;
+      loginStatus.textContent = message || "";
+    }
+    window.history.replaceState({}, "", window.location.pathname);
+    loginForm.elements.identifier.focus({ preventScroll: true });
+  }
+
+  function showForgot() {
+    showView("forgot");
+    clearFeedback(forgotForm, forgotError);
+    forgotStatus.hidden = true;
+    forgotStatus.textContent = "";
+    var email = params.get("email") || "";
+    if (email && !forgotForm.elements.email.value) forgotForm.elements.email.value = email;
+    var scope = document.querySelector("[data-recovery-scope]");
+    if (scope) {
+      scope.hidden = !workspace;
+      scope.textContent = workspace ? `Pemulihan dibatasi untuk workspace ${workspace}.` : "";
+    }
+    forgotForm.elements.email.focus({ preventScroll: true });
+  }
+
+  function showReset() {
+    showView("reset");
+    clearFeedback(resetForm, resetError);
+    resetForm.elements.password.focus({ preventScroll: true });
   }
 
   function googleErrorMessage(reason) {
@@ -82,33 +158,38 @@
     return "Login Google belum berhasil. Silakan coba lagi atau gunakan password akun tenant Anda.";
   }
 
-  var oauthParams = new URLSearchParams(window.location.search);
-  var requireReauthentication = oauthParams.get("reauth") === "1";
-  if (oauthParams.get("oauth") === "failed" || oauthParams.get("oauth") === "denied") {
-    var oauthReason = oauthParams.get("oauth") === "denied" ? "denied" : oauthParams.get("reason");
-    showError(googleErrorMessage(oauthReason));
-    oauthParams.delete("oauth");
-    oauthParams.delete("reason");
-    var cleanQuery = oauthParams.toString();
-    window.history.replaceState({}, "", window.location.pathname + (cleanQuery ? "?" + cleanQuery : "") + window.location.hash);
-  }
-
-  if (requireReauthentication) {
-    oauthParams.delete("reauth");
-    var reauthQuery = oauthParams.toString();
-    revokeActivePortalSession().finally(function () {
-      window.history.replaceState({}, "", window.location.pathname + (reauthQuery ? "?" + reauthQuery : "") + window.location.hash);
-      revealLogin();
-    });
+  if (recoveryMode) {
+    revealLogin();
+    if (params.get("reset") === "1" && resetToken) showReset();
+    else showForgot();
   } else {
-    enterActiveWorkspace()
-      .then(function (redirectUrl) { window.location.replace(redirectUrl); })
-      .catch(function (error) {
+    var requireReauthentication = params.get("reauth") === "1";
+    if (params.get("oauth") === "failed" || params.get("oauth") === "denied") {
+      var oauthReason = params.get("oauth") === "denied" ? "denied" : params.get("reason");
+      showError(loginError, googleErrorMessage(oauthReason));
+      params.delete("oauth");
+      params.delete("reason");
+      var cleanQuery = params.toString();
+      window.history.replaceState({}, "", window.location.pathname + (cleanQuery ? "?" + cleanQuery : "") + window.location.hash);
+    }
+
+    if (requireReauthentication) {
+      params.delete("reauth");
+      var reauthQuery = params.toString();
+      revokeActivePortalSession().finally(function () {
+        window.history.replaceState({}, "", window.location.pathname + (reauthQuery ? "?" + reauthQuery : "") + window.location.hash);
         revealLogin();
-        if (error.status && error.status !== 401) {
-          showError("Sesi tersimpan belum dapat dibuka. Silakan login kembali.");
-        }
       });
+    } else {
+      enterActiveWorkspace()
+        .then(function (redirectUrl) { window.location.replace(redirectUrl); })
+        .catch(function (error) {
+          revealLogin();
+          if (error.status && error.status !== 401) {
+            showError(loginError, "Sesi tersimpan belum dapat dibuka. Silakan login kembali.");
+          }
+        });
+    }
   }
 
   if (googleButton) {
@@ -119,51 +200,95 @@
     });
   }
 
-  Array.prototype.forEach.call(form.elements, function (field) {
-    field.addEventListener("input", function () {
-      field.removeAttribute("aria-invalid");
-      errorBox.hidden = true;
-      errorBox.textContent = "";
+  document.querySelector("[data-show-forgot]").addEventListener("click", function () {
+    workspace = "";
+    params = new URLSearchParams();
+    showForgot();
+  });
+  Array.prototype.forEach.call(document.querySelectorAll("[data-back-login]"), function (button) {
+    button.addEventListener("click", function () { showLogin(""); });
+  });
+
+  Array.prototype.forEach.call(document.querySelectorAll("[data-password-toggle]"), function (button) {
+    button.addEventListener("click", function () {
+      var field = document.getElementById(button.getAttribute("aria-controls"));
+      var reveal = field.type === "password";
+      field.type = reveal ? "text" : "password";
+      button.setAttribute("aria-pressed", reveal ? "true" : "false");
+      button.setAttribute("aria-label", reveal ? "Sembunyikan password" : "Tampilkan password");
+      field.focus({ preventScroll: true });
     });
   });
 
-  if (passwordToggle) {
-    passwordToggle.addEventListener("click", function () {
-      var reveal = password.type === "password";
-      password.type = reveal ? "text" : "password";
-      passwordToggle.setAttribute("aria-pressed", reveal ? "true" : "false");
-      passwordToggle.setAttribute("aria-label", reveal ? "Sembunyikan password" : "Tampilkan password");
-      password.focus({ preventScroll: true });
+  Array.prototype.forEach.call(loginForm.elements, function (field) {
+    field.addEventListener("input", function () {
+      clearFeedback(loginForm, loginError);
+      if (loginStatus) loginStatus.hidden = true;
     });
-  }
+  });
+  Array.prototype.forEach.call(forgotForm.elements, function (field) {
+    field.addEventListener("input", function () { clearFeedback(forgotForm, forgotError); });
+  });
+  Array.prototype.forEach.call(resetForm.elements, function (field) {
+    field.addEventListener("input", function () { clearFeedback(resetForm, resetError); });
+  });
 
-  form.addEventListener("submit", function (event) {
+  loginForm.addEventListener("submit", function (event) {
     event.preventDefault();
-    var identifier = form.elements.identifier.value.trim();
-    var passwordValue = form.elements.password.value;
-    if (identifier.length < 2) return showError("Masukkan username atau email akun tenant Anda.", form.elements.identifier);
-    if (!passwordValue) return showError("Masukkan password akun tenant Anda.", form.elements.password);
+    var identifier = loginForm.elements.identifier.value.trim();
+    var password = loginForm.elements.password.value;
+    if (identifier.length < 2) return showError(loginError, "Masukkan username atau email akun tenant Anda.", loginForm.elements.identifier);
+    if (!password) return showError(loginError, "Masukkan password akun tenant Anda.", loginForm.elements.password);
 
-    setLoading(true);
-    fetch("/api/portal/login", {
-      method: "POST",
-      credentials: "same-origin",
-      headers: { Accept: "application/json", "Content-Type": "application/json" },
-      body: JSON.stringify({ identifier: identifier, password: passwordValue }),
-    })
-      .then(function (response) {
-        return response.json().catch(function () { return {}; }).then(function (payload) {
-          if (!response.ok) throw new Error(payload.message || "Login belum berhasil. Silakan coba lagi.");
-          return payload;
-        });
-      })
+    setLoading(loginForm, true);
+    requestJSON("/api/portal/login", { identifier: identifier, password: password })
       .then(function (payload) {
         if (!payload.redirectUrl) throw new Error("Workspace belum dapat dibuka.");
         window.location.assign(payload.redirectUrl);
       })
       .catch(function (error) {
-        showError(error.message || "Login belum berhasil. Silakan coba lagi.");
-        setLoading(false);
+        showError(loginError, error.message || "Login belum berhasil. Silakan coba lagi.");
+        setLoading(loginForm, false);
       });
+  });
+
+  forgotForm.addEventListener("submit", function (event) {
+    event.preventDefault();
+    var email = forgotForm.elements.email.value.trim().toLowerCase();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      return showError(forgotError, "Masukkan alamat email akun yang valid.", forgotForm.elements.email);
+    }
+    setLoading(forgotForm, true);
+    requestJSON("/api/portal/forgot-password", { email: email, workspace: workspace })
+      .then(function (payload) {
+        forgotStatus.hidden = false;
+        forgotStatus.textContent = payload.message || "Jika email terdaftar, tautan reset telah dikirim.";
+      })
+      .catch(function (error) {
+        showError(forgotError, error.message || "Tautan reset belum dapat dikirim. Silakan coba lagi.");
+      })
+      .finally(function () { setLoading(forgotForm, false); });
+  });
+
+  resetForm.addEventListener("submit", function (event) {
+    event.preventDefault();
+    var password = resetForm.elements.password.value;
+    var confirmation = resetForm.elements.passwordConfirm.value;
+    if (password.length < 8 || !/[A-Za-z]/.test(password) || !/\d/.test(password)) {
+      return showError(resetError, "Password minimal 8 karakter dan harus berisi huruf serta angka.", resetForm.elements.password);
+    }
+    if (password !== confirmation) {
+      return showError(resetError, "Konfirmasi password baru tidak sama.", resetForm.elements.passwordConfirm);
+    }
+    setLoading(resetForm, true);
+    requestJSON("/api/portal/reset-password", { token: resetToken, password: password })
+      .then(function (payload) {
+        resetForm.reset();
+        showLogin(payload.message || "Password berhasil diperbarui. Silakan login dengan password baru.");
+      })
+      .catch(function (error) {
+        showError(resetError, error.message || "Password belum berhasil diperbarui. Periksa tautan reset lalu coba lagi.");
+      })
+      .finally(function () { setLoading(resetForm, false); });
   });
 })();

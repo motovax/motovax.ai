@@ -101,6 +101,66 @@
   margin-top: 2px;
 }
 
+.portal-field-label-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.portal-field-label-row label {
+  color: #526074;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.portal-text-action {
+  min-height: 32px;
+  padding: 0;
+  border: 0;
+  color: #0b57d0;
+  background: transparent;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.portal-text-action:hover,
+.portal-text-action:focus-visible {
+  color: #063f9e;
+  outline: none;
+}
+
+.portal-recovery-view .onboarding-step-head {
+  margin-bottom: 18px;
+}
+
+.portal-recovery-back {
+  width: 100%;
+  min-height: 46px;
+}
+
+.portal-recovery-scope,
+.portal-recovery-status {
+  margin: 0;
+  padding: 11px 13px;
+  border: 1px solid #cfe0f7;
+  border-radius: 10px;
+  color: #31506f;
+  background: #f3f8ff;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.portal-recovery-status {
+  border-color: #b8ebd2;
+  color: #075d44;
+  background: #edfcf5;
+}
+
 .portal-register-prompt {
   display: grid;
   gap: 6px;
