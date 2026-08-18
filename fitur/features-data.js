@@ -982,7 +982,14 @@ window.MOTOVAX_FEATURES = {
       },
       { title: "Inbox multi-channel", desc: "WhatsApp, Facebook Messenger, dan Instagram DM hadir di satu workspace." },
       { title: "Funneling dan auto routing", desc: "Lead bergerak melalui bucket AI, Call Center, dan MR dengan kepemilikan yang jelas." },
-      { title: "Aksi cepat inventori dan kredit", desc: "Agent mengecek unit dan simulasi kredit langsung dari percakapan." },
+      {
+        title: "Aksi cepat inventori dan kredit",
+        desc: "Dari Aksi Cepat di percakapan Call Center, agent bisa cek inventori unit ready dan cek simulasi kredit tanpa meninggalkan inbox.",
+        points: [
+          "Cek inventori — Cari unit ready, harga, cabang, dan foto stok live dealer langsung dari percakapan.",
+          "Cek simulasi kredit — Hitung DP, tenor, dan angsuran dari Aksi Cepat, lalu bagikan ke pelanggan.",
+        ],
+      },
       { title: "Analytics omnichannel", desc: "Pantau journey lead, channel, respons, dan hasil penanganan tim." },
     ],
     howItWorks: [

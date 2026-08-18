@@ -124,10 +124,28 @@
     })
     .join("");
 
+  function renderShowcasePoints(capability, index) {
+    const explicit = Array.isArray(capability?.points) ? capability.points.filter(Boolean) : [];
+    if (explicit.length) {
+      return explicit
+        .map((point) => {
+          if (typeof point === "string") return `<li>${escapeHtml(point)}</li>`;
+          const title = String(point.title || "").trim();
+          const desc = String(point.desc || "").trim();
+          if (title && desc) return `<li>${escapeHtml(title)} — ${escapeHtml(desc)}</li>`;
+          return `<li>${escapeHtml(title || desc)}</li>`;
+        })
+        .join("");
+    }
+    const step = workflow[index % Math.max(workflow.length, 1)];
+    const benefit = benefits[index % Math.max(benefits.length, 1)];
+    return `
+              ${step ? `<li>${escapeHtml(step.title)} — ${escapeHtml(step.desc)}</li>` : ""}
+              ${benefit ? `<li>${escapeHtml(benefit)}</li>` : ""}`;
+  }
+
   const showcase = capabilities
     .map((capability, index) => {
-      const step = workflow[index % Math.max(workflow.length, 1)];
-      const benefit = benefits[index % Math.max(benefits.length, 1)];
       return `
         <article class="feature-showcase-row${index % 2 ? " reverse" : ""}">
           <div class="feature-showcase-copy">
@@ -135,8 +153,7 @@
             <h3>${escapeHtml(capability.title)}</h3>
             <p>${escapeHtml(capability.desc)}</p>
             <ul>
-              ${step ? `<li>${escapeHtml(step.title)} — ${escapeHtml(step.desc)}</li>` : ""}
-              ${benefit ? `<li>${escapeHtml(benefit)}</li>` : ""}
+              ${renderShowcasePoints(capability, index)}
             </ul>
             ${renderShowcaseAction(capability)}
           </div>

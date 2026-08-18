@@ -895,3 +895,27 @@ test("session portal legacy di landing langsung handoff ke workspace", async () 
   assert.equal(new URL(page.url()).searchParams.get("token"), "legacy-handoff");
   await context.close();
 });
+
+for (const viewport of viewports) {
+  test(`fitur 04 Omni Jasmine menjelaskan cek inventori dan simulasi kredit pada ${viewport.name}`, async () => {
+    const context = await browser.newContext({ viewport });
+    const page = await context.newPage();
+    await page.route(/https:\/\/fonts\.(?:googleapis|gstatic)\.com\//, (route) => route.abort());
+    await page.goto(`${baseUrl}/fitur/omni-jasmine-ai.html`, { waitUntil: "load" });
+
+    const row = page.locator(".feature-showcase-row", { hasText: "Aksi cepat inventori dan kredit" });
+    await row.scrollIntoViewIfNeeded();
+    const copy = await row.locator(".feature-showcase-copy").innerText();
+    assert.match(copy, /cek inventori/i);
+    assert.match(copy, /simulasi kredit/i);
+    assert.doesNotMatch(copy, /Handoff ke MR/);
+    assert.doesNotMatch(copy, /Kinerja channel dapat diukur/);
+
+    const points = await row.locator(".feature-showcase-copy li").allTextContents();
+    assert.equal(points.length >= 2, true, points.join(" | "));
+    assert.match(points.join("\n"), /Cek inventori/i);
+    assert.match(points.join("\n"), /Cek simulasi kredit/i);
+    assert.equal(await noOverflow(page), true);
+    await context.close();
+  });
+}
