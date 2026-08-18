@@ -612,9 +612,19 @@ for (const viewport of viewports) {
     const page = await context.newPage();
     await page.route(/https:\/\/fonts\.(?:googleapis|gstatic)\.com\//, (route) => route.abort());
     let loginPayload;
+    let forgotPayload;
+    let resetPayload;
     await page.route("**/api/portal/login", (route) => {
       loginPayload = route.request().postDataJSON();
       return route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ redirectUrl: "https://dealer-test.motovax.com/magic-login?token=login-handoff" }) });
+    });
+    await page.route("**/api/portal/forgot-password", (route) => {
+      forgotPayload = route.request().postDataJSON();
+      return route.fulfill({ status: 202, contentType: "application/json", body: JSON.stringify({ message: "Jika email terdaftar, tautan reset telah dikirim." }) });
+    });
+    await page.route("**/api/portal/reset-password", (route) => {
+      resetPayload = route.request().postDataJSON();
+      return route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ message: "Password berhasil diperbarui. Silakan login dengan password baru." }) });
     });
     await page.route("https://dealer-test.motovax.com/**", (route) => route.fulfill({ status: 200, contentType: "text/html", body: "<title>Workspace Dealer</title>" }));
     await page.goto(`${baseUrl}/login.html?oauth=failed&reason=account_not_found`, { waitUntil: "load" });
@@ -623,6 +633,28 @@ for (const viewport of viewports) {
     assert.match(await page.locator('[data-login-error]').textContent(), /belum terdaftar pada workspace MOTOVAX/);
     assert.equal(new URL(page.url()).searchParams.has("oauth"), false);
     assert.equal(await fitsViewport(page), true);
+
+    await page.goto(`${baseUrl}/login.html?forgot=1&workspace=dealer-test.motovax.com&email=owner%40dealer.test`, { waitUntil: "load" });
+    await page.waitForSelector("[data-forgot-view]:visible");
+    assert.match(await page.locator("[data-recovery-scope]").textContent(), /dealer-test\.motovax\.com/);
+    assert.equal(await page.inputValue('[data-forgot-form] input[name="email"]'), "owner@dealer.test");
+    await page.click('[data-forgot-form] button[type="submit"]');
+    await page.waitForSelector("[data-forgot-status]:visible");
+    assert.deepEqual(forgotPayload, { email: "owner@dealer.test", workspace: "dealer-test.motovax.com" });
+    assert.equal(await noOverflow(page), true);
+    await page.click("[data-back-login]");
+    assert.equal(await page.locator("[data-login-view]").isVisible(), true);
+
+    await page.goto(`${baseUrl}/login.html?reset=1&token=test-reset-token`, { waitUntil: "load" });
+    await page.waitForSelector("[data-reset-view]:visible");
+    await page.fill('#portalResetPassword', "passwordBaru123");
+    await page.fill('#portalResetPasswordConfirm', "passwordBaru123");
+    await page.click('[data-reset-form] button[type="submit"]');
+    await page.waitForSelector("[data-login-status]:visible");
+    assert.deepEqual(resetPayload, { token: "test-reset-token", password: "passwordBaru123" });
+    assert.match(await page.locator("[data-login-status]").textContent(), /berhasil diperbarui/);
+    assert.equal(await fitsViewport(page), true);
+
     await page.goto(`${baseUrl}/login.html`, { waitUntil: "load" });
     await page.waitForSelector(".portal-login-auth-content:visible");
     assert.equal(await page.getAttribute('.portal-register-prompt a', "href"), "https://onboard.motovax.com/onboarding.html?fresh=1");
@@ -635,9 +667,9 @@ for (const viewport of viewports) {
     assert.equal(await page.locator('[data-login-error]').isVisible(), true);
     assert.equal(await fitsViewport(page), true);
     await page.fill('#portalPassword', "rahasia123");
-    await page.click('[data-password-toggle]');
+    await page.click('[data-password-toggle][aria-controls="portalPassword"]');
     assert.equal(await page.getAttribute('#portalPassword', "type"), "text");
-    await page.click('[data-password-toggle]');
+    await page.click('[data-password-toggle][aria-controls="portalPassword"]');
     assert.equal(await noOverflow(page), true);
     assert.equal(await fitsViewport(page), true);
     await page.evaluate(() => window.scrollTo(0, 0));
@@ -660,7 +692,7 @@ for (const viewport of viewports) {
     assert.equal(await page.locator("[data-portal-account], [data-portal-workspace], [data-portal-billing]").count(), 0);
     assert.equal(await page.getByRole("link", { name: "Login/Daftar", exact: true }).count(), 1);
     assert.equal(await page.getAttribute('.site-header .header-login', "href"), "https://onboard.motovax.com/login.html?reauth=1");
-    assert.equal(await page.locator('a[href="https://onboard.motovax.com/onboarding.html?fresh=1"]').count(), 3);
+    assert.equal(await page.locator('a[href="https://onboard.motovax.com/onboarding.html?fresh=1"]').count(), 2);
     assert.equal(await noOverflow(page), true);
     await page.screenshot({ path: `/tmp/motovax-stateless-landing-${viewport.name}.png`, fullPage: false });
     await context.close();

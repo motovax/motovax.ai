@@ -210,6 +210,40 @@ const store = {
     ];
     return [];
   },
+  async findPortalPasswordResetCandidates({ email, domain = "" }) {
+    if (email !== "owner@dealer.test") return [];
+    if (domain && domain !== "dealer-test.motovax.com") return [];
+    return [{
+      id: "app-user-1",
+      tenant_id: "tenant-1",
+      username: "owner",
+      display_name: "Owner Dealer",
+      email: "owner@dealer.test",
+      password_hash: portalPasswordHash,
+      onboarding_password_hash: "",
+      tenant_name: "Dealer Test",
+      domain: "dealer-test.motovax.com",
+    }];
+  },
+  async findPortalPasswordResetUser({ userId, tenantId }) {
+    if (userId !== "app-user-1" || tenantId !== "tenant-1") return null;
+    return {
+      id: "app-user-1",
+      tenant_id: "tenant-1",
+      username: "owner",
+      display_name: "Owner Dealer",
+      email: "owner@dealer.test",
+      password_hash: portalPasswordHash,
+      onboarding_password_hash: "",
+      tenant_name: "Dealer Test",
+      domain: "dealer-test.motovax.com",
+    };
+  },
+  async updatePortalUserPassword({ userId, tenantId, passwordHash }) {
+    if (userId !== "app-user-1" || tenantId !== "tenant-1") return false;
+    portalPasswordHash = passwordHash;
+    return true;
+  },
   async createPortalSession(record) {
     portalSessions.set(record.sessionDigest, {
       id: record.appUserId,
@@ -768,6 +802,41 @@ test("portal login tenant membuat cookie sesi dan langsung handoff workspace", a
     body: "{}",
   });
   assert.equal(expired.status, 401);
+});
+
+test("pemulihan password tenant mengirim link terikat akun dan hanya dapat dipakai sekali", async () => {
+  const sentBefore = sentEmails.length;
+  const forgot = await fetch(`${baseUrl}/api/portal/forgot-password`, {
+    method: "POST",
+    headers: { origin: "http://127.0.0.1", "content-type": "application/json" },
+    body: JSON.stringify({ email: "owner@dealer.test", workspace: "dealer-test.motovax.com" }),
+  });
+  assert.equal(forgot.status, 202);
+  assert.equal(sentEmails.length, sentBefore + 1);
+  const email = sentEmails.at(-1);
+  assert.equal(email.to, "owner@dealer.test");
+  assert.match(email.subject, /Dealer Test/);
+  const resetUrlText = email.text.split("\n").find((line) => line.includes("/login.html?reset=1"));
+  const resetUrl = new URL(resetUrlText);
+  const token = resetUrl.searchParams.get("token");
+  assert.ok(token);
+
+  const reset = await fetch(`${baseUrl}/api/portal/reset-password`, {
+    method: "POST",
+    headers: { origin: "http://127.0.0.1", "content-type": "application/json" },
+    body: JSON.stringify({ token, password: "passwordBaru123" }),
+  });
+  assert.equal(reset.status, 200);
+  assert.equal(await bcrypt.compare("passwordBaru123", portalPasswordHash), true);
+
+  const replay = await fetch(`${baseUrl}/api/portal/reset-password`, {
+    method: "POST",
+    headers: { origin: "http://127.0.0.1", "content-type": "application/json" },
+    body: JSON.stringify({ token, password: "passwordLain123" }),
+  });
+  assert.equal(replay.status, 400);
+  assert.equal((await replay.json()).error, "invalid_token");
+  portalPasswordHash = await bcrypt.hash("rahasia123", 4);
 });
 
 test("logout workspace tenant dapat mencabut cookie portal tanpa membuka endpoint portal lain", async () => {

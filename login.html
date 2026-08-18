@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="./styles.css?v=direct-workspace-20260814" />
-    <link rel="stylesheet" href="./onboarding-auth.css?v=centered-auth-20260815" />
+    <link rel="stylesheet" href="./onboarding-auth.css?v=password-recovery-20260817" />
   </head>
   <body class="onboarding-body portal-login-body is-session-checking">
     <header class="site-header onboarding-header">
@@ -29,6 +29,7 @@
             <div><b>Memeriksa sesi Anda…</b><p>Jika Anda sudah login, kami langsung mengarahkan ke workspace tenant.</p></div>
           </div>
           <div class="portal-login-auth-content" data-login-auth-content>
+          <section data-login-view>
           <header class="onboarding-step-head">
             <span>LOGIN TENANT</span>
             <h2 id="portalLoginTitle">Selamat datang kembali</h2>
@@ -57,7 +58,10 @@
               <input type="text" name="identifier" autocomplete="username" placeholder="nama.user atau nama@dealer.com" maxlength="254" required autofocus />
             </label>
             <div class="onboarding-field">
-              <label for="portalPassword">Password</label>
+              <div class="portal-field-label-row">
+                <label for="portalPassword">Password</label>
+                <button type="button" class="portal-text-action" data-show-forgot>Lupa password?</button>
+              </div>
               <div class="onboarding-password-control">
                 <input id="portalPassword" type="password" name="password" autocomplete="current-password" placeholder="Masukkan password" maxlength="200" required />
                 <button type="button" data-password-toggle aria-controls="portalPassword" aria-label="Tampilkan password" aria-pressed="false">
@@ -66,6 +70,7 @@
                 </button>
               </div>
             </div>
+            <p class="portal-recovery-status" data-login-status role="status" aria-live="polite" hidden></p>
             <p class="onboarding-form-error" data-login-error role="alert" aria-live="assertive" hidden></p>
             <button type="submit" class="btn btn-primary portal-login-submit" data-loading-label="Memeriksa akun…">
               <span>Login ke workspace</span><span aria-hidden="true">→</span>
@@ -76,7 +81,64 @@
             <span>Belum punya workspace MOTOVAX?</span>
             <a href="https://onboard.motovax.com/onboarding.html?fresh=1">Daftar dan mulai onboarding <span aria-hidden="true">→</span></a>
           </div>
-          <p class="portal-login-help">Lupa akses akun tenant? Hubungi admin workspace atau <a href="https://motovax.ai/hubungi-kami.html">tim MOTOVAX</a>.</p>
+          <p class="portal-login-help">Butuh bantuan lain? Hubungi admin workspace atau <a href="https://motovax.ai/hubungi-kami.html">tim MOTOVAX</a>.</p>
+          </section>
+
+          <section class="portal-recovery-view" data-forgot-view hidden aria-labelledby="portalForgotTitle">
+            <header class="onboarding-step-head">
+              <span>PEMULIHAN AKUN</span>
+              <h2 id="portalForgotTitle">Lupa password?</h2>
+              <p>Masukkan email yang terdaftar pada akun tenant. Kami akan mengirim tautan aman untuk membuat password baru.</p>
+            </header>
+            <form class="onboarding-form portal-login-form" data-forgot-form novalidate>
+              <label>
+                <span>Email akun tenant</span>
+                <input type="email" name="email" autocomplete="email" placeholder="nama@dealer.com" maxlength="254" required />
+              </label>
+              <p class="portal-recovery-scope" data-recovery-scope hidden></p>
+              <p class="onboarding-form-error" data-forgot-error role="alert" aria-live="assertive" hidden></p>
+              <p class="portal-recovery-status" data-forgot-status role="status" aria-live="polite" hidden></p>
+              <button type="submit" class="btn btn-primary portal-login-submit" data-loading-label="Mengirim tautan…">
+                <span>Kirim tautan reset</span><span aria-hidden="true">→</span>
+              </button>
+              <button type="button" class="btn btn-secondary portal-recovery-back" data-back-login>← Kembali ke login</button>
+            </form>
+          </section>
+
+          <section class="portal-recovery-view" data-reset-view hidden aria-labelledby="portalResetTitle">
+            <header class="onboarding-step-head">
+              <span>PEMULIHAN AKUN</span>
+              <h2 id="portalResetTitle">Buat password baru</h2>
+              <p>Gunakan minimal 8 karakter yang berisi huruf dan angka. Password baru berlaku untuk login motovax.ai dan domain workspace tenant.</p>
+            </header>
+            <form class="onboarding-form portal-login-form" data-reset-form novalidate>
+              <div class="onboarding-field">
+                <label for="portalResetPassword">Password baru</label>
+                <div class="onboarding-password-control">
+                  <input id="portalResetPassword" type="password" name="password" autocomplete="new-password" placeholder="Min. 8 karakter + angka" minlength="8" maxlength="200" required />
+                  <button type="button" data-password-toggle aria-controls="portalResetPassword" aria-label="Tampilkan password baru" aria-pressed="false">
+                    <svg class="password-icon password-icon-show" viewBox="0 0 24 24" aria-hidden="true"><path d="M2.1 12s3.6-6 9.9-6 9.9 6 9.9 6-3.6 6-9.9 6-9.9-6-9.9-6Z"/><circle cx="12" cy="12" r="3"/></svg>
+                    <svg class="password-icon password-icon-hide" viewBox="0 0 24 24" aria-hidden="true"><path d="m3 3 18 18M10.6 6.1A10.8 10.8 0 0 1 12 6c6.3 0 9.9 6 9.9 6a18 18 0 0 1-2.5 3.2M6.2 6.2C3.6 8 2.1 12 2.1 12s3.6 6 9.9 6a10.4 10.4 0 0 0 4-.8M9.9 9.9a3 3 0 0 0 4.2 4.2"/></svg>
+                  </button>
+                </div>
+              </div>
+              <div class="onboarding-field">
+                <label for="portalResetPasswordConfirm">Konfirmasi password baru</label>
+                <div class="onboarding-password-control">
+                  <input id="portalResetPasswordConfirm" type="password" name="passwordConfirm" autocomplete="new-password" placeholder="Ulangi password baru" minlength="8" maxlength="200" required />
+                  <button type="button" data-password-toggle aria-controls="portalResetPasswordConfirm" aria-label="Tampilkan konfirmasi password" aria-pressed="false">
+                    <svg class="password-icon password-icon-show" viewBox="0 0 24 24" aria-hidden="true"><path d="M2.1 12s3.6-6 9.9-6 9.9 6 9.9 6-3.6 6-9.9 6-9.9-6-9.9-6Z"/><circle cx="12" cy="12" r="3"/></svg>
+                    <svg class="password-icon password-icon-hide" viewBox="0 0 24 24" aria-hidden="true"><path d="m3 3 18 18M10.6 6.1A10.8 10.8 0 0 1 12 6c6.3 0 9.9 6 9.9 6a18 18 0 0 1-2.5 3.2M6.2 6.2C3.6 8 2.1 12 2.1 12s3.6 6 9.9 6a10.4 10.4 0 0 0 4-.8M9.9 9.9a3 3 0 0 0 4.2 4.2"/></svg>
+                  </button>
+                </div>
+              </div>
+              <p class="onboarding-form-error" data-reset-error role="alert" aria-live="assertive" hidden></p>
+              <button type="submit" class="btn btn-primary portal-login-submit" data-loading-label="Menyimpan password…">
+                <span>Simpan password baru</span><span aria-hidden="true">→</span>
+              </button>
+              <button type="button" class="btn btn-secondary portal-recovery-back" data-back-login>← Kembali ke login</button>
+            </form>
+          </section>
           </div>
         </section>
       </div>
@@ -85,6 +147,6 @@
     <footer class="onboarding-footer portal-login-footer">
       <div class="container"><span>© <span data-year></span> MOTOVAX</span><a href="https://motovax.ai/kebijakan-privasi.html">Kebijakan Privasi</a><a href="https://motovax.ai/syarat-ketentuan.html">Syarat &amp; Ketentuan</a></div>
     </footer>
-    <script src="./login.js?v=logout-session-sync-20260814"></script>
+    <script src="./login.js?v=password-recovery-20260817"></script>
   </body>
 </html>
