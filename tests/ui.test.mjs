@@ -124,6 +124,19 @@ for (const viewport of viewports) {
         );
         assert.equal(mobileState.allVisible, true, route);
         assert.equal(mobileState.bodyLocked, true, route);
+        const login = page.locator(".site-header .header-login");
+        if (await login.count()) {
+          const loginBox = await login.boundingBox();
+          const triggerBox = await page.locator("[data-mobile-nav-trigger]").boundingBox();
+          assert.ok(loginBox && triggerBox, route);
+          assert.ok(Math.abs(loginBox.y - triggerBox.y) <= 4, `header wrap on ${route}`);
+        }
+        const urlBeforeProduk = page.url();
+        await page.locator('[data-mobile-nav-panel]:not([hidden]) summary', { hasText: "Produk" }).click();
+        assert.equal(page.url(), urlBeforeProduk, route);
+        assert.equal(await page.locator("[data-mobile-nav-panel]:not([hidden]) .mobile-product-suite").count(), 6, route);
+        assert.equal(await page.locator('[data-mobile-nav-panel]:not([hidden]) .mobile-product-suite > p', { hasText: "Core Platform" }).isVisible(), true, route);
+        assert.equal(await page.locator('[data-mobile-nav-panel]:not([hidden]) a', { hasText: "Lead / Customer List" }).isVisible(), true, route);
         await page.keyboard.press("Escape");
         assert.equal(await page.locator("[data-mobile-nav-panel]").isHidden(), true, route);
         assert.equal(await page.locator("body").evaluate((body) => body.classList.contains("mobile-menu-open")), false, route);
@@ -718,9 +731,15 @@ for (const viewport of viewports) {
       await trigger.click();
       assert.equal(await trigger.getAttribute("aria-expanded"), "true");
       assert.equal(await panel.isVisible(), true);
-      assert.equal(await panel.locator("a", { hasText: "Produk" }).isVisible(), true);
+      assert.equal(await panel.locator("summary", { hasText: "Produk" }).isVisible(), true);
       assert.equal(await panel.locator("a", { hasText: "Cara Kerja" }).isVisible(), true);
       assert.equal(await panel.locator("a", { hasText: "Harga" }).isVisible(), true);
+      const urlBeforeProduk = page.url();
+      await panel.locator("summary", { hasText: "Produk" }).click();
+      assert.equal(page.url(), urlBeforeProduk);
+      assert.equal(await panel.locator(".mobile-product-suite").count(), 6);
+      assert.equal(await panel.locator(".mobile-product-suite > p", { hasText: "Omni + Jasmine AI" }).isVisible(), true);
+      assert.equal(await panel.locator("a", { hasText: "WhatsApp, Instagram & Facebook" }).isVisible(), true);
       await panel.locator("summary", { hasText: "Solusi" }).click();
       assert.equal(await panel.locator("a", { hasText: "Solusi dealer secara menyeluruh" }).isVisible(), true);
       assert.equal(await panel.locator("a", { hasText: "Tangkap & respons setiap lead" }).isVisible(), true);
