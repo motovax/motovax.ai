@@ -798,6 +798,12 @@
       preview = captured("facebook-messenger-realtime-public.png", "Messenger · Realtime Aktif", "Status koneksi dan pesan Messenger diperbarui langsung di workspace Call Center.");
     } else if (slug === "facebook-messenger" && /journey lead/i.test(capabilityTitle)) {
       preview = captured("omnichannel-performance-public.png", "Analytics · Journey Lead", "Perjalanan customer dan funnel penanganan menghubungkan aktivitas channel ke hasil lead.");
+    } else if (slug === "omni-jasmine-ai" && /funnel|fanel|auto rout|routing/i.test(capabilityTitle)) {
+      preview = captured(
+        "omnichannel-faneling-bucket-public.png?v=20260818-bucket-2",
+        "Call Center · Faneling Bucket",
+        "Bucket list faneling (MR Belum Balas, Ditangani AI) dengan conversation yang diambil alih agent terlihat jelas.",
+      );
     } else if (matches(/fanel/i)) {
       preview = captured("omnichannel-faneling-public.png", "Call Center · AI → Agent → MR", "Jejak AI dan takeover Agent tetap terlihat setelah lead masuk bucket MR.");
     } else if (matches(/handoff|takeover|eskalasi/i)) {
