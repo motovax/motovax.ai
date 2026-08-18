@@ -976,8 +976,11 @@ window.MOTOVAX_FEATURES = {
     demoHash: "omniDemo",
     breadcrumbs: ["Produk", "Modul", "Omni + Jasmine AI"],
     capabilities: [
+      {
+        title: "Jasmine AI memahami dan bertindak",
+        desc: "Jasmine membaca konteks percakapan dan tenant dealer, menyusun respons yang relevan, lalu menjalankan tool bisnis seperti cek stok, kirim foto unit, atau simulasi kredit sebelum alur diserahkan ke agent manusia.",
+      },
       { title: "Inbox multi-channel", desc: "WhatsApp, Facebook Messenger, dan Instagram DM hadir di satu workspace." },
-      { title: "Jasmine AI dan takeover", desc: "AI merespons lebih dulu, lalu agent mengambil alih tanpa kehilangan konteks." },
       { title: "Funneling dan auto routing", desc: "Lead bergerak melalui bucket AI, Call Center, dan MR dengan kepemilikan yang jelas." },
       { title: "Aksi cepat inventori dan kredit", desc: "Agent mengecek unit dan simulasi kredit langsung dari percakapan." },
       { title: "Analytics omnichannel", desc: "Pantau journey lead, channel, respons, dan hasil penanganan tim." },
