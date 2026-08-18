@@ -3,6 +3,7 @@ import { test } from "node:test";
 
 import {
   buildIsolatedTenantConfig,
+  COPY_DEFAULT_LLM_ALLOCATIONS_SQL,
   shouldProvisionCallCenterRole,
   tenantRoleTemplatesForProvisioning,
 } from "../server.mjs";
@@ -116,4 +117,11 @@ test("mapping Call Center awal memakai role seeded tanpa mengaktifkan Jasmine ot
     "22222222-2222-2222-2222-222222222222",
   ]);
   assert.equal(config.whatsapp.jasmine_auto_assign_enabled, false);
+});
+
+test("onboarding menyalin rantai LLM platform, bukan hanya menghapus allocation tenant baru", () => {
+  assert.match(COPY_DEFAULT_LLM_ALLOCATIONS_SQL, /INSERT INTO tenant_llm_allocations/i);
+  assert.match(COPY_DEFAULT_LLM_ALLOCATIONS_SQL, /FROM tenant_llm_allocations a/i);
+  assert.match(COPY_DEFAULT_LLM_ALLOCATIONS_SQL, /JOIN llm_endpoints e/i);
+  assert.match(COPY_DEFAULT_LLM_ALLOCATIONS_SQL, /e\.is_active = true/i);
 });

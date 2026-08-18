@@ -619,7 +619,7 @@
       return [previewFactory("product-dashboard-overview.png?v=20260818-ana-hero-ovw-2", "Ana AI · Analytics"), previewFactory("product-dashboard-sales.png", "Sales Performance"), previewFactory("product-dashboard-locations.png", "Performa Cabang")];
     }
     if (id === "social-media-sora-ai") {
-      return [previewFactory("product-social-studio.png", "Social Media + Sora AI"), previewFactory("product-social-calendar.png", "Kalender Posting"), previewFactory("product-social-insight.png", "Campaign Insight")];
+      return [previewFactory("product-social-pilih-kendaraan-public.png?v=20260818-sora-1", "Social Media + Sora AI"), previewFactory("product-social-calendar.png", "Kalender Posting"), previewFactory("product-social-insight.png", "Campaign Insight")];
     }
 
     if (id === "whatsapp-business-api") {
@@ -807,7 +807,11 @@
     } else if (slug === "social-media-sora-ai" && /publish|scheduler/i.test(capabilityTitle)) {
       preview = captured("product-social-calendar.png", "Social Media · Kalender Posting", "Konten terjadwal tersusun dalam kalender publikasi tim.");
     } else if (slug === "social-media-sora-ai" && /analytics/i.test(capabilityTitle)) {
-      preview = captured("product-social-insight.png", "Social Media · Campaign Insight", "Klik, lead, dan hasil campaign dipantau dalam satu tampilan.");
+      preview = captured(
+        "product-social-ads-campaign.png?v=20260818-ads-1",
+        "Social Media · Ads Campaign Analytics",
+        "Klik, lead terkonfirmasi, konversi, dan tren seluruh campaign tampil dalam satu dashboard analitik.",
+      );
     } else if (slug === "ana-ai-analytics" && /finansial/i.test(capabilityTitle)) {
       preview = captured(
         "product-finance-trend-public.png?v=20260818-fin-trend-2",
