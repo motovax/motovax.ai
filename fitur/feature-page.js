@@ -766,6 +766,19 @@
         "Ana AI · Laporan Finansial",
         "Revenue, HPP, gross profit, margin, dan tren laba tersaji per periode, lengkap dengan total finansial dan nilai stok.",
       );
+    } else if (slug === "ana-ai-analytics" && /analitik operasional/i.test(capabilityTitle)) {
+      preview = captured(
+        "product-analitik-operasional.png?v=20260818-fitur1-ops",
+        "Ana AI · Analitik Operasional",
+        "Pantau stok lama, rata-rata hari jual, unit terjual, omzet, dan konversi lead ke booking dalam satu dashboard operasional.",
+      );
+    } else if (slug === "ana-ai-analytics" && /sales performance/i.test(capabilityTitle)) {
+      preview = captured(
+        "product-dashboard-sales-performance-mobix.png?v=20260818-sales-1",
+        "Ana AI · Sales Performance",
+        "KPI pipeline, pendapatan, tingkat konversi, rata-rata deal, kecepatan closing, dan top agent tampil langsung dari halaman Sales di aplikasi produksi.",
+        [1440, 900],
+      );
     } else if (slug === "facebook-messenger" && /inbox messenger/i.test(capabilityTitle)) {
       preview = captured("facebook-messenger-inbox-public.png", "Inbox · Facebook Messenger", "Filter Facebook aktif menampilkan seluruh inquiry Messenger dalam satu antrean.");
     } else if (slug === "facebook-messenger" && /respons ai|takeover agent/i.test(capabilityTitle)) {
