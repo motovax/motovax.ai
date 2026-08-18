@@ -98,7 +98,7 @@ const template = (slug, title, description) => `<!doctype html>
 
     <script>window.__FEATURE_SLUG__ = ${JSON.stringify(slug)};</script>
     <script src="./features-data.js?v=falcon-ai-first-20260818"></script>
-    <script src="./feature-page.js?v=falcon-ai-first-20260818"></script>
+    <script src="./feature-page.js?v=omni-handoff-20260818"></script>
     <script src="../script.js?v=falcon-ai-first-20260818"></script>
   </body>
 </html>

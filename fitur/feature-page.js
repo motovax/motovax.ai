@@ -858,9 +858,9 @@
       );
     } else if (slug === "omni-jasmine-ai" && /funnel|fanel|auto rout|routing/i.test(capabilityTitle)) {
       preview = captured(
-        "omnichannel-faneling-bucket-public.png?v=20260818-bucket-2",
-        "Call Center · Faneling Bucket",
-        "Bucket list faneling (MR Belum Balas, Ditangani AI) dengan conversation yang diambil alih agent terlihat jelas.",
+        "omnichannel-faneling-handoff-public.png?v=20260818-handoff-1",
+        "Call Center · Handoff ke MR",
+        "Dialog Jalur 3 Handoff Manual ke MR terbuka di workspace Call Center: saran MR, alasan, dan ringkasan sebelum lead di-routing.",
       );
     } else if (matches(/fanel/i)) {
       preview = captured("omnichannel-faneling-public.png", "Call Center · AI → Agent → MR", "Jejak AI dan takeover Agent tetap terlihat setelah lead masuk bucket MR.");
