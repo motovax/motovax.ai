@@ -600,7 +600,7 @@
       return [previewFactory("product-dashboard-overview.png?v=20260818-ana-hero-ovw-2", "Ana AI · Analytics"), previewFactory("product-dashboard-sales.png", "Sales Performance"), previewFactory("product-dashboard-locations.png", "Performa Cabang")];
     }
     if (id === "social-media-sora-ai") {
-      return [previewFactory("product-social-studio.png", "Social Media + Sora AI"), previewFactory("product-social-calendar.png", "Kalender Posting"), previewFactory("product-social-insight.png", "Campaign Insight")];
+      return [previewFactory("product-social-pilih-kendaraan-public.png?v=20260818-sora-1", "Social Media + Sora AI"), previewFactory("product-social-calendar.png", "Kalender Posting"), previewFactory("product-social-insight.png", "Campaign Insight")];
     }
 
     if (id === "whatsapp-business-api") {
@@ -754,8 +754,14 @@
       preview = captured("product-falcon-sales.png", "Falcon · Pencarian & Rekomendasi", "Falcon memakai inventory tenant untuk membantu pencarian, foto, dan rekomendasi unit.");
     } else if (slug === "inventory-falcon-ai" && /katalog api/i.test(capabilityTitle)) {
       preview = captured("product-capability-whatsapp-content.png", "Developer API · Katalog", "Capability integrasi menyediakan data produk untuk kanal eksternal melalui API.");
-    } else if (slug === "social-media-sora-ai" && /content studio|visual/i.test(capabilityTitle)) {
-      preview = captured("product-social-studio.png", "Social Media · Content Studio", "Unit inventory dipilih sebagai sumber desain dan materi konten.");
+    } else if (slug === "social-media-sora-ai" && /content studio/i.test(capabilityTitle)) {
+      preview = captured(
+        "product-social-pilih-kendaraan-public.png?v=20260818-sora-1",
+        "Social Media · Content Studio",
+        "Pilih unit ready dari inventory tenant sebagai sumber desain, harga, dan materi konten.",
+      );
+    } else if (slug === "social-media-sora-ai" && /visual/i.test(capabilityTitle)) {
+      preview = captured("product-social-studio.png", "Social Media · Pengolahan Visual AI", "Editor studio menampilkan layer, AI Enhance, dan generate background untuk materi kampanye.");
     } else if (slug === "social-media-sora-ai" && /publish|scheduler/i.test(capabilityTitle)) {
       preview = captured("product-social-calendar.png", "Social Media · Kalender Posting", "Konten terjadwal tersusun dalam kalender publikasi tim.");
     } else if (slug === "social-media-sora-ai" && /analytics/i.test(capabilityTitle)) {
