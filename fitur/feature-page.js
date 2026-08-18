@@ -597,7 +597,7 @@
       return [previewFactory("product-falcon-sales.png", "Inventory + Falcon AI"), previewFactory("product-social-studio.png", "Inventory Unit"), previews.analytics];
     }
     if (id === "ana-ai-analytics") {
-      return [previewFactory("product-dashboard-overview.png?v=20260818-dash-hero-1", "Ana AI · Analytics"), previewFactory("product-dashboard-sales.png", "Sales Performance"), previewFactory("product-dashboard-locations.png", "Performa Cabang")];
+      return [previewFactory("product-dashboard-overview.png?v=20260818-ana-hero-ovw-2", "Ana AI · Analytics"), previewFactory("product-dashboard-sales.png", "Sales Performance"), previewFactory("product-dashboard-locations.png", "Performa Cabang")];
     }
     if (id === "social-media-sora-ai") {
       return [previewFactory("product-social-studio.png", "Social Media + Sora AI"), previewFactory("product-social-calendar.png", "Kalender Posting"), previewFactory("product-social-insight.png", "Campaign Insight")];
@@ -762,26 +762,26 @@
       preview = captured("product-social-insight.png", "Social Media · Campaign Insight", "Klik, lead, dan hasil campaign dipantau dalam satu tampilan.");
     } else if (slug === "ana-ai-analytics" && /finansial/i.test(capabilityTitle)) {
       preview = captured(
-        "product-finance-trend-public.png?v=20260818-fin-trend-1",
+        "product-finance-trend-public.png?v=20260818-fin-trend-2",
         "Ana AI · Laporan Finansial",
         "Revenue, HPP, gross profit, margin, dan tren laba tersaji per periode, lengkap dengan total finansial dan nilai stok.",
       );
     } else if (slug === "ana-ai-analytics" && /analitik operasional/i.test(capabilityTitle)) {
       preview = captured(
-        "product-analitik-operasional.png?v=20260818-fitur1-ops",
+        "product-analitik-operasional.png?v=20260818-fitur1-ops-2",
         "Ana AI · Analitik Operasional",
         "Pantau stok lama, rata-rata hari jual, unit terjual, omzet, dan konversi lead ke booking dalam satu dashboard operasional.",
       );
     } else if (slug === "ana-ai-analytics" && /sales performance/i.test(capabilityTitle)) {
       preview = captured(
-        "product-dashboard-sales-performance-mobix.png?v=20260818-sales-1",
+        "product-dashboard-sales-performance-mobix.png?v=20260818-sales-2",
         "Ana AI · Sales Performance",
         "KPI pipeline, pendapatan, tingkat konversi, rata-rata deal, kecepatan closing, dan top agent tampil langsung dari halaman Sales di aplikasi produksi.",
         [1440, 900],
       );
     } else if (slug === "ana-ai-analytics" && /performa cabang|cabang dan channel|pendapatan per cabang/i.test(capabilityTitle)) {
       preview = captured(
-        "product-sales-insight-cabang-channel.png?v=20260818-cabang-channel-1",
+        "product-sales-insight-cabang-channel.png?v=20260818-cabang-channel-2",
         "Ana AI · Performa Cabang & Channel",
         "Perbandingan hasil per cabang, sumber lead, dan channel omnichannel tersaji langsung dari halaman Sales Insight di aplikasi produksi.",
         [1440, 900],
@@ -840,7 +840,7 @@
       } else if (matches(/sales|scorecard|konversi/i)) {
         preview = captured("product-dashboard-sales.png", "Dashboard · Sales Performance", "KPI pipeline, konversi, dan performa sales terlihat bersama.");
       } else {
-        preview = captured("product-dashboard-overview.png", "Dashboard · Operasional", "KPI unit, cabang, dan penjualan tampil langsung dari dashboard produksi.");
+        preview = captured("product-dashboard-overview.png?v=20260818-dash-ops-2", "Dashboard · Operasional", "KPI unit, cabang, dan penjualan tampil langsung dari dashboard produksi.");
       }
     } else if (matches(/crm|deal|kontak|gps|sales suite|customer database|pipeline|follow|guideline|salespeople/i)) {
       if (matches(/follow/i)) {
@@ -862,7 +862,7 @@
     } else if (matches(/automasi|workflow|workers|tool chains/i)) {
       preview = captured("product-capability-automation.png", "Automation · Email Report", "Konfigurasi report otomatis terlihat langsung pada aplikasi produksi.");
     } else {
-      preview = captured("product-dashboard-overview.png", "Motovax · Executive Overview", "Ringkasan operasional produk tersedia dalam satu dashboard.");
+      preview = captured("product-dashboard-overview.png?v=20260818-dash-ovw-2", "Motovax · Executive Overview", "Ringkasan operasional produk tersedia dalam satu dashboard.");
     }
     return `
       <figure class="feature-showcase-visual feature-showcase-preview family-${productProfile.family}">
