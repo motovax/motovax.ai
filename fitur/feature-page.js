@@ -759,7 +759,11 @@
     } else if (slug === "social-media-sora-ai" && /publish|scheduler/i.test(capabilityTitle)) {
       preview = captured("product-social-calendar.png", "Social Media · Kalender Posting", "Konten terjadwal tersusun dalam kalender publikasi tim.");
     } else if (slug === "social-media-sora-ai" && /analytics/i.test(capabilityTitle)) {
-      preview = captured("product-social-insight.png", "Social Media · Campaign Insight", "Klik, lead, dan hasil campaign dipantau dalam satu tampilan.");
+      preview = captured(
+        "product-social-ads-campaign.png?v=20260818-ads-1",
+        "Social Media · Ads Campaign Analytics",
+        "Klik, lead terkonfirmasi, konversi, dan tren seluruh campaign tampil dalam satu dashboard analitik.",
+      );
     } else if (slug === "ana-ai-analytics" && /finansial/i.test(capabilityTitle)) {
       preview = captured(
         "product-finance-trend-public.png?v=20260818-fin-trend-2",
