@@ -27,6 +27,24 @@ const RESERVED_SLUGS = new Set([
   "api", "app", "assets", "auth", "dss", "internal", "motovax-ai", "onboard", "status", "support", "workspace", "www",
 ]);
 const MOBIX_TENANT_ID = "4c8bdcb3-c535-4ad6-b2fb-53f5361c8489";
+
+export const COPY_DEFAULT_LLM_ALLOCATIONS_SQL = `
+INSERT INTO tenant_llm_allocations (
+  id, tenant_id, endpoint_id, mode, allocation_percent, priority_order, created_at, updated_at
+)
+SELECT gen_random_uuid(), $1, a.endpoint_id, a.mode, a.allocation_percent, a.priority_order, NOW(), NOW()
+FROM tenant_llm_allocations a
+JOIN llm_endpoints e ON e.id = a.endpoint_id
+WHERE a.tenant_id = $2
+  AND a.allocation_percent > 0
+  AND e.is_active = true
+  AND NOT EXISTS (
+    SELECT 1
+    FROM tenant_llm_allocations existing
+    WHERE existing.tenant_id = $1
+      AND existing.mode = a.mode
+  )
+`;
 const BILLING_PACKAGE_DEFINITIONS = [
   { id: "core", name: "Core — Platform Integrasi Agentic AI", priceAmount: 1_500_000, includedCredits: 0, enabled: () => true },
   { id: "crm", name: "CRM", priceAmount: 1_500_000, includedCredits: 0, enabled: (features) => features.crm_autopilot === true },
@@ -1545,12 +1563,14 @@ export async function createPostgresStore(connectionString) {
            VALUES ($1, $2, $3, $4, $5, '', $6, 'falcon', NOW(), NOW())`,
           [appUserId, tenantId, username, profile.full_name, profile.email, profile.region],
         );
-        // UUID tenant baru seharusnya belum punya allocation. DELETE defensif ini
-        // memastikan trigger/seed eksternal tidak mewariskan endpoint LLM tenant lain.
+        // Jangan mewarisi allocation acak dari trigger/seed tenant lain.
+        // Setelah dibersihkan, salin rantai LLM platform (Mobix) agar Falcon/Jasmine
+        // langsung punya endpoint aktif — tanpa ini tenant baru reply error generic.
         await client.query(
           "DELETE FROM tenant_llm_allocations WHERE tenant_id = $1",
           [tenantId],
         );
+        await client.query(COPY_DEFAULT_LLM_ALLOCATIONS_SQL, [tenantId, MOBIX_TENANT_ID]);
         await client.query(
           "INSERT INTO user_roles (user_id, role_id) VALUES ($1, $2)",
           [appUserId, adminRoleId],
