@@ -36,7 +36,7 @@
     },
     inventory: {
       title: "Inventory Management System",
-      desc: "Kelola unit, detail stok, cabang, foto, import data, status, aging, dan insight inventori dealer.",
+      desc: "Falcon mencari unit, mengirim foto, dan merekomendasikan stok live. Listing, import, dan cabang menjaga datanya akurat.",
       href: "../fitur/inventory-falcon-ai.html",
       code: "IM",
     },
