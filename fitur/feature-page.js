@@ -597,7 +597,7 @@
       return [previewFactory("product-falcon-sales.png", "Inventory + Falcon AI"), previewFactory("product-social-studio.png", "Inventory Unit"), previews.analytics];
     }
     if (id === "ana-ai-analytics") {
-      return [previewFactory("product-dashboard-overview.png", "Ana AI · Analytics"), previewFactory("product-dashboard-sales.png", "Sales Performance"), previewFactory("product-dashboard-locations.png", "Performa Cabang")];
+      return [previewFactory("product-dashboard-overview.png?v=20260818-dash-hero-1", "Ana AI · Analytics"), previewFactory("product-dashboard-sales.png", "Sales Performance"), previewFactory("product-dashboard-locations.png", "Performa Cabang")];
     }
     if (id === "social-media-sora-ai") {
       return [previewFactory("product-social-studio.png", "Social Media + Sora AI"), previewFactory("product-social-calendar.png", "Kalender Posting"), previewFactory("product-social-insight.png", "Campaign Insight")];
