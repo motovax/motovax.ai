@@ -760,6 +760,12 @@
       preview = captured("product-social-calendar.png", "Social Media · Kalender Posting", "Konten terjadwal tersusun dalam kalender publikasi tim.");
     } else if (slug === "social-media-sora-ai" && /analytics/i.test(capabilityTitle)) {
       preview = captured("product-social-insight.png", "Social Media · Campaign Insight", "Klik, lead, dan hasil campaign dipantau dalam satu tampilan.");
+    } else if (slug === "ana-ai-analytics" && /finansial/i.test(capabilityTitle)) {
+      preview = captured(
+        "product-finance-trend-public.png?v=20260818-fin-trend-1",
+        "Ana AI · Laporan Finansial",
+        "Revenue, HPP, gross profit, margin, dan tren laba tersaji per periode, lengkap dengan total finansial dan nilai stok.",
+      );
     } else if (slug === "facebook-messenger" && /inbox messenger/i.test(capabilityTitle)) {
       preview = captured("facebook-messenger-inbox-public.png", "Inbox · Facebook Messenger", "Filter Facebook aktif menampilkan seluruh inquiry Messenger dalam satu antrean.");
     } else if (slug === "facebook-messenger" && /respons ai|takeover agent/i.test(capabilityTitle)) {
