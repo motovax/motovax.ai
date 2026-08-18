@@ -779,6 +779,13 @@
         "KPI pipeline, pendapatan, tingkat konversi, rata-rata deal, kecepatan closing, dan top agent tampil langsung dari halaman Sales di aplikasi produksi.",
         [1440, 900],
       );
+    } else if (slug === "ana-ai-analytics" && /performa cabang|cabang dan channel|pendapatan per cabang/i.test(capabilityTitle)) {
+      preview = captured(
+        "product-sales-insight-cabang-channel.png?v=20260818-cabang-channel-1",
+        "Ana AI · Performa Cabang & Channel",
+        "Perbandingan hasil per cabang, sumber lead, dan channel omnichannel tersaji langsung dari halaman Sales Insight di aplikasi produksi.",
+        [1440, 900],
+      );
     } else if (slug === "facebook-messenger" && /inbox messenger/i.test(capabilityTitle)) {
       preview = captured("facebook-messenger-inbox-public.png", "Inbox · Facebook Messenger", "Filter Facebook aktif menampilkan seluruh inquiry Messenger dalam satu antrean.");
     } else if (slug === "facebook-messenger" && /respons ai|takeover agent/i.test(capabilityTitle)) {
