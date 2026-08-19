@@ -84,6 +84,7 @@ const expectedPillars = [
   { label: "Ana AI Analytics", href: "./fitur/ana-ai-analytics.html" },
   { label: "AI Sora + Social Media", href: "./fitur/social-media-sora-ai.html" },
 ];
+const registerHref = "https://onboard.motovax.com/onboarding.html?fresh=1";
 
 async function noOverflow(page) {
   return page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth + 1);
@@ -97,34 +98,54 @@ for (const viewport of viewports) {
     await page.goto(`${baseUrl}/index-alt.html`, { waitUntil: "load" });
 
     assert.equal(await page.locator("[data-typewriter]").getAttribute("data-phrases"), expectedPhrases);
-    assert.equal(await page.locator(".alt-pillar").count(), 6);
-    assert.equal(await page.locator(".alt-story, .alt-howto, .channel-strip").count(), 0);
-    assert.equal(await page.locator(".alt-pillars img").count(), 0);
+    assert.equal(await page.locator(".alt-node[data-pillar]").count(), 6);
+    assert.equal(await page.locator(".alt-story, .alt-howto, .channel-strip, .alt-pillar").count(), 0);
+    assert.equal(await page.locator("section.alt-feature").count(), 5);
 
-    const pillars = await page.locator(".alt-pillar").evaluateAll((cards) =>
+    const nodes = await page.locator(".alt-node[data-pillar]").evaluateAll((cards) =>
       cards.map((card) => ({
-        label: card.querySelector(".alt-pillar-label")?.textContent.trim(),
-        href: card.querySelector("a.btn")?.getAttribute("href"),
-        cta: card.querySelector("a.btn")?.textContent.replace(/\s+/g, " ").trim(),
+        pillar: card.getAttribute("data-pillar"),
+        label: (card.querySelector(".alt-pillar-label") || card.querySelector("small"))?.textContent.trim(),
+        href: card.getAttribute("href"),
       })),
     );
-    assert.deepEqual(
-      pillars.map((item) => ({ label: item.label, href: item.href })),
-      expectedPillars,
-    );
-    assert.ok(pillars.every((item) => item.cta.startsWith("Selengkapnya")));
+    const byPillar = Object.fromEntries(nodes.map((item) => [item.pillar, item]));
+    assert.equal(byPillar.core.href, expectedPillars[0].href);
+    assert.match(byPillar.core.label, /CORE PLATFORM/i);
+    assert.equal(byPillar.crm.label, expectedPillars[1].label);
+    assert.equal(byPillar.crm.href, expectedPillars[1].href);
+    assert.equal(byPillar.jasmine.label, expectedPillars[2].label);
+    assert.equal(byPillar.jasmine.href, expectedPillars[2].href);
+    assert.equal(byPillar.falcon.label, expectedPillars[3].label);
+    assert.equal(byPillar.falcon.href, expectedPillars[3].href);
+    assert.equal(byPillar.ana.label, expectedPillars[4].label);
+    assert.equal(byPillar.ana.href, expectedPillars[4].href);
+    assert.equal(byPillar.sora.label, expectedPillars[5].label);
+    assert.equal(byPillar.sora.href, expectedPillars[5].href);
 
-    const grid = page.locator(".alt-pillars-grid");
-    await grid.scrollIntoViewIfNeeded();
-    const columns = await grid.evaluate((element) => getComputedStyle(element).gridTemplateColumns.split(" ").length);
-    if (viewport.name === "desktop") assert.equal(columns, 3);
-    if (viewport.name === "tablet") assert.equal(columns, 2);
-    if (viewport.name === "mobile") assert.equal(columns, 1);
+    const crmImage = page.locator(".alt-crm-visual img");
+    await crmImage.scrollIntoViewIfNeeded();
+    assert.match(await crmImage.getAttribute("src"), /alt-crm-workspace\.png/);
+    assert.equal(await crmImage.evaluate((img) => img.naturalWidth > 0), true);
+
+    const featureImages = page.locator(".alt-feature img");
+    const count = await featureImages.count();
+    assert.ok(count >= 6);
+    for (let index = 0; index < count; index += 1) {
+      const image = featureImages.nth(index);
+      await image.scrollIntoViewIfNeeded();
+      const box = await image.boundingBox();
+      assert.ok(box && box.width > 80 && box.height > 80, `feature image ${index} terlalu kecil: ${JSON.stringify(box)}`);
+    }
+
+    const cta = page.locator(".home-cta a.btn");
+    assert.equal(await cta.getAttribute("href"), registerHref);
+    assert.match((await cta.textContent()).replace(/\s+/g, " "), /Daftar|Mulai Coba/i);
 
     assert.equal(await noOverflow(page), true);
 
     if (viewport.name === "mobile") {
-      await page.locator("[data-hero-image-open]").click();
+      await page.locator("[data-hero-image-open]").first().click();
       const modal = page.locator("[data-hero-image-modal]");
       assert.equal(await modal.isHidden(), false);
       assert.equal(await page.locator("body").evaluate((body) => getComputedStyle(body).overflow), "hidden");
