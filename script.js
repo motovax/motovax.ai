@@ -1,5 +1,11 @@
-const whatsappUrl =
-  "https://wa.me/6281999197186?text=Halo%20MOTOVAX%2C%20saya%20ingin%20jadwalkan%20demo.";
+const whatsappNumber = "6281999197186";
+const defaultWhatsappText = "Halo MOTOVAX, saya ingin jadwalkan demo.";
+
+function buildWhatsAppUrl(text = defaultWhatsappText) {
+  return `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(text)}`;
+}
+
+const whatsappUrl = buildWhatsAppUrl();
 
 for (const el of document.querySelectorAll("[data-year]")) {
   el.textContent = String(new Date().getFullYear());
@@ -7,7 +13,8 @@ for (const el of document.querySelectorAll("[data-year]")) {
 
 for (const link of document.querySelectorAll("[data-wa]")) {
   if (link instanceof HTMLAnchorElement) {
-    link.href = whatsappUrl;
+    const customText = link.getAttribute("data-wa-text");
+    link.href = customText ? buildWhatsAppUrl(customText) : whatsappUrl;
     link.target = "_blank";
     link.rel = "noreferrer";
   }
