@@ -107,6 +107,11 @@ for (const viewport of viewports) {
     const featureHeadingFont = await page.locator("#jasmine-heading").evaluate((el) => getComputedStyle(el).fontFamily);
     assert.equal(/caveat/i.test(featureHeadingFont), false);
 
+    const coreImage = page.locator(".alt-orbit-art img");
+    await coreImage.scrollIntoViewIfNeeded();
+    assert.match(await coreImage.getAttribute("src"), /alt-core-platform\.png/);
+    assert.equal(await coreImage.evaluate((img) => img.naturalWidth > 0), true);
+
     assert.equal(await page.locator(".alt-orbit-lines path[id^='orbit-']").count(), 5);
     const dots = page.locator(".alt-orbit-dots circle");
     assert.ok(await dots.count() >= 5, "diagram punya titik animasi di jalur");
