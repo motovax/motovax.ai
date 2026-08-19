@@ -642,13 +642,13 @@
     }
     if (id === "inventory-falcon-ai") {
       const falconPreview = previewFactory(
-        "inventory-falcon-query-public.png?v=falcon-tools-20260819",
+        "inventory-falcon-query-public.png?v=falcon-iphone-20260819",
         "Falcon AI · Query stok",
       );
       falconPreview.wide = true;
       return [
         falconPreview,
-        previewFactory("inventory-falcon-branches-public.png?v=falcon-tools-20260819", "Inventory · Unit per cabang"),
+        previewFactory("inventory-falcon-branches-public.png?v=falcon-iphone-20260819", "Inventory · Unit per cabang"),
         previews.analytics,
       ];
     }
@@ -806,35 +806,35 @@
       preview = captured("core-platform-native-ai-tools-public.png?v=20260805-2", "Core Platform · Native AI Tools", "Jasmine memakai inventori tenant untuk menjawab kebutuhan unit, memperbarui konteks lead, dan mendukung takeover serta handoff sesuai role.");
     } else if (slug === "inventory-falcon-ai" && /memahami|permintaan stok|query/i.test(capabilityTitle)) {
       preview = captured(
-        "inventory-falcon-query-public.png?v=falcon-tools-20260819",
+        "inventory-falcon-query-public.png?v=falcon-iphone-20260819",
         "Falcon AI · Query stok",
         "Falcon menerima permintaan stok lewat percakapan, lalu mengembalikan daftar unit ready lengkap dengan plat, kilometer, cabang, dan harga.",
         [1440, 900],
       );
     } else if (slug === "inventory-falcon-ai" && /foto|serupa|alternatif/i.test(capabilityTitle)) {
       preview = captured(
-        "inventory-falcon-photos-public.png?v=falcon-tools-20260819",
+        "inventory-falcon-photos-public.png?v=falcon-iphone-20260819",
         "Falcon AI · Foto dan alternatif",
         "Falcon mengirim foto unit yang diminta, lalu menawarkan unit serupa dari stok ready jika perlu alternatif.",
         [1440, 900],
       );
     } else if (slug === "inventory-falcon-ai" && /laporan|peran|aging/i.test(capabilityTitle)) {
       preview = captured(
-        "inventory-falcon-report-public.png?v=falcon-tools-20260819",
+        "inventory-falcon-report-public.png?v=falcon-iphone-20260819",
         "Falcon AI · Laporan sesuai peran",
         "Management mendapat laporan stok per cabang dan aging unit dari percakapan yang sama, sesuai permission.",
         [1440, 900],
       );
     } else if (slug === "inventory-falcon-ai" && /listing|multi-cabang/i.test(capabilityTitle)) {
       preview = captured(
-        "inventory-falcon-branches-public.png?v=falcon-tools-20260819",
+        "inventory-falcon-branches-public.png?v=falcon-iphone-20260819",
         "Inventory · Unit per cabang",
         "Stok ready, booked, sold, dan kelengkapan foto terlihat per cabang sebagai sumber kebenaran yang dibaca Falcon.",
         [1440, 900],
       );
     } else if (slug === "inventory-falcon-ai" && /import|validasi|katalog/i.test(capabilityTitle)) {
       preview = captured(
-        "inventory-falcon-import-public.png?v=falcon-tools-20260819",
+        "inventory-falcon-import-public.png?v=falcon-iphone-20260819",
         "Inventory · Import dan katalog API",
         "Import Excel atau Google Sheets menampilkan warning identitas, lalu stok aktif disajikan ke aplikasi eksternal lewat katalog API.",
         [1440, 900],
