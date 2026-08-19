@@ -381,6 +381,36 @@
         facts: ["Multi-modul", "Satu data", "Role-based"],
       };
     }
+    if (id === "omni-jasmine-ai") {
+      return {
+        family: "omni",
+        eyebrow: "JASMINE AI + OMNICHANNEL",
+        sectionLabel: "AI LAYANAN PELANGGAN",
+        intro: "Jasmine merespons percakapan pelanggan dengan konteks dealer dan tool bisnis. Inbox, funneling, takeover, dan handoff menjaga alur tim tetap rapi.",
+        roles: ["Customer Service", "Tim Sales", "Marketing"],
+        facts: ["Multi-channel", "AI first", "Handoff jelas"],
+      };
+    }
+    if (id === "inventory-falcon-ai") {
+      return {
+        family: "inventory",
+        eyebrow: "FALCON AI + INVENTORY",
+        sectionLabel: "AI STOK DEALER",
+        intro: "Falcon memakai inventory live dealer untuk mencari unit, mengirim foto, merekomendasikan alternatif, dan menyusun laporan. Tools listing, import, dan API menjaga data yang dibaca AI tetap akurat.",
+        roles: ["Tim Sales", "Management", "Admin Inventory"],
+        facts: ["Stok live", "Role-aware", "Tool native"],
+      };
+    }
+    if (id === "social-media-sora-ai") {
+      return {
+        family: "campaign",
+        eyebrow: "SORA AI + SOCIAL MEDIA",
+        sectionLabel: "AI KONTEN DEALER",
+        intro: "Sora mengolah visual dan materi dari stok live. Studio, scheduler, publish, dan ads menjaga kampanye tetap terjadwal dan terukur.",
+        roles: ["Marketing", "Tim Sales", "Manajemen"],
+        facts: ["Visual AI", "Terjadwal", "Terukur"],
+      };
+    }
     if (campaign || social) {
       return {
         family: "campaign",
@@ -419,16 +449,6 @@
         intro: "Kelola customer, pipeline, follow-up, dan performa sales dari satu workspace yang terhubung.",
         roles: ["Tim Sales", "Marketing", "Manajemen"],
         facts: ["Customer 360°", "Pipeline", "Follow-up"],
-      };
-    }
-    if (id === "inventory-falcon-ai") {
-      return {
-        family: "inventory",
-        eyebrow: "FALCON AI + INVENTORY",
-        sectionLabel: "AI STOK DEALER",
-        intro: "Falcon memakai inventory live dealer untuk mencari unit, mengirim foto, merekomendasikan alternatif, dan menyusun laporan. Tools listing, import, dan API menjaga data yang dibaca AI tetap akurat.",
-        roles: ["Tim Sales", "Management", "Admin Inventory"],
-        facts: ["Stok live", "Role-aware", "Tool native"],
       };
     }
     return {
@@ -618,17 +638,17 @@
       return [previewFactory("core-platform-whatsapp-integrations-public.png?v=20260806-2", "Core Platform · Integrasi WhatsApp"), previews.analytics, previews.integrations];
     }
     if (id === "omni-jasmine-ai") {
-      return [previewFactory("omnichannel-faneling-public.png", "Omni + Jasmine AI"), previews.omni, previews.integrations];
+      return [previewFactory("omnichannel-faneling-public.png", "Jasmine AI + Omnichannel"), previews.omni, previews.integrations];
     }
     if (id === "inventory-falcon-ai") {
       const falconPreview = previewFactory(
-        "inventory-falcon-query-public.png?v=falcon-ai-first-20260818",
+        "inventory-falcon-query-public.png?v=falcon-tools-20260819",
         "Falcon AI · Query stok",
       );
       falconPreview.wide = true;
       return [
         falconPreview,
-        previewFactory("core-platform-multi-branch-public.png?v=falcon-ai-first-20260818", "Inventory · Unit per cabang"),
+        previewFactory("inventory-falcon-branches-public.png?v=falcon-tools-20260819", "Inventory · Unit per cabang"),
         previews.analytics,
       ];
     }
@@ -636,7 +656,7 @@
       return [previewFactory("product-dashboard-overview.png?v=20260818-ana-hero-ovw-2", "Ana AI · Analytics"), previewFactory("product-dashboard-sales.png", "Sales Performance"), previewFactory("product-dashboard-locations.png", "Performa Cabang")];
     }
     if (id === "social-media-sora-ai") {
-      return [previewFactory("product-social-pilih-kendaraan-public.png?v=20260818-sora-1", "Social Media + Sora AI"), previewFactory("product-social-calendar.png", "Kalender Posting"), previewFactory("product-social-insight.png", "Campaign Insight")];
+      return [previewFactory("product-social-pilih-kendaraan-public.png?v=20260818-sora-1", "Sora AI + Social Media"), previewFactory("product-social-calendar.png", "Kalender Posting"), previewFactory("product-social-insight.png", "Campaign Insight")];
     }
 
     if (id === "whatsapp-business-api") {
@@ -786,38 +806,38 @@
       preview = captured("core-platform-native-ai-tools-public.png?v=20260805-2", "Core Platform · Native AI Tools", "Jasmine memakai inventori tenant untuk menjawab kebutuhan unit, memperbarui konteks lead, dan mendukung takeover serta handoff sesuai role.");
     } else if (slug === "inventory-falcon-ai" && /memahami|permintaan stok|query/i.test(capabilityTitle)) {
       preview = captured(
-        "inventory-falcon-query-public.png?v=falcon-ai-first-20260818",
+        "inventory-falcon-query-public.png?v=falcon-tools-20260819",
         "Falcon AI · Query stok",
-        "Falcon menerima permintaan stok lewat percakapan, lalu mengembalikan daftar unit live lengkap dengan plat, kilometer, cabang, dan harga.",
-        [1510, 1042],
+        "Falcon menerima permintaan stok lewat percakapan, lalu mengembalikan daftar unit ready lengkap dengan plat, kilometer, cabang, dan harga.",
+        [1440, 900],
       );
     } else if (slug === "inventory-falcon-ai" && /foto|serupa|alternatif/i.test(capabilityTitle)) {
       preview = captured(
-        "inventory-falcon-query-public.png?v=falcon-ai-first-20260818",
-        "Falcon AI · Unit dan alternatif",
-        "Hasil pencarian Falcon menampilkan unit yang cocok beserta atribut operasional, sehingga foto, unit serupa, dan alternatif bisa dikirim dari stok yang sama.",
-        [1510, 1042],
+        "inventory-falcon-photos-public.png?v=falcon-tools-20260819",
+        "Falcon AI · Foto dan alternatif",
+        "Falcon mengirim foto unit yang diminta, lalu menawarkan unit serupa dari stok ready jika perlu alternatif.",
+        [1440, 900],
       );
     } else if (slug === "inventory-falcon-ai" && /laporan|peran|aging/i.test(capabilityTitle)) {
       preview = captured(
-        "inventory-falcon-query-public.png?v=falcon-ai-first-20260818",
-        "Falcon AI · Tool sesuai peran",
-        "Menu Falcon memperlihatkan cek stok, detail unit, edit data, import Excel atau Google Sheets, dan laporan stok PDF sesuai permission pengguna.",
-        [1510, 1042],
+        "inventory-falcon-report-public.png?v=falcon-tools-20260819",
+        "Falcon AI · Laporan sesuai peran",
+        "Management mendapat laporan stok per cabang dan aging unit dari percakapan yang sama, sesuai permission.",
+        [1440, 900],
       );
     } else if (slug === "inventory-falcon-ai" && /listing|multi-cabang/i.test(capabilityTitle)) {
       preview = captured(
-        "core-platform-multi-branch-public.png?v=falcon-ai-first-20260818",
+        "inventory-falcon-branches-public.png?v=falcon-tools-20260819",
         "Inventory · Unit per cabang",
-        "Stok ready, booked, dan kelengkapan foto terlihat per cabang sebagai sumber kebenaran yang dibaca Falcon.",
-        [1586, 992],
+        "Stok ready, booked, sold, dan kelengkapan foto terlihat per cabang sebagai sumber kebenaran yang dibaca Falcon.",
+        [1440, 900],
       );
     } else if (slug === "inventory-falcon-ai" && /import|validasi|katalog/i.test(capabilityTitle)) {
       preview = captured(
-        "inventory-falcon-query-public.png?v=falcon-ai-first-20260818",
-        "Falcon AI · Import dan data live",
-        "Falcon dapat mengimpor listing lewat Excel atau Google Sheets dari percakapan, sementara katalog API memakai stok aktif yang sama.",
-        [1510, 1042],
+        "inventory-falcon-import-public.png?v=falcon-tools-20260819",
+        "Inventory · Import dan katalog API",
+        "Import Excel atau Google Sheets menampilkan warning identitas, lalu stok aktif disajikan ke aplikasi eksternal lewat katalog API.",
+        [1440, 900],
       );
     } else if (slug === "social-media-sora-ai" && /content studio|visual/i.test(capabilityTitle)) {
       preview = captured("product-social-studio.png", "Social Media · Content Studio", "Unit inventory dipilih sebagai sumber desain dan materi konten.");
