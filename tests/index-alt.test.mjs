@@ -99,6 +99,26 @@ for (const viewport of viewports) {
 
     assert.equal(await page.locator("[data-typewriter]").getAttribute("data-phrases"), expectedPhrases);
     assert.equal(await page.locator(".alt-node[data-pillar]").count(), 6);
+
+    const headingFont = await page.locator("#core-heading").evaluate((el) => getComputedStyle(el).fontFamily);
+    assert.equal(/caveat/i.test(headingFont), false, `judul memakai font hirarki Inter, bukan Caveat: ${headingFont}`);
+    assert.match(headingFont, /inter|system-ui|sans-serif/i);
+
+    const featureHeadingFont = await page.locator("#jasmine-heading").evaluate((el) => getComputedStyle(el).fontFamily);
+    assert.equal(/caveat/i.test(featureHeadingFont), false);
+
+    assert.equal(await page.locator(".alt-orbit-lines path[id^='orbit-']").count(), 5);
+    const dots = page.locator(".alt-orbit-dots circle");
+    assert.ok(await dots.count() >= 5, "diagram punya titik animasi di jalur");
+    if (viewport.name !== "mobile") {
+      assert.notEqual(await page.locator(".alt-orbit-lines").evaluate((el) => getComputedStyle(el).display), "none");
+      assert.ok(
+        await page.locator("animateMotion").count() >= 5,
+        "titik diagram bergerak mengikuti jalur",
+      );
+    } else {
+      assert.equal(await page.locator(".alt-orbit-lines").evaluate((el) => getComputedStyle(el).display), "none");
+    }
     assert.equal(await page.locator(".alt-story, .alt-howto, .channel-strip, .alt-pillar").count(), 0);
     assert.equal(await page.locator("section.alt-feature").count(), 5);
 
