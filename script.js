@@ -415,10 +415,10 @@ const dealerProductNavigation = Object.freeze({
       paneTitle: "Inventory + Falcon AI",
       demo: { id: "inventory", hash: "inventoryDemo", context: "inventory", label: "Coba Inventory" },
       features: [
-        { title: "Item / listing multi cabang", desc: "Kelola item dan listing dari seluruh cabang dalam satu inventori", icon: "shop", slug: "inventory-falcon-ai" },
+        { title: "Falcon AI: searching, kirim foto & rekomendasi otomatis", desc: "Cari unit, kirim foto, dan rekomendasikan alternatif dari stok live dealer", icon: "ai", slug: "inventory-falcon-ai" },
+        { title: "Laporan dan aksi sesuai peran", desc: "Sales dan management memakai tool Falcon sesuai permission — dari cek stok sampai laporan PDF", icon: "report", slug: "inventory-falcon-ai" },
+        { title: "Item / listing multi cabang", desc: "Kelola item dan listing dari seluruh cabang sebagai sumber kebenaran Falcon", icon: "shop", slug: "inventory-falcon-ai" },
         { title: "Import listing via WhatsApp", desc: "Tambahkan data listing melalui alur WhatsApp yang terhubung ke inventori", icon: "wa", slug: "inventory-falcon-ai" },
-        { title: "Custom tagging / status & filter slicing", desc: "Atur tag, status, dan filter untuk menemukan kelompok stok yang dibutuhkan", icon: "ticket", slug: "inventory-falcon-ai" },
-        { title: "Falcon AI: searching, kirim foto & rekomendasi otomatis", desc: "Cari unit, kirim foto, dan rekomendasikan alternatif secara otomatis", icon: "ai", slug: "inventory-falcon-ai" },
         { title: "Live katalog API", desc: "Hubungkan stok aktif ke katalog dan aplikasi eksternal melalui API", icon: "live", slug: "inventory-falcon-ai" },
         { title: "AI 500 credit", desc: "Gunakan 500 kredit AI untuk pencarian dan bantuan operasional Falcon", icon: "ai", slug: "inventory-falcon-ai" },
       ],
