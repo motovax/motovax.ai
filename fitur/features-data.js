@@ -965,16 +965,20 @@ window.MOTOVAX_FEATURES = {
 
   "omni-jasmine-ai": {
     slug: "omni-jasmine-ai",
-    title: "Omni + Jasmine AI",
+    title: "Jasmine AI + Omnichannel",
     heroTitle: "Satukan channel pelanggan dengan AI dan agent manusia",
-    heroDesc: "Omni + Jasmine AI menyatukan WhatsApp, Instagram DM, dan Facebook Messenger di Call Center Motovax dengan respons AI, aksi cepat, funneling, takeover agent, serta handoff ke Marketing Representative.",
+    heroDesc: "Jasmine AI + Omnichannel menyatukan WhatsApp, Instagram DM, dan Facebook Messenger di Call Center Motovax dengan respons AI, aksi cepat, funneling, takeover agent, serta handoff ke Marketing Representative.",
     status: "Live",
-    module: "Omni + Jasmine AI",
+    module: "Jasmine AI + Omnichannel",
     flag: "whatsapp_ai",
     category: "Aplikasi Omnichannel",
     demo: "omni",
     demoHash: "omniDemo",
-    breadcrumbs: ["Produk", "Modul", "Omni + Jasmine AI"],
+    breadcrumbs: ["Produk", "Modul", "Jasmine AI + Omnichannel"],
+    sectionTitle: "Jasmine merespons pelanggan, tools omnichannel menjaga alurnya",
+    showcaseTitle: "Kecanggihan Jasmine dulu, baru tools yang dipakai tim",
+    showcaseDesc: "Jasmine membaca konteks percakapan dan menjalankan aksi bisnis dari inbox. Setelah itu baru funneling, takeover, dan analytics yang dipakai Call Center serta MR.",
+    processTitle: "Dari pesan masuk hingga handoff dengan konteks utuh",
     capabilities: [
       {
         title: "Jasmine AI memahami dan bertindak",
@@ -1004,21 +1008,21 @@ window.MOTOVAX_FEATURES = {
 
   "inventory-falcon-ai": {
     slug: "inventory-falcon-ai",
-    title: "Inventory + Falcon AI",
+    title: "Falcon AI + Inventory",
     heroTitle: "Falcon mencari dan merekomendasikan unit dari stok live dealer",
     heroDesc:
       "Falcon AI mencari unit, mengirim foto, merekomendasikan alternatif, dan menyusun laporan dari stok live dealer. Listing multi-cabang, import, dan katalog API menjaga data yang dibaca AI tetap akurat.",
     status: "Live",
-    module: "Inventory + Falcon AI",
+    module: "Falcon AI + Inventory",
     flag: "inventory_management",
     category: "Inventory Management",
     demo: "falcon",
     demoHash: "contoh-alur",
     demoLabel: "Lihat Falcon di lapangan",
-    breadcrumbs: ["Produk", "Modul", "Inventory + Falcon AI"],
+    breadcrumbs: ["Produk", "Modul", "Falcon AI + Inventory"],
     sectionTitle: "Falcon mengerjakan stok live, tools inventory menjaga datanya",
-    showcaseTitle: "Kecanggihan Falcon dulu, baru tools yang dipakai tim",
-    showcaseDesc: "Falcon menjalankan tool inventory dari percakapan. Setelah itu baru listing, import, dan API yang menjadi sumber kebenaran stok.",
+    showcaseTitle: "Falcon mencari unit, mengirim foto, dan menyusun laporan dari stok live",
+    showcaseDesc: "Sales atau management menuliskan kebutuhan unit di percakapan. Falcon memahami permintaan, menjalankan tool inventory, lalu mengirim unit ready, foto, alternatif, atau laporan sesuai peran. Listing multi-cabang, import, dan katalog API menjaga data yang dibaca AI tetap akurat.",
     processTitle: "Dari permintaan stok hingga data yang sama di seluruh tim",
     capabilities: [
       {
@@ -1085,16 +1089,20 @@ window.MOTOVAX_FEATURES = {
 
   "social-media-sora-ai": {
     slug: "social-media-sora-ai",
-    title: "Social Media + Sora AI",
+    title: "Sora AI + Social Media",
     heroTitle: "Buat, jadwalkan, publikasikan, dan ukur konten dari satu studio",
-    heroDesc: "Social Media + Sora AI menghubungkan inventory dengan content studio, pengolahan visual AI, caption, kalender posting, publikasi Facebook dan Instagram melalui Meta Business, WhatsApp content, serta ads campaign analytics.",
+    heroDesc: "Sora AI + Social Media menghubungkan inventory dengan content studio, pengolahan visual AI, caption, kalender posting, publikasi Facebook dan Instagram melalui Meta Business, WhatsApp content, serta ads campaign analytics.",
     status: "Live · flag",
-    module: "Social Media + Sora AI",
+    module: "Sora AI + Social Media",
     flag: "social_media_automation",
     category: "Manajemen Campaign",
     demo: "social",
     demoHash: "socialDemo",
-    breadcrumbs: ["Produk", "Modul", "Social Media + Sora AI"],
+    breadcrumbs: ["Produk", "Modul", "Sora AI + Social Media"],
+    sectionTitle: "Sora mengolah konten, tools studio menjaga publikasinya",
+    showcaseTitle: "Kecanggihan Sora dulu, baru tools yang dipakai tim",
+    showcaseDesc: "Sora meningkatkan visual dan membantu caption dari data stok. Setelah itu baru studio, scheduler, publish, dan ads yang dipakai marketing.",
+    processTitle: "Dari unit ready hingga kampanye yang terukur",
     capabilities: [
       { title: "Content studio dari inventory", desc: "Pilih unit ready sebagai sumber desain, harga, atribut, dan materi kampanye." },
       { title: "Pengolahan visual dengan AI", desc: "Buat variasi materi, tingkatkan kualitas gambar, dan sesuaikan background untuk kebutuhan konten." },

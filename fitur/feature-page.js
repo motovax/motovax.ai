@@ -381,6 +381,36 @@
         facts: ["Multi-modul", "Satu data", "Role-based"],
       };
     }
+    if (id === "omni-jasmine-ai") {
+      return {
+        family: "omni",
+        eyebrow: "JASMINE AI + OMNICHANNEL",
+        sectionLabel: "AI LAYANAN PELANGGAN",
+        intro: "Jasmine merespons percakapan pelanggan dengan konteks dealer dan tool bisnis. Inbox, funneling, takeover, dan handoff menjaga alur tim tetap rapi.",
+        roles: ["Customer Service", "Tim Sales", "Marketing"],
+        facts: ["Multi-channel", "AI first", "Handoff jelas"],
+      };
+    }
+    if (id === "inventory-falcon-ai") {
+      return {
+        family: "inventory",
+        eyebrow: "FALCON AI + INVENTORY",
+        sectionLabel: "AI STOK DEALER",
+        intro: "Falcon memakai inventory live dealer untuk mencari unit, mengirim foto, merekomendasikan alternatif, dan menyusun laporan. Tools listing, import, dan API menjaga data yang dibaca AI tetap akurat.",
+        roles: ["Tim Sales", "Management", "Admin Inventory"],
+        facts: ["Stok live", "Role-aware", "Tool native"],
+      };
+    }
+    if (id === "social-media-sora-ai") {
+      return {
+        family: "campaign",
+        eyebrow: "SORA AI + SOCIAL MEDIA",
+        sectionLabel: "AI KONTEN DEALER",
+        intro: "Sora mengolah visual dan materi dari stok live. Studio, scheduler, publish, dan ads menjaga kampanye tetap terjadwal dan terukur.",
+        roles: ["Marketing", "Tim Sales", "Manajemen"],
+        facts: ["Visual AI", "Terjadwal", "Terukur"],
+      };
+    }
     if (campaign || social) {
       return {
         family: "campaign",
@@ -419,16 +449,6 @@
         intro: "Kelola customer, pipeline, follow-up, dan performa sales dari satu workspace yang terhubung.",
         roles: ["Tim Sales", "Marketing", "Manajemen"],
         facts: ["Customer 360°", "Pipeline", "Follow-up"],
-      };
-    }
-    if (id === "inventory-falcon-ai") {
-      return {
-        family: "inventory",
-        eyebrow: "FALCON AI + INVENTORY",
-        sectionLabel: "AI STOK DEALER",
-        intro: "Falcon memakai inventory live dealer untuk mencari unit, mengirim foto, merekomendasikan alternatif, dan menyusun laporan. Tools listing, import, dan API menjaga data yang dibaca AI tetap akurat.",
-        roles: ["Tim Sales", "Management", "Admin Inventory"],
-        facts: ["Stok live", "Role-aware", "Tool native"],
       };
     }
     return {
@@ -618,7 +638,7 @@
       return [previewFactory("core-platform-whatsapp-integrations-public.png?v=20260806-2", "Core Platform · Integrasi WhatsApp"), previews.analytics, previews.integrations];
     }
     if (id === "omni-jasmine-ai") {
-      return [previewFactory("omnichannel-faneling-public.png", "Omni + Jasmine AI"), previews.omni, previews.integrations];
+      return [previewFactory("omnichannel-faneling-public.png", "Jasmine AI + Omnichannel"), previews.omni, previews.integrations];
     }
     if (id === "inventory-falcon-ai") {
       const falconPreview = previewFactory(
@@ -636,7 +656,7 @@
       return [previewFactory("product-dashboard-overview.png?v=20260818-ana-hero-ovw-2", "Ana AI · Analytics"), previewFactory("product-dashboard-sales.png", "Sales Performance"), previewFactory("product-dashboard-locations.png", "Performa Cabang")];
     }
     if (id === "social-media-sora-ai") {
-      return [previewFactory("product-social-pilih-kendaraan-public.png?v=20260818-sora-1", "Social Media + Sora AI"), previewFactory("product-social-calendar.png", "Kalender Posting"), previewFactory("product-social-insight.png", "Campaign Insight")];
+      return [previewFactory("product-social-pilih-kendaraan-public.png?v=20260818-sora-1", "Sora AI + Social Media"), previewFactory("product-social-calendar.png", "Kalender Posting"), previewFactory("product-social-insight.png", "Campaign Insight")];
     }
 
     if (id === "whatsapp-business-api") {

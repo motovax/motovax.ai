@@ -738,7 +738,9 @@ for (const viewport of viewports) {
       await panel.locator("summary", { hasText: "Produk" }).click();
       assert.equal(page.url(), urlBeforeProduk);
       assert.equal(await panel.locator(".mobile-product-suite").count(), 6);
-      assert.equal(await panel.locator(".mobile-product-suite > p", { hasText: "Omni + Jasmine AI" }).isVisible(), true);
+      assert.equal(await panel.locator(".mobile-product-suite > p", { hasText: "Jasmine AI + Omnichannel" }).isVisible(), true);
+      assert.equal(await panel.locator(".mobile-product-suite > p", { hasText: "Falcon AI + Inventory" }).isVisible(), true);
+      assert.equal(await panel.locator(".mobile-product-suite > p", { hasText: "Sora AI + Social Media" }).isVisible(), true);
       assert.equal(await panel.locator("a", { hasText: "WhatsApp, Instagram & Facebook" }).isVisible(), true);
       await panel.locator("summary", { hasText: "Solusi" }).click();
       assert.equal(await panel.locator("a", { hasText: "Solusi dealer secara menyeluruh" }).isVisible(), true);
