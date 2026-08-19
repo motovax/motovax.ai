@@ -1,4 +1,4 @@
-/* Alternative homepage only — loaded after styles.css. Production index.html tidak memakai file ini. */
+/* Homepage Core Platform — dimuat setelah styles.css pada index.html produksi. */
 
 .alt-preview-bar {
   position: relative;

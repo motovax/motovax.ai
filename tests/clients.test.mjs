@@ -98,16 +98,16 @@ for (const viewport of viewports) {
     await section.scrollIntoViewIfNeeded();
 
     const state = await page.evaluate(() => {
-      const usecase = document.querySelector(".usecase-section");
+      const crm = document.querySelector("#crm");
       const clients = document.querySelector("#our-clients");
-      const started = document.querySelector(".getting-started");
+      const cta = document.querySelector(".home-cta");
       const logos = [...document.querySelectorAll(".clients-logos img")];
       const more = document.querySelector(".clients-more span");
       const heading = document.querySelector("#clients-heading");
       const label = document.querySelector(".clients-heading .section-label");
       return {
-        afterUsecase: usecase?.nextElementSibling === clients,
-        beforeStart: clients?.nextElementSibling === started,
+        afterCrm: crm?.nextElementSibling === clients,
+        beforeCta: clients?.nextElementSibling === cta,
         label: label?.textContent?.trim() || "",
         heading: heading?.textContent?.trim() || "",
         more: more?.textContent?.trim() || "",
@@ -123,8 +123,8 @@ for (const viewport of viewports) {
       };
     });
 
-    assert.equal(state.afterUsecase, true, "Our Clients harus langsung di bawah contoh alur nyata");
-    assert.equal(state.beforeStart, true, "Our Clients harus sebelum setup mandiri");
+    assert.equal(state.afterCrm, true, "Our Clients harus langsung di bawah seksi CRM");
+    assert.equal(state.beforeCta, true, "Our Clients harus sebelum CTA daftar");
     assert.equal(state.label, "Our Clients");
     assert.match(state.heading, /Dealer yang sudah memakai Motovax/);
     assert.equal(state.more, "and many more");

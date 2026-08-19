@@ -3,11 +3,13 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>MOTOVAX | Platform AI untuk Sales Dealer Mobil</title>
+    <title>MOTOVAX | One Stock, More Sales, Faster Response</title>
     <meta name="description" content="Motovax menyatukan inventori unit, lead omnichannel, CRM, dan AI agar dealer mobil mempercepat respons, test drive, follow-up, dan penjualan." />
+    <link rel="canonical" href="https://motovax.ai/" />
     <meta property="og:type" content="website" />
-    <meta property="og:title" content="MOTOVAX | Platform AI untuk Sales Dealer Mobil" />
+    <meta property="og:title" content="MOTOVAX | One Stock, More Sales, Faster Response" />
     <meta property="og:description" content="Satu data dealer untuk menghubungkan stok unit, lead, sales, test drive, follow-up, dan closing." />
+    <meta property="og:url" content="https://motovax.ai/" />
     <meta property="og:image" content="./icons/icon-512.png" />
     <meta name="theme-color" content="#1267f5" />
     <link rel="icon" type="image/svg+xml" href="./icons/favicon.svg" />
@@ -15,9 +17,10 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="./styles.css?v=ai-first-tools-20260819" />
+    <link rel="stylesheet" href="./styles.css?v=home-live-20260819" />
+    <link rel="stylesheet" href="./styles-alt.css?v=home-live-20260819" />
   </head>
-  <body class="home-redesign">
+  <body class="home-redesign home-alt">
     <header class="site-header">
       <div class="container header-inner">
         <a class="brand" href="#top" aria-label="MOTOVAX home"><span>MOTO</span><strong>VAX</strong></a>
@@ -26,7 +29,7 @@
             <button type="button" class="nav-produk-trigger" aria-expanded="false" aria-haspopup="true" aria-controls="produk-mega-menu" data-produk-trigger>Produk <svg class="nav-chevron" width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 4.5 6 8l3.5-3.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
             <div class="produk-mega" id="produk-mega-menu" role="region" aria-label="Menu produk Motovax" hidden data-produk-panel data-produk-mount></div>
           </div>
-          <a href="#cara-kerja">Cara Kerja</a><a href="#solusi">Solusi</a><a href="./harga.html">Harga</a><a href="./hubungi-kami.html">Hubungi Kami</a>
+          <a href="#produk">Kapabilitas</a><a href="./harga.html">Harga</a><a href="./hubungi-kami.html">Hubungi Kami</a>
         </nav>
         <div class="header-actions">
           <a class="btn btn-secondary header-login" href="https://onboard.motovax.com/login.html?reauth=1">Login/Daftar</a>
@@ -38,24 +41,19 @@
       <section class="home-hero">
         <div class="container home-hero-grid">
           <div class="home-hero-copy">
+            <p class="alt-hero-kicker">Platform penjualan untuk dealer mobil</p>
             <h1 class="hero-type-headline">
               <span class="hero-type-static">One Data.</span>
               <span class="hero-type-static">One Platform.</span>
               <span class="hero-type-dynamic">
-                <span class="hero-type-sizer" aria-hidden="true">More Unit Sales.</span>
+                <span class="hero-type-sizer" aria-hidden="true">Unlimited Growth.</span>
                 <span class="hero-type-live">
-                  <span
-                    class="hero-type-text"
-                    data-typewriter
-                    data-phrases="More Test Drives.|More Unit Sales."
-                    aria-live="polite"
-                  >More Test Drives.</span>
-                  <span class="hero-type-caret" aria-hidden="true"></span>
+                  <span class="hero-type-text" data-typewriter data-phrases="One Stock.|More Sales.|Faster Response.|Unlimited Growth." aria-live="polite">One Stock.</span><span class="hero-type-caret" aria-hidden="true"></span>
                 </span>
               </span>
             </h1>
-            <p>Akselerasikan penjualan dengan AI, automasi, dan data yang terintegrasi dari lead hingga transaksi</p>
-            <div class="home-hero-actions"><a class="btn btn-primary btn-large" href="https://onboard.motovax.com/onboarding.html">Mulai Sekarang <span>→</span></a></div>
+            <p>Satukan percakapan, follow-up, dan stok unit agar tim sales bisa bergerak dari lead ke test drive tanpa menunggu data dari banyak tempat.</p>
+            <div class="home-hero-actions"><a class="btn btn-primary btn-large" href="https://onboard.motovax.com/onboarding.html?fresh=1">Mulai Sekarang <span>→</span></a></div>
           </div>
           <figure class="hero-workspace" aria-label="Screenshot Motovax Call Center">
             <div class="hero-shot-window">
@@ -99,303 +97,276 @@
         </div>
       </section>
 
-      <section class="channel-strip" aria-label="Kanal yang didukung">
+      <section class="alt-core" id="produk" aria-labelledby="core-heading">
+        <span id="cara-kerja" hidden></span>
+        <span id="solusi" hidden></span>
         <div class="container">
-          <p>Satu ruang kerja untuk kanal yang digunakan pelanggan Anda</p>
-          <div class="channel-list">
-            <span class="channel-item channel-whatsapp">
-              <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91S17.5 2 12.04 2m.01 18.15c-1.48 0-2.93-.4-4.2-1.15l-.3-.18-3.12.82.83-3.04-.2-.31a8.2 8.2 0 0 1-1.26-4.38c0-4.54 3.7-8.24 8.24-8.24 2.2 0 4.27.86 5.82 2.42a8.18 8.18 0 0 1 2.41 5.83c0 4.54-3.7 8.23-8.22 8.23m4.52-6.16c-.25-.12-1.47-.72-1.69-.81s-.39-.12-.56.13c-.17.25-.64.8-.79.97-.14.17-.29.19-.54.06-.25-.12-1.05-.39-2-1.23-.74-.66-1.23-1.47-1.38-1.72-.14-.25-.02-.38.11-.51.11-.11.25-.29.37-.43.13-.14.17-.25.25-.41.08-.17.04-.31-.02-.43s-.56-1.34-.76-1.84c-.2-.48-.4-.42-.56-.42h-.48c-.17 0-.43.06-.66.31-.22.25-.87.85-.87 2.07s.89 2.4 1.01 2.56c.12.17 1.75 2.67 4.23 3.74.59.26 1.05.41 1.41.52.59.19 1.13.16 1.56.1.48-.07 1.47-.6 1.67-1.18.21-.58.21-1.07.14-1.18-.06-.1-.23-.16-.48-.28"/></svg>
-              WhatsApp
-            </span>
-            <span class="channel-item channel-instagram">
-              <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M7.5 2h9A5.5 5.5 0 0 1 22 7.5v9A5.5 5.5 0 0 1 16.5 22h-9A5.5 5.5 0 0 1 2 16.5v-9A5.5 5.5 0 0 1 7.5 2m0 2A3.5 3.5 0 0 0 4 7.5v9A3.5 3.5 0 0 0 7.5 20h9a3.5 3.5 0 0 0 3.5-3.5v-9A3.5 3.5 0 0 0 16.5 4zm9.25 1.25a1.25 1.25 0 1 1 0 2.5 1.25 1.25 0 0 1 0-2.5M12 7a5 5 0 1 1 0 10 5 5 0 0 1 0-10m0 2a3 3 0 1 0 0 6 3 3 0 0 0 0-6"/></svg>
-              Instagram
-            </span>
-            <span class="channel-item channel-facebook">
-              <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M22 12.07C22 6.48 17.52 2 11.93 2S1.86 6.48 1.86 12.07c0 5.02 3.66 9.18 8.44 9.93v-7.03H7.9v-2.9h2.4V9.85c0-2.38 1.42-3.69 3.58-3.69 1.04 0 2.12.18 2.12.18v2.34h-1.2c-1.18 0-1.54.73-1.54 1.48v1.78h2.63l-.42 2.9h-2.21V22c4.78-.75 8.44-4.91 8.44-9.93"/></svg>
-              Facebook
-            </span>
-            <span class="channel-item channel-web">
-              <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M4.5 4.5h15A2.5 2.5 0 0 1 22 7v8a2.5 2.5 0 0 1-2.5 2.5H13l-4.2 3.4a.9.9 0 0 1-1.45-.72V17.5H4.5A2.5 2.5 0 0 1 2 15V7a2.5 2.5 0 0 1 2.5-2.5m2.7 5.35a1.15 1.15 0 1 0 0 2.3 1.15 1.15 0 0 0 0-2.3m4.8 0a1.15 1.15 0 1 0 0 2.3 1.15 1.15 0 0 0 0-2.3m4.8 0a1.15 1.15 0 1 0 0 2.3 1.15 1.15 0 0 0 0-2.3"/></svg>
-              Percakapan Web
-            </span>
-            <span class="channel-item channel-broadcast">
-              <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M14.2 4.15c.7-.4 1.55.12 1.55.93v13.84c0 .81-.85 1.33-1.55.93L8.9 16.5H6.2A2.2 2.2 0 0 1 4 14.3v-4.6A2.2 2.2 0 0 1 6.2 7.5h2.7zm5.05 4.1a1 1 0 0 1 1.4.15 6.6 6.6 0 0 1 0 7.2 1 1 0 1 1-1.55-1.25 4.6 4.6 0 0 0 0-4.7 1 1 0 0 1 .15-1.4m-1.7 2.05a1 1 0 0 1 1.35.3 3.1 3.1 0 0 1 0 2.8 1 1 0 1 1-1.65-1.12 1.1 1.1 0 0 0 0-.56 1 1 0 0 1 .3-1.42"/></svg>
-              Siaran Pesan
-            </span>
+          <header class="alt-core-heading">
+            <h2 id="core-heading" class="alt-hand">Core Platform</h2>
+            <p class="alt-core-lead">Satu pusat kendali untuk operasi sales dealer. Satukan data, tim, dan proses sales dalam satu platform yang terhubung.</p>
+            <a class="btn btn-primary alt-more" href="./fitur/core-platform-agentic-ai.html">Selengkapnya <span>→</span></a>
+          </header>
+
+          <div class="alt-orbit" data-alt-orbit>
+            <figure class="alt-orbit-art">
+              <picture>
+                <source
+                  type="image/webp"
+                  srcset="./assets/alt-core-platform-720.webp?v=alt-home-20260819e 720w, ./assets/alt-core-platform-1200.webp?v=alt-home-20260819e 1029w"
+                  sizes="(max-width: 760px) calc(100vw - 32px), min(1100px, calc(100vw - 64px))"
+                />
+                <img
+                  src="./assets/alt-core-platform.png?v=alt-home-20260819e"
+                  width="1029"
+                  height="415"
+                  alt="Diagram Core Platform Motovax: Ana AI Analytics, CRM, AI Jasmine + Omni, AI Sora + Social Media, dan AI Falcon + Inventory terhubung ke satu pusat."
+                  decoding="async"
+                />
+              </picture>
+              <svg class="alt-orbit-lines" viewBox="0 0 1029 415" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+                <defs>
+                  <filter id="alt-dot-glow" x="-80%" y="-80%" width="260%" height="260%">
+                    <feGaussianBlur in="SourceGraphic" stdDeviation="1.4" result="blur" />
+                    <feMerge>
+                      <feMergeNode in="blur" />
+                      <feMergeNode in="SourceGraphic" />
+                    </feMerge>
+                  </filter>
+                  <path id="orbit-ana" d="M508 193 C 450 170 360 95 286 84" fill="none" />
+                  <path id="orbit-crm" d="M508 193 C 568 165 640 72 698 56" fill="none" />
+                  <path id="orbit-jasmine" d="M508 193 C 575 186 640 176 698 182" fill="none" />
+                  <path id="orbit-sora" d="M508 193 C 568 225 640 312 698 322" fill="none" />
+                  <path id="orbit-falcon" d="M508 193 C 450 225 360 312 286 322" fill="none" />
+                </defs>
+                <g class="alt-orbit-dots" filter="url(#alt-dot-glow)">
+                  <circle cx="508" cy="193" r="4.5" fill="#3b82f6"><animateMotion dur="5.4s" repeatCount="indefinite" begin="0s" path="M0 0 C -58 -23 -148 -98 -222 -109" /></circle>
+                  <circle cx="508" cy="193" r="3.2" fill="#7eb6ff"><animateMotion dur="7.6s" repeatCount="indefinite" begin="2.1s" path="M0 0 C -58 -23 -148 -98 -222 -109" /></circle>
+                  <circle cx="508" cy="193" r="4.5" fill="#3b82f6"><animateMotion dur="5.8s" repeatCount="indefinite" begin=".8s" path="M0 0 C 60 -28 132 -121 190 -137" /></circle>
+                  <circle cx="508" cy="193" r="3.2" fill="#7eb6ff"><animateMotion dur="8s" repeatCount="indefinite" begin="3.2s" path="M0 0 C 60 -28 132 -121 190 -137" /></circle>
+                  <circle cx="508" cy="193" r="4.5" fill="#3b82f6"><animateMotion dur="4.8s" repeatCount="indefinite" begin="1.2s" path="M0 0 C 67 -7 132 -17 190 -11" /></circle>
+                  <circle cx="508" cy="193" r="3.2" fill="#7eb6ff"><animateMotion dur="7.2s" repeatCount="indefinite" begin="3.8s" path="M0 0 C 67 -7 132 -17 190 -11" /></circle>
+                  <circle cx="508" cy="193" r="4.5" fill="#3b82f6"><animateMotion dur="6.1s" repeatCount="indefinite" begin=".4s" path="M0 0 C 60 32 132 119 190 129" /></circle>
+                  <circle cx="508" cy="193" r="3.2" fill="#7eb6ff"><animateMotion dur="8.4s" repeatCount="indefinite" begin="2.6s" path="M0 0 C 60 32 132 119 190 129" /></circle>
+                  <circle cx="508" cy="193" r="4.5" fill="#3b82f6"><animateMotion dur="5.6s" repeatCount="indefinite" begin="1.6s" path="M0 0 C -58 32 -148 119 -222 129" /></circle>
+                  <circle cx="508" cy="193" r="3.2" fill="#7eb6ff"><animateMotion dur="7.8s" repeatCount="indefinite" begin="4s" path="M0 0 C -58 32 -148 119 -222 129" /></circle>
+                </g>
+              </svg>
+            </figure>
+
+            <a class="alt-node alt-node-hub" data-pillar="core" href="./fitur/core-platform-agentic-ai.html">
+              <span class="alt-hub-mark" aria-hidden="true">
+                <svg viewBox="0 0 48 48" width="34" height="34">
+                  <path fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round" d="M24 6.2 40 15.4v17.2L24 41.8 8 32.6V15.4L24 6.2Z"/>
+                  <path fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" d="M24 6.2v17.8L8 15.4M24 24l16-8.6M24 24v17.8"/>
+                </svg>
+              </span>
+              <img src="./icons/logo-motovax.png" width="216" height="47" alt="" />
+              <small>CORE PLATFORM</small>
+            </a>
+
+            <a class="alt-node" data-pillar="ana" data-slot="ana" href="./fitur/ana-ai-analytics.html">
+              <span class="alt-node-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M4.5 16.5 9 11l3.2 3.1L19.5 7.5" />
+                  <path d="M14.8 7.5h4.7v4.7" />
+                </svg>
+              </span>
+              <span class="alt-node-copy">
+                <strong class="alt-pillar-label">Ana AI Analytics</strong>
+                <em>AI-powered analytics and smart insights</em>
+              </span>
+            </a>
+
+            <a class="alt-node" data-pillar="crm" data-slot="crm" href="./fitur/aplikasi-crm.html">
+              <span class="alt-node-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="9" cy="8" r="2.6" />
+                  <circle cx="16.2" cy="8.6" r="2.1" />
+                  <path d="M4.4 18.2c.4-2.6 2.6-4.1 4.8-4.1s4.4 1.5 4.8 4.1" />
+                  <path d="M13.4 14.6c1.5-.6 3.3-.4 4.6.8.6.6 1 1.4 1.2 2.4" />
+                </svg>
+              </span>
+              <span class="alt-node-copy">
+                <strong class="alt-pillar-label">CRM</strong>
+                <em>Customer relationship management</em>
+              </span>
+            </a>
+
+            <a class="alt-node" data-pillar="jasmine" data-slot="jasmine" href="./fitur/omni-jasmine-ai.html">
+              <span class="alt-node-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 4.2 13.3 10 19 11.2 13.3 12.4 12 18.2 10.7 12.4 5 11.2 10.7 10 12 4.2Z" />
+                  <path d="M17.8 16.2v3.2M16.2 17.8h3.2" />
+                </svg>
+              </span>
+              <span class="alt-node-copy">
+                <strong class="alt-pillar-label">AI Jasmine + Omni</strong>
+                <em>AI sales assistant and omnichannel</em>
+              </span>
+            </a>
+
+            <a class="alt-node" data-pillar="sora" data-slot="sora" href="./fitur/social-media-sora-ai.html">
+              <span class="alt-node-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M3.8 12s3.2-6.2 8.2-6.2S20.2 12 20.2 12s-3.2 6.2-8.2 6.2S3.8 12 3.8 12Z" />
+                  <circle cx="12" cy="12" r="2.6" />
+                </svg>
+              </span>
+              <span class="alt-node-copy">
+                <strong class="alt-pillar-label">AI Sora + Social Media</strong>
+                <em>Social listening, engagement and content intelligence</em>
+              </span>
+            </a>
+
+            <a class="alt-node" data-pillar="falcon" data-slot="falcon" href="./fitur/inventory-falcon-ai.html">
+              <span class="alt-node-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M5.2 13.2c1.4-5.2 6-8 10.4-6.2 1.4.6 2.6 1.6 3.4 2.8-2.2.1-3.8.6-4.8 1.6 2.8.4 4.8 1.8 6.2 4.2-2.4-.4-4.4 0-5.6 1 1.2 1.2 1.8 2.6 1.8 4.2-2.6-1.4-4.8-1.6-6.8-.8-1.4 2-3.6 3.2-6.6 3.6 1.4-2.2 1.6-4 .8-5.6-.8-1.4-1.4-2.8-1.8-4.8Z" />
+                  <path d="M14.6 9.6c.6-.1 1.2 0 1.8.4" />
+                </svg>
+              </span>
+              <span class="alt-node-copy">
+                <strong class="alt-pillar-label">AI Falcon + Inventory</strong>
+                <em>AI-driven inventory and stock intelligence</em>
+              </span>
+            </a>
           </div>
         </div>
       </section>
 
-      <section class="home-section problem-section" id="keunggulan">
-        <div class="container problem-visual-wrap">
-          <div class="section-label">TANTANGAN DEALER HARI INI</div>
-          <h2 class="visually-hidden">Tantangan dealer: follow-up lambat, lead tercecer, dan minim insight penjualan</h2>
-          <figure class="problem-visual">
-            <picture>
-              <source
-                type="image/webp"
-                srcset="./assets/tantangan-dealer-hari-ini-720.webp?v=tantangan-img-20260815 720w, ./assets/tantangan-dealer-hari-ini-1200.webp?v=tantangan-img-20260815 1200w, ./assets/tantangan-dealer-hari-ini.webp?v=tantangan-img-20260815 1536w"
-                sizes="(max-width: 760px) calc(100vw - 32px), min(1180px, calc(100vw - 48px))"
-              />
-              <img
-                data-problem-visual
-                src="./assets/tantangan-dealer-hari-ini.png?v=tantangan-img-20260815"
-                width="1536"
-                height="1024"
-                alt="Infografis tantangan dealer: follow up lambat dan tidak terkontrol, lead tercecer di WhatsApp pribadi, tidak ada monitoring performa sales, serta tidak ada insight konversi pipeline."
-                decoding="async"
-              />
-            </picture>
-            <figcaption>
-              <button
-                type="button"
-                data-hero-image-open
-                data-image-src="./assets/tantangan-dealer-hari-ini.png?v=tantangan-img-20260815"
-                data-image-alt="Infografis tantangan dealer: follow up lambat dan tidak terkontrol, lead tercecer di WhatsApp pribadi, tidak ada monitoring performa sales, serta tidak ada insight konversi pipeline."
-                data-image-title="Tantangan dealer hari ini"
-              >Buka ukuran penuh ↗</button>
-            </figcaption>
+      <section class="alt-feature" id="jasmine" aria-labelledby="jasmine-heading">
+        <div class="container alt-feature-grid">
+          <div class="alt-feature-copy">
+            <h2 id="jasmine-heading" class="alt-hand">AI Jasmine + Omni</h2>
+            <p class="alt-feature-kicker">Respons cepat, 24/7.</p>
+            <p>Satukan percakapan dari berbagai kanal. Jasmine merespons pelanggan secara otomatis, lalu agent dapat melanjutkan saat diperlukan.</p>
+            <a class="btn btn-primary alt-more" href="./fitur/omni-jasmine-ai.html">Selengkapnya <span>→</span></a>
+          </div>
+          <div class="alt-shot-stack" data-stack="jasmine">
+            <figure class="alt-shot alt-shot-back">
+              <button type="button" data-hero-image-open data-image-src="./assets/feature-previews/omnichannel-faneling-public.png?v=hero-cc-20260814" data-image-alt="Workspace Call Center Motovax: inbox multi-channel, jejak Jasmine AI, takeover Agent, dan handoff MR." data-image-title="AI Jasmine + Omni">
+                <picture>
+                  <source type="image/webp" srcset="./assets/feature-previews/omnichannel-faneling-public-720.webp?v=hero-cc-20260814 720w, ./assets/feature-previews/omnichannel-faneling-public-1200.webp?v=hero-cc-20260814 1200w" sizes="(max-width: 760px) calc(100vw - 40px), min(560px, 46vw)" />
+                  <img src="./assets/feature-previews/omnichannel-faneling-public.png?v=hero-cc-20260814" width="1440" height="900" alt="Workspace Call Center Motovax: inbox multi-channel, jejak Jasmine AI, takeover Agent, dan handoff MR." decoding="async" />
+                </picture>
+              </button>
+            </figure>
+            <figure class="alt-shot alt-shot-front">
+              <button type="button" data-hero-image-open data-image-src="./assets/feature-previews/omnichannel-multichannel-public.png?v=alt-home-20260819c" data-image-alt="Percakapan omnichannel Motovax dengan respons Jasmine, takeover Call Center, dan handoff ke MR." data-image-title="Inbox Jasmine">
+                <picture>
+                  <source type="image/webp" srcset="./assets/feature-previews/omnichannel-multichannel-public-720.webp?v=alt-home-20260819c 720w, ./assets/feature-previews/omnichannel-multichannel-public-1200.webp?v=alt-home-20260819c 1200w" sizes="(max-width: 760px) calc(100vw - 56px), min(520px, 42vw)" />
+                  <img src="./assets/feature-previews/omnichannel-multichannel-public.png?v=alt-home-20260819c" width="1440" height="900" alt="Percakapan omnichannel Motovax dengan respons Jasmine, takeover Call Center, dan handoff ke MR." decoding="async" />
+                </picture>
+              </button>
+            </figure>
+          </div>
+        </div>
+      </section>
+
+      <section class="alt-feature is-reverse" id="falcon" aria-labelledby="falcon-heading">
+        <div class="container alt-feature-grid">
+          <div class="alt-feature-copy">
+            <h2 id="falcon-heading" class="alt-hand">AI Falcon + Inventory</h2>
+            <p class="alt-feature-kicker">Satu sumber stok, siap dibagikan.</p>
+            <p>Kelola unit, status, foto, harga, dan lokasi dalam satu sumber data yang dapat langsung digunakan sales dan Falcon.</p>
+            <a class="btn btn-primary alt-more" href="./fitur/inventory-falcon-ai.html">Selengkapnya <span>→</span></a>
+          </div>
+          <figure class="alt-falcon-visual">
+            <button type="button" data-hero-image-open data-image-src="./assets/feature-previews/alt-falcon-phones.png?v=alt-home-20260819c" data-image-alt="Percakapan WhatsApp Falcon AI: catat lead baru dan kirim daftar unit ready dari stok live dealer." data-image-title="AI Falcon + Inventory">
+              <picture>
+                <source type="image/webp" srcset="./assets/feature-previews/alt-falcon-phones-720.webp?v=alt-home-20260819c 720w, ./assets/feature-previews/alt-falcon-phones-1200.webp?v=alt-home-20260819c 1200w" sizes="(max-width: 760px) calc(100vw - 32px), min(560px, 48vw)" />
+                <img src="./assets/feature-previews/alt-falcon-phones.png?v=alt-home-20260819c" width="742" height="805" alt="Percakapan WhatsApp Falcon AI: catat lead baru dan kirim daftar unit ready dari stok live dealer." decoding="async" />
+              </picture>
+            </button>
           </figure>
         </div>
       </section>
 
-            <section class="home-section how-section native-flow-section" id="cara-kerja">
-        <div class="container narrow-heading native-flow-heading">
-          <h2>Solusi yang tepat untuk Anda</h2>
-          <p>Satu platform untuk menghubungkan data, proses, dan tim. Dari lead hingga closing.</p>
-        </div>
-        <div class="container e2e-flow" aria-label="Skema end-to-end Motovax">
-          <p class="e2e-flow-badge"><span>End-to-End Flow</span></p>
-          <div class="e2e-flow-stages">
-            <article class="e2e-stage">
-              <header class="e2e-stage-head">
-                <small>SORA AI</small>
-                <h3>Attract</h3>
-                <em>Media Sosial</em>
-              </header>
-              <p class="e2e-stage-copy">Sora AI menghasilkan konten dan menjalankan media sosial secara otomatis untuk menarik customer dealer.</p>
-              <div class="e2e-stage-tree">
-                <div class="native-node ai"><span class="node-icon">✦</span><div><small>SORA AI</small><b>Generate konten dari stok unit</b><em>Studio · Jadwal · Meta</em></div></div>
-                <div class="native-line vertical short"></div>
-                <div class="native-node action"><span class="node-icon">▦</span><div><small>TINDAKAN</small><b>Posting dan iklan berjalan otomatis</b><em>Tarik minat dari kanal sosial</em></div></div>
-              </div>
-            </article>
-            <span class="e2e-flow-arrow" aria-hidden="true"></span>
-            <article class="e2e-stage">
-              <header class="e2e-stage-head">
-                <small>JASMINE AI</small>
-                <h3>Convert</h3>
-                <em>Inbox Omnichannel</em>
-              </header>
-              <p class="e2e-stage-copy">Jasmine AI menangani inquiry WhatsApp, website, dan sosial sampai jadi lead berkualitas. Falcon AI menyiapkan stok dan simulasi.</p>
-              <div class="e2e-stage-tree">
-                <div class="native-node ai"><span class="node-icon">✦</span><div><small>JASMINE AI</small><b>Pahami kebutuhan dan konteks</b><em>WhatsApp · Web · Instagram</em></div></div>
-                <div class="native-line vertical short"></div>
-                <div class="native-node action"><span class="node-icon">▦</span><div><small>FALCON AI</small><b>Kirim stok, foto, dan simulasi</b><em>Lead berkualitas masuk CRM</em></div></div>
-              </div>
-            </article>
-            <span class="e2e-flow-arrow" aria-hidden="true"></span>
-            <article class="e2e-stage">
-              <header class="e2e-stage-head">
-                <small>AUTOPILOT CRM</small>
-                <h3>Retain &amp; Close</h3>
-                <em>Follow-up sampai transaksi</em>
-              </header>
-              <p class="e2e-stage-copy">Autopilot CRM menjalankan follow-up, nurturing, dan next action sampai terjadi transaksi.</p>
-              <div class="e2e-stage-tree">
-                <div class="native-node ai"><span class="node-icon">✦</span><div><small>AUTOPILOT CRM</small><b>Follow-up dan nurturing otomatis</b><em>Pipeline · Pengingat · Next action</em></div></div>
-                <div class="native-line vertical short"></div>
-                <div class="native-node action"><span class="node-icon">⌁</span><div><small>TINDAKAN</small><b>Tutup deal dan catat transaksi</b><em>Sales lanjut dengan konteks lengkap</em></div></div>
-              </div>
-            </article>
+      <section class="alt-feature" id="ana" aria-labelledby="ana-heading">
+        <div class="container alt-feature-grid">
+          <div class="alt-feature-copy">
+            <h2 id="ana-heading" class="alt-hand">Ana AI Analytics</h2>
+            <p class="alt-feature-kicker">Ubah data jadi insight.</p>
+            <p>Pantau aktivitas lead dan performa sales untuk melihat apa yang terjadi dan menentukan langkah berikutnya.</p>
+            <a class="btn btn-primary alt-more" href="./fitur/ana-ai-analytics.html">Selengkapnya <span>→</span></a>
+          </div>
+          <div class="alt-shot-stack is-charts" data-stack="ana">
+            <figure class="alt-shot alt-shot-back">
+              <button type="button" data-hero-image-open data-image-src="./assets/feature-previews/product-finance-trend-public.png?v=alt-home-20260819c" data-image-alt="Dashboard finansial Ana: revenue, HPP, laba kotor, tren, dan perbandingan cabang." data-image-title="Ana AI Analytics">
+                <picture>
+                  <source type="image/webp" srcset="./assets/feature-previews/product-finance-trend-public-720.webp?v=alt-home-20260819c 720w, ./assets/feature-previews/product-finance-trend-public-1200.webp?v=alt-home-20260819c 1200w" sizes="(max-width: 760px) calc(100vw - 40px), min(560px, 46vw)" />
+                  <img src="./assets/feature-previews/product-finance-trend-public.png?v=alt-home-20260819c" width="1440" height="900" alt="Dashboard finansial Ana: revenue, HPP, laba kotor, tren, dan perbandingan cabang." decoding="async" />
+                </picture>
+              </button>
+            </figure>
+            <figure class="alt-shot alt-shot-front">
+              <button type="button" data-hero-image-open data-image-src="./assets/feature-previews/report-sales-trend-public.png?v=alt-home-20260819c" data-image-alt="Performa sales Ana: pipeline, konversi, tren pendapatan, dan peringatan lead yang perlu ditindaklanjuti." data-image-title="Performa sales">
+                <picture>
+                  <source type="image/webp" srcset="./assets/feature-previews/report-sales-trend-public-720.webp?v=alt-home-20260819c 720w, ./assets/feature-previews/report-sales-trend-public-1200.webp?v=alt-home-20260819c 1200w" sizes="(max-width: 760px) calc(100vw - 56px), min(520px, 42vw)" />
+                  <img src="./assets/feature-previews/report-sales-trend-public.png?v=alt-home-20260819c" width="1440" height="900" alt="Performa sales Ana: pipeline, konversi, tren pendapatan, dan peringatan lead yang perlu ditindaklanjuti." decoding="async" />
+                </picture>
+              </button>
+            </figure>
           </div>
         </div>
-      </section>
-
-      <section class="home-section solution-section" id="solusi">
-        <div class="container solution-intro"><div><div class="section-label">SOLUSI UNTUK DEALER MOBIL</div><h2>Kapabilitas yang bekerja bersama dari stok hingga closing.</h2></div><a href="./modul.html">Lihat semua kapabilitas <span>→</span></a></div>
-        <div class="container solution-grid">
-          <a class="solution-card" href="./fitur/aplikasi-crm.html"><span class="solution-status">AKTIF</span><div class="solution-icon"><svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="12" cy="10" r="4"/><path d="M4.5 25c.7-5 3.2-7.5 7.5-7.5s6.8 2.5 7.5 7.5M23 7v10m-5-5h10"/></svg></div><h3>CRM</h3><p>Kenali peluang yang paling penting, pahami percakapan, lalu arahkan tim ke tindakan terbaik berikutnya.</p><b>Pelajari CRM →</b></a>
-          <a class="solution-card" href="./fitur/aplikasi-omnichannel.html"><span class="solution-status">AKTIF</span><div class="solution-icon"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M5 7.5h22v15H14l-6 5v-5H5z"/><path d="M10 13h12m-12 5h8"/></svg></div><h3>Inbox</h3><p>Setiap percakapan menjadi tindakan dengan konteks stok dan lead dealer, bantuan AI, serta alih tangan ke sales.</p><b>Pelajari Inbox →</b></a>
-          <a class="solution-card" href="./fitur/agentic-ai.html"><span class="solution-status">AKTIF</span><div class="solution-icon"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 3.5 18.5 11l7.5 2.5-7.5 2.5-2.5 7.5-2.5-7.5L6 13.5l7.5-2.5z"/><path d="m25 21 1 3 3 1-3 1-1 3-1-3-3-1 3-1z"/></svg></div><h3>Agent AI</h3><p>Delegasikan hasil kepada agent khusus yang dapat memakai alat Motovax sesuai izin yang Anda berikan.</p><b>Pelajari Agent AI →</b></a>
-          <a class="solution-card" href="./fitur/inventory-falcon-ai.html"><span class="solution-status">AKTIF</span><div class="solution-icon"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="m5 10 11-6 11 6-11 6z"/><path d="M5 10v12l11 6 11-6V10M16 16v12"/></svg></div><h3>Falcon AI dan Inventori</h3><p>Falcon mencari unit, mengirim foto, dan merekomendasikan stok live. Listing multi-cabang menjaga datanya akurat.</p><b>Pelajari Inventori →</b></a>
-          <a class="solution-card" href="./fitur/social-media-sora-ai.html"><span class="solution-status">AKTIF</span><div class="solution-icon"><svg viewBox="0 0 32 32" aria-hidden="true"><rect x="5" y="5" width="22" height="22" rx="5"/><circle cx="16" cy="16" r="5"/><circle cx="23" cy="9" r="1" class="solution-icon-fill"/></svg></div><h3>Sora AI dan Media Sosial</h3><p>Ubah data inventori menjadi konten, jadwal, kampanye, dan wawasan Meta.</p><b>Pelajari Studio Konten →</b></a>
-          <a class="solution-card" href="./fitur/ana-ai-analytics.html"><span class="solution-status">AKTIF</span><div class="solution-icon"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M5 27V16m8 11V9m8 18V14m8 13V5"/><path d="m5 11 8-5 8 3 8-6"/></svg></div><h3>Ana AI Analitik</h3><p>Baca alur konversi, kanal, tenaga penjualan, cabang, dan metrik finansial utama.</p><b>Pelajari Analitik →</b></a>
+        <div class="container">
+          <ul class="alt-pills">
+            <li>KPI utama dalam satu dashboard</li>
+            <li>Keputusan berbasis data aktual</li>
+            <li>Perbandingan lintas cabang</li>
+            <li>Visibilitas revenue dan margin</li>
+          </ul>
         </div>
       </section>
 
-      <section class="home-section usecase-section" id="contoh-alur">
-        <div class="container usecase-slider" data-usecase-slider>
-          <header class="usecase-heading">
-            <h2>CONTOH ALUR NYATA</h2>
+      <section class="alt-feature is-centered" id="sora" aria-labelledby="sora-heading">
+        <div class="container">
+          <header class="alt-feature-copy is-center">
+            <h2 id="sora-heading" class="alt-hand">AI Sora + Social Media</h2>
+            <p class="alt-feature-kicker">Social media lebih terarah.</p>
+            <p>Kelola konten dan aktivitas social media secara lebih konsisten dari satu alur kerja.</p>
+            <a class="btn btn-primary alt-more" href="./fitur/social-media-sora-ai.html">Selengkapnya <span>→</span></a>
           </header>
-
-          <div class="usecase-viewport">
-            <article class="usecase-slide is-active" id="usecase-panel-falcon" role="tabpanel" aria-labelledby="usecase-tab-falcon" data-usecase-panel="falcon">
-              <div class="usecase-copy">
-                <p class="usecase-kicker">USE CASE: DSS Motor</p>
-                <h3>AI Sales Assistant &amp; Sales Automation</h3>
-                <p class="usecase-lead">Implementasi Falcon &amp; AI</p>
-                <p class="usecase-lead">Implementasi DSS Motor dengan AI Sales Copilot (WhatsApp-based)</p>
-                <div class="usecase-block">
-                  <span>Terintegrasi dengan</span>
-                  <ul>
-                    <li>Inventory Management</li>
-                    <li>AI Sales Assistant</li>
-                  </ul>
-                </div>
-                <div class="usecase-impact">
-                  <span>Impact</span>
-                  <ul>
-                    <li>Sales process lebih cepat &amp; terstruktur</li>
-                    <li>Tim sales terbantu AI dalam closing</li>
-                    <li>Data lebih akurat &amp; real-time</li>
-                  </ul>
-                </div>
-              </div>
-              <figure class="usecase-photo">
+          <div class="alt-shot-stack is-social" data-stack="sora">
+            <figure class="alt-shot alt-shot-back">
+              <button type="button" data-hero-image-open data-image-src="./assets/feature-previews/product-social-pilih-kendaraan-public.png?v=alt-home-20260819c" data-image-alt="Studio Sora: pilih unit ready dari inventory untuk dijadikan materi konten." data-image-title="Pilih kendaraan">
                 <picture>
-                  <source
-                    type="image/webp"
-                    srcset="./assets/usecase/falcon-ims-dss-motor-720.webp?v=usecase-blue-20260815 720w, ./assets/usecase/falcon-ims-dss-motor-1200.webp?v=usecase-blue-20260815 1200w"
-                    sizes="(max-width: 760px) calc(100vw - 32px), (max-width: 1100px) min(480px, calc(52vw - 24px)), 760px"
-                  />
-                  <img
-                    data-usecase-visual
-                    src="./assets/usecase/falcon-ims-dss-motor.png?v=usecase-blue-20260815"
-                    width="1510"
-                    height="1042"
-                    alt="Percakapan WhatsApp DSS Motor AI Falcon: lead baru terdaftar otomatis dan stok unit dicari lewat Inventory Management."
-                    decoding="async"
-                  />
+                  <source type="image/webp" srcset="./assets/feature-previews/product-social-pilih-kendaraan-public-720.webp?v=alt-home-20260819c 720w, ./assets/feature-previews/product-social-pilih-kendaraan-public-1200.webp?v=alt-home-20260819c 1200w" sizes="(max-width: 760px) calc(100vw - 40px), min(640px, 62vw)" />
+                  <img src="./assets/feature-previews/product-social-pilih-kendaraan-public.png?v=alt-home-20260819c" width="1440" height="900" alt="Studio Sora: pilih unit ready dari inventory untuk dijadikan materi konten." decoding="async" />
                 </picture>
-                <figcaption>
-                  <button
-                    type="button"
-                    data-hero-image-open
-                    data-image-src="./assets/usecase/falcon-ims-dss-motor.png?v=usecase-blue-20260815"
-                    data-image-alt="Percakapan WhatsApp DSS Motor AI Falcon: lead baru terdaftar otomatis dan stok unit dicari lewat Inventory Management."
-                    data-image-title="AI Sales Assistant &amp; Sales Automation — DSS Motor"
-                  >Buka ukuran penuh ↗</button>
-                </figcaption>
-              </figure>
-            </article>
-
-            <article class="usecase-slide" id="usecase-panel-social" role="tabpanel" aria-labelledby="usecase-tab-social" data-usecase-panel="social" hidden>
-              <div class="usecase-copy">
-                <p class="usecase-kicker">USE CASE: Mobix by DSSM</p>
-                <h3>Automated Social Media from Inventory</h3>
-                <p class="usecase-lead">Automasi posting &amp; marketing</p>
-                <div class="usecase-block">
-                  <span>Kapabilitas</span>
-                  <ul>
-                    <li>AI Background generator</li>
-                    <li>Schedule posting</li>
-                    <li>1 platform to post it all</li>
-                  </ul>
-                </div>
-                <div class="usecase-impact">
-                  <span>Impact</span>
-                  <ul>
-                    <li>Konsistensi konten meningkat</li>
-                    <li>Hemat waktu tim marketing</li>
-                    <li>Inventory lebih cepat terjual</li>
-                  </ul>
-                </div>
-              </div>
-              <figure class="usecase-photo">
+              </button>
+            </figure>
+            <figure class="alt-shot alt-shot-front">
+              <button type="button" data-hero-image-open data-image-src="./assets/feature-previews/product-social-studio.png?v=alt-home-20260819c" data-image-alt="Generator konten Sora: layer desain, harga unit, dan tools AI enhance serta background." data-image-title="Content studio Sora">
                 <picture>
-                  <source
-                    type="image/webp"
-                    srcset="./assets/usecase/social-media-mobix-dssm-720.webp?v=usecase-blue-20260815 720w, ./assets/usecase/social-media-mobix-dssm-1200.webp?v=usecase-blue-20260815 1200w"
-                    sizes="(max-width: 760px) calc(100vw - 32px), (max-width: 1100px) min(480px, calc(52vw - 24px)), 760px"
-                  />
-                  <img
-                    data-usecase-visual
-                    src="./assets/usecase/social-media-mobix-dssm.png?v=usecase-blue-20260815"
-                    width="1510"
-                    height="1042"
-                    alt="Studio konten Mobix: pilih unit dari inventori, generate background AI, lalu jadwalkan posting ke Instagram, Facebook, TikTok, dan WhatsApp."
-                    decoding="async"
-                  />
+                  <source type="image/webp" srcset="./assets/feature-previews/product-social-studio-720.webp?v=alt-home-20260819c 720w, ./assets/feature-previews/product-social-studio-1200.webp?v=alt-home-20260819c 1200w" sizes="(max-width: 760px) calc(100vw - 56px), min(620px, 58vw)" />
+                  <img src="./assets/feature-previews/product-social-studio.png?v=alt-home-20260819c" width="1440" height="900" alt="Generator konten Sora: layer desain, harga unit, dan tools AI enhance serta background." decoding="async" />
                 </picture>
-                <figcaption>
-                  <button
-                    type="button"
-                    data-hero-image-open
-                    data-image-src="./assets/usecase/social-media-mobix-dssm.png?v=usecase-blue-20260815"
-                    data-image-alt="Studio konten Mobix: pilih unit dari inventori, generate background AI, lalu jadwalkan posting ke Instagram, Facebook, TikTok, dan WhatsApp."
-                    data-image-title="Automated Social Media — Mobix by DSSM"
-                  >Buka ukuran penuh ↗</button>
-                </figcaption>
-              </figure>
-            </article>
-
-            <article class="usecase-slide" id="usecase-panel-omni" role="tabpanel" aria-labelledby="usecase-tab-omni" data-usecase-panel="omni" hidden>
-              <div class="usecase-copy">
-                <p class="usecase-kicker">USE CASE: DSF</p>
-                <h3>AI-Driven Lead Conversion</h3>
-                <p class="usecase-lead">Automasi lead capture dari berbagai source, nurture, hingga distribusi di dalam 1 dashboard</p>
-                <div class="usecase-block">
-                  <span>Kapabilitas</span>
-                  <ul>
-                    <li>AI Jasmine sales agent</li>
-                    <li>1 Dashboard to manage</li>
-                    <li>Lead capturing, filtering, nurturing</li>
-                  </ul>
-                </div>
-                <div class="usecase-impact">
-                  <span>Impact</span>
-                  <ul>
-                    <li>Zero missed leads</li>
-                    <li>Faster response time</li>
-                    <li>Higher conversion rate</li>
-                  </ul>
-                </div>
-              </div>
-              <figure class="usecase-photo">
-                <picture>
-                  <source
-                    type="image/webp"
-                    srcset="./assets/usecase/omnichannel-dsf-720.webp?v=usecase-blue-20260815 720w, ./assets/usecase/omnichannel-dsf-1200.webp?v=usecase-blue-20260815 1200w"
-                    sizes="(max-width: 760px) calc(100vw - 32px), (max-width: 1100px) min(480px, calc(52vw - 24px)), 760px"
-                  />
-                  <img
-                    data-usecase-visual
-                    src="./assets/usecase/omnichannel-dsf.png?v=usecase-blue-20260815"
-                    width="1510"
-                    height="1042"
-                    alt="Dashboard omnichannel DSF: inbox percakapan, simulasi kredit, detail lead, dan distribusi ke tim sales dari satu layar."
-                    decoding="async"
-                  />
-                </picture>
-                <figcaption>
-                  <button
-                    type="button"
-                    data-hero-image-open
-                    data-image-src="./assets/usecase/omnichannel-dsf.png?v=usecase-blue-20260815"
-                    data-image-alt="Dashboard omnichannel DSF: inbox percakapan, simulasi kredit, detail lead, dan distribusi ke tim sales dari satu layar."
-                    data-image-title="AI-Driven Lead Conversion — DSF"
-                  >Buka ukuran penuh ↗</button>
-                </figcaption>
-              </figure>
-            </article>
+              </button>
+            </figure>
           </div>
+        </div>
+      </section>
 
-          <div class="usecase-controls">
-            <button type="button" class="usecase-arrow" data-usecase-prev aria-label="Alur sebelumnya">
-              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6 9 12l6 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            </button>
-            <div class="usecase-tabs" role="tablist" aria-label="Contoh alur nyata">
-              <button class="active" type="button" role="tab" id="usecase-tab-falcon" aria-selected="true" aria-controls="usecase-panel-falcon" tabindex="0" data-usecase="falcon">AI Sales Assistant</button>
-              <button type="button" role="tab" id="usecase-tab-social" aria-selected="false" aria-controls="usecase-panel-social" tabindex="-1" data-usecase="social">Social Media</button>
-              <button type="button" role="tab" id="usecase-tab-omni" aria-selected="false" aria-controls="usecase-panel-omni" tabindex="-1" data-usecase="omni">Lead Conversion</button>
-            </div>
-            <button type="button" class="usecase-arrow" data-usecase-next aria-label="Alur berikutnya">
-              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            </button>
+      <section class="alt-feature alt-crm" id="crm" aria-labelledby="crm-heading">
+        <div class="container alt-feature-grid">
+          <div class="alt-feature-copy">
+            <h2 id="crm-heading" class="alt-hand">CRM</h2>
+            <p class="alt-feature-kicker">Jangan biarkan lead terlewat.</p>
+            <p>Kelola lead, riwayat percakapan, status, dan follow-up dalam satu alur.</p>
+            <a class="btn btn-primary alt-more" href="./fitur/aplikasi-crm.html">Selengkapnya <span>→</span></a>
           </div>
+          <figure class="alt-crm-visual">
+            <button type="button" data-hero-image-open data-image-src="./assets/feature-previews/alt-crm-workspace.png?v=alt-home-20260819c" data-image-alt="Workspace CRM Motovax: detail prospect, Sales Assistant AI merekomendasikan unit, dan metrik pengunjung website di sekitar sales yang sedang follow-up." data-image-title="CRM Motovax">
+              <picture>
+                <source type="image/webp" srcset="./assets/feature-previews/alt-crm-workspace-720.webp?v=alt-home-20260819c 720w, ./assets/feature-previews/alt-crm-workspace-1200.webp?v=alt-home-20260819c 1200w" sizes="(max-width: 760px) calc(100vw - 24px), min(720px, 56vw)" />
+                <img src="./assets/feature-previews/alt-crm-workspace.png?v=alt-home-20260819c" width="1315" height="874" alt="Workspace CRM Motovax: detail prospect, Sales Assistant AI merekomendasikan unit, dan metrik pengunjung website di sekitar sales yang sedang follow-up." decoding="async" />
+              </picture>
+            </button>
+            <figcaption>
+              <button type="button" data-hero-image-open data-image-src="./assets/feature-previews/alt-crm-workspace.png?v=alt-home-20260819c" data-image-alt="Workspace CRM Motovax: detail prospect, Sales Assistant AI merekomendasikan unit, dan metrik pengunjung website di sekitar sales yang sedang follow-up." data-image-title="CRM Motovax">Buka ukuran penuh ↗</button>
+            </figcaption>
+          </figure>
         </div>
       </section>
 
@@ -407,31 +378,13 @@
           </header>
           <ul class="clients-logos">
             <li>
-              <img
-                src="./assets/clients/dss-motor.png?v=clients-20260815"
-                width="130"
-                height="129"
-                alt="DSS Motor"
-                decoding="async"
-              />
+              <img src="./assets/clients/dss-motor.png?v=clients-20260815" width="130" height="129" alt="DSS Motor" decoding="async" />
             </li>
             <li>
-              <img
-                src="./assets/clients/mobix.png?v=clients-20260815"
-                width="152"
-                height="118"
-                alt="Mobix — Xtra aman, xtra yakin"
-                decoding="async"
-              />
+              <img src="./assets/clients/mobix.png?v=clients-20260815" width="152" height="118" alt="Mobix — Xtra aman, xtra yakin" decoding="async" />
             </li>
             <li>
-              <img
-                src="./assets/clients/dsf.png?v=clients-20260815"
-                width="218"
-                height="124"
-                alt="DSF"
-                decoding="async"
-              />
+              <img src="./assets/clients/dsf.png?v=clients-20260815" width="218" height="124" alt="DSF" decoding="async" />
             </li>
             <li class="clients-more" aria-label="and many more">
               <span>and many more</span>
@@ -440,39 +393,48 @@
         </div>
       </section>
 
-      <section class="home-section getting-started">
-        <div class="container start-layout">
-          <div class="start-intro">
-            <div class="section-label">SETUP MANDIRI, TANPA RIBET</div>
-            <h2>Workspace Anda siap dalam 3 langkah simpel.</h2>
-            <p>Tak perlu menunggu bantuan konfigurasi. Ikuti onboarding singkat, lengkapi profil dealer, lalu pilih modul yang dibutuhkan tim Anda.</p>
-            <a class="btn btn-primary btn-large" href="https://onboard.motovax.com/onboarding.html?fresh=1">Mulai setup sekarang <span>→</span></a>
-            <small><b>✓</b> Bisa diubah kembali kapan saja</small>
+      <section class="home-cta" id="mulai">
+        <div class="container">
+          <div>
+            <span>SIAP MULAI COBA?</span>
+            <h2>Daftar sekarang dan gerakkan lead dealer Anda.</h2>
+            <p>Buat akun Motovax, satukan kanal, stok unit, sales, serta follow-up — lalu coba alur kerja dealer Anda hari ini.</p>
           </div>
-          <ol class="start-steps">
-            <li>
-              <span class="start-number">01</span>
-              <div class="start-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 13a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z"/><path d="M4.5 21a7.5 7.5 0 0 1 15 0"/><path d="M18 7h4m-2-2v4"/></svg></div>
-              <div><small>LANGKAH PERTAMA</small><h3>Buat akun Anda</h3><p>Daftar dengan email atau Google untuk memulai workspace Motovax.</p></div>
-            </li>
-            <li>
-              <span class="start-number">02</span>
-              <div class="start-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 21V8l8-5 8 5v13"/><path d="M8 21v-5h8v5M8 10h.01M12 10h.01M16 10h.01"/></svg></div>
-              <div><small>KENALI DEALER ANDA</small><h3>Lengkapi profil dealer</h3><p>Isi nama dealer serta detail cabang dan wilayah bila diperlukan.</p></div>
-            </li>
-            <li>
-              <span class="start-number">03</span>
-              <div class="start-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4z"/><path d="m15 17 2 2 4-5"/></svg></div>
-              <div><small>SESUAIKAN WORKSPACE</small><h3>Pilih modul prioritas</h3><p>Aktifkan modul yang dibutuhkan. Workspace Anda langsung siap dicoba.</p></div>
-            </li>
-          </ol>
+          <div>
+            <a class="btn btn-light btn-large" href="https://onboard.motovax.com/onboarding.html?fresh=1">Daftar &amp; Mulai Coba <span>→</span></a>
+            <small>Gratis mulai onboarding. Sudah punya akun? <a href="https://onboard.motovax.com/login.html?reauth=1">Login</a></small>
+          </div>
         </div>
       </section>
-
-      <section class="home-cta"><div class="container"><div><span>SIAP MEMPERCEPAT PENJUALAN DEALER ANDA?</span><h2>Gerakkan lead dari percakapan menuju test drive dan closing.</h2><p>Buat akun Motovax dan satukan kanal, stok unit, sales, serta follow-up dealer Anda mulai sekarang.</p></div><div><a class="btn btn-light btn-large" href="https://onboard.motovax.com/onboarding.html?fresh=1">Mulai Sekarang <span>→</span></a><small>Mulai onboarding dealer Anda</small></div></div></section>
     </main>
 
-    <footer class="footer"><div class="container footer-grid"><div><a class="brand footer-brand" href="#top"><span>MOTO</span><strong>VAX</strong></a><p>Platform AI untuk menyatukan stok unit, lead, sales, dan operasional dealer mobil.</p></div><div><h3>Produk</h3><a href="./modul.html">Semua Produk</a><a href="./fitur/agentic-ai.html">Agentic AI</a><a href="./harga.html">Harga</a></div><div><h3>Perusahaan</h3><a href="./hubungi-kami.html">Hubungi Kami</a><a href="./kebijakan-privasi.html">Kebijakan Privasi</a><a href="./syarat-ketentuan.html">Syarat & Ketentuan</a></div><div><h3>Kontak</h3><p>hello@motovax.ai</p><a href="#" data-wa>WhatsApp kami →</a></div></div><div class="copyright">&copy; <span data-year></span> MOTOVAX. Hak cipta dilindungi.</div></footer>
+    <footer class="footer">
+      <div class="container footer-grid">
+        <div>
+          <a class="brand footer-brand" href="#top"><span>MOTO</span><strong>VAX</strong></a>
+          <p>Platform AI untuk menyatukan stok unit, lead, sales, dan operasional dealer mobil.</p>
+        </div>
+        <div>
+          <h3>Produk</h3>
+          <a href="./modul.html">Semua Produk</a>
+          <a href="./fitur/agentic-ai.html">Agentic AI</a>
+          <a href="./harga.html">Harga</a>
+        </div>
+        <div>
+          <h3>Perusahaan</h3>
+          <a href="./hubungi-kami.html">Hubungi Kami</a>
+          <a href="./kebijakan-privasi.html">Kebijakan Privasi</a>
+          <a href="./syarat-ketentuan.html">Syarat & Ketentuan</a>
+        </div>
+        <div>
+          <h3>Kontak</h3>
+          <p>hello@motovax.ai</p>
+          <a href="#" data-wa>WhatsApp kami →</a>
+        </div>
+      </div>
+      <div class="copyright">&copy; <span data-year></span> MOTOVAX. Hak cipta dilindungi.</div>
+    </footer>
+
     <div class="feature-image-modal" data-hero-image-modal hidden role="dialog" aria-modal="true" aria-labelledby="heroImageModalTitle">
       <div class="feature-image-modal-panel">
         <header>
@@ -487,6 +449,6 @@
         </div>
       </div>
     </div>
-    <script src="./script.js?v=ai-first-tools-20260819"></script>
+    <script src="./script.js?v=home-live-20260819"></script>
   </body>
 </html>

@@ -98,8 +98,8 @@ const template = (slug, title, description) => `<!doctype html>
 
     <script>window.__FEATURE_SLUG__ = ${JSON.stringify(slug)};</script>
     <script src="./features-data.js?v=ai-first-tools-20260819"></script>
-    <script src="./feature-page.js?v=ai-first-tools-20260819"></script>
-    <script src="../script.js?v=ai-first-tools-20260819"></script>
+    <script src="./feature-page.js?v=home-live-20260819"></script>
+    <script src="../script.js?v=home-live-20260819"></script>
   </body>
 </html>
 `;
@@ -172,7 +172,7 @@ fs.writeFileSync(
       <ul class="feature-index-list">${listItems}</ul>
     </div>
   </main>
-  <script src="../script.js?v=ai-first-tools-20260819"></script>
+  <script src="../script.js?v=home-live-20260819"></script>
 </body>
 </html>
 `,

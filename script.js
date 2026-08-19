@@ -588,7 +588,7 @@ const dealerProductNavigation = Object.freeze({
     const panes = allPanes
       .map((item) => {
         const demoHref = item.demo
-          ? `${rootPrefix}index.html?demo=${item.demo.id}&from=${encodeURIComponent(item.demo.context || item.id)}#${item.demo.hash}`
+          ? `${rootPrefix}index-legacy.html?demo=${item.demo.id}&from=${encodeURIComponent(item.demo.context || item.id)}#${item.demo.hash}`
           : "";
         const demoCta = item.demo
           ? `<a href="${demoHref}" class="produk-mega-demo-button" data-open-${item.demo.id}-demo data-demo-context="${item.demo.context || item.id}" data-produk-close>

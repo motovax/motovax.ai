@@ -106,7 +106,10 @@ for (const viewport of viewports) {
             return target?.textContent.replace(/\s+/g, " ").trim() || "";
           }),
         );
-        assert.deepEqual(labels, ["Produk", "Cara Kerja", "Solusi", "Harga", "Hubungi Kami"], route);
+        const expectedNav = route === "/index.html"
+          ? ["Produk", "Kapabilitas", "Harga", "Hubungi Kami"]
+          : ["Produk", "Cara Kerja", "Solusi", "Harga", "Hubungi Kami"];
+        assert.deepEqual(labels, expectedNav, route);
       } else {
         await page.click("[data-mobile-nav-trigger]");
         const mobileState = await page.locator("[data-mobile-nav-panel]:not([hidden]) .mobile-nav-links > a, [data-mobile-nav-panel]:not([hidden]) .mobile-nav-links > details > summary").evaluateAll((links) => ({
@@ -209,7 +212,7 @@ for (const viewport of viewports) {
     const context = await browser.newContext({ viewport });
     const page = await context.newPage();
     await page.route(/https:\/\/fonts\.(?:googleapis|gstatic)\.com\//, (route) => route.abort());
-    await page.goto(`${baseUrl}/index.html`, { waitUntil: "load" });
+    await page.goto(`${baseUrl}/index-legacy.html`, { waitUntil: "load" });
 
     const section = page.locator("#solusi");
     await section.scrollIntoViewIfNeeded();
@@ -777,7 +780,7 @@ for (const viewport of viewports) {
     await page.goto(`${baseUrl}/index.html`, { waitUntil: "load" });
     assert.equal(
       await page.locator("[data-typewriter]").getAttribute("data-phrases"),
-      "More Test Drives.|More Unit Sales.",
+      "One Stock.|More Sales.|Faster Response.|Unlimited Growth.",
     );
     assert.equal(await noOverflow(page), true);
 

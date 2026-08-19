@@ -73,7 +73,7 @@
   const sharedDemo = data.demo || demoByCategory[data.category] || "dashboard";
   const sharedDemoHash = data.demoHash || demoHashes[sharedDemo] || "solusi";
   const demoParams = new URLSearchParams({ demo: sharedDemo, from: data.slug || slug });
-  const demoHref = `../index.html?${demoParams.toString()}#${sharedDemoHash}`;
+  const demoHref = `../index-legacy.html?${demoParams.toString()}#${sharedDemoHash}`;
   const isRelatedSimulation = /partial|roadmap/i.test(data.status || "");
   const demoLabel = data.demoLabel || (isRelatedSimulation ? "Lihat Simulasi Terkait" : "Coba Demo Interaktif");
   const demoCta = `<a class="btn btn-secondary feature-hero-demo" href="${escapeHtml(demoHref)}">${demoLabel} <span>-></span></a>`;

@@ -91,11 +91,11 @@ async function noOverflow(page) {
 }
 
 for (const viewport of viewports) {
-  test(`index-alt product overview scanable pada ${viewport.name}`, async () => {
+  test(`beranda product overview scanable pada ${viewport.name}`, async () => {
     const context = await browser.newContext({ viewport });
     const page = await context.newPage();
     await page.route(/https:\/\/fonts\.(?:googleapis|gstatic)\.com\//, (route) => route.abort());
-    await page.goto(`${baseUrl}/index-alt.html`, { waitUntil: "load" });
+    await page.goto(`${baseUrl}/index.html`, { waitUntil: "load" });
 
     assert.equal(await page.locator("[data-typewriter]").getAttribute("data-phrases"), expectedPhrases);
     assert.equal(await page.locator(".alt-node[data-pillar]").count(), 6);
@@ -178,7 +178,22 @@ for (const viewport of viewports) {
       assert.equal(await modal.isHidden(), true);
     }
 
+    assert.equal(await page.locator(".alt-preview-bar").count(), 0);
+    assert.equal(await page.locator('meta[name="robots"]').count(), 0);
+    assert.match(await page.title(), /One Stock, More Sales, Faster Response/i);
+
     await page.screenshot({ path: `/tmp/motovax-index-alt-${viewport.name}.png`, fullPage: true });
     await context.close();
   });
 }
+
+test("index-alt.html mengarah ke beranda", async () => {
+  const context = await browser.newContext();
+  const page = await context.newPage();
+  const response = await page.goto(`${baseUrl}/index-alt.html`, { waitUntil: "load" });
+  const url = new URL(page.url());
+  assert.equal(url.pathname, "/");
+  assert.ok(response && [200, 301, 302, 308].includes(response.status()));
+  assert.equal(await page.locator(".alt-node[data-pillar]").count(), 6);
+  await context.close();
+});

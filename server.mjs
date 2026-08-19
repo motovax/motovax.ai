@@ -2760,6 +2760,9 @@ export function createApp({
     }
     return next();
   });
+  app.get("/index-alt.html", (_req, res) => {
+    return res.redirect(301, "/");
+  });
   app.get(["/profile.html", "/billing.html"], (_req, res) => {
     return res.redirect(302, new URL("/login.html", config.publicBaseUrl).toString());
   });
