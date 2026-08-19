@@ -134,6 +134,13 @@ for (const link of document.querySelectorAll("[data-wa]")) {
   observer.observe(headline || typed);
 })();
 
+(function initAltOrbitMotion() {
+  const orbit = document.querySelector("[data-alt-orbit]");
+  if (!orbit) return;
+  if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  for (const motion of orbit.querySelectorAll("animateMotion")) motion.remove();
+})();
+
 /** Garis bawahi spidol merah: tergambar saat masuk viewport, bisa digaris ulang dengan pointer. */
 (function initMarkerUnderline() {
   const marks = [...document.querySelectorAll("[data-marker-underline]")];
@@ -405,8 +412,8 @@ const dealerProductNavigation = Object.freeze({
     },
     {
       id: "omni-jasmine",
-      label: "Omni + Jasmine AI",
-      paneTitle: "Omni + Jasmine AI",
+      label: "Jasmine AI + Omnichannel",
+      paneTitle: "Jasmine AI + Omnichannel",
       demo: { id: "omni", hash: "omniDemo", context: "omnichannel", label: "Coba Omnichannel" },
       features: [
         { title: "WhatsApp, Instagram & Facebook", desc: "Satukan chat pelanggan dari tiga channel dalam satu inbox Call Center", icon: "chat", slug: "omni-jasmine-ai" },
@@ -418,14 +425,14 @@ const dealerProductNavigation = Object.freeze({
     },
     {
       id: "inventory-falcon",
-      label: "Inventory + Falcon AI",
-      paneTitle: "Inventory + Falcon AI",
+      label: "Falcon AI + Inventory",
+      paneTitle: "Falcon AI + Inventory",
       demo: { id: "inventory", hash: "inventoryDemo", context: "inventory", label: "Coba Inventory" },
       features: [
-        { title: "Item / listing multi cabang", desc: "Kelola item dan listing dari seluruh cabang dalam satu inventori", icon: "shop", slug: "inventory-falcon-ai" },
+        { title: "Falcon AI: searching, kirim foto & rekomendasi otomatis", desc: "Cari unit, kirim foto, dan rekomendasikan alternatif dari stok live dealer", icon: "ai", slug: "inventory-falcon-ai" },
+        { title: "Laporan dan aksi sesuai peran", desc: "Sales dan management memakai tool Falcon sesuai permission — dari cek stok sampai laporan PDF", icon: "report", slug: "inventory-falcon-ai" },
+        { title: "Item / listing multi cabang", desc: "Kelola item dan listing dari seluruh cabang sebagai sumber kebenaran Falcon", icon: "shop", slug: "inventory-falcon-ai" },
         { title: "Import listing via WhatsApp", desc: "Tambahkan data listing melalui alur WhatsApp yang terhubung ke inventori", icon: "wa", slug: "inventory-falcon-ai" },
-        { title: "Custom tagging / status & filter slicing", desc: "Atur tag, status, dan filter untuk menemukan kelompok stok yang dibutuhkan", icon: "ticket", slug: "inventory-falcon-ai" },
-        { title: "Falcon AI: searching, kirim foto & rekomendasi otomatis", desc: "Cari unit, kirim foto, dan rekomendasikan alternatif secara otomatis", icon: "ai", slug: "inventory-falcon-ai" },
         { title: "Live katalog API", desc: "Hubungkan stok aktif ke katalog dan aplikasi eksternal melalui API", icon: "live", slug: "inventory-falcon-ai" },
         { title: "AI 500 credit", desc: "Gunakan 500 kredit AI untuk pencarian dan bantuan operasional Falcon", icon: "ai", slug: "inventory-falcon-ai" },
       ],
@@ -444,8 +451,8 @@ const dealerProductNavigation = Object.freeze({
     },
     {
       id: "social-sora",
-      label: "Social Media + Sora AI",
-      paneTitle: "Social Media + Sora AI",
+      label: "Sora AI + Social Media",
+      paneTitle: "Sora AI + Social Media",
       demo: { id: "social", hash: "socialDemo", context: "social", label: "Coba Social Studio" },
       features: [
         { title: "Content studio", desc: "Susun materi promosi dan caption dari data produk dalam satu workspace", icon: "shop", slug: "social-media-sora-ai" },
@@ -588,7 +595,7 @@ const dealerProductNavigation = Object.freeze({
     const panes = allPanes
       .map((item) => {
         const demoHref = item.demo
-          ? `${rootPrefix}index.html?demo=${item.demo.id}&from=${encodeURIComponent(item.demo.context || item.id)}#${item.demo.hash}`
+          ? `${rootPrefix}index-legacy.html?demo=${item.demo.id}&from=${encodeURIComponent(item.demo.context || item.id)}#${item.demo.hash}`
           : "";
         const demoCta = item.demo
           ? `<a href="${demoHref}" class="produk-mega-demo-button" data-open-${item.demo.id}-demo data-demo-context="${item.demo.context || item.id}" data-produk-close>
@@ -797,14 +804,14 @@ const dealerSolutionNavigation = Object.freeze({
     {
       title: "Putar stok lebih cepat",
       desc: "Pantau stok dan aging lintas cabang serta bantu tim menemukan unit yang tepat.",
-      capability: "Inventory Management + Falcon AI",
+      capability: "Falcon AI + Inventory",
       icon: "inventory",
       href: "inventory-falcon-ai.html",
     },
     {
       title: "Aktifkan kampanye dari stok",
       desc: "Ubah data unit menjadi konten dan kampanye yang relevan di setiap channel.",
-      capability: "Social Media & Ads Automation",
+      capability: "Sora AI + Social Media",
       icon: "campaign",
       href: "social-media-sora-ai.html",
     },

@@ -10,7 +10,8 @@ python -m http.server 5179
 
 Open `http://localhost:5179/`.
 
-- Home: `index.html` (solusi + interactive demos)
+- Home: `index.html` (Core Platform + kapabilitas)
+- Demo interaktif (arsip): `index-legacy.html`
 - Login tenant: `login.html` (+ `login.js`) — autentikasi Google atau username/email, deteksi tenant otomatis, dan handoff SSO langsung ke aplikasi tanpa portal akun perantara
 - Onboarding user baru: `onboarding.html` (+ `onboarding.js`) — daftar, profil dealer, modul
 - Modul breakdown: `modul.html`

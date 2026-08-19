@@ -48,10 +48,10 @@ WHERE a.tenant_id = $2
 const BILLING_PACKAGE_DEFINITIONS = [
   { id: "core", name: "Core — Platform Integrasi Agentic AI", priceAmount: 1_500_000, includedCredits: 0, enabled: () => true },
   { id: "crm", name: "CRM", priceAmount: 1_500_000, includedCredits: 0, enabled: (features) => features.crm_autopilot === true },
-  { id: "omni_jasmine", name: "Omni + Jasmine AI", priceAmount: 2_000_000, includedCredits: 500, enabled: (features) => features.whatsapp_ai === true },
-  { id: "inventory_falcon", name: "Inventory + Falcon AI", priceAmount: 1_500_000, includedCredits: 500, enabled: (features) => features.inventory_management === true },
+  { id: "omni_jasmine", name: "Jasmine AI + Omnichannel", priceAmount: 2_000_000, includedCredits: 500, enabled: (features) => features.whatsapp_ai === true },
+  { id: "inventory_falcon", name: "Falcon AI + Inventory", priceAmount: 1_500_000, includedCredits: 500, enabled: (features) => features.inventory_management === true },
   { id: "ana_analytics", name: "Ana AI — Advanced Analytics", priceAmount: 1_000_000, includedCredits: 0, enabled: (features) => features.data_insight === true || features.one_dashboard === true },
-  { id: "social_sora", name: "Social Media + Sora AI", priceAmount: 1_500_000, includedCredits: 500, enabled: (features) => features.social_media_automation === true },
+  { id: "social_sora", name: "Sora AI + Social Media", priceAmount: 1_500_000, includedCredits: 500, enabled: (features) => features.social_media_automation === true },
 ];
 
 export function buildBillingPackages(features = {}, usageRows = []) {
@@ -2759,6 +2759,9 @@ export function createApp({
       return res.redirect(302, "/onboarding.html");
     }
     return next();
+  });
+  app.get("/index-alt.html", (_req, res) => {
+    return res.redirect(301, "/");
   });
   app.get(["/profile.html", "/billing.html"], (_req, res) => {
     return res.redirect(302, new URL("/login.html", config.publicBaseUrl).toString());

@@ -47,7 +47,7 @@ const template = (slug, title, description) => `<!doctype html>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="../styles.css?v=mobile-produk-nav-20260818" />
+    <link rel="stylesheet" href="../styles.css?v=ai-first-tools-20260819" />
   </head>
   <body class="feature-detail-page">
     <header class="site-header">
@@ -97,9 +97,9 @@ const template = (slug, title, description) => `<!doctype html>
     </footer>
 
     <script>window.__FEATURE_SLUG__ = ${JSON.stringify(slug)};</script>
-    <script src="./features-data.js?v=copy-20260818-ai-first"></script>
-    <script src="./feature-page.js?v=copy-20260818-ai-first"></script>
-    <script src="../script.js?v=mobile-produk-nav-20260818"></script>
+    <script src="./features-data.js?v=ai-first-tools-20260819"></script>
+    <script src="./feature-page.js?v=home-live-20260819"></script>
+    <script src="../script.js?v=home-live-20260819"></script>
   </body>
 </html>
 `;
@@ -143,7 +143,7 @@ fs.writeFileSync(
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Semua Fitur — MOTOVAX</title>
   <meta name="description" content="Jelajahi fitur Motovax untuk inventory unit, sales dealer, customer service, CRM, omnichannel, dan automasi dealer mobil." />
-  <link rel="stylesheet" href="../styles.css?v=mobile-produk-nav-20260818" />
+  <link rel="stylesheet" href="../styles.css?v=ai-first-tools-20260819" />
   <link rel="icon" href="../favicon.ico" />
 </head>
 <body class="feature-detail-page">
@@ -172,7 +172,7 @@ fs.writeFileSync(
       <ul class="feature-index-list">${listItems}</ul>
     </div>
   </main>
-  <script src="../script.js?v=mobile-produk-nav-20260818"></script>
+  <script src="../script.js?v=home-live-20260819"></script>
 </body>
 </html>
 `,

@@ -143,7 +143,7 @@ for (const viewport of viewports) {
     const context = await browser.newContext({ viewport });
     const page = await context.newPage();
     await page.route(/https:\/\/fonts\.(?:googleapis|gstatic)\.com\//, (route) => route.abort());
-    await page.goto(`${baseUrl}/index.html`, { waitUntil: "load" });
+    await page.goto(`${baseUrl}/index-legacy.html`, { waitUntil: "load" });
     await page.locator(".usecase-section").scrollIntoViewIfNeeded();
 
     const title = await page.locator(".usecase-heading h2").textContent();

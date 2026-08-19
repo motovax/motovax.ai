@@ -2141,6 +2141,11 @@ body.solusi-menu-open {
   --feature-accent-soft: #e9efff;
 }
 
+.family-inventory {
+  --feature-accent: #0f766e;
+  --feature-accent-soft: #e6f7f4;
+}
+
 .feature-product-visual {
   position: relative;
   min-width: 0;

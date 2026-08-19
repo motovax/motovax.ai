@@ -73,9 +73,9 @@
   const sharedDemo = data.demo || demoByCategory[data.category] || "dashboard";
   const sharedDemoHash = data.demoHash || demoHashes[sharedDemo] || "solusi";
   const demoParams = new URLSearchParams({ demo: sharedDemo, from: data.slug || slug });
-  const demoHref = `../index.html?${demoParams.toString()}#${sharedDemoHash}`;
+  const demoHref = `../index-legacy.html?${demoParams.toString()}#${sharedDemoHash}`;
   const isRelatedSimulation = /partial|roadmap/i.test(data.status || "");
-  const demoLabel = isRelatedSimulation ? "Lihat Simulasi Terkait" : "Coba Demo Interaktif";
+  const demoLabel = data.demoLabel || (isRelatedSimulation ? "Lihat Simulasi Terkait" : "Coba Demo Interaktif");
   const demoCta = `<a class="btn btn-secondary feature-hero-demo" href="${escapeHtml(demoHref)}">${demoLabel} <span>-></span></a>`;
 
   function isFanelingCapability(capability) {
@@ -124,10 +124,28 @@
     })
     .join("");
 
+  function renderShowcasePoints(capability, index) {
+    const explicit = Array.isArray(capability?.points) ? capability.points.filter(Boolean) : [];
+    if (explicit.length) {
+      return explicit
+        .map((point) => {
+          if (typeof point === "string") return `<li>${escapeHtml(point)}</li>`;
+          const title = String(point.title || "").trim();
+          const desc = String(point.desc || "").trim();
+          if (title && desc) return `<li>${escapeHtml(title)} — ${escapeHtml(desc)}</li>`;
+          return `<li>${escapeHtml(title || desc)}</li>`;
+        })
+        .join("");
+    }
+    const step = workflow[index % Math.max(workflow.length, 1)];
+    const benefit = benefits[index % Math.max(benefits.length, 1)];
+    return `
+              ${step ? `<li>${escapeHtml(step.title)} — ${escapeHtml(step.desc)}</li>` : ""}
+              ${benefit ? `<li>${escapeHtml(benefit)}</li>` : ""}`;
+  }
+
   const showcase = capabilities
     .map((capability, index) => {
-      const step = workflow[index % Math.max(workflow.length, 1)];
-      const benefit = benefits[index % Math.max(benefits.length, 1)];
       return `
         <article class="feature-showcase-row${index % 2 ? " reverse" : ""}">
           <div class="feature-showcase-copy">
@@ -135,8 +153,7 @@
             <h3>${escapeHtml(capability.title)}</h3>
             <p>${escapeHtml(capability.desc)}</p>
             <ul>
-              ${step ? `<li>${escapeHtml(step.title)} — ${escapeHtml(step.desc)}</li>` : ""}
-              ${benefit ? `<li>${escapeHtml(benefit)}</li>` : ""}
+              ${renderShowcasePoints(capability, index)}
             </ul>
             ${renderShowcaseAction(capability)}
           </div>
@@ -210,7 +227,7 @@
     <section class="feature-page-section feature-intro-section">
       <div class="container">
         <div class="feature-section-heading centered">
-          <h2>${escapeHtml(data.title)} untuk operasional yang lebih cepat dan terhubung</h2>
+          <h2>${escapeHtml(data.sectionTitle || `${data.title} untuk operasional yang lebih cepat dan terhubung`)}</h2>
           <p>${escapeHtml(profile.intro)}</p>
         </div>
         <div class="feature-use-case-grid">${useCases}</div>
@@ -220,8 +237,8 @@
     <section class="feature-page-section feature-showcase-section" id="kemampuan">
       <div class="container">
         <div class="feature-section-heading centered">
-          <h2>Kemampuan yang dapat dipakai tim Anda</h2>
-          <p>Setiap bagian di bawah menggambarkan capability Motovax dan alur kerja yang didukungnya.</p>
+          <h2>${escapeHtml(data.showcaseTitle || "Kemampuan yang dapat dipakai tim Anda")}</h2>
+          <p>${escapeHtml(data.showcaseDesc || "Setiap bagian di bawah menggambarkan capability Motovax dan alur kerja yang didukungnya.")}</p>
         </div>
         <div class="feature-showcase-list">${showcase}</div>
       </div>
@@ -245,7 +262,7 @@
     <section class="feature-page-section feature-process-section">
       <div class="container feature-process-grid">
         <div class="feature-section-heading">
-          <h2>Dari aktivitas masuk hingga tindak lanjut</h2>
+          <h2>${escapeHtml(data.processTitle || "Dari aktivitas masuk hingga tindak lanjut")}</h2>
           <p>${escapeHtml(availability.detail)}</p>
           <a class="btn btn-primary" href="https://motovax.ai/hubungi-kami.html">Diskusikan kebutuhan Anda</a>
         </div>
@@ -362,6 +379,36 @@
         intro: "Satukan modul yang relevan dalam satu journey agar tim bergerak dengan konteks data yang sama.",
         roles: ["Manajemen", "Tim Sales", "Customer Service"],
         facts: ["Multi-modul", "Satu data", "Role-based"],
+      };
+    }
+    if (id === "omni-jasmine-ai") {
+      return {
+        family: "omni",
+        eyebrow: "JASMINE AI + OMNICHANNEL",
+        sectionLabel: "AI LAYANAN PELANGGAN",
+        intro: "Jasmine merespons percakapan pelanggan dengan konteks dealer dan tool bisnis. Inbox, funneling, takeover, dan handoff menjaga alur tim tetap rapi.",
+        roles: ["Customer Service", "Tim Sales", "Marketing"],
+        facts: ["Multi-channel", "AI first", "Handoff jelas"],
+      };
+    }
+    if (id === "inventory-falcon-ai") {
+      return {
+        family: "inventory",
+        eyebrow: "FALCON AI + INVENTORY",
+        sectionLabel: "AI STOK DEALER",
+        intro: "Falcon memakai inventory live dealer untuk mencari unit, mengirim foto, merekomendasikan alternatif, dan menyusun laporan. Tools listing, import, dan API menjaga data yang dibaca AI tetap akurat.",
+        roles: ["Tim Sales", "Management", "Admin Inventory"],
+        facts: ["Stok live", "Role-aware", "Tool native"],
+      };
+    }
+    if (id === "social-media-sora-ai") {
+      return {
+        family: "campaign",
+        eyebrow: "SORA AI + SOCIAL MEDIA",
+        sectionLabel: "AI KONTEN DEALER",
+        intro: "Sora mengolah visual dan materi dari stok live. Studio, scheduler, publish, dan ads menjaga kampanye tetap terjadwal dan terukur.",
+        roles: ["Marketing", "Tim Sales", "Manajemen"],
+        facts: ["Visual AI", "Terjadwal", "Terukur"],
       };
     }
     if (campaign || social) {
@@ -591,16 +638,25 @@
       return [previewFactory("core-platform-whatsapp-integrations-public.png?v=20260806-2", "Core Platform · Integrasi WhatsApp"), previews.analytics, previews.integrations];
     }
     if (id === "omni-jasmine-ai") {
-      return [previewFactory("omnichannel-faneling-public.png", "Omni + Jasmine AI"), previews.omni, previews.integrations];
+      return [previewFactory("omnichannel-faneling-public.png", "Jasmine AI + Omnichannel"), previews.omni, previews.integrations];
     }
     if (id === "inventory-falcon-ai") {
-      return [previewFactory("product-falcon-sales.png", "Inventory + Falcon AI"), previewFactory("product-social-studio.png", "Inventory Unit"), previews.analytics];
+      const falconPreview = previewFactory(
+        "inventory-falcon-query-public.png?v=falcon-iphone-20260819",
+        "Falcon AI · Query stok",
+      );
+      falconPreview.wide = true;
+      return [
+        falconPreview,
+        previewFactory("inventory-falcon-branches-public.png?v=falcon-iphone-20260819", "Inventory · Unit per cabang"),
+        previews.analytics,
+      ];
     }
     if (id === "ana-ai-analytics") {
       return [previewFactory("product-dashboard-overview.png?v=20260818-ana-hero-ovw-2", "Ana AI · Analytics"), previewFactory("product-dashboard-sales.png", "Sales Performance"), previewFactory("product-dashboard-locations.png", "Performa Cabang")];
     }
     if (id === "social-media-sora-ai") {
-      return [previewFactory("product-social-studio.png", "Social Media + Sora AI"), previewFactory("product-social-calendar.png", "Kalender Posting"), previewFactory("product-social-insight.png", "Campaign Insight")];
+      return [previewFactory("product-social-pilih-kendaraan-public.png?v=20260818-sora-1", "Sora AI + Social Media"), previewFactory("product-social-calendar.png", "Kalender Posting"), previewFactory("product-social-insight.png", "Campaign Insight")];
     }
 
     if (id === "whatsapp-business-api") {
@@ -748,18 +804,51 @@
       preview = captured("core-platform-whatsapp-integrations-page-public.png?v=20260806-3", "Core Platform · Integrasi Channel", "WhatsApp, Instagram, Facebook Messenger, Meta Business, dan TikTok terlihat dalam satu pusat integrasi channel.");
     } else if (slug === "core-platform-agentic-ai" && /agentic ai|native tools/i.test(capabilityTitle)) {
       preview = captured("core-platform-native-ai-tools-public.png?v=20260805-2", "Core Platform · Native AI Tools", "Jasmine memakai inventori tenant untuk menjawab kebutuhan unit, memperbarui konteks lead, dan mendukung takeover serta handoff sesuai role.");
-    } else if (slug === "inventory-falcon-ai" && /listing|import|validasi/i.test(capabilityTitle)) {
-      preview = captured("product-social-studio.png", "Inventory · Unit Ready", "Unit ready dari inventory tenant tersedia sebagai sumber data dan materi operasional.");
-    } else if (slug === "inventory-falcon-ai" && /falcon|foto|rekomendasi/i.test(capabilityTitle)) {
-      preview = captured("product-falcon-sales.png", "Falcon · Pencarian & Rekomendasi", "Falcon memakai inventory tenant untuk membantu pencarian, foto, dan rekomendasi unit.");
-    } else if (slug === "inventory-falcon-ai" && /katalog api/i.test(capabilityTitle)) {
-      preview = captured("product-capability-whatsapp-content.png", "Developer API · Katalog", "Capability integrasi menyediakan data produk untuk kanal eksternal melalui API.");
+    } else if (slug === "inventory-falcon-ai" && /memahami|permintaan stok|query/i.test(capabilityTitle)) {
+      preview = captured(
+        "inventory-falcon-query-public.png?v=falcon-iphone-20260819",
+        "Falcon AI · Query stok",
+        "Falcon menerima permintaan stok lewat percakapan, lalu mengembalikan daftar unit ready lengkap dengan plat, kilometer, cabang, dan harga.",
+        [1440, 900],
+      );
+    } else if (slug === "inventory-falcon-ai" && /foto|serupa|alternatif/i.test(capabilityTitle)) {
+      preview = captured(
+        "inventory-falcon-photos-public.png?v=falcon-iphone-20260819",
+        "Falcon AI · Foto dan alternatif",
+        "Falcon mengirim foto unit yang diminta, lalu menawarkan unit serupa dari stok ready jika perlu alternatif.",
+        [1440, 900],
+      );
+    } else if (slug === "inventory-falcon-ai" && /laporan|peran|aging/i.test(capabilityTitle)) {
+      preview = captured(
+        "inventory-falcon-report-public.png?v=falcon-iphone-20260819",
+        "Falcon AI · Laporan sesuai peran",
+        "Management mendapat laporan stok per cabang dan aging unit dari percakapan yang sama, sesuai permission.",
+        [1440, 900],
+      );
+    } else if (slug === "inventory-falcon-ai" && /listing|multi-cabang/i.test(capabilityTitle)) {
+      preview = captured(
+        "inventory-falcon-branches-public.png?v=falcon-iphone-20260819",
+        "Inventory · Unit per cabang",
+        "Stok ready, booked, sold, dan kelengkapan foto terlihat per cabang sebagai sumber kebenaran yang dibaca Falcon.",
+        [1440, 900],
+      );
+    } else if (slug === "inventory-falcon-ai" && /import|validasi|katalog/i.test(capabilityTitle)) {
+      preview = captured(
+        "inventory-falcon-import-public.png?v=falcon-iphone-20260819",
+        "Inventory · Import dan katalog API",
+        "Import Excel atau Google Sheets menampilkan warning identitas, lalu stok aktif disajikan ke aplikasi eksternal lewat katalog API.",
+        [1440, 900],
+      );
     } else if (slug === "social-media-sora-ai" && /content studio|visual/i.test(capabilityTitle)) {
       preview = captured("product-social-studio.png", "Social Media · Content Studio", "Unit inventory dipilih sebagai sumber desain dan materi konten.");
     } else if (slug === "social-media-sora-ai" && /publish|scheduler/i.test(capabilityTitle)) {
       preview = captured("product-social-calendar.png", "Social Media · Kalender Posting", "Konten terjadwal tersusun dalam kalender publikasi tim.");
     } else if (slug === "social-media-sora-ai" && /analytics/i.test(capabilityTitle)) {
-      preview = captured("product-social-insight.png", "Social Media · Campaign Insight", "Klik, lead, dan hasil campaign dipantau dalam satu tampilan.");
+      preview = captured(
+        "product-social-ads-campaign.png?v=20260818-ads-1",
+        "Social Media · Ads Campaign Analytics",
+        "Klik, lead terkonfirmasi, konversi, dan tren seluruh campaign tampil dalam satu dashboard analitik.",
+      );
     } else if (slug === "ana-ai-analytics" && /finansial/i.test(capabilityTitle)) {
       preview = captured(
         "product-finance-trend-public.png?v=20260818-fin-trend-2",
@@ -806,9 +895,9 @@
       );
     } else if (slug === "omni-jasmine-ai" && /funnel|fanel|auto rout|routing/i.test(capabilityTitle)) {
       preview = captured(
-        "omnichannel-faneling-bucket-public.png?v=20260818-bucket-2",
-        "Call Center · Faneling Bucket",
-        "Bucket list faneling (MR Belum Balas, Ditangani AI) dengan conversation yang diambil alih agent terlihat jelas.",
+        "omnichannel-faneling-handoff-public.png?v=20260818-handoff-1",
+        "Call Center · Handoff ke MR",
+        "Dialog Jalur 3 Handoff Manual ke MR terbuka di workspace Call Center: saran MR, alasan, dan ringkasan sebelum lead di-routing.",
       );
     } else if (matches(/fanel/i)) {
       preview = captured("omnichannel-faneling-public.png", "Call Center · AI → Agent → MR", "Jejak AI dan takeover Agent tetap terlihat setelah lead masuk bucket MR.");
