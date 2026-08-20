@@ -127,13 +127,6 @@ for (const link of document.querySelectorAll("[data-wa]")) {
   observer.observe(headline || typed);
 })();
 
-(function initAltOrbitMotion() {
-  const orbit = document.querySelector("[data-alt-orbit]");
-  if (!orbit) return;
-  if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-  for (const motion of orbit.querySelectorAll("animateMotion")) motion.remove();
-})();
-
 /** Garis bawahi spidol merah: tergambar saat masuk viewport, bisa digaris ulang dengan pointer. */
 (function initMarkerUnderline() {
   const marks = [...document.querySelectorAll("[data-marker-underline]")];

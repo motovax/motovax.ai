@@ -112,18 +112,13 @@ for (const viewport of viewports) {
     assert.match(await coreImage.getAttribute("src"), /alt-core-platform\.png/);
     assert.equal(await coreImage.evaluate((img) => img.naturalWidth > 0), true);
 
-    assert.equal(await page.locator(".alt-orbit-lines path[id^='orbit-']").count(), 5);
-    const dots = page.locator(".alt-orbit-dots circle");
-    assert.ok(await dots.count() >= 5, "diagram punya titik animasi di jalur");
-    if (viewport.name !== "mobile") {
-      assert.notEqual(await page.locator(".alt-orbit-lines").evaluate((el) => getComputedStyle(el).display), "none");
-      assert.ok(
-        await page.locator("animateMotion").count() >= 5,
-        "titik diagram bergerak mengikuti jalur",
-      );
-    } else {
-      assert.equal(await page.locator(".alt-orbit-lines").evaluate((el) => getComputedStyle(el).display), "none");
-    }
+    const coreMore = page.locator(".alt-core-heading .alt-core-more");
+    assert.equal(await coreMore.count(), 1);
+    assert.equal(await coreMore.getAttribute("href"), "./fitur/core-platform-agentic-ai.html");
+    assert.equal(await page.locator(".alt-core-heading .btn").count(), 0, "Selengkapnya Core Platform bukan tombol");
+    const coreMoreBg = await coreMore.evaluate((el) => getComputedStyle(el).backgroundColor);
+    assert.equal(coreMoreBg === "rgba(0, 0, 0, 0)" || coreMoreBg === "transparent", true, `Selengkapnya tidak boleh berwarna tombol: ${coreMoreBg}`);
+    assert.equal(await page.locator(".alt-orbit-lines, .alt-orbit-dots, animateMotion").count(), 0, "animasi bulet diagram dihapus");
     assert.equal(await page.locator(".alt-story, .alt-howto, .channel-strip, .alt-pillar").count(), 0);
     assert.equal(await page.locator("section.alt-feature").count(), 5);
 
