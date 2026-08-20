@@ -98,6 +98,10 @@ for (const viewport of viewports) {
     await page.goto(`${baseUrl}/index.html`, { waitUntil: "load" });
 
     assert.equal(await page.locator("[data-typewriter]").getAttribute("data-phrases"), expectedPhrases);
+    assert.equal(
+      (await page.locator(".alt-core-lead").innerText()).replace(/\s+/g, " ").trim(),
+      "Satu platform untuk membantu bisnis mendapatkan customer, mengelola interaksi, hingga meningkatkan penjualan secara otomatis berbasis AI.",
+    );
     assert.equal(await page.locator(".alt-node[data-pillar]").count(), 6);
 
     const headingFont = await page.locator("#core-heading").evaluate((el) => getComputedStyle(el).fontFamily);
