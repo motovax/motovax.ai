@@ -1755,10 +1755,10 @@
 
   .onboarding-panel {
     width: 100%;
-    padding: 4px 0 0;
+    padding: 16px;
     border: 0;
     border-radius: 0;
-    background: transparent;
+    background: #fff;
     box-shadow: none;
     overflow: visible;
   }

@@ -221,7 +221,7 @@ for (const viewport of viewports) {
     if (viewport.width <= 720) {
       assert.equal(onboardingShellStyle.panelBorderStyle, "none");
       assert.equal(onboardingShellStyle.panelBoxShadow, "none");
-      assert.equal(onboardingShellStyle.panelBackground, "rgba(0, 0, 0, 0)");
+      assert.equal(onboardingShellStyle.panelBackground, "rgb(255, 255, 255)");
       assert.equal(onboardingShellStyle.activeRailBackground, "rgba(0, 0, 0, 0)");
       assert.equal(onboardingShellStyle.activeRailBoxShadow, "none");
       assert.equal(onboardingShellStyle.activeRailAfterContent, "none");
