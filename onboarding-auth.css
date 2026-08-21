@@ -1726,11 +1726,12 @@
 
   .onboarding-rail li {
     display: flex;
-    min-height: 46px;
-    padding: 4px;
+    min-height: 40px;
+    padding: 0;
     align-items: center;
     justify-content: center;
-    background: rgba(255, 255, 255, 0.46);
+    border-radius: 0;
+    background: transparent;
   }
 
   .onboarding-rail li > div {
@@ -1743,20 +1744,27 @@
     flex: 0 0 38px;
   }
 
+  .onboarding-rail li.is-active {
+    background: transparent;
+    box-shadow: none;
+  }
+
   .onboarding-rail li.is-active::after {
-    right: 8px;
-    bottom: -5px;
-    left: 8px;
+    content: none;
   }
 
   .onboarding-panel {
     width: 100%;
-    padding: 20px 16px 16px;
-    border-radius: 14px;
+    padding: 4px 0 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+    overflow: visible;
   }
 
   .onboarding-progress {
-    margin: -20px -16px 18px;
+    display: none;
   }
 
   .onboarding-footer {

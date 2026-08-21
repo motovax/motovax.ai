@@ -201,6 +201,36 @@ for (const viewport of viewports) {
     assert.equal(await page.getByRole("link", { name: "Jadwalkan Demo", exact: true }).count(), 0);
     assert.equal(await page.getByRole("link", { name: "Kembali ke beranda", exact: false }).count(), 1);
     assert.equal(await page.evaluate(() => JSON.parse(localStorage.getItem("motovax_onboarding_v1")).workspace), null);
+    const onboardingShellStyle = await page.evaluate(() => {
+      const panel = document.querySelector(".onboarding-panel");
+      const activeRailStep = document.querySelector(".onboarding-rail li.is-active");
+      const progress = document.querySelector(".onboarding-progress");
+      const panelStyle = getComputedStyle(panel);
+      const activeRailStyle = getComputedStyle(activeRailStep);
+      const activeRailAfterStyle = getComputedStyle(activeRailStep, "::after");
+      return {
+        panelBorderStyle: panelStyle.borderStyle,
+        panelBoxShadow: panelStyle.boxShadow,
+        panelBackground: panelStyle.backgroundColor,
+        activeRailBackground: activeRailStyle.backgroundColor,
+        activeRailBoxShadow: activeRailStyle.boxShadow,
+        activeRailAfterContent: activeRailAfterStyle.content,
+        progressDisplay: getComputedStyle(progress).display,
+      };
+    });
+    if (viewport.width <= 720) {
+      assert.equal(onboardingShellStyle.panelBorderStyle, "none");
+      assert.equal(onboardingShellStyle.panelBoxShadow, "none");
+      assert.equal(onboardingShellStyle.panelBackground, "rgba(0, 0, 0, 0)");
+      assert.equal(onboardingShellStyle.activeRailBackground, "rgba(0, 0, 0, 0)");
+      assert.equal(onboardingShellStyle.activeRailBoxShadow, "none");
+      assert.equal(onboardingShellStyle.activeRailAfterContent, "none");
+      assert.equal(onboardingShellStyle.progressDisplay, "none");
+    } else {
+      assert.notEqual(onboardingShellStyle.panelBorderStyle, "none");
+      assert.notEqual(onboardingShellStyle.panelBoxShadow, "none");
+      assert.notEqual(onboardingShellStyle.progressDisplay, "none");
+    }
     assert.equal(await noOverflow(page), true);
     await page.screenshot({ path: `/tmp/motovax-fresh-registration-${viewport.name}.png`, fullPage: false });
     await context.close();
