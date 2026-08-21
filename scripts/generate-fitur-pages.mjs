@@ -97,9 +97,9 @@ const template = (slug, title, description) => `<!doctype html>
     </footer>
 
     <script>window.__FEATURE_SLUG__ = ${JSON.stringify(slug)};</script>
-    <script src="./features-data.js?v=ai-first-tools-20260819"></script>
-    <script src="./feature-page.js?v=home-live-20260819"></script>
-    <script src="../script.js?v=home-live-20260819"></script>
+    <script src="./features-data.js?v=iris-social-20260821"></script>
+    <script src="./feature-page.js?v=iris-social-20260821"></script>
+    <script src="../script.js?v=iris-social-20260821"></script>
   </body>
 </html>
 `;
@@ -172,7 +172,7 @@ fs.writeFileSync(
       <ul class="feature-index-list">${listItems}</ul>
     </div>
   </main>
-  <script src="../script.js?v=home-live-20260819"></script>
+  <script src="../script.js?v=iris-social-20260821"></script>
 </body>
 </html>
 `,

@@ -51,7 +51,7 @@ const BILLING_PACKAGE_DEFINITIONS = [
   { id: "omni_jasmine", name: "Jasmine AI + Omnichannel", priceAmount: 2_000_000, includedCredits: 500, enabled: (features) => features.whatsapp_ai === true },
   { id: "inventory_falcon", name: "Falcon AI + Inventory", priceAmount: 1_500_000, includedCredits: 500, enabled: (features) => features.inventory_management === true },
   { id: "ana_analytics", name: "Ana AI — Advanced Analytics", priceAmount: 1_000_000, includedCredits: 0, enabled: (features) => features.data_insight === true || features.one_dashboard === true },
-  { id: "social_sora", name: "Sora AI + Social Media", priceAmount: 1_500_000, includedCredits: 500, enabled: (features) => features.social_media_automation === true },
+  { id: "social_sora", name: "Iris AI + Social Media", priceAmount: 1_500_000, includedCredits: 500, enabled: (features) => features.social_media_automation === true },
 ];
 
 export function buildBillingPackages(features = {}, usageRows = []) {

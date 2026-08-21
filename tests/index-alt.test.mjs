@@ -82,7 +82,7 @@ const expectedPillars = [
   { label: "AI Jasmine + Omni", href: "./fitur/omni-jasmine-ai.html" },
   { label: "AI Falcon + Inventory", href: "./fitur/inventory-falcon-ai.html" },
   { label: "Ana AI Analytics", href: "./fitur/ana-ai-analytics.html" },
-  { label: "AI Sora + Social Media", href: "./fitur/social-media-sora-ai.html" },
+  { label: "AI Iris + Social Media", href: "./fitur/social-media-sora-ai.html" },
 ];
 const registerHref = "https://onboard.motovax.com/onboarding.html?fresh=1";
 
