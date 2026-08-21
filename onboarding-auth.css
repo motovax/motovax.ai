@@ -1949,16 +1949,8 @@
   background: #fff;
 }
 
-.onboarding-step[data-step="1"] .onboarding-step-actions {
-  display: block;
-  margin: 2px 0 0;
-  padding: 0;
-}
-
-.onboarding-step[data-step="1"] .onboarding-step-actions .btn-primary {
-  width: 100%;
+.onboarding-page .onboarding-panel .btn-primary {
   min-height: 54px;
-  justify-content: center;
   border: 0;
   border-radius: 6px;
   background: #1764e8;
@@ -1966,12 +1958,14 @@
   text-shadow: none;
 }
 
-.onboarding-step[data-step="1"] .onboarding-step-actions .btn-primary::before {
+.onboarding-page .onboarding-panel .btn-primary::before {
   display: none;
 }
 
-.onboarding-step[data-step="1"] .onboarding-step-actions .btn-primary > span:last-child {
+.onboarding-page .onboarding-panel .btn-primary > span:last-child,
+.onboarding-page .onboarding-panel .onboarding-finish-button i {
   display: inline;
+  width: auto;
   min-width: 0;
   height: auto;
   margin-left: 10px;
@@ -1980,10 +1974,44 @@
   background: transparent;
 }
 
-.onboarding-step[data-step="1"] .onboarding-step-actions .btn-primary:hover {
+.onboarding-page .onboarding-panel .btn-primary:hover {
+  border-color: transparent;
   background: #0f56d1;
   box-shadow: none;
+  filter: none;
   transform: translateY(-1px);
+}
+
+.onboarding-page .onboarding-panel .btn-primary:hover > span:last-child,
+.onboarding-page .onboarding-panel .onboarding-finish-button:hover i {
+  background: transparent;
+  transform: translateX(2px);
+}
+
+.onboarding-page .onboarding-panel .btn-primary:active {
+  background: #0b4bb9;
+  box-shadow: none;
+  transform: translateY(0);
+}
+
+.onboarding-page .onboarding-panel .btn-primary:disabled {
+  border-color: #cbd5e1;
+  color: #64748b;
+  background: #e2e8f0;
+  box-shadow: none;
+  text-shadow: none;
+  transform: none;
+}
+
+.onboarding-step[data-step="1"] .onboarding-step-actions {
+  display: block;
+  margin: 2px 0 0;
+  padding: 0;
+}
+
+.onboarding-step[data-step="1"] .onboarding-step-actions .btn-primary {
+  width: 100%;
+  justify-content: center;
 }
 
 .onboarding-auth-divider {

@@ -239,6 +239,24 @@ for (const viewport of viewports) {
       assert.equal(onboardingShellStyle.panelBoxShadow, "none");
       assert.notEqual(onboardingShellStyle.activeRailAfterContent, "none");
     }
+    const primaryButtonStyles = await page.evaluate(() => [...document.querySelectorAll(".onboarding-panel .btn-primary:not(:disabled)")].map((button) => {
+      const style = getComputedStyle(button);
+      const arrow = button.querySelector(":scope > span:last-child, :scope > i:last-child");
+      const arrowStyle = arrow ? getComputedStyle(arrow) : null;
+      return {
+        backgroundColor: style.backgroundColor,
+        borderRadius: style.borderRadius,
+        boxShadow: style.boxShadow,
+        arrowBackgroundColor: arrowStyle?.backgroundColor || null,
+        arrowBorderWidth: arrowStyle?.borderTopWidth || null,
+      };
+    }));
+    assert.ok(primaryButtonStyles.length >= 5);
+    assert.equal(new Set(primaryButtonStyles.map((style) => style.backgroundColor)).size, 1);
+    assert.equal(new Set(primaryButtonStyles.map((style) => style.borderRadius)).size, 1);
+    assert.equal(new Set(primaryButtonStyles.map((style) => style.boxShadow)).size, 1);
+    assert.equal(primaryButtonStyles.every((style) => style.arrowBackgroundColor === null || style.arrowBackgroundColor === "rgba(0, 0, 0, 0)"), true);
+    assert.equal(primaryButtonStyles.every((style) => style.arrowBorderWidth === null || style.arrowBorderWidth === "0px"), true);
     assert.equal(await noOverflow(page), true);
     await page.screenshot({ path: `/tmp/motovax-fresh-registration-${viewport.name}.png`, fullPage: false });
     await context.close();
