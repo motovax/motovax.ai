@@ -9,14 +9,17 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="./styles.css?v=ai-first-tools-20260819" />
-    <link rel="stylesheet" href="./onboarding-auth.css?v=password-recovery-20260817" />
+    <link rel="stylesheet" href="./onboarding-auth.css?v=login-reference-20260821" />
   </head>
   <body class="onboarding-body portal-login-body is-session-checking">
     <header class="site-header onboarding-header">
       <div class="container header-inner onboarding-header-inner">
         <a class="brand" href="https://motovax.ai/" aria-label="MOTOVAX home"><span>MOTO</span><strong>VAX</strong></a>
         <div class="onboarding-header-actions">
-          <a class="onboarding-link-muted" href="https://motovax.ai/">← Kembali ke beranda</a>
+          <a class="onboarding-link-muted" href="https://motovax.ai/">
+            <span class="portal-back-desktop">← Kembali ke beranda</span>
+            <span class="portal-back-mobile">← Kembali</span>
+          </a>
         </div>
       </div>
     </header>
@@ -50,7 +53,7 @@
             <span>Login dengan Google</span>
           </a>
 
-          <div class="onboarding-auth-divider portal-login-divider" aria-hidden="true"><span>atau pakai password</span></div>
+          <div class="onboarding-auth-divider portal-login-divider" aria-hidden="true"><span>atau</span></div>
 
           <form class="onboarding-form portal-login-form" data-portal-login-form novalidate>
             <label>
@@ -81,7 +84,6 @@
             <span>Belum punya workspace MOTOVAX?</span>
             <a href="https://onboard.motovax.com/onboarding.html?fresh=1">Daftar dan mulai onboarding <span aria-hidden="true">→</span></a>
           </div>
-          <p class="portal-login-help">Butuh bantuan lain? Hubungi admin workspace atau <a href="https://motovax.ai/hubungi-kami.html">tim MOTOVAX</a>.</p>
           </section>
 
           <section class="portal-recovery-view" data-forgot-view hidden aria-labelledby="portalForgotTitle">
@@ -141,6 +143,7 @@
           </section>
           </div>
         </section>
+        <p class="portal-login-help">Butuh bantuan lain? Hubungi admin workspace atau <a href="https://motovax.ai/hubungi-kami.html">tim MOTOVAX</a>.</p>
       </div>
     </main>
 
