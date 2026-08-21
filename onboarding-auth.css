@@ -1757,9 +1757,9 @@
     width: 100%;
     padding: 16px;
     border: 0;
-    border-radius: 0;
+    border-radius: 16px;
     background: #fff;
-    box-shadow: none;
+    box-shadow: 0 8px 24px rgba(50, 78, 119, 0.08);
     overflow: visible;
   }
 

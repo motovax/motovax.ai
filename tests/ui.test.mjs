@@ -210,6 +210,7 @@ for (const viewport of viewports) {
       const activeRailAfterStyle = getComputedStyle(activeRailStep, "::after");
       return {
         panelBorderStyle: panelStyle.borderStyle,
+        panelBorderRadius: panelStyle.borderRadius,
         panelBoxShadow: panelStyle.boxShadow,
         panelBackground: panelStyle.backgroundColor,
         activeRailBackground: activeRailStyle.backgroundColor,
@@ -220,7 +221,8 @@ for (const viewport of viewports) {
     });
     if (viewport.width <= 720) {
       assert.equal(onboardingShellStyle.panelBorderStyle, "none");
-      assert.equal(onboardingShellStyle.panelBoxShadow, "none");
+      assert.equal(onboardingShellStyle.panelBorderRadius, "16px");
+      assert.notEqual(onboardingShellStyle.panelBoxShadow, "none");
       assert.equal(onboardingShellStyle.panelBackground, "rgb(255, 255, 255)");
       assert.equal(onboardingShellStyle.activeRailBackground, "rgba(0, 0, 0, 0)");
       assert.equal(onboardingShellStyle.activeRailBoxShadow, "none");
