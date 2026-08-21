@@ -15,7 +15,7 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="./styles.css?v=ai-first-tools-20260819" />
-    <link rel="stylesheet" href="./onboarding-auth.css?v=simple-mobile-card-20260821" />
+    <link rel="stylesheet" href="./onboarding-auth.css?v=onboarding-reference-20260821" />
   </head>
   <body class="onboarding-body">
     <header class="site-header onboarding-header">
@@ -31,40 +31,40 @@
 
     <main class="onboarding-page">
       <div class="container onboarding-shell">
-        <nav class="onboarding-aside" aria-label="Progress onboarding">
-          <ol class="onboarding-rail" data-onboarding-rail aria-label="Progress langkah">
-            <li class="is-active" data-rail-step="1">
-              <i>1</i>
-              <div>
-                <b>Akun</b>
-                <small>Daftar akun</small>
-              </div>
-            </li>
-            <li data-rail-step="2">
-              <i>2</i>
-              <div>
-                <b>Profil dealer</b>
-                <small>Dealer &amp; workspace</small>
-              </div>
-            </li>
-            <li data-rail-step="3">
-              <i>3</i>
-              <div>
-                <b>Modul prioritas</b>
-                <small>Fokus first value</small>
-              </div>
-            </li>
-            <li data-rail-step="4">
-              <i>4</i>
-              <div>
-                <b>Siap coba</b>
-                <small>Workspace dealer</small>
-              </div>
-            </li>
-          </ol>
-        </nav>
-
         <section class="onboarding-panel" aria-labelledby="onboardingPanelTitle">
+          <nav class="onboarding-aside" aria-label="Progress onboarding">
+            <ol class="onboarding-rail" data-onboarding-rail aria-label="Progress langkah">
+              <li class="is-active" data-rail-step="1">
+                <i>1</i>
+                <div>
+                  <b>Akun</b>
+                  <small>Daftar akun</small>
+                </div>
+              </li>
+              <li data-rail-step="2">
+                <i>2</i>
+                <div>
+                  <b>Profil dealer</b>
+                  <small>Dealer &amp; workspace</small>
+                </div>
+              </li>
+              <li data-rail-step="3">
+                <i>3</i>
+                <div>
+                  <b>Modul prioritas</b>
+                  <small>Fokus first value</small>
+                </div>
+              </li>
+              <li data-rail-step="4">
+                <i>4</i>
+                <div>
+                  <b>Siap coba</b>
+                  <small>Workspace dealer</small>
+                </div>
+              </li>
+            </ol>
+          </nav>
+
           <div class="onboarding-progress" aria-hidden="true">
             <div class="onboarding-progress-bar" data-onboarding-progress style="--p: 25%"></div>
           </div>
@@ -87,7 +87,7 @@
             >
               <label>
                 <span>Nama lengkap</span>
-                <input type="text" name="fullName" autocomplete="name" placeholder="Contoh: Budi Santoso" required />
+                <input type="text" name="fullName" autocomplete="name" placeholder="Nama lengkap" required />
               </label>
               <label>
                 <span>Email kerja</span>
@@ -105,7 +105,7 @@
                   </div>
                 </div>
                 <div class="onboarding-field">
-                  <label for="signupPasswordConfirm">Konfirmasi</label>
+                  <label for="signupPasswordConfirm">Konfirmasi password</label>
                   <div class="onboarding-password-control">
                     <input id="signupPasswordConfirm" type="password" name="passwordConfirm" autocomplete="new-password" placeholder="Ulangi password" minlength="8" required />
                     <button type="button" data-password-toggle data-password-label="konfirmasi password" aria-controls="signupPasswordConfirm" aria-label="Tampilkan konfirmasi password" aria-pressed="false">
@@ -117,15 +117,6 @@
               </div>
               <p class="onboarding-form-error" data-form-error role="alert" aria-live="assertive" hidden></p>
               <div class="onboarding-step-actions">
-                <span class="onboarding-hint">
-                  Dengan lanjut, Anda menyetujui <a href="https://motovax.ai/syarat-ketentuan.html">Syarat &amp; Ketentuan</a>
-                  dan <a href="https://motovax.ai/kebijakan-privasi.html">Kebijakan Privasi</a> MOTOVAX.
-                  <span class="onboarding-recaptcha-disclosure">
-                    This site is protected by reCAPTCHA and the Google
-                    <a href="https://policies.google.com/privacy">Privacy Policy</a> and
-                    <a href="https://policies.google.com/terms">Terms of Service</a> apply.
-                  </span>
-                </span>
                 <button type="submit" class="btn btn-primary" data-loading-label="Membuat akun…">Lanjut ke profil <span>→</span></button>
               </div>
             </form>
@@ -427,13 +418,22 @@
             </div>
           </div>
         </section>
+
+        <p class="onboarding-legal" data-onboarding-legal>
+          Dengan lanjut, Anda menyetujui <a href="https://motovax.ai/syarat-ketentuan.html">Syarat &amp; Ketentuan</a>
+          dan <a href="https://motovax.ai/kebijakan-privasi.html">Kebijakan Privasi</a> MOTOVAX.
+          <span class="onboarding-recaptcha-disclosure">
+            This site is protected by reCAPTCHA and the Google
+            <a href="https://policies.google.com/privacy">Privacy Policy</a> and
+            <a href="https://policies.google.com/terms">Terms of Service</a> apply.
+          </span>
+        </p>
       </div>
     </main>
 
     <footer class="onboarding-footer">
       <div class="container">
         <span>© <span data-year></span> MOTOVAX</span>
-        <a href="https://motovax.ai/modul.html">Lihat breakdown modul</a>
         <a href="https://motovax.ai/kebijakan-privasi.html">Kebijakan Privasi</a>
         <a href="https://motovax.ai/syarat-ketentuan.html">Syarat &amp; Ketentuan</a>
         <a href="https://motovax.ai/#kontak">Butuh bantuan?</a>
@@ -449,6 +449,6 @@
     </div>
 
     <script src="./script.js?v=iris-social-20260821"></script>
-    <script src="./onboarding.js?v=shared-entry-20260814"></script>
+    <script src="./onboarding.js?v=reference-layout-20260821"></script>
   </body>
 </html>

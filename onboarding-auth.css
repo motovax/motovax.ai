@@ -1802,3 +1802,358 @@
     padding-inline: 14px;
   }
 }
+
+/*
+ * Onboarding reference layout 2026-08-21
+ * Progress berada di dalam kartu pada desktop dan berubah menjadi alur penuh
+ * tanpa bingkai kartu pada mobile, sesuai referensi desktop/mobile produk.
+ */
+.onboarding-body {
+  background: #fff;
+}
+
+.onboarding-header {
+  border-bottom: 1px solid #e7edf5;
+  background: #fff;
+}
+
+.onboarding-header .header-inner,
+.onboarding-header-inner {
+  width: min(calc(100% - 40px), 1080px);
+  min-height: 94px;
+}
+
+.onboarding-page {
+  padding: 36px 0 20px;
+}
+
+.onboarding-shell {
+  width: min(calc(100% - 40px), 720px);
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0;
+}
+
+.onboarding-panel {
+  width: 100%;
+  min-height: 0;
+  padding: 30px 42px 26px;
+  border: 1px solid #dce4ef;
+  border-radius: 12px;
+  box-shadow: none;
+}
+
+.onboarding-aside {
+  position: static;
+  margin: 0 0 34px;
+  padding: 0;
+}
+
+.onboarding-rail {
+  width: 100%;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin: 0;
+}
+
+.onboarding-rail li {
+  position: relative;
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr);
+  gap: 10px;
+  min-width: 0;
+  padding: 3px 0 18px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+.onboarding-rail li i {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  color: #64748b;
+  background: #f1f4f8;
+}
+
+.onboarding-rail li b {
+  overflow: visible;
+  color: #526079;
+  font-size: 12px;
+  line-height: 34px;
+  text-overflow: clip;
+  white-space: nowrap;
+}
+
+.onboarding-rail li small {
+  display: none;
+}
+
+.onboarding-rail li.is-active {
+  background: transparent;
+  box-shadow: none;
+}
+
+.onboarding-rail li.is-active::after {
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 2px;
+  background: #1b67ec;
+}
+
+.onboarding-rail li.is-active i {
+  color: #fff;
+  background: #1267f5;
+  box-shadow: 0 4px 10px rgba(18, 103, 245, 0.2);
+}
+
+.onboarding-progress {
+  display: none;
+}
+
+.onboarding-step-head {
+  margin-bottom: 24px;
+}
+
+.onboarding-step-head > span {
+  font-size: 12px;
+}
+
+.onboarding-step-head h2 {
+  margin: 9px 0 8px;
+  font-size: 28px;
+}
+
+.onboarding-form {
+  gap: 22px;
+}
+
+.onboarding-form-row {
+  gap: 18px;
+}
+
+.onboarding-form input,
+.onboarding-form select,
+.onboarding-form textarea {
+  min-height: 48px;
+  border-radius: 9px;
+}
+
+.onboarding-password-control {
+  border-radius: 9px;
+}
+
+.onboarding-password-control button {
+  min-height: 46px;
+  color: #64748b;
+  background: #fff;
+}
+
+.onboarding-step[data-step="1"] .onboarding-step-actions {
+  display: block;
+  margin: 2px 0 0;
+  padding: 0;
+}
+
+.onboarding-step[data-step="1"] .onboarding-step-actions .btn-primary {
+  width: 100%;
+  min-height: 54px;
+  justify-content: center;
+  border: 0;
+  border-radius: 6px;
+  background: #1764e8;
+  box-shadow: none;
+  text-shadow: none;
+}
+
+.onboarding-step[data-step="1"] .onboarding-step-actions .btn-primary::before {
+  display: none;
+}
+
+.onboarding-step[data-step="1"] .onboarding-step-actions .btn-primary > span:last-child {
+  display: inline;
+  min-width: 0;
+  height: auto;
+  margin-left: 10px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+.onboarding-step[data-step="1"] .onboarding-step-actions .btn-primary:hover {
+  background: #0f56d1;
+  box-shadow: none;
+  transform: translateY(-1px);
+}
+
+.onboarding-auth-divider {
+  margin: 26px 0 22px;
+}
+
+.onboarding-google-btn {
+  min-height: 48px;
+  border-radius: 7px;
+}
+
+.onboarding-legal {
+  width: min(100%, 720px);
+  margin: 18px auto 0;
+  color: #8b9bb3;
+  font-size: 11px;
+  line-height: 1.55;
+  text-align: center;
+}
+
+.onboarding-legal[hidden] {
+  display: none;
+}
+
+.onboarding-legal a {
+  color: #71849f;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.onboarding-legal .onboarding-recaptcha-disclosure {
+  margin-top: 3px;
+  font-size: 9px;
+  opacity: 0.82;
+}
+
+.onboarding-footer {
+  padding: 18px 0 22px;
+  border-top: 1px solid #edf1f6;
+}
+
+.onboarding-footer .container {
+  width: min(calc(100% - 40px), 1080px);
+  justify-content: space-between;
+}
+
+@media (max-width: 900px) {
+  .onboarding-header .header-inner,
+  .onboarding-header-inner,
+  .onboarding-footer .container {
+    width: min(calc(100% - 48px), 1080px);
+  }
+
+  .onboarding-shell {
+    width: min(calc(100% - 48px), 720px);
+  }
+}
+
+@media (max-width: 720px) {
+  .onboarding-header {
+    border-bottom: 0;
+  }
+
+  .onboarding-header .header-inner,
+  .onboarding-header-inner {
+    width: min(calc(100% - 32px), 1080px);
+    min-height: 78px;
+  }
+
+  .onboarding-header .brand {
+    font-size: 22px;
+  }
+
+  .onboarding-link-muted {
+    font-size: 12px;
+  }
+
+  .onboarding-page {
+    padding: 46px 0 max(28px, env(safe-area-inset-bottom));
+  }
+
+  .onboarding-shell {
+    width: min(calc(100% - 48px), 720px);
+  }
+
+  .onboarding-panel {
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+  }
+
+  .onboarding-aside {
+    margin-bottom: 32px;
+  }
+
+  .onboarding-rail {
+    gap: 16px;
+  }
+
+  .onboarding-rail li {
+    display: flex;
+    min-height: 38px;
+    padding: 0;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .onboarding-rail li > div {
+    display: none;
+  }
+
+  .onboarding-rail li i {
+    width: 38px;
+    height: 38px;
+    flex: 0 0 38px;
+  }
+
+  .onboarding-rail li.is-active::after {
+    content: none;
+  }
+
+  .onboarding-step-head {
+    margin-bottom: 22px;
+  }
+
+  .onboarding-step-head h2 {
+    font-size: 26px;
+  }
+
+  .onboarding-step-head p {
+    font-size: 14px;
+    line-height: 1.55;
+  }
+
+  .onboarding-form-row {
+    grid-template-columns: 1fr;
+    gap: 22px;
+  }
+
+  .onboarding-step[data-step="1"] .onboarding-step-actions .btn-primary {
+    min-height: 52px;
+  }
+
+  .onboarding-legal {
+    margin-top: 24px;
+    font-size: 11px;
+    text-align: left;
+  }
+
+  .onboarding-legal .onboarding-recaptcha-disclosure {
+    margin-top: 5px;
+    font-size: 9px;
+  }
+
+  .onboarding-footer {
+    display: none;
+  }
+}
+
+@media (max-width: 390px) {
+  .onboarding-header .header-inner,
+  .onboarding-header-inner,
+  .onboarding-shell {
+    width: min(calc(100% - 48px), 720px);
+  }
+
+  .onboarding-link-muted {
+    max-width: none;
+    font-size: 11px;
+  }
+}

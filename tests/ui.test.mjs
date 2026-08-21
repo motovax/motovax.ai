@@ -205,6 +205,7 @@ for (const viewport of viewports) {
       const panel = document.querySelector(".onboarding-panel");
       const activeRailStep = document.querySelector(".onboarding-rail li.is-active");
       const progress = document.querySelector(".onboarding-progress");
+      const legal = document.querySelector("[data-onboarding-legal]");
       const panelStyle = getComputedStyle(panel);
       const activeRailStyle = getComputedStyle(activeRailStep);
       const activeRailAfterStyle = getComputedStyle(activeRailStep, "::after");
@@ -217,21 +218,26 @@ for (const viewport of viewports) {
         activeRailBoxShadow: activeRailStyle.boxShadow,
         activeRailAfterContent: activeRailAfterStyle.content,
         progressDisplay: getComputedStyle(progress).display,
+        railInsidePanel: panel.contains(activeRailStep),
+        legalOutsidePanel: !panel.contains(legal),
       };
     });
+    assert.equal(onboardingShellStyle.railInsidePanel, true);
+    assert.equal(onboardingShellStyle.legalOutsidePanel, true);
+    assert.equal(onboardingShellStyle.progressDisplay, "none");
     if (viewport.width <= 720) {
       assert.equal(onboardingShellStyle.panelBorderStyle, "none");
-      assert.equal(onboardingShellStyle.panelBorderRadius, "16px");
-      assert.notEqual(onboardingShellStyle.panelBoxShadow, "none");
-      assert.equal(onboardingShellStyle.panelBackground, "rgb(255, 255, 255)");
+      assert.equal(onboardingShellStyle.panelBorderRadius, "0px");
+      assert.equal(onboardingShellStyle.panelBoxShadow, "none");
+      assert.equal(onboardingShellStyle.panelBackground, "rgba(0, 0, 0, 0)");
       assert.equal(onboardingShellStyle.activeRailBackground, "rgba(0, 0, 0, 0)");
       assert.equal(onboardingShellStyle.activeRailBoxShadow, "none");
       assert.equal(onboardingShellStyle.activeRailAfterContent, "none");
-      assert.equal(onboardingShellStyle.progressDisplay, "none");
     } else {
       assert.notEqual(onboardingShellStyle.panelBorderStyle, "none");
-      assert.notEqual(onboardingShellStyle.panelBoxShadow, "none");
-      assert.notEqual(onboardingShellStyle.progressDisplay, "none");
+      assert.equal(onboardingShellStyle.panelBorderRadius, "12px");
+      assert.equal(onboardingShellStyle.panelBoxShadow, "none");
+      assert.notEqual(onboardingShellStyle.activeRailAfterContent, "none");
     }
     assert.equal(await noOverflow(page), true);
     await page.screenshot({ path: `/tmp/motovax-fresh-registration-${viewport.name}.png`, fullPage: false });

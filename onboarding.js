@@ -259,6 +259,7 @@
     this.steps = qsa("[data-step]");
     this.railItems = qsa("[data-rail-step]");
     this.progressBar = qs("[data-onboarding-progress]");
+    this.legal = qs("[data-onboarding-legal]");
     this.toast = qs("[data-onboarding-toast]");
 
     this.signupForm = qs('[data-auth-form="signup"]');
@@ -1367,6 +1368,7 @@
     if (this.progressBar) {
       this.progressBar.style.setProperty("--p", step * 25 + "%");
     }
+    if (this.legal) this.legal.hidden = step !== 1;
 
     if (step === 4) this.renderSummary();
 
