@@ -15,7 +15,7 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="./styles.css?v=ai-first-tools-20260819" />
-    <link rel="stylesheet" href="./onboarding-auth.css?v=unified-primary-buttons-20260821" />
+    <link rel="stylesheet" href="./onboarding-auth.css?v=clear-stepper-20260822" />
   </head>
   <body class="onboarding-body">
     <header class="site-header onboarding-header">
@@ -33,33 +33,41 @@
       <div class="container onboarding-shell">
         <section class="onboarding-panel" aria-labelledby="onboardingPanelTitle">
           <nav class="onboarding-aside" aria-label="Progress onboarding">
+            <div class="onboarding-rail-head">
+              <span>Progres pendaftaran</span>
+              <strong>
+                <span data-onboarding-current-step>Langkah 1 dari 4</span>
+                <span aria-hidden="true">·</span>
+                <span data-onboarding-current-label>Akun</span>
+              </strong>
+            </div>
             <ol class="onboarding-rail" data-onboarding-rail aria-label="Progress langkah">
-              <li class="is-active" data-rail-step="1">
-                <i>1</i>
+              <li class="is-active" data-rail-step="1" aria-current="step">
+                <i aria-hidden="true">1</i>
                 <div>
                   <b>Akun</b>
-                  <small>Daftar akun</small>
+                  <small>Buat akun</small>
                 </div>
               </li>
               <li data-rail-step="2">
-                <i>2</i>
+                <i aria-hidden="true">2</i>
                 <div>
                   <b>Profil dealer</b>
-                  <small>Dealer &amp; workspace</small>
+                  <small>Data bisnis</small>
                 </div>
               </li>
               <li data-rail-step="3">
-                <i>3</i>
+                <i aria-hidden="true">3</i>
                 <div>
-                  <b>Modul prioritas</b>
-                  <small>Fokus first value</small>
+                  <b>Pilih modul</b>
+                  <small>Kebutuhan utama</small>
                 </div>
               </li>
               <li data-rail-step="4">
-                <i>4</i>
+                <i aria-hidden="true">4</i>
                 <div>
-                  <b>Siap coba</b>
-                  <small>Workspace dealer</small>
+                  <b>Siap digunakan</b>
+                  <small>Ringkasan</small>
                 </div>
               </li>
             </ol>
@@ -449,6 +457,6 @@
     </div>
 
     <script src="./script.js?v=iris-social-20260821"></script>
-    <script src="./onboarding.js?v=reference-layout-20260821"></script>
+    <script src="./onboarding.js?v=clear-stepper-20260822"></script>
   </body>
 </html>

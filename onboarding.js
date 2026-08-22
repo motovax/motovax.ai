@@ -259,6 +259,8 @@
     this.steps = qsa("[data-step]");
     this.railItems = qsa("[data-rail-step]");
     this.progressBar = qs("[data-onboarding-progress]");
+    this.currentStepLabel = qs("[data-onboarding-current-step]");
+    this.currentStepName = qs("[data-onboarding-current-label]");
     this.legal = qs("[data-onboarding-legal]");
     this.toast = qs("[data-onboarding-toast]");
 
@@ -1353,17 +1355,22 @@
       panel.classList.toggle("is-active", active);
     });
 
-    var railCopies = {
-      2: "Dealer & workspace",
-      3: "Fokus first value",
-    };
+    var currentStepName = "";
     this.railItems.forEach(function (item) {
       var n = parseInt(item.getAttribute("data-rail-step"), 10);
-      item.classList.toggle("is-active", n === step);
+      var isActive = n === step;
+      item.classList.toggle("is-active", isActive);
       item.classList.toggle("is-done", n < step);
-      var copy = qs("small", item);
-      if (copy && railCopies[n]) copy.textContent = railCopies[n];
+      if (isActive) {
+        item.setAttribute("aria-current", "step");
+        currentStepName = qs("b", item)?.textContent || "";
+      } else {
+        item.removeAttribute("aria-current");
+      }
     });
+
+    if (this.currentStepLabel) this.currentStepLabel.textContent = "Langkah " + step + " dari 4";
+    if (this.currentStepName) this.currentStepName.textContent = currentStepName;
 
     if (this.progressBar) {
       this.progressBar.style.setProperty("--p", step * 25 + "%");

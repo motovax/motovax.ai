@@ -204,11 +204,12 @@ for (const viewport of viewports) {
     const onboardingShellStyle = await page.evaluate(() => {
       const panel = document.querySelector(".onboarding-panel");
       const activeRailStep = document.querySelector(".onboarding-rail li.is-active");
+      const secondRailStep = document.querySelector('[data-rail-step="2"]');
       const progress = document.querySelector(".onboarding-progress");
       const legal = document.querySelector("[data-onboarding-legal]");
       const panelStyle = getComputedStyle(panel);
       const activeRailStyle = getComputedStyle(activeRailStep);
-      const activeRailAfterStyle = getComputedStyle(activeRailStep, "::after");
+      const activeNumberStyle = getComputedStyle(activeRailStep.querySelector("i"));
       return {
         panelBorderStyle: panelStyle.borderStyle,
         panelBorderRadius: panelStyle.borderRadius,
@@ -216,7 +217,10 @@ for (const viewport of viewports) {
         panelBackground: panelStyle.backgroundColor,
         activeRailBackground: activeRailStyle.backgroundColor,
         activeRailBoxShadow: activeRailStyle.boxShadow,
-        activeRailAfterContent: activeRailAfterStyle.content,
+        activeNumberBoxShadow: activeNumberStyle.boxShadow,
+        secondRailConnectorContent: getComputedStyle(secondRailStep, "::before").content,
+        currentStepCopy: document.querySelector(".onboarding-rail-head strong")?.textContent.replace(/\s+/g, " ").trim(),
+        activeAriaCurrent: activeRailStep.getAttribute("aria-current"),
         progressDisplay: getComputedStyle(progress).display,
         railInsidePanel: panel.contains(activeRailStep),
         legalOutsidePanel: !panel.contains(legal),
@@ -225,6 +229,10 @@ for (const viewport of viewports) {
     assert.equal(onboardingShellStyle.railInsidePanel, true);
     assert.equal(onboardingShellStyle.legalOutsidePanel, true);
     assert.equal(onboardingShellStyle.progressDisplay, "none");
+    assert.equal(onboardingShellStyle.currentStepCopy, "Langkah 1 dari 4 · Akun");
+    assert.equal(onboardingShellStyle.activeAriaCurrent, "step");
+    assert.notEqual(onboardingShellStyle.activeNumberBoxShadow, "none");
+    assert.notEqual(onboardingShellStyle.secondRailConnectorContent, "none");
     if (viewport.width <= 720) {
       assert.equal(onboardingShellStyle.panelBorderStyle, "none");
       assert.equal(onboardingShellStyle.panelBorderRadius, "0px");
@@ -232,12 +240,10 @@ for (const viewport of viewports) {
       assert.equal(onboardingShellStyle.panelBackground, "rgba(0, 0, 0, 0)");
       assert.equal(onboardingShellStyle.activeRailBackground, "rgba(0, 0, 0, 0)");
       assert.equal(onboardingShellStyle.activeRailBoxShadow, "none");
-      assert.equal(onboardingShellStyle.activeRailAfterContent, "none");
     } else {
       assert.notEqual(onboardingShellStyle.panelBorderStyle, "none");
       assert.equal(onboardingShellStyle.panelBorderRadius, "12px");
       assert.equal(onboardingShellStyle.panelBoxShadow, "none");
-      assert.notEqual(onboardingShellStyle.activeRailAfterContent, "none");
     }
     const primaryButtonStyles = await page.evaluate(() => [...document.querySelectorAll(".onboarding-panel .btn-primary:not(:disabled)")].map((button) => {
       const style = getComputedStyle(button);
@@ -657,6 +663,8 @@ for (const viewport of viewports) {
       industry: document.querySelector("[data-summary-industry]")?.textContent.trim(),
       branches: document.querySelector("[data-summary-branches]")?.textContent.trim(),
       railActive: document.querySelector("[data-rail-step].is-active")?.getAttribute("data-rail-step"),
+      railAriaCurrent: document.querySelector("[data-rail-step].is-active")?.getAttribute("aria-current"),
+      progressCopy: document.querySelector(".onboarding-rail-head strong")?.textContent.replace(/\s+/g, " ").trim(),
       redirectVisible: !document.querySelector("[data-redirect-state]")?.hidden,
       redirectBusy: document.querySelector("[data-redirect-state]")?.getAttribute("aria-busy"),
       summaryHidden: document.querySelector("[data-workspace-summary]")?.hidden,
@@ -667,6 +675,8 @@ for (const viewport of viewports) {
       industry: "Dealer mobil",
       branches: "Belum ditentukan",
       railActive: "4",
+      railAriaCurrent: "step",
+      progressCopy: "Langkah 4 dari 4 · Siap digunakan",
       redirectVisible: true,
       redirectBusy: "true",
       summaryHidden: true,
