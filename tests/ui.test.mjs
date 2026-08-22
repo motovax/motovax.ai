@@ -233,6 +233,7 @@ for (const viewport of viewports) {
     assert.equal(onboardingShellStyle.activeAriaCurrent, "step");
     assert.notEqual(onboardingShellStyle.activeNumberBoxShadow, "none");
     assert.notEqual(onboardingShellStyle.secondRailConnectorContent, "none");
+    assert.equal(await fitsViewport(page), true);
     if (viewport.width <= 720) {
       assert.equal(onboardingShellStyle.panelBorderStyle, "none");
       assert.equal(onboardingShellStyle.panelBorderRadius, "0px");

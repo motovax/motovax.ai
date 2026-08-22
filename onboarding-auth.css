@@ -1820,11 +1820,11 @@
 .onboarding-header .header-inner,
 .onboarding-header-inner {
   width: min(calc(100% - 40px), 1080px);
-  min-height: 94px;
+  min-height: 84px;
 }
 
 .onboarding-page {
-  padding: 36px 0 20px;
+  padding: 24px 0 16px;
 }
 
 .onboarding-shell {
@@ -1836,7 +1836,7 @@
 .onboarding-panel {
   width: 100%;
   min-height: 0;
-  padding: 30px 42px 26px;
+  padding: 26px 40px 22px;
   border: 1px solid #dce4ef;
   border-radius: 12px;
   box-shadow: none;
@@ -1844,7 +1844,7 @@
 
 .onboarding-aside {
   position: static;
-  margin: 0 0 32px;
+  margin: 0 0 24px;
   padding: 0;
 }
 
@@ -1853,7 +1853,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  margin-bottom: 18px;
+  margin-bottom: 14px;
 }
 
 .onboarding-rail-head > span {
@@ -1995,7 +1995,7 @@
 }
 
 .onboarding-step-head {
-  margin-bottom: 24px;
+  margin-bottom: 18px;
 }
 
 .onboarding-step-head > span {
@@ -2008,17 +2008,17 @@
 }
 
 .onboarding-form {
-  gap: 22px;
+  gap: 18px;
 }
 
 .onboarding-form-row {
-  gap: 18px;
+  gap: 16px;
 }
 
 .onboarding-form input,
 .onboarding-form select,
 .onboarding-form textarea {
-  min-height: 48px;
+  min-height: 46px;
   border-radius: 9px;
 }
 
@@ -2033,7 +2033,7 @@
 }
 
 .onboarding-page .onboarding-panel .btn-primary {
-  min-height: 54px;
+  min-height: 50px;
   border: 0;
   border-radius: 6px;
   background: #1764e8;
@@ -2098,17 +2098,17 @@
 }
 
 .onboarding-auth-divider {
-  margin: 26px 0 22px;
+  margin: 20px 0 18px;
 }
 
 .onboarding-google-btn {
-  min-height: 48px;
+  min-height: 46px;
   border-radius: 7px;
 }
 
 .onboarding-legal {
   width: min(100%, 720px);
-  margin: 18px auto 0;
+  margin: 14px auto 0;
   color: #8b9bb3;
   font-size: 11px;
   line-height: 1.55;
@@ -2132,7 +2132,7 @@
 }
 
 .onboarding-footer {
-  padding: 18px 0 22px;
+  padding: 12px 0 14px;
   border-top: 1px solid #edf1f6;
 }
 
@@ -2161,11 +2161,11 @@
   .onboarding-header .header-inner,
   .onboarding-header-inner {
     width: min(calc(100% - 32px), 1080px);
-    min-height: 78px;
+    min-height: 64px;
   }
 
   .onboarding-header .brand {
-    font-size: 22px;
+    font-size: 21px;
   }
 
   .onboarding-link-muted {
@@ -2173,7 +2173,7 @@
   }
 
   .onboarding-page {
-    padding: 46px 0 max(28px, env(safe-area-inset-bottom));
+    padding: 12px 0 max(8px, env(safe-area-inset-bottom));
   }
 
   .onboarding-shell {
@@ -2189,11 +2189,11 @@
   }
 
   .onboarding-aside {
-    margin-bottom: 28px;
+    margin-bottom: 16px;
   }
 
   .onboarding-rail-head {
-    margin-bottom: 16px;
+    margin-bottom: 10px;
   }
 
   .onboarding-rail-head > span {
@@ -2217,8 +2217,8 @@
 
   .onboarding-rail li {
     display: grid;
-    min-height: 34px;
-    grid-template-rows: 34px;
+    min-height: 32px;
+    grid-template-rows: 32px;
     padding: 0 4px;
   }
 
@@ -2227,12 +2227,12 @@
   }
 
   .onboarding-rail li i {
-    width: 34px;
-    height: 34px;
+    width: 32px;
+    height: 32px;
   }
 
   .onboarding-rail li::before {
-    top: 16px;
+    top: 15px;
   }
 
   .onboarding-rail li.is-active::after {
@@ -2240,35 +2240,54 @@
   }
 
   .onboarding-step-head {
-    margin-bottom: 22px;
+    margin-bottom: 12px;
+  }
+
+  .onboarding-page .onboarding-step-head > span {
+    display: none;
   }
 
   .onboarding-step-head h2 {
-    font-size: 26px;
+    margin-top: 0;
+    font-size: 24px;
   }
 
   .onboarding-step-head p {
-    font-size: 14px;
-    line-height: 1.55;
+    font-size: 13px;
+    line-height: 1.45;
+  }
+
+  .onboarding-form {
+    gap: 12px;
   }
 
   .onboarding-form-row {
     grid-template-columns: 1fr;
-    gap: 22px;
+    gap: 12px;
+  }
+
+  .onboarding-form input,
+  .onboarding-form select,
+  .onboarding-form textarea {
+    min-height: 44px;
   }
 
   .onboarding-step[data-step="1"] .onboarding-step-actions .btn-primary {
-    min-height: 52px;
+    min-height: 48px;
+  }
+
+  .onboarding-auth-divider {
+    margin: 12px 0 10px;
   }
 
   .onboarding-legal {
-    margin-top: 24px;
-    font-size: 11px;
+    margin-top: 14px;
+    font-size: 10px;
     text-align: left;
   }
 
   .onboarding-legal .onboarding-recaptcha-disclosure {
-    margin-top: 5px;
+    margin-top: 3px;
     font-size: 9px;
   }
 
@@ -2308,7 +2327,7 @@
 .portal-login-body .onboarding-header .header-inner,
 .portal-login-body .onboarding-header-inner {
   width: min(calc(100% - 96px), 1344px);
-  min-height: 100px;
+  min-height: 84px;
 }
 
 .portal-login-body .onboarding-header .brand {
@@ -2336,7 +2355,7 @@
   flex: 1 1 auto;
   min-height: 0;
   align-items: center;
-  padding: 56px 0 38px;
+  padding: 30px 0 24px;
   background:
     radial-gradient(circle at 50% 20%, rgba(214, 231, 255, 0.5), transparent 48%),
     linear-gradient(180deg, #f8fbff 0%, #f4f8fd 100%);
@@ -2353,7 +2372,7 @@
 .portal-login-body .portal-login-panel {
   width: min(100%, 660px);
   min-height: 0;
-  padding: 40px 34px 34px;
+  padding: 32px 32px 28px;
   border: 1px solid rgba(225, 232, 242, 0.72);
   border-radius: 20px;
   background: #fff;
@@ -2361,7 +2380,7 @@
 }
 
 .portal-login-body .portal-login-panel .onboarding-step-head {
-  margin-bottom: 24px;
+  margin-bottom: 18px;
 }
 
 .portal-login-body .portal-login-panel .onboarding-step-head > span {
@@ -2372,9 +2391,9 @@
 }
 
 .portal-login-body .portal-login-panel .onboarding-step-head h2 {
-  margin: 10px 0 7px;
+  margin: 8px 0 6px;
   color: #101827;
-  font-size: 27px;
+  font-size: 26px;
   line-height: 1.15;
   letter-spacing: -0.035em;
 }
@@ -2387,7 +2406,7 @@
 }
 
 .portal-login-body .portal-login-google {
-  min-height: 52px;
+  min-height: 50px;
   border-color: #d5dfec;
   border-radius: 10px;
   color: #101827;
@@ -2402,7 +2421,7 @@
 }
 
 .portal-login-body .portal-login-divider {
-  margin: 24px 0 20px;
+  margin: 20px 0 16px;
   color: #718096;
   font-size: 13px;
   font-weight: 700;
@@ -2418,7 +2437,7 @@
 }
 
 .portal-login-body .portal-login-form {
-  gap: 18px;
+  gap: 16px;
 }
 
 .portal-login-body .portal-login-form > label,
@@ -2435,7 +2454,7 @@
 }
 
 .portal-login-body .portal-login-form input {
-  min-height: 52px;
+  min-height: 50px;
   border-color: #d6e0ec;
   border-radius: 10px;
   color: #172033;
@@ -2461,14 +2480,14 @@
 .portal-login-body .onboarding-password-control button {
   width: 52px;
   min-width: 52px;
-  min-height: 50px;
+  min-height: 48px;
   border-left: 0;
   color: #075edb;
   background: #fff;
 }
 
 .portal-login-body .portal-login-submit {
-  min-height: 56px;
+  min-height: 52px;
   margin-top: 2px;
   border: 0;
   border-radius: 10px;
@@ -2489,8 +2508,8 @@
 
 .portal-login-body .portal-register-prompt {
   gap: 4px;
-  margin-top: 24px;
-  padding: 16px;
+  margin-top: 18px;
+  padding: 13px;
   border-color: #dce5f0;
   border-radius: 12px;
   background: #f7faff;
@@ -2509,7 +2528,7 @@
 }
 
 .portal-login-body .portal-login-help {
-  margin: 28px 0 0;
+  margin: 18px 0 0;
   color: #65748b;
   font-size: 12px;
   line-height: 1.5;
@@ -2531,7 +2550,7 @@
 .portal-login-body .portal-login-footer .container {
   display: flex;
   width: min(calc(100% - 96px), 760px);
-  min-height: 66px;
+  min-height: 54px;
   align-items: center;
   justify-content: center;
   gap: 72px;
@@ -2555,7 +2574,7 @@
   }
 
   .portal-login-body .portal-login-page {
-    padding: 48px 0 34px;
+    padding: 28px 0 22px;
   }
 }
 
@@ -2567,11 +2586,11 @@
   .portal-login-body .onboarding-header .header-inner,
   .portal-login-body .onboarding-header-inner {
     width: min(calc(100% - 48px), 672px);
-    min-height: 100px;
+    min-height: 72px;
   }
 
   .portal-login-body .onboarding-header .brand {
-    font-size: 23px;
+    font-size: 22px;
   }
 
   .portal-back-desktop {
@@ -2588,8 +2607,8 @@
   }
 
   .portal-login-body .portal-login-page {
-    align-items: start;
-    padding: 8px 0 20px;
+    align-items: center;
+    padding: 4px 0 10px;
     background: #fff;
   }
 
@@ -2599,7 +2618,7 @@
 
   .portal-login-body .portal-login-panel {
     width: 100%;
-    padding: 30px 22px 24px;
+    padding: 22px 20px 18px;
     border: 1px solid #dce4ee;
     border-radius: 16px;
     background: #fff;
@@ -2607,46 +2626,46 @@
   }
 
   .portal-login-body .portal-login-panel .onboarding-step-head {
-    margin-bottom: 24px;
+    margin-bottom: 16px;
   }
 
   .portal-login-body .portal-login-panel .onboarding-step-head h2 {
-    margin-top: 10px;
-    font-size: 24px;
+    margin-top: 8px;
+    font-size: 23px;
   }
 
   .portal-login-body .portal-login-panel .onboarding-step-head p {
     font-size: 13px;
-    line-height: 1.55;
+    line-height: 1.45;
   }
 
   .portal-login-body .portal-login-google {
-    min-height: 54px;
+    min-height: 48px;
   }
 
   .portal-login-body .portal-login-divider {
-    margin: 24px 0 20px;
+    margin: 16px 0 14px;
   }
 
   .portal-login-body .portal-login-form {
-    gap: 18px;
+    gap: 14px;
   }
 
   .portal-login-body .portal-login-form input {
-    min-height: 54px;
+    min-height: 48px;
   }
 
   .portal-login-body .onboarding-password-control button {
-    min-height: 52px;
+    min-height: 46px;
   }
 
   .portal-login-body .portal-login-submit {
-    min-height: 56px;
+    min-height: 50px;
   }
 
   .portal-login-body .portal-register-prompt {
-    margin-top: 20px;
-    padding: 15px 10px;
+    margin-top: 14px;
+    padding: 12px 10px;
   }
 
   .portal-login-body .portal-login-help {
@@ -2662,7 +2681,7 @@
   .portal-login-body .portal-login-footer .container {
     display: flex;
     width: min(calc(100% - 48px), 540px);
-    min-height: 54px;
+    min-height: 48px;
     justify-content: space-between;
     gap: 20px;
     font-size: 11px;
