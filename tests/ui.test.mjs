@@ -196,6 +196,27 @@ for (const viewport of viewports) {
     assert.equal(workspaceEnterCount, 0);
     assert.equal(await page.inputValue('[data-auth-form="signup"] input[name="fullName"]'), "");
     assert.equal(await page.inputValue('[data-auth-form="signup"] input[name="email"]'), "");
+    assert.equal(await page.getByRole("link", { name: "Daftar dengan Google", exact: true }).count(), 1);
+    assert.equal(await page.evaluate(() => {
+      const googleButton = document.querySelector("[data-google-login]");
+      const signupForm = document.querySelector('[data-auth-form="signup"]');
+      return Boolean(googleButton.compareDocumentPosition(signupForm) & Node.DOCUMENT_POSITION_FOLLOWING);
+    }), true);
+    assert.deepEqual(await page.locator("[data-google-login]").evaluate((button) => {
+      const style = getComputedStyle(button);
+      const iconStyle = getComputedStyle(button.querySelector(".onboarding-google-icon"));
+      return {
+        minHeight: style.minHeight,
+        borderRadius: style.borderRadius,
+        fontWeight: style.fontWeight,
+        iconWidth: iconStyle.width,
+      };
+    }), {
+      minHeight: viewport.width <= 720 ? "48px" : "50px",
+      borderRadius: "10px",
+      fontWeight: "800",
+      iconWidth: "21px",
+    });
     assert.equal(await page.locator('[data-step="4"]').isHidden(), true);
     assert.equal(await page.getByText("Jadwalkan demo live", { exact: false }).count(), 0);
     assert.equal(await page.getByRole("link", { name: "Jadwalkan Demo", exact: true }).count(), 0);
@@ -752,6 +773,26 @@ for (const viewport of viewports) {
     assert.equal(await page.locator('[data-google-login]').isVisible(), true);
     assert.equal(await page.getAttribute('[data-google-login]', "href"), "https://onboard.motovax.com/api/auth/google/start?mode=portal");
     assert.equal(await page.getByRole("link", { name: "Login dengan Google", exact: true }).count(), 1);
+    assert.equal(await page.evaluate(() => {
+      const googleButton = document.querySelector("[data-google-login]");
+      const loginForm = document.querySelector("[data-portal-login-form]");
+      return Boolean(googleButton.compareDocumentPosition(loginForm) & Node.DOCUMENT_POSITION_FOLLOWING);
+    }), true);
+    assert.deepEqual(await page.locator("[data-google-login]").evaluate((button) => {
+      const style = getComputedStyle(button);
+      const iconStyle = getComputedStyle(button.querySelector(".onboarding-google-icon"));
+      return {
+        minHeight: style.minHeight,
+        borderRadius: style.borderRadius,
+        fontWeight: style.fontWeight,
+        iconWidth: iconStyle.width,
+      };
+    }), {
+      minHeight: viewport.width <= 720 ? "48px" : "50px",
+      borderRadius: "10px",
+      fontWeight: "800",
+      iconWidth: "21px",
+    });
     assert.equal(await page.locator('input[name="workspace"]').count(), 0);
     await page.fill('input[name="identifier"]', "owner");
     await page.click('[data-portal-login-form] button[type="submit"]');

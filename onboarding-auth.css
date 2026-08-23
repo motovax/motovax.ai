@@ -2101,9 +2101,18 @@
   margin: 20px 0 18px;
 }
 
-.onboarding-google-btn {
-  min-height: 46px;
-  border-radius: 7px;
+.onboarding-step[data-step="1"] > .onboarding-google-btn {
+  min-height: 50px;
+  border-color: #d5dfec;
+  border-radius: 10px;
+  color: #101827;
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.onboarding-step[data-step="1"] > .onboarding-google-btn .onboarding-google-icon {
+  width: 21px;
+  height: 21px;
 }
 
 .onboarding-legal {
@@ -2273,6 +2282,10 @@
   }
 
   .onboarding-step[data-step="1"] .onboarding-step-actions .btn-primary {
+    min-height: 48px;
+  }
+
+  .onboarding-step[data-step="1"] > .onboarding-google-btn {
     min-height: 48px;
   }
 
