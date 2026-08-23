@@ -2662,7 +2662,7 @@ export function createApp({
         if (matchingUsers.length === 0) {
           const user = await store.upsertGoogleUser(googleProfile);
           await issueSession(req, res, user.id);
-          return res.redirect(302, oauthResultUrl(config, "failed", "account_not_found", authMode));
+          return res.redirect(302, oauthResultUrl(config, "success", "", "signup"));
         }
         if (matchingUsers.length > 1 || candidates.length > 20) {
           return res.redirect(302, oauthResultUrl(config, "failed", "ambiguous_account", authMode));

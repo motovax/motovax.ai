@@ -745,10 +745,9 @@ test("callback Google mode portal memakai sesi yang sama untuk onboarding saat t
       },
     );
     const location = new URL(callback.headers.get("location"));
-    assert.equal(location.pathname, "/login.html");
-    assert.equal(location.searchParams.get("ui"), "account-state-v2");
-    assert.equal(location.searchParams.get("oauth"), "failed");
-    assert.equal(location.searchParams.get("reason"), "account_not_found");
+    assert.equal(location.pathname, "/onboarding.html");
+    assert.equal(location.searchParams.get("oauth"), "success");
+    assert.equal(location.searchParams.has("reason"), false);
 
     const sessionToken = cookieValue(callback.headers.get("set-cookie"), "motovax_session");
     assert.ok(sessionToken.length >= 48);
