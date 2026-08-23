@@ -164,6 +164,8 @@ for (const viewport of viewports) {
       }));
     });
     const page = await context.newPage();
+    const devtools = await context.newCDPSession(page);
+    await devtools.send("Network.setCacheDisabled", { cacheDisabled: true });
     let logoutCount = 0;
     let meCount = 0;
     let workspaceEnterCount = 0;
@@ -240,7 +242,8 @@ for (const viewport of viewports) {
         activeRailBoxShadow: activeRailStyle.boxShadow,
         activeNumberBoxShadow: activeNumberStyle.boxShadow,
         secondRailConnectorContent: getComputedStyle(secondRailStep, "::before").content,
-        currentStepCopy: document.querySelector(".onboarding-rail-head strong")?.textContent.replace(/\s+/g, " ").trim(),
+        railHeadCount: document.querySelectorAll(".onboarding-rail-head").length,
+        stepHeadCount: document.querySelectorAll("[data-step] > .onboarding-step-head").length,
         activeAriaCurrent: activeRailStep.getAttribute("aria-current"),
         progressDisplay: getComputedStyle(progress).display,
         railInsidePanel: panel.contains(activeRailStep),
@@ -250,7 +253,8 @@ for (const viewport of viewports) {
     assert.equal(onboardingShellStyle.railInsidePanel, true);
     assert.equal(onboardingShellStyle.legalOutsidePanel, true);
     assert.equal(onboardingShellStyle.progressDisplay, "none");
-    assert.equal(onboardingShellStyle.currentStepCopy, "Langkah 1 dari 4 · Akun");
+    assert.equal(onboardingShellStyle.railHeadCount, 0);
+    assert.equal(onboardingShellStyle.stepHeadCount, 0);
     assert.equal(onboardingShellStyle.activeAriaCurrent, "step");
     assert.notEqual(onboardingShellStyle.activeNumberBoxShadow, "none");
     assert.notEqual(onboardingShellStyle.secondRailConnectorContent, "none");
@@ -440,7 +444,6 @@ test("link verifikasi kedaluwarsa menampilkan pemulihan yang jelas", async () =>
   await page.route("**/api/auth/pending-signup", (route) => route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ pending: true, email: "owner@dealer.test", resendAfterSeconds: 0, expiresInSeconds: 86400 }) }));
   await page.goto(`${baseUrl}/onboarding.html?email=expired`, { waitUntil: "load" });
   await page.waitForSelector('[data-verification-panel][data-state="error"]:not([hidden])');
-  assert.equal(await page.locator('[data-auth-title]').textContent(), "Link verifikasi kedaluwarsa");
   assert.equal(await page.locator('[data-verification-title]').textContent(), "Minta link verifikasi baru");
   assert.match(await page.locator('[data-verification-status]').textContent(), /Kirim ulang email/);
   assert.equal(await noOverflow(page), true);
@@ -580,6 +583,8 @@ for (const viewport of viewports) {
       window.grecaptcha = { enterprise: { ready(callback) { callback(); }, execute() { return Promise.resolve("recaptcha-token"); } } };
     });
     const page = await context.newPage();
+    const devtools = await context.newCDPSession(page);
+    await devtools.send("Network.setCacheDisabled", { cacheDisabled: true });
     await page.route(/https:\/\/fonts\.(?:googleapis|gstatic)\.com\//, (route) => route.abort());
     await page.route("**/api/auth/me", (route) => route.fulfill({ status: 401, contentType: "application/json", body: JSON.stringify({ authenticated: false }) }));
     await page.route("**/api/config", (route) => route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ recaptcha: { enabled: true, siteKey: "test", action: "complete_onboarding" } }) }));
@@ -649,6 +654,8 @@ for (const viewport of viewports) {
     await page.fill('[data-auth-form="signup"] input[name="passwordConfirm"]', "rahasia123");
     await page.click('[data-auth-form="signup"] button[type="submit"]');
     await page.waitForSelector('[data-step="2"].is-active');
+    assert.equal(await noOverflow(page), true);
+    await page.screenshot({ path: `/tmp/motovax-onboarding-step-2-${viewport.name}.png`, fullPage: false });
 
     await page.fill('[data-business-form] input[name="businessName"]', "Dealer Maju Jaya");
     assert.equal(await page.inputValue('[data-business-form] input[name="workspaceSlug"]'), "dealer-maju-jaya");
@@ -658,6 +665,8 @@ for (const viewport of viewports) {
     await page.waitForSelector('[data-slug-status][data-state="available"]');
     await page.click('[data-business-form] button[type="submit"]');
     await page.waitForSelector('[data-step="3"].is-active');
+    assert.equal(await noOverflow(page), true);
+    await page.screenshot({ path: `/tmp/motovax-onboarding-step-3-${viewport.name}.png`, fullPage: false });
     assert.equal(profilePayload.industry, "automotive");
     assert.equal(profilePayload.branchCount, "");
     assert.equal(profilePayload.region, "");
@@ -686,7 +695,8 @@ for (const viewport of viewports) {
       branches: document.querySelector("[data-summary-branches]")?.textContent.trim(),
       railActive: document.querySelector("[data-rail-step].is-active")?.getAttribute("data-rail-step"),
       railAriaCurrent: document.querySelector("[data-rail-step].is-active")?.getAttribute("aria-current"),
-      progressCopy: document.querySelector(".onboarding-rail-head strong")?.textContent.replace(/\s+/g, " ").trim(),
+      railHeadCount: document.querySelectorAll(".onboarding-rail-head").length,
+      stepHeadCount: document.querySelectorAll("[data-step] > .onboarding-step-head").length,
       redirectVisible: !document.querySelector("[data-redirect-state]")?.hidden,
       redirectBusy: document.querySelector("[data-redirect-state]")?.getAttribute("aria-busy"),
       summaryHidden: document.querySelector("[data-workspace-summary]")?.hidden,
@@ -698,7 +708,8 @@ for (const viewport of viewports) {
       branches: "Belum ditentukan",
       railActive: "4",
       railAriaCurrent: "step",
-      progressCopy: "Langkah 4 dari 4 · Siap digunakan",
+      railHeadCount: 0,
+      stepHeadCount: 0,
       redirectVisible: true,
       redirectBusy: "true",
       summaryHidden: true,

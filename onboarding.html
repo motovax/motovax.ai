@@ -15,7 +15,7 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="./styles.css?v=ai-first-tools-20260819" />
-    <link rel="stylesheet" href="./onboarding-auth.css?v=google-top-20260823" />
+    <link rel="stylesheet" href="./onboarding-auth.css?v=streamlined-steps-20260823" />
   </head>
   <body class="onboarding-body">
     <header class="site-header onboarding-header">
@@ -32,15 +32,8 @@
     <main class="onboarding-page">
       <div class="container onboarding-shell">
         <section class="onboarding-panel" aria-labelledby="onboardingPanelTitle">
+          <h1 class="visually-hidden" id="onboardingPanelTitle">Pendaftaran akun MOTOVAX</h1>
           <nav class="onboarding-aside" aria-label="Progress onboarding">
-            <div class="onboarding-rail-head">
-              <span>Progres pendaftaran</span>
-              <strong>
-                <span data-onboarding-current-step>Langkah 1 dari 4</span>
-                <span aria-hidden="true">·</span>
-                <span data-onboarding-current-label>Akun</span>
-              </strong>
-            </div>
             <ol class="onboarding-rail" data-onboarding-rail aria-label="Progress langkah">
               <li class="is-active" data-rail-step="1" aria-current="step">
                 <i aria-hidden="true">1</i>
@@ -79,14 +72,6 @@
 
           <!-- STEP 1: Auth -->
           <div class="onboarding-step is-active" data-step="1">
-            <header class="onboarding-step-head">
-              <span data-auth-kicker>LANGKAH 1 · AKUN</span>
-              <h2 id="onboardingPanelTitle" data-auth-title>Buat akun baru</h2>
-              <p data-auth-lead>
-                Buat akun Motovax menggunakan email kerja atau akun Google Anda.
-              </p>
-            </header>
-
             <a
               class="onboarding-google-btn"
               data-google-login
@@ -225,12 +210,6 @@
 
           <!-- STEP 2: Dealer profile -->
           <div class="onboarding-step" data-step="2" hidden>
-            <header class="onboarding-step-head">
-              <span>LANGKAH 2 · PROFIL DEALER</span>
-              <h2>Ceritakan dealer Anda</h2>
-              <p>Data ini digunakan untuk membuat workspace dan konfigurasi awal tenant dealer mobil Anda.</p>
-            </header>
-
             <div class="email-verified-banner" data-email-verified-banner role="status" hidden>
               <span aria-hidden="true">✓</span>
               <p><b>Email berhasil diverifikasi.</b> Sekarang lengkapi profil dealer Anda.</p>
@@ -285,12 +264,6 @@
 
           <!-- STEP 3: Modules -->
           <div class="onboarding-step" data-step="3" hidden>
-            <header class="onboarding-step-head">
-              <span>LANGKAH 3 · MODUL PRIORITAS</span>
-              <h2>Apa yang ingin Anda coba dulu?</h2>
-              <p>Pilih minimal satu. Pilihan ini menjadi konfigurasi awal workspace Anda.</p>
-            </header>
-
             <form class="onboarding-form" data-modules-form novalidate>
               <div class="onboarding-module-grid" data-module-grid>
                 <label class="onboarding-module-card">
@@ -367,12 +340,6 @@
 
           <!-- STEP 4: Ready -->
           <div class="onboarding-step" data-step="4" hidden>
-            <header class="onboarding-step-head">
-              <span>LANGKAH 4 · SIAP</span>
-              <h2 data-ready-title>Pendaftaran berhasil</h2>
-              <p data-ready-copy>Akun Anda sudah aktif. Anda akan langsung diarahkan ke workspace dealer.</p>
-            </header>
-
             <div class="onboarding-redirect-card" data-redirect-state role="status" aria-live="polite" aria-busy="true" hidden>
               <div class="onboarding-redirect-loader" aria-hidden="true">
                 <span></span>
@@ -458,6 +425,6 @@
     </div>
 
     <script src="./script.js?v=iris-social-20260821"></script>
-    <script src="./onboarding.js?v=clear-stepper-20260822"></script>
+    <script src="./onboarding.js?v=streamlined-steps-20260823"></script>
   </body>
 </html>

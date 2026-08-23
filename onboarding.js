@@ -19,7 +19,6 @@
     inventory: "Kontrol stok & aging",
     scale: "Scale multi-lokasi",
   };
-  var AUTH_LEAD = "Buat akun Motovax menggunakan email kerja atau akun Google Anda.";
   var GOOGLE_AUTH_ORIGIN = "https://onboard.motovax.com";
   var FINAL_SETUP_TIMEOUT_MS = 3000;
   function loadState() {
@@ -259,8 +258,6 @@
     this.steps = qsa("[data-step]");
     this.railItems = qsa("[data-rail-step]");
     this.progressBar = qs("[data-onboarding-progress]");
-    this.currentStepLabel = qs("[data-onboarding-current-step]");
-    this.currentStepName = qs("[data-onboarding-current-label]");
     this.legal = qs("[data-onboarding-legal]");
     this.toast = qs("[data-onboarding-toast]");
 
@@ -554,13 +551,6 @@
     if (divider) divider.hidden = false;
     if (googleButton) googleButton.hidden = false;
 
-    var lead = qs("[data-auth-lead]");
-    if (lead) lead.textContent = AUTH_LEAD;
-    var kicker = qs("[data-auth-kicker]");
-    var title = qs("[data-auth-title]");
-    if (kicker) kicker.textContent = "LANGKAH 1 · AKUN";
-    if (title) title.textContent = "Buat akun baru";
-
     var googleBtn = qs("[data-google-login]");
     if (googleBtn) {
       googleBtn.setAttribute(
@@ -586,22 +576,18 @@
     options = options || {};
     var email = options.email || this.state.pendingVerification?.email || this.state.account?.email || "";
     var viewState = state || "pending";
-    var title = "Cek email Anda";
     var panelHeading = "Periksa kotak masuk";
     var copy = "Kami mengirim link verifikasi ke:";
     var status = options.status || "Link berlaku selama 24 jam. Anda dapat menutup halaman ini dan kembali nanti.";
     if (viewState === "expired") {
-      title = "Link verifikasi kedaluwarsa";
       panelHeading = "Minta link verifikasi baru";
       copy = "Kirim link baru untuk memverifikasi:";
       status = options.status || "Link hanya berlaku 24 jam. Kirim ulang email untuk mendapatkan link baru.";
     } else if (viewState === "used") {
-      title = "Link ini sudah tidak berlaku";
       panelHeading = "Gunakan link terbaru";
       copy = "Gunakan email verifikasi terbaru untuk:";
       status = options.status || "Link mungkin sudah digunakan atau digantikan oleh kiriman yang lebih baru.";
     } else if (viewState === "invalid") {
-      title = "Link verifikasi tidak valid";
       panelHeading = "Minta link verifikasi baru";
       copy = "Minta link baru untuk memverifikasi:";
       status = options.status || "Pastikan link disalin lengkap atau kirim ulang email verifikasi.";
@@ -617,12 +603,6 @@
     var googleButton = qs("[data-google-login]");
     if (divider) divider.hidden = true;
     if (googleButton) googleButton.hidden = true;
-    var kicker = qs("[data-auth-kicker]");
-    var authTitle = qs("[data-auth-title]");
-    var lead = qs("[data-auth-lead]");
-    if (kicker) kicker.textContent = "LANGKAH 1 · VERIFIKASI EMAIL";
-    if (authTitle) authTitle.textContent = title;
-    if (lead) lead.textContent = "Selesaikan verifikasi sebelum membuat workspace dealer Anda.";
     var panelTitle = qs("[data-verification-title]");
     var panelCopy = qs("[data-verification-copy]");
     var panelEmail = qs("[data-verification-email]");
@@ -752,8 +732,6 @@
     var googleButton = qs("[data-google-login]");
     if (divider) divider.hidden = true;
     if (googleButton) googleButton.hidden = true;
-    var lead = qs("[data-auth-lead]");
-    if (lead) lead.textContent = "Buat password baru untuk akun Motovax Anda.";
   };
 
   OnboardingApp.prototype.submitResetPassword = async function () {
@@ -1177,16 +1155,12 @@
     var redirectState = qs("[data-redirect-state]");
     var workspaceSummary = qs("[data-workspace-summary]");
     var workspaceActions = qs("[data-workspace-actions]");
-    var readyTitle = qs("[data-ready-title]");
-    var readyCopy = qs("[data-ready-copy]");
     var redirectDomain = qs("[data-redirect-domain]");
     window.clearTimeout(this.toastTimer);
     if (this.toast) this.toast.hidden = true;
     if (redirectState) redirectState.hidden = false;
     if (workspaceSummary) workspaceSummary.hidden = true;
     if (workspaceActions) workspaceActions.hidden = true;
-    if (readyTitle) readyTitle.textContent = "Pendaftaran berhasil";
-    if (readyCopy) readyCopy.textContent = "Akses aman sudah siap. Anda langsung dialihkan ke dashboard workspace dealer.";
     if (redirectDomain) redirectDomain.textContent = this.state.workspace?.domain || "workspace dealer Anda";
   };
 
@@ -1301,15 +1275,11 @@
     var statusEl = qs("[data-workspace-status]");
     var workspaceSummary = qs("[data-workspace-summary]");
     var workspaceActions = qs("[data-workspace-actions]");
-    var readyTitle = qs("[data-ready-title]");
-    var readyCopy = qs("[data-ready-copy]");
     var redirectState = qs("[data-redirect-state]");
     this.isRedirecting = false;
     if (redirectState) redirectState.hidden = true;
     if (workspaceSummary) workspaceSummary.hidden = false;
     if (workspaceActions) workspaceActions.hidden = false;
-    if (readyTitle) readyTitle.textContent = "Pendaftaran berhasil";
-    if (readyCopy) readyCopy.textContent = "Akun Anda sudah aktif. Anda akan langsung diarahkan ke workspace dealer.";
 
     if (nameEl) nameEl.textContent = biz.businessName || "Dealer Anda";
     if (userEl) {
@@ -1355,7 +1325,6 @@
       panel.classList.toggle("is-active", active);
     });
 
-    var currentStepName = "";
     this.railItems.forEach(function (item) {
       var n = parseInt(item.getAttribute("data-rail-step"), 10);
       var isActive = n === step;
@@ -1363,14 +1332,10 @@
       item.classList.toggle("is-done", n < step);
       if (isActive) {
         item.setAttribute("aria-current", "step");
-        currentStepName = qs("b", item)?.textContent || "";
       } else {
         item.removeAttribute("aria-current");
       }
     });
-
-    if (this.currentStepLabel) this.currentStepLabel.textContent = "Langkah " + step + " dari 4";
-    if (this.currentStepName) this.currentStepName.textContent = currentStepName;
 
     if (this.progressBar) {
       this.progressBar.style.setProperty("--p", step * 25 + "%");
