@@ -2465,6 +2465,43 @@
   color: #8592a6;
 }
 
+.portal-login-body .portal-login-error {
+  display: grid;
+  gap: 10px;
+}
+
+.portal-login-body .portal-login-error[hidden] {
+  display: none;
+}
+
+.portal-login-body .portal-login-error-register {
+  display: inline-flex;
+  width: fit-content;
+  min-height: 36px;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 12px;
+  border: 1px solid #f3aaaa;
+  border-radius: 8px;
+  color: #a81212;
+  background: #fff;
+  font-size: 12px;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.portal-login-body .portal-login-error-register[hidden] {
+  display: none;
+}
+
+.portal-login-body .portal-login-error-register:hover,
+.portal-login-body .portal-login-error-register:focus-visible {
+  border-color: #dc2626;
+  color: #8e1010;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.12);
+}
+
 .portal-login-body .portal-text-action {
   min-height: 24px;
   color: #075edb;
@@ -2653,6 +2690,11 @@
 
   .portal-login-body .portal-login-form input {
     min-height: 48px;
+  }
+
+  .portal-login-body .portal-login-error-register {
+    width: 100%;
+    justify-content: center;
   }
 
   .portal-login-body .onboarding-password-control button {

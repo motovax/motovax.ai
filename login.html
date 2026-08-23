@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="./styles.css?v=ai-first-tools-20260819" />
-    <link rel="stylesheet" href="./onboarding-auth.css?v=compact-access-20260822" />
+    <link rel="stylesheet" href="./onboarding-auth.css?v=register-cta-20260823" />
   </head>
   <body class="onboarding-body portal-login-body is-session-checking">
     <header class="site-header onboarding-header">
@@ -74,7 +74,12 @@
               </div>
             </div>
             <p class="portal-recovery-status" data-login-status role="status" aria-live="polite" hidden></p>
-            <p class="onboarding-form-error" data-login-error role="alert" aria-live="assertive" hidden></p>
+            <div class="onboarding-form-error portal-login-error" data-login-error role="alert" aria-live="assertive" hidden>
+              <span data-error-message></span>
+              <a class="portal-login-error-register" data-login-register href="https://onboard.motovax.com/onboarding.html?fresh=1" hidden>
+                Daftar workspace baru <span aria-hidden="true">→</span>
+              </a>
+            </div>
             <button type="submit" class="btn btn-primary portal-login-submit" data-loading-label="Memeriksa akun…">
               <span>Login ke workspace</span><span aria-hidden="true">→</span>
             </button>
@@ -150,6 +155,6 @@
     <footer class="onboarding-footer portal-login-footer">
       <div class="container"><span>© <span data-year></span> MOTOVAX</span><a href="https://motovax.ai/kebijakan-privasi.html">Kebijakan Privasi</a><a href="https://motovax.ai/syarat-ketentuan.html">Syarat &amp; Ketentuan</a></div>
     </footer>
-    <script src="./login.js?v=password-recovery-20260817"></script>
+    <script src="./login.js?v=register-cta-20260823"></script>
   </body>
 </html>
