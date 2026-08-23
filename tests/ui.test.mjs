@@ -470,10 +470,17 @@ test("verifikasi berhasil berlanjut ke profil dealer dengan konfirmasi", async (
   await context.close();
 });
 
-test("alur final berhenti menunggu setelah 3 detik ketika server tidak merespons", async () => {
+test("alur final tetap berhasil ketika verifikasi keamanan membutuhkan lebih dari 3 detik", async () => {
   const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
   await context.addInitScript(() => {
-    window.grecaptcha = { enterprise: { ready(callback) { callback(); }, execute() { return Promise.resolve("recaptcha-token"); } } };
+    window.grecaptcha = {
+      enterprise: {
+        ready(callback) { callback(); },
+        execute() {
+          return new Promise((resolve) => window.setTimeout(() => resolve("recaptcha-token"), 3200));
+        },
+      },
+    };
     localStorage.setItem("motovax_onboarding_v1", JSON.stringify({
       step: 3,
       authMode: "signup",
@@ -495,45 +502,36 @@ test("alur final berhenti menunggu setelah 3 detik ketika server tidak merespons
     workspaces: [],
   }) }));
   await page.route("**/api/onboarding/profile", (route) => route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ profile: route.request().postDataJSON() }) }));
+  await page.route("**/api/onboarding/complete", (route) => route.fulfill({
+    status: 202,
+    contentType: "application/json",
+    body: JSON.stringify({
+      workspace: {
+        id: "tenant-slow-recaptcha",
+        name: "Dealer Timeout",
+        domain: "dealer-timeout.motovax.com",
+        ready: false,
+      },
+    }),
+  }));
 
   await page.goto(`${baseUrl}/onboarding.html`, { waitUntil: "load" });
   await page.waitForSelector('[data-step="3"].is-active');
   await page.evaluate(() => {
-    const originalFetch = window.fetch.bind(window);
     window.__finalTimeoutStartedAt = 0;
-    window.__finalTimeoutEndedAt = 0;
     const form = document.querySelector("[data-modules-form]");
-    const error = form?.querySelector("[data-form-error]");
     form?.addEventListener("submit", () => {
       window.__finalTimeoutStartedAt = performance.now();
     }, { capture: true, once: true });
-    if (error) {
-      const observer = new MutationObserver(() => {
-        if (!error.hidden && !window.__finalTimeoutEndedAt) {
-          window.__finalTimeoutEndedAt = performance.now();
-          observer.disconnect();
-        }
-      });
-      observer.observe(error, { attributes: true, attributeFilter: ["hidden"] });
-    }
-    window.fetch = (input, options = {}) => {
-      if (String(input).includes("/api/onboarding/complete")) {
-        return new Promise((_, reject) => {
-          options.signal?.addEventListener("abort", () => {
-            reject(new DOMException("Request dibatalkan karena timeout.", "AbortError"));
-          }, { once: true });
-        });
-      }
-      return originalFetch(input, options);
-    };
   });
   await page.click('[data-modules-form] button[type="submit"]');
-  await page.waitForSelector('[data-modules-form] [data-form-error]:not([hidden])', { timeout: 4500 });
-  const elapsed = await page.evaluate(() => window.__finalTimeoutEndedAt - window.__finalTimeoutStartedAt);
-  assert.ok(elapsed >= 2500 && elapsed < 3400, `timeout UI selesai dalam ${elapsed}ms`);
-  assert.match(await page.locator('[data-modules-form] [data-form-error]').textContent(), /batas waktu/);
+  await page.waitForSelector('[data-step="4"].is-active', { timeout: 5500 });
+  const elapsed = await page.evaluate(() => performance.now() - window.__finalTimeoutStartedAt);
+  assert.ok(elapsed >= 3000 && elapsed < 5000, `onboarding selesai dalam ${elapsed}ms`);
+  assert.equal(await page.locator('[data-modules-form] [data-form-error]').isHidden(), true);
   assert.equal(await page.locator('[data-modules-form] button[type="submit"]').isEnabled(), true);
   assert.equal(await page.getAttribute('[data-modules-form] button[type="submit"]', "aria-busy"), null);
+  assert.equal(await page.locator('[data-redirect-state]').isVisible(), true);
   assert.equal(await noOverflow(page), true);
   await context.close();
 });

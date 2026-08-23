@@ -20,7 +20,9 @@
     scale: "Scale multi-lokasi",
   };
   var GOOGLE_AUTH_ORIGIN = "https://onboard.motovax.com";
-  var FINAL_SETUP_TIMEOUT_MS = 3000;
+  var API_REQUEST_TIMEOUT_MS = 10000;
+  var RECAPTCHA_TIMEOUT_MS = 10000;
+  var WORKSPACE_SETUP_TIMEOUT_MS = 15000;
   function loadState() {
     try {
       var raw = localStorage.getItem(STORAGE_KEY);
@@ -301,7 +303,7 @@
   OnboardingApp.prototype.startFreshRegistration = function (params) {
     var self = this;
     setFormLoading(this.signupForm, true);
-    api("/api/auth/logout", { method: "POST", body: "{}", timeoutMs: FINAL_SETUP_TIMEOUT_MS })
+    api("/api/auth/logout", { method: "POST", body: "{}", timeoutMs: API_REQUEST_TIMEOUT_MS })
       .then(function () {
         try {
           localStorage.removeItem(STORAGE_KEY);
@@ -343,7 +345,7 @@
   };
 
   OnboardingApp.prototype.getRecaptchaToken = async function (timeoutMs) {
-    var availableMs = Math.max(1, Number(timeoutMs || FINAL_SETUP_TIMEOUT_MS));
+    var availableMs = Math.max(1, Number(timeoutMs || RECAPTCHA_TIMEOUT_MS));
     var startedAt = Date.now();
     var remainingTime = function () {
       return Math.max(1, availableMs - (Date.now() - startedAt));
@@ -351,7 +353,7 @@
     var config = await withTimeout(
       this.recaptchaConfigPromise,
       remainingTime(),
-      "Verifikasi keamanan belum siap dalam 3 detik. Silakan coba lagi.",
+      "Verifikasi keamanan membutuhkan waktu terlalu lama. Periksa koneksi dan coba lagi.",
     );
     if (!config || !config.enabled || !window.grecaptcha || !window.grecaptcha.enterprise) {
       throw new Error(config && config.error || "Proteksi keamanan belum siap. Muat ulang halaman dan coba lagi.");
@@ -364,7 +366,7 @@
             reject(new Error("Verifikasi keamanan gagal. Muat ulang halaman dan coba lagi."));
           });
       });
-    }), remainingTime(), "Verifikasi keamanan melewati batas 3 detik. Silakan coba lagi.");
+    }), remainingTime(), "Verifikasi keamanan membutuhkan waktu terlalu lama. Periksa koneksi dan coba lagi.");
   };
 
   OnboardingApp.prototype.bind = function () {
@@ -1121,16 +1123,12 @@
 
     this.state.modules = checked;
     setFormLoading(form, true);
-    var startedAt = Date.now();
-    var remainingTime = function () {
-      return Math.max(1, FINAL_SETUP_TIMEOUT_MS - (Date.now() - startedAt));
-    };
     try {
-      await this.saveProfile(remainingTime());
-      var recaptchaToken = await this.getRecaptchaToken(remainingTime());
+      await this.saveProfile(API_REQUEST_TIMEOUT_MS);
+      var recaptchaToken = await this.getRecaptchaToken(RECAPTCHA_TIMEOUT_MS);
       var payload = await api("/api/onboarding/complete", {
         method: "POST",
-        timeoutMs: remainingTime(),
+        timeoutMs: WORKSPACE_SETUP_TIMEOUT_MS,
         body: JSON.stringify({ recaptchaToken: recaptchaToken }),
       });
       this.state.workspace = payload.workspace;
