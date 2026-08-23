@@ -19,6 +19,7 @@
   var resetForm = document.querySelector("[data-reset-form]");
   var loginError = document.querySelector("[data-login-error]");
   var loginRegister = document.querySelector("[data-login-register]");
+  var loginRegisterPrompt = document.querySelector("[data-login-register-prompt]");
   var loginStatus = document.querySelector("[data-login-status]");
   var forgotError = document.querySelector("[data-forgot-error]");
   var forgotStatus = document.querySelector("[data-forgot-status]");
@@ -70,7 +71,10 @@
     var messageBox = box.querySelector("[data-error-message]");
     if (messageBox) messageBox.textContent = message;
     else box.textContent = message;
-    if (box === loginError && loginRegister) loginRegister.hidden = true;
+    if (box === loginError) {
+      if (loginRegister) loginRegister.hidden = true;
+      if (loginRegisterPrompt) loginRegisterPrompt.hidden = false;
+    }
     if (field) {
       field.setAttribute("aria-invalid", "true");
       field.focus({ preventScroll: true });
@@ -82,7 +86,10 @@
     var messageBox = errorBox.querySelector("[data-error-message]");
     if (messageBox) messageBox.textContent = "";
     else errorBox.textContent = "";
-    if (errorBox === loginError && loginRegister) loginRegister.hidden = true;
+    if (errorBox === loginError) {
+      if (loginRegister) loginRegister.hidden = true;
+      if (loginRegisterPrompt) loginRegisterPrompt.hidden = false;
+    }
     Array.prototype.forEach.call(form.elements, function (field) {
       field.removeAttribute("aria-invalid");
     });
@@ -174,7 +181,10 @@
     if (params.get("oauth") === "failed" || params.get("oauth") === "denied") {
       var oauthReason = params.get("oauth") === "denied" ? "denied" : params.get("reason");
       showError(loginError, googleErrorMessage(oauthReason));
-      if (oauthReason === "account_not_found" && loginRegister) loginRegister.hidden = false;
+      if (oauthReason === "account_not_found") {
+        if (loginRegister) loginRegister.hidden = false;
+        if (loginRegisterPrompt) loginRegisterPrompt.hidden = true;
+      }
       params.delete("oauth");
       params.delete("reason");
       var cleanQuery = params.toString();

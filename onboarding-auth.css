@@ -2565,6 +2565,10 @@
   background: #f7faff;
 }
 
+.portal-login-body .portal-register-prompt[hidden] {
+  display: none;
+}
+
 .portal-login-body .portal-register-prompt span {
   color: #66748a;
   font-size: 12px;

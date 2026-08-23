@@ -738,13 +738,21 @@ for (const viewport of viewports) {
     assert.equal(await page.locator('[data-login-register]').isVisible(), true);
     assert.equal(await page.getAttribute('[data-login-register]', "href"), "https://onboard.motovax.com/onboarding.html?fresh=1");
     assert.match(await page.locator('[data-login-register]').textContent(), /Daftar workspace baru/);
+    assert.equal(await page.locator('[data-login-register-prompt]').isHidden(), true);
+    assert.equal(await page.locator('a[href="https://onboard.motovax.com/onboarding.html?fresh=1"]:visible').count(), 1);
     assert.equal(new URL(page.url()).searchParams.has("oauth"), false);
     assert.equal(await fitsViewport(page), true);
+
+    await page.fill('input[name="identifier"]', "owner");
+    assert.equal(await page.locator('[data-login-error]').isHidden(), true);
+    assert.equal(await page.locator('[data-login-register]').isHidden(), true);
+    assert.equal(await page.locator('[data-login-register-prompt]').isVisible(), true);
 
     await page.goto(`${baseUrl}/login.html?oauth=denied`, { waitUntil: "load" });
     await page.waitForSelector(".portal-login-auth-content:visible");
     assert.equal(await page.locator('[data-login-error]').isVisible(), true);
     assert.equal(await page.locator('[data-login-register]').isHidden(), true);
+    assert.equal(await page.locator('[data-login-register-prompt]').isVisible(), true);
 
     await page.goto(`${baseUrl}/login.html?forgot=1&workspace=dealer-test.motovax.com&email=owner%40dealer.test`, { waitUntil: "load" });
     await page.waitForSelector("[data-forgot-view]:visible");
