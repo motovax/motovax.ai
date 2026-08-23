@@ -21,7 +21,7 @@
   };
   var GOOGLE_AUTH_ORIGIN = "https://onboard.motovax.com";
   var API_REQUEST_TIMEOUT_MS = 10000;
-  var RECAPTCHA_TIMEOUT_MS = 10000;
+  var RECAPTCHA_TIMEOUT_MS = 20000;
   var WORKSPACE_SETUP_TIMEOUT_MS = 15000;
   function loadState() {
     try {
@@ -208,7 +208,7 @@
     }
     return new Promise(function (resolve, reject) {
       var script = document.createElement("script");
-      script.src = "https://www.google.com/recaptcha/enterprise.js?render=" + encodeURIComponent(siteKey);
+      script.src = "https://www.recaptcha.net/recaptcha/enterprise.js?render=" + encodeURIComponent(siteKey);
       script.async = true;
       script.defer = true;
       script.dataset.motovaxRecaptcha = "true";

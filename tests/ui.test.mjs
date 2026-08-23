@@ -470,6 +470,39 @@ test("verifikasi berhasil berlanjut ke profil dealer dengan konfirmasi", async (
   await context.close();
 });
 
+test("loader verifikasi keamanan memakai endpoint recaptcha.net", async () => {
+  const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
+  const page = await context.newPage();
+  let recaptchaScriptUrl = "";
+  await page.route(/https:\/\/fonts\.(?:googleapis|gstatic)\.com\//, (route) => route.abort());
+  await page.route("**/api/config", (route) => route.fulfill({
+    status: 200,
+    contentType: "application/json",
+    body: JSON.stringify({ recaptcha: { enabled: true, siteKey: "test-site-key", action: "complete_onboarding" } }),
+  }));
+  await page.route("**/api/auth/me", (route) => route.fulfill({
+    status: 401,
+    contentType: "application/json",
+    body: JSON.stringify({ authenticated: false }),
+  }));
+  await page.route("https://www.recaptcha.net/recaptcha/enterprise.js?**", (route) => {
+    recaptchaScriptUrl = route.request().url();
+    return route.fulfill({
+      status: 200,
+      contentType: "application/javascript",
+      body: "window.grecaptcha = { enterprise: { ready: function (callback) { callback(); }, execute: function () { return Promise.resolve('token'); } } };",
+    });
+  });
+
+  await page.goto(`${baseUrl}/onboarding.html`, { waitUntil: "load" });
+  await page.waitForFunction(() => Boolean(window.grecaptcha?.enterprise));
+  const scriptUrl = new URL(recaptchaScriptUrl);
+  assert.equal(scriptUrl.hostname, "www.recaptcha.net");
+  assert.equal(scriptUrl.pathname, "/recaptcha/enterprise.js");
+  assert.equal(scriptUrl.searchParams.get("render"), "test-site-key");
+  await context.close();
+});
+
 test("alur final tetap berhasil ketika verifikasi keamanan membutuhkan lebih dari 3 detik", async () => {
   const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
   await context.addInitScript(() => {
