@@ -733,25 +733,29 @@ for (const viewport of viewports) {
     await page.route("https://dealer-test.motovax.com/**", (route) => route.fulfill({ status: 200, contentType: "text/html", body: "<title>Workspace Dealer</title>" }));
     await page.goto(`${baseUrl}/login.html?oauth=failed&reason=account_not_found`, { waitUntil: "load" });
     await page.waitForSelector(".portal-login-auth-content:visible");
-    assert.equal(await page.locator('[data-login-error]').isVisible(), true);
-    assert.match(await page.locator('[data-login-error]').textContent(), /belum terdaftar pada workspace MOTOVAX/);
-    assert.equal(await page.locator('[data-login-register]').isVisible(), true);
-    assert.equal(await page.getAttribute('[data-login-register]', "href"), "https://onboard.motovax.com/onboarding.html?fresh=1");
-    assert.match(await page.locator('[data-login-register]').textContent(), /Daftar workspace baru/);
-    assert.equal(await page.locator('[data-login-register-prompt]').isHidden(), true);
+    assert.equal(await page.locator('[data-account-not-found]').isVisible(), true);
+    assert.match(await page.locator('[data-account-not-found]').textContent(), /Email Google ini belum terdaftar di workspace MOTOVAX/);
+    assert.equal(await page.locator('[data-login-default]').isHidden(), true);
+    assert.equal(await page.locator('[data-login-error]').isHidden(), true);
+    assert.equal(await page.locator('[data-google-login]').isHidden(), true);
+    assert.equal(await page.locator('[data-portal-login-form]').isHidden(), true);
+    assert.equal(await page.getAttribute('[data-account-register]', "href"), "https://onboard.motovax.com/onboarding.html?fresh=1");
+    assert.match(await page.locator('[data-account-register]').textContent(), /Daftar workspace baru/);
     assert.equal(await page.locator('a[href="https://onboard.motovax.com/onboarding.html?fresh=1"]:visible').count(), 1);
     assert.equal(new URL(page.url()).searchParams.has("oauth"), false);
     assert.equal(await fitsViewport(page), true);
+    await page.screenshot({ path: `/tmp/motovax-login-account-not-found-${viewport.name}.png`, fullPage: false });
 
-    await page.fill('input[name="identifier"]', "owner");
+    await page.click('[data-use-another-account]');
+    assert.equal(await page.locator('[data-account-not-found]').isHidden(), true);
+    assert.equal(await page.locator('[data-login-default]').isVisible(), true);
     assert.equal(await page.locator('[data-login-error]').isHidden(), true);
-    assert.equal(await page.locator('[data-login-register]').isHidden(), true);
     assert.equal(await page.locator('[data-login-register-prompt]').isVisible(), true);
 
     await page.goto(`${baseUrl}/login.html?oauth=denied`, { waitUntil: "load" });
     await page.waitForSelector(".portal-login-auth-content:visible");
     assert.equal(await page.locator('[data-login-error]').isVisible(), true);
-    assert.equal(await page.locator('[data-login-register]').isHidden(), true);
+    assert.equal(await page.locator('[data-account-not-found]').isHidden(), true);
     assert.equal(await page.locator('[data-login-register-prompt]').isVisible(), true);
 
     await page.goto(`${baseUrl}/login.html?forgot=1&workspace=dealer-test.motovax.com&email=owner%40dealer.test`, { waitUntil: "load" });

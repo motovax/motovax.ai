@@ -2478,41 +2478,8 @@
   color: #8592a6;
 }
 
-.portal-login-body .portal-login-error {
-  display: grid;
-  gap: 10px;
-}
-
 .portal-login-body .portal-login-error[hidden] {
   display: none;
-}
-
-.portal-login-body .portal-login-error-register {
-  display: inline-flex;
-  width: fit-content;
-  min-height: 36px;
-  align-items: center;
-  gap: 8px;
-  padding: 7px 12px;
-  border: 1px solid #f3aaaa;
-  border-radius: 8px;
-  color: #a81212;
-  background: #fff;
-  font-size: 12px;
-  font-weight: 800;
-  text-decoration: none;
-}
-
-.portal-login-body .portal-login-error-register[hidden] {
-  display: none;
-}
-
-.portal-login-body .portal-login-error-register:hover,
-.portal-login-body .portal-login-error-register:focus-visible {
-  border-color: #dc2626;
-  color: #8e1010;
-  outline: none;
-  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.12);
 }
 
 .portal-login-body .portal-text-action {
@@ -2579,6 +2546,105 @@
   font-size: 14px;
   font-weight: 800;
   text-decoration: none;
+}
+
+.portal-login-body .portal-account-not-found {
+  display: grid;
+  justify-items: center;
+  padding: 14px 12px 8px;
+  text-align: center;
+}
+
+.portal-login-body .portal-account-not-found[hidden] {
+  display: none;
+}
+
+.portal-login-body .portal-account-not-found-icon {
+  display: grid;
+  width: 68px;
+  height: 68px;
+  margin-bottom: 22px;
+  place-items: center;
+  border: 1px solid #c9dcfa;
+  border-radius: 20px;
+  color: #075edb;
+  background: linear-gradient(145deg, #f5f9ff, #e7f1ff);
+  box-shadow: 0 12px 30px rgba(9, 89, 211, 0.12);
+}
+
+.portal-login-body .portal-account-not-found-icon svg {
+  width: 32px;
+  height: 32px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.portal-login-body .portal-account-not-found-kicker {
+  color: #075edb;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+}
+
+.portal-login-body .portal-account-not-found h2 {
+  margin: 8px 0 8px;
+  color: #101827;
+  font-size: 28px;
+  line-height: 1.15;
+  letter-spacing: -0.035em;
+  outline: none;
+}
+
+.portal-login-body .portal-account-not-found p {
+  max-width: 420px;
+  margin: 0 0 24px;
+  color: #5d6b82;
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.portal-login-body .portal-account-not-found-register {
+  width: min(100%, 360px);
+  min-height: 52px;
+  border: 0;
+  border-radius: 10px;
+  font-size: 14px;
+  text-decoration: none;
+}
+
+.portal-login-body .portal-account-not-found-register > span:last-child {
+  display: inline-grid;
+  min-width: 30px;
+  height: 30px;
+  margin-left: 10px;
+  place-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.portal-login-body .portal-account-not-found-switch {
+  min-height: 40px;
+  margin-top: 10px;
+  padding: 0 16px;
+  border: 0;
+  color: #526079;
+  background: transparent;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.portal-login-body .portal-account-not-found-switch:hover,
+.portal-login-body .portal-account-not-found-switch:focus-visible {
+  color: #075edb;
+  outline: none;
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 
 .portal-login-body .portal-login-help {
@@ -2709,11 +2775,6 @@
     min-height: 48px;
   }
 
-  .portal-login-body .portal-login-error-register {
-    width: 100%;
-    justify-content: center;
-  }
-
   .portal-login-body .onboarding-password-control button {
     min-height: 46px;
   }
@@ -2725,6 +2786,31 @@
   .portal-login-body .portal-register-prompt {
     margin-top: 14px;
     padding: 12px 10px;
+  }
+
+  .portal-login-body .portal-account-not-found {
+    padding: 8px 0 2px;
+  }
+
+  .portal-login-body .portal-account-not-found-icon {
+    width: 60px;
+    height: 60px;
+    margin-bottom: 18px;
+    border-radius: 18px;
+  }
+
+  .portal-login-body .portal-account-not-found-icon svg {
+    width: 28px;
+    height: 28px;
+  }
+
+  .portal-login-body .portal-account-not-found h2 {
+    font-size: 24px;
+  }
+
+  .portal-login-body .portal-account-not-found p {
+    margin-bottom: 20px;
+    font-size: 13px;
   }
 
   .portal-login-body .portal-login-help {

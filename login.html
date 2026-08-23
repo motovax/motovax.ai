@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="./styles.css?v=ai-first-tools-20260819" />
-    <link rel="stylesheet" href="./onboarding-auth.css?v=dedupe-register-20260823" />
+    <link rel="stylesheet" href="./onboarding-auth.css?v=account-not-found-20260823" />
   </head>
   <body class="onboarding-body portal-login-body is-session-checking">
     <header class="site-header onboarding-header">
@@ -33,6 +33,7 @@
           </div>
           <div class="portal-login-auth-content" data-login-auth-content>
           <section data-login-view>
+          <div data-login-default>
           <header class="onboarding-step-head">
             <span>LOGIN TENANT</span>
             <h2 id="portalLoginTitle">Selamat datang kembali</h2>
@@ -76,9 +77,6 @@
             <p class="portal-recovery-status" data-login-status role="status" aria-live="polite" hidden></p>
             <div class="onboarding-form-error portal-login-error" data-login-error role="alert" aria-live="assertive" hidden>
               <span data-error-message></span>
-              <a class="portal-login-error-register" data-login-register href="https://onboard.motovax.com/onboarding.html?fresh=1" hidden>
-                Daftar workspace baru <span aria-hidden="true">→</span>
-              </a>
             </div>
             <button type="submit" class="btn btn-primary portal-login-submit" data-loading-label="Memeriksa akun…">
               <span>Login ke workspace</span><span aria-hidden="true">→</span>
@@ -89,6 +87,22 @@
             <span>Belum punya workspace MOTOVAX?</span>
             <a href="https://onboard.motovax.com/onboarding.html?fresh=1">Daftar dan mulai onboarding <span aria-hidden="true">→</span></a>
           </div>
+          </div>
+
+          <section class="portal-account-not-found" data-account-not-found role="status" aria-live="polite" hidden>
+            <span class="portal-account-not-found-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" focusable="false">
+                <path d="M4 20V9.5L12 4l8 5.5V20M8 20v-6h8v6M9 10h.01M15 10h.01" />
+              </svg>
+            </span>
+            <span class="portal-account-not-found-kicker">AKUN BELUM TERDAFTAR</span>
+            <h2 tabindex="-1">Email belum terhubung</h2>
+            <p>Email Google ini belum terdaftar di workspace MOTOVAX.</p>
+            <a class="btn btn-primary portal-account-not-found-register" data-account-register href="https://onboard.motovax.com/onboarding.html?fresh=1">
+              <span>Daftar workspace baru</span><span aria-hidden="true">→</span>
+            </a>
+            <button type="button" class="portal-account-not-found-switch" data-use-another-account>Gunakan akun lain</button>
+          </section>
           </section>
 
           <section class="portal-recovery-view" data-forgot-view hidden aria-labelledby="portalForgotTitle">
@@ -155,6 +169,6 @@
     <footer class="onboarding-footer portal-login-footer">
       <div class="container"><span>© <span data-year></span> MOTOVAX</span><a href="https://motovax.ai/kebijakan-privasi.html">Kebijakan Privasi</a><a href="https://motovax.ai/syarat-ketentuan.html">Syarat &amp; Ketentuan</a></div>
     </footer>
-    <script src="./login.js?v=dedupe-register-20260823"></script>
+    <script src="./login.js?v=account-not-found-20260823"></script>
   </body>
 </html>

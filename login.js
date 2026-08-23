@@ -14,12 +14,12 @@
   var loginView = document.querySelector("[data-login-view]");
   var forgotView = document.querySelector("[data-forgot-view]");
   var resetView = document.querySelector("[data-reset-view]");
+  var loginDefault = document.querySelector("[data-login-default]");
+  var accountNotFound = document.querySelector("[data-account-not-found]");
   var loginForm = document.querySelector("[data-portal-login-form]");
   var forgotForm = document.querySelector("[data-forgot-form]");
   var resetForm = document.querySelector("[data-reset-form]");
   var loginError = document.querySelector("[data-login-error]");
-  var loginRegister = document.querySelector("[data-login-register]");
-  var loginRegisterPrompt = document.querySelector("[data-login-register-prompt]");
   var loginStatus = document.querySelector("[data-login-status]");
   var forgotError = document.querySelector("[data-forgot-error]");
   var forgotStatus = document.querySelector("[data-forgot-status]");
@@ -71,10 +71,6 @@
     var messageBox = box.querySelector("[data-error-message]");
     if (messageBox) messageBox.textContent = message;
     else box.textContent = message;
-    if (box === loginError) {
-      if (loginRegister) loginRegister.hidden = true;
-      if (loginRegisterPrompt) loginRegisterPrompt.hidden = false;
-    }
     if (field) {
       field.setAttribute("aria-invalid", "true");
       field.focus({ preventScroll: true });
@@ -86,10 +82,6 @@
     var messageBox = errorBox.querySelector("[data-error-message]");
     if (messageBox) messageBox.textContent = "";
     else errorBox.textContent = "";
-    if (errorBox === loginError) {
-      if (loginRegister) loginRegister.hidden = true;
-      if (loginRegisterPrompt) loginRegisterPrompt.hidden = false;
-    }
     Array.prototype.forEach.call(form.elements, function (field) {
       field.removeAttribute("aria-invalid");
     });
@@ -129,6 +121,8 @@
 
   function showLogin(message) {
     showView("login");
+    loginDefault.hidden = false;
+    accountNotFound.hidden = true;
     clearFeedback(loginForm, loginError);
     if (loginStatus) {
       loginStatus.hidden = !message;
@@ -136,6 +130,13 @@
     }
     window.history.replaceState({}, "", window.location.pathname);
     loginForm.elements.identifier.focus({ preventScroll: true });
+  }
+
+  function showAccountNotFound() {
+    showView("login");
+    loginDefault.hidden = true;
+    accountNotFound.hidden = false;
+    accountNotFound.querySelector("h2").focus({ preventScroll: true });
   }
 
   function showForgot() {
@@ -160,9 +161,6 @@
   }
 
   function googleErrorMessage(reason) {
-    if (reason === "account_not_found") {
-      return "Email Google ini belum terdaftar pada workspace MOTOVAX. Gunakan akun tenant lain atau daftar workspace baru.";
-    }
     if (reason === "ambiguous_account") {
       return "Email Google ini terhubung ke lebih dari satu workspace. Login memakai email dan password akun tenant yang spesifik.";
     }
@@ -180,11 +178,9 @@
     var requireReauthentication = params.get("reauth") === "1";
     if (params.get("oauth") === "failed" || params.get("oauth") === "denied") {
       var oauthReason = params.get("oauth") === "denied" ? "denied" : params.get("reason");
-      showError(loginError, googleErrorMessage(oauthReason));
       if (oauthReason === "account_not_found") {
-        if (loginRegister) loginRegister.hidden = false;
-        if (loginRegisterPrompt) loginRegisterPrompt.hidden = true;
-      }
+        showAccountNotFound();
+      } else showError(loginError, googleErrorMessage(oauthReason));
       params.delete("oauth");
       params.delete("reason");
       var cleanQuery = params.toString();
@@ -222,6 +218,9 @@
     workspace = "";
     params = new URLSearchParams();
     showForgot();
+  });
+  document.querySelector("[data-use-another-account]").addEventListener("click", function () {
+    showLogin("");
   });
   Array.prototype.forEach.call(document.querySelectorAll("[data-back-login]"), function (button) {
     button.addEventListener("click", function () { showLogin(""); });
