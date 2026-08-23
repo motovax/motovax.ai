@@ -745,7 +745,7 @@ for (const viewport of viewports) {
     await page.goto(`${baseUrl}/login.html?oauth=failed&reason=account_not_found`, { waitUntil: "load" });
     await page.waitForSelector(".portal-login-auth-content:visible");
     assert.equal(await page.locator('[data-account-not-found]').isVisible(), true);
-    assert.match(await page.locator('[data-account-not-found]').textContent(), /Email Google ini belum terdaftar di workspace MOTOVAX/);
+    assert.match(await page.locator('[data-account-not-found]').textContent(), /Daftar workspace baru untuk menggunakan akun Google ini di MOTOVAX/);
     assert.equal(await page.locator('[data-login-default]').isHidden(), true);
     assert.equal(await page.locator('[data-login-error]').isHidden(), true);
     assert.equal(await page.locator('[data-google-login]').isHidden(), true);
