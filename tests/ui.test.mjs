@@ -750,9 +750,9 @@ for (const viewport of viewports) {
     assert.equal(await page.locator('[data-login-error]').isHidden(), true);
     assert.equal(await page.locator('[data-google-login]').isHidden(), true);
     assert.equal(await page.locator('[data-portal-login-form]').isHidden(), true);
-    assert.equal(await page.getAttribute('[data-account-register]', "href"), "https://onboard.motovax.com/onboarding.html?fresh=1");
+    assert.equal(await page.getAttribute('[data-account-register]', "href"), "https://onboard.motovax.com/onboarding.html");
     assert.match(await page.locator('[data-account-register]').textContent(), /Daftar workspace baru/);
-    assert.equal(await page.locator('a[href="https://onboard.motovax.com/onboarding.html?fresh=1"]:visible').count(), 1);
+    assert.equal(await page.locator('a[href="https://onboard.motovax.com/onboarding.html"]:visible').count(), 1);
     assert.equal(new URL(page.url()).searchParams.has("oauth"), false);
     assert.equal(await fitsViewport(page), true);
     await page.screenshot({ path: `/tmp/motovax-login-account-not-found-${viewport.name}.png`, fullPage: false });

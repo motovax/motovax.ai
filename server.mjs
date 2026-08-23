@@ -19,6 +19,7 @@ const HANDOFF_TTL_MS = 60 * 1000;
 const EMAIL_VERIFICATION_TTL_MS = 24 * 60 * 60 * 1000;
 const EMAIL_VERIFICATION_RESEND_COOLDOWN_SECONDS = 60;
 const PORTAL_PASSWORD_RESET_TTL_MS = 30 * 60 * 1000;
+const PORTAL_LOGIN_UI_VERSION = "account-state-v2";
 const DOMAIN_PROVISIONING_TIMEOUT_MS = 3_000;
 const DOMAIN_PROVISIONING_RETRY_DELAYS_MS = [3_000, 10_000];
 const ALLOWED_MODULES = new Set(["ims", "omni", "social", "crm", "dashboard", "insight"]);
@@ -629,6 +630,7 @@ function oauthResultUrl(config, status, reason = "", authMode = "signup") {
   const target = authMode === "portal"
     ? new URL("/login.html", config.publicBaseUrl)
     : new URL(config.oauthSuccessUrl);
+  if (authMode === "portal") target.searchParams.set("ui", PORTAL_LOGIN_UI_VERSION);
   target.searchParams.set("oauth", status);
   if (reason) target.searchParams.set("reason", reason);
   return target.toString();
@@ -2658,6 +2660,8 @@ export function createApp({
           (candidate) => String(candidate.email || "").trim().toLowerCase() === googleProfile.email,
         );
         if (matchingUsers.length === 0) {
+          const user = await store.upsertGoogleUser(googleProfile);
+          await issueSession(req, res, user.id);
           return res.redirect(302, oauthResultUrl(config, "failed", "account_not_found", authMode));
         }
         if (matchingUsers.length > 1 || candidates.length > 20) {
@@ -2772,6 +2776,12 @@ export function createApp({
       extensions: ["html"],
       index: "index.html",
       maxAge: config.nodeEnv === "production" ? "1h" : 0,
+      setHeaders(res, filePath) {
+        const fileName = path.basename(filePath);
+        if (fileName === "login.html" || fileName === "onboarding.html") {
+          res.setHeader("Cache-Control", "no-store");
+        }
+      },
     }),
   );
 

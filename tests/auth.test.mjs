@@ -7,6 +7,7 @@ import { buildBillingPackages, createApp, verifyRecaptchaToken } from "../server
 
 const oauthStates = new Map();
 const sessions = new Map();
+const googleUsers = new Map();
 const passwordUsers = new Map();
 const actionTokens = new Map();
 const sentEmails = [];
@@ -60,12 +61,16 @@ const store = {
     };
   },
   async upsertGoogleUser(profile) {
-    return {
+    const user = {
       id: "40aa7e34-66fd-42d9-b586-93e65607b670",
       email: profile.email,
+      email_verified: true,
       full_name: profile.name,
       avatar_url: profile.picture,
+      provider: "google",
     };
+    googleUsers.set(user.id, user);
+    return user;
   },
   async createPasswordUser({ email, fullName, passwordHash, authenticatedUserId = "" }) {
     const existing = passwordUsers.get(email);
@@ -150,14 +155,15 @@ const store = {
   },
   async createSession(record) {
     const passwordUser = [...passwordUsers.values()].find((user) => user.id === record.userId);
+    const googleUser = googleUsers.get(record.userId);
     sessions.set(record.sessionDigest, {
       id: record.userId,
-      email: passwordUser?.email || "user@example.com",
-      email_verified: passwordUser?.email_verified ?? true,
-      full_name: passwordUser?.full_name || "User Test",
-      avatar_url: passwordUser?.avatar_url || "https://example.com/avatar.png",
+      email: passwordUser?.email || googleUser?.email || "user@example.com",
+      email_verified: passwordUser?.email_verified ?? googleUser?.email_verified ?? true,
+      full_name: passwordUser?.full_name || googleUser?.full_name || "User Test",
+      avatar_url: passwordUser?.avatar_url || googleUser?.avatar_url || "https://example.com/avatar.png",
       password_hash: passwordUser?.password_hash || "",
-      provider: passwordUser ? "password" : "google",
+      provider: passwordUser ? "password" : googleUser?.provider || "google",
     });
   },
   async findSession(digest) {
@@ -723,7 +729,7 @@ test("callback Google mode portal membuat sesi tenant dan langsung ke workspace"
   }
 });
 
-test("callback Google mode portal menolak email yang belum menjadi user tenant", async () => {
+test("callback Google mode portal memakai sesi yang sama untuk onboarding saat tenant tidak ditemukan", async () => {
   googleProfileEmail = "belum-terdaftar@example.com";
   try {
     const start = await fetch(`${baseUrl}/api/auth/google/start?mode=portal`, {
@@ -740,8 +746,24 @@ test("callback Google mode portal menolak email yang belum menjadi user tenant",
     );
     const location = new URL(callback.headers.get("location"));
     assert.equal(location.pathname, "/login.html");
+    assert.equal(location.searchParams.get("ui"), "account-state-v2");
     assert.equal(location.searchParams.get("oauth"), "failed");
     assert.equal(location.searchParams.get("reason"), "account_not_found");
+
+    const sessionToken = cookieValue(callback.headers.get("set-cookie"), "motovax_session");
+    assert.ok(sessionToken.length >= 48);
+    assert.ok(sessions.has(digest(sessionToken)));
+    assert.equal(cookieValue(callback.headers.get("set-cookie"), "motovax_portal_session"), "");
+
+    const me = await fetch(`${baseUrl}/api/auth/me`, {
+      headers: { cookie: `motovax_session=${encodeURIComponent(sessionToken)}` },
+    });
+    assert.equal(me.status, 200);
+    const payload = await me.json();
+    assert.equal(payload.authenticated, true);
+    assert.equal(payload.user.email, "belum-terdaftar@example.com");
+    assert.equal(payload.user.provider, "google");
+    assert.deepEqual(payload.workspaces, []);
   } finally {
     googleProfileEmail = "user@example.com";
   }
@@ -929,6 +951,14 @@ test("URL profile dan billing lama dialihkan ke gerbang login", async () => {
     const response = await fetch(`${baseUrl}${pathName}`, { redirect: "manual" });
     assert.equal(response.status, 302);
     assert.equal(new URL(response.headers.get("location")).pathname, "/login.html");
+  }
+});
+
+test("halaman autentikasi tidak disimpan di cache browser", async () => {
+  for (const pathname of ["/login.html", "/onboarding.html"]) {
+    const response = await fetch(`${baseUrl}${pathname}`);
+    assert.equal(response.status, 200);
+    assert.equal(response.headers.get("cache-control"), "no-store");
   }
 });
 
