@@ -19,9 +19,10 @@
     inventory: "Kontrol stok & aging",
     scale: "Scale multi-lokasi",
   };
-  var AUTH_LEAD = "Buat akun Motovax menggunakan email kerja atau akun Google Anda.";
   var GOOGLE_AUTH_ORIGIN = "https://onboard.motovax.com";
-  var FINAL_SETUP_TIMEOUT_MS = 3000;
+  var API_REQUEST_TIMEOUT_MS = 10000;
+  var RECAPTCHA_TIMEOUT_MS = 20000;
+  var WORKSPACE_SETUP_TIMEOUT_MS = 15000;
   function loadState() {
     try {
       var raw = localStorage.getItem(STORAGE_KEY);
@@ -207,7 +208,7 @@
     }
     return new Promise(function (resolve, reject) {
       var script = document.createElement("script");
-      script.src = "https://www.google.com/recaptcha/enterprise.js?render=" + encodeURIComponent(siteKey);
+      script.src = "https://www.recaptcha.net/recaptcha/enterprise.js?render=" + encodeURIComponent(siteKey);
       script.async = true;
       script.defer = true;
       script.dataset.motovaxRecaptcha = "true";
@@ -259,6 +260,7 @@
     this.steps = qsa("[data-step]");
     this.railItems = qsa("[data-rail-step]");
     this.progressBar = qs("[data-onboarding-progress]");
+    this.legal = qs("[data-onboarding-legal]");
     this.toast = qs("[data-onboarding-toast]");
 
     this.signupForm = qs('[data-auth-form="signup"]');
@@ -301,7 +303,7 @@
   OnboardingApp.prototype.startFreshRegistration = function (params) {
     var self = this;
     setFormLoading(this.signupForm, true);
-    api("/api/auth/logout", { method: "POST", body: "{}", timeoutMs: FINAL_SETUP_TIMEOUT_MS })
+    api("/api/auth/logout", { method: "POST", body: "{}", timeoutMs: API_REQUEST_TIMEOUT_MS })
       .then(function () {
         try {
           localStorage.removeItem(STORAGE_KEY);
@@ -343,7 +345,7 @@
   };
 
   OnboardingApp.prototype.getRecaptchaToken = async function (timeoutMs) {
-    var availableMs = Math.max(1, Number(timeoutMs || FINAL_SETUP_TIMEOUT_MS));
+    var availableMs = Math.max(1, Number(timeoutMs || RECAPTCHA_TIMEOUT_MS));
     var startedAt = Date.now();
     var remainingTime = function () {
       return Math.max(1, availableMs - (Date.now() - startedAt));
@@ -351,7 +353,7 @@
     var config = await withTimeout(
       this.recaptchaConfigPromise,
       remainingTime(),
-      "Verifikasi keamanan belum siap dalam 3 detik. Silakan coba lagi.",
+      "Verifikasi keamanan membutuhkan waktu terlalu lama. Periksa koneksi dan coba lagi.",
     );
     if (!config || !config.enabled || !window.grecaptcha || !window.grecaptcha.enterprise) {
       throw new Error(config && config.error || "Proteksi keamanan belum siap. Muat ulang halaman dan coba lagi.");
@@ -364,7 +366,7 @@
             reject(new Error("Verifikasi keamanan gagal. Muat ulang halaman dan coba lagi."));
           });
       });
-    }), remainingTime(), "Verifikasi keamanan melewati batas 3 detik. Silakan coba lagi.");
+    }), remainingTime(), "Verifikasi keamanan membutuhkan waktu terlalu lama. Periksa koneksi dan coba lagi.");
   };
 
   OnboardingApp.prototype.bind = function () {
@@ -551,13 +553,6 @@
     if (divider) divider.hidden = false;
     if (googleButton) googleButton.hidden = false;
 
-    var lead = qs("[data-auth-lead]");
-    if (lead) lead.textContent = AUTH_LEAD;
-    var kicker = qs("[data-auth-kicker]");
-    var title = qs("[data-auth-title]");
-    if (kicker) kicker.textContent = "LANGKAH 1 · AKUN";
-    if (title) title.textContent = "Buat akun baru";
-
     var googleBtn = qs("[data-google-login]");
     if (googleBtn) {
       googleBtn.setAttribute(
@@ -583,22 +578,18 @@
     options = options || {};
     var email = options.email || this.state.pendingVerification?.email || this.state.account?.email || "";
     var viewState = state || "pending";
-    var title = "Cek email Anda";
     var panelHeading = "Periksa kotak masuk";
     var copy = "Kami mengirim link verifikasi ke:";
     var status = options.status || "Link berlaku selama 24 jam. Anda dapat menutup halaman ini dan kembali nanti.";
     if (viewState === "expired") {
-      title = "Link verifikasi kedaluwarsa";
       panelHeading = "Minta link verifikasi baru";
       copy = "Kirim link baru untuk memverifikasi:";
       status = options.status || "Link hanya berlaku 24 jam. Kirim ulang email untuk mendapatkan link baru.";
     } else if (viewState === "used") {
-      title = "Link ini sudah tidak berlaku";
       panelHeading = "Gunakan link terbaru";
       copy = "Gunakan email verifikasi terbaru untuk:";
       status = options.status || "Link mungkin sudah digunakan atau digantikan oleh kiriman yang lebih baru.";
     } else if (viewState === "invalid") {
-      title = "Link verifikasi tidak valid";
       panelHeading = "Minta link verifikasi baru";
       copy = "Minta link baru untuk memverifikasi:";
       status = options.status || "Pastikan link disalin lengkap atau kirim ulang email verifikasi.";
@@ -614,12 +605,6 @@
     var googleButton = qs("[data-google-login]");
     if (divider) divider.hidden = true;
     if (googleButton) googleButton.hidden = true;
-    var kicker = qs("[data-auth-kicker]");
-    var authTitle = qs("[data-auth-title]");
-    var lead = qs("[data-auth-lead]");
-    if (kicker) kicker.textContent = "LANGKAH 1 · VERIFIKASI EMAIL";
-    if (authTitle) authTitle.textContent = title;
-    if (lead) lead.textContent = "Selesaikan verifikasi sebelum membuat workspace dealer Anda.";
     var panelTitle = qs("[data-verification-title]");
     var panelCopy = qs("[data-verification-copy]");
     var panelEmail = qs("[data-verification-email]");
@@ -749,8 +734,6 @@
     var googleButton = qs("[data-google-login]");
     if (divider) divider.hidden = true;
     if (googleButton) googleButton.hidden = true;
-    var lead = qs("[data-auth-lead]");
-    if (lead) lead.textContent = "Buat password baru untuk akun Motovax Anda.";
   };
 
   OnboardingApp.prototype.submitResetPassword = async function () {
@@ -1140,16 +1123,12 @@
 
     this.state.modules = checked;
     setFormLoading(form, true);
-    var startedAt = Date.now();
-    var remainingTime = function () {
-      return Math.max(1, FINAL_SETUP_TIMEOUT_MS - (Date.now() - startedAt));
-    };
     try {
-      await this.saveProfile(remainingTime());
-      var recaptchaToken = await this.getRecaptchaToken(remainingTime());
+      await this.saveProfile(API_REQUEST_TIMEOUT_MS);
+      var recaptchaToken = await this.getRecaptchaToken(RECAPTCHA_TIMEOUT_MS);
       var payload = await api("/api/onboarding/complete", {
         method: "POST",
-        timeoutMs: remainingTime(),
+        timeoutMs: WORKSPACE_SETUP_TIMEOUT_MS,
         body: JSON.stringify({ recaptchaToken: recaptchaToken }),
       });
       this.state.workspace = payload.workspace;
@@ -1174,16 +1153,12 @@
     var redirectState = qs("[data-redirect-state]");
     var workspaceSummary = qs("[data-workspace-summary]");
     var workspaceActions = qs("[data-workspace-actions]");
-    var readyTitle = qs("[data-ready-title]");
-    var readyCopy = qs("[data-ready-copy]");
     var redirectDomain = qs("[data-redirect-domain]");
     window.clearTimeout(this.toastTimer);
     if (this.toast) this.toast.hidden = true;
     if (redirectState) redirectState.hidden = false;
     if (workspaceSummary) workspaceSummary.hidden = true;
     if (workspaceActions) workspaceActions.hidden = true;
-    if (readyTitle) readyTitle.textContent = "Pendaftaran berhasil";
-    if (readyCopy) readyCopy.textContent = "Akses aman sudah siap. Anda langsung dialihkan ke dashboard workspace dealer.";
     if (redirectDomain) redirectDomain.textContent = this.state.workspace?.domain || "workspace dealer Anda";
   };
 
@@ -1298,15 +1273,11 @@
     var statusEl = qs("[data-workspace-status]");
     var workspaceSummary = qs("[data-workspace-summary]");
     var workspaceActions = qs("[data-workspace-actions]");
-    var readyTitle = qs("[data-ready-title]");
-    var readyCopy = qs("[data-ready-copy]");
     var redirectState = qs("[data-redirect-state]");
     this.isRedirecting = false;
     if (redirectState) redirectState.hidden = true;
     if (workspaceSummary) workspaceSummary.hidden = false;
     if (workspaceActions) workspaceActions.hidden = false;
-    if (readyTitle) readyTitle.textContent = "Pendaftaran berhasil";
-    if (readyCopy) readyCopy.textContent = "Akun Anda sudah aktif. Anda akan langsung diarahkan ke workspace dealer.";
 
     if (nameEl) nameEl.textContent = biz.businessName || "Dealer Anda";
     if (userEl) {
@@ -1352,21 +1323,22 @@
       panel.classList.toggle("is-active", active);
     });
 
-    var railCopies = {
-      2: "Dealer & workspace",
-      3: "Fokus first value",
-    };
     this.railItems.forEach(function (item) {
       var n = parseInt(item.getAttribute("data-rail-step"), 10);
-      item.classList.toggle("is-active", n === step);
+      var isActive = n === step;
+      item.classList.toggle("is-active", isActive);
       item.classList.toggle("is-done", n < step);
-      var copy = qs("small", item);
-      if (copy && railCopies[n]) copy.textContent = railCopies[n];
+      if (isActive) {
+        item.setAttribute("aria-current", "step");
+      } else {
+        item.removeAttribute("aria-current");
+      }
     });
 
     if (this.progressBar) {
       this.progressBar.style.setProperty("--p", step * 25 + "%");
     }
+    if (this.legal) this.legal.hidden = step !== 1;
 
     if (step === 4) this.renderSummary();
 

@@ -80,7 +80,7 @@ for (const viewport of viewports) {
     const context = await browser.newContext({ viewport });
     const page = await context.newPage();
     await page.route(/https:\/\/fonts\.(?:googleapis|gstatic)\.com\//, (route) => route.abort());
-    await page.goto(`${baseUrl}/index.html?v=tantangan-img-20260815`, { waitUntil: "load" });
+    await page.goto(`${baseUrl}/index-legacy.html?v=tantangan-img-20260815`, { waitUntil: "load" });
 
     const section = page.locator("#keunggulan");
     const image = page.locator("[data-problem-visual]");

@@ -1,5 +1,11 @@
-const whatsappUrl =
-  "https://wa.me/6281999197186?text=Halo%20MOTOVAX%2C%20saya%20ingin%20jadwalkan%20demo.";
+const whatsappNumber = "6281999197186";
+const defaultWhatsappText = "Halo MOTOVAX, saya ingin jadwalkan demo.";
+
+function buildWhatsAppUrl(text = defaultWhatsappText) {
+  return `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(text)}`;
+}
+
+const whatsappUrl = buildWhatsAppUrl();
 
 for (const el of document.querySelectorAll("[data-year]")) {
   el.textContent = String(new Date().getFullYear());
@@ -7,7 +13,8 @@ for (const el of document.querySelectorAll("[data-year]")) {
 
 for (const link of document.querySelectorAll("[data-wa]")) {
   if (link instanceof HTMLAnchorElement) {
-    link.href = whatsappUrl;
+    const customText = link.getAttribute("data-wa-text");
+    link.href = customText ? buildWhatsAppUrl(customText) : whatsappUrl;
     link.target = "_blank";
     link.rel = "noreferrer";
   }
@@ -437,16 +444,16 @@ const dealerProductNavigation = Object.freeze({
     },
     {
       id: "social-sora",
-      label: "Sora AI + Social Media",
-      paneTitle: "Sora AI + Social Media",
+      label: "Iris AI + Social Media",
+      paneTitle: "Iris AI + Social Media",
       demo: { id: "social", hash: "socialDemo", context: "social", label: "Coba Social Studio" },
       features: [
         { title: "Content studio", desc: "Susun materi promosi dan caption dari data produk dalam satu workspace", icon: "shop", slug: "social-media-sora-ai" },
-        { title: "Sora AI upscale & background edit", desc: "Tingkatkan kualitas visual dan edit latar gambar dengan bantuan AI", icon: "ai", slug: "social-media-sora-ai" },
+        { title: "Iris AI upscale & background edit", desc: "Tingkatkan kualitas visual dan edit latar gambar dengan bantuan AI", icon: "ai", slug: "social-media-sora-ai" },
         { title: "Publish ke Facebook, Instagram & WhatsApp", desc: "Publikasikan konten ke channel sosial yang aktif dari satu alur", icon: "blast", slug: "social-media-sora-ai" },
         { title: "Scheduler", desc: "Jadwalkan konten agar tayang sesuai kalender campaign", icon: "sla", slug: "social-media-sora-ai" },
         { title: "Meta ads manager", desc: "Kelola campaign Meta dan lead template WhatsApp dari Social Studio", icon: "ads", slug: "social-media-sora-ai" },
-        { title: "Meta ads analytic by Sora", desc: "Pantau performa iklan dan insight campaign dengan bantuan AI", icon: "report", slug: "social-media-sora-ai" },
+        { title: "Meta ads analytic by Iris", desc: "Pantau performa iklan dan insight campaign dengan bantuan AI", icon: "report", slug: "social-media-sora-ai" },
         { title: "AI 500 credit", desc: "Gunakan 500 kredit AI untuk pembuatan dan pengolahan konten", icon: "ai", slug: "social-media-sora-ai" },
       ],
     },
@@ -581,7 +588,7 @@ const dealerProductNavigation = Object.freeze({
     const panes = allPanes
       .map((item) => {
         const demoHref = item.demo
-          ? `${rootPrefix}index.html?demo=${item.demo.id}&from=${encodeURIComponent(item.demo.context || item.id)}#${item.demo.hash}`
+          ? `${rootPrefix}index-legacy.html?demo=${item.demo.id}&from=${encodeURIComponent(item.demo.context || item.id)}#${item.demo.hash}`
           : "";
         const demoCta = item.demo
           ? `<a href="${demoHref}" class="produk-mega-demo-button" data-open-${item.demo.id}-demo data-demo-context="${item.demo.context || item.id}" data-produk-close>
@@ -797,7 +804,7 @@ const dealerSolutionNavigation = Object.freeze({
     {
       title: "Aktifkan kampanye dari stok",
       desc: "Ubah data unit menjadi konten dan kampanye yang relevan di setiap channel.",
-      capability: "Sora AI + Social Media",
+      capability: "Iris AI + Social Media",
       icon: "campaign",
       href: "social-media-sora-ai.html",
     },

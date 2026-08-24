@@ -82,7 +82,7 @@ const expectedPillars = [
   { label: "AI Jasmine + Omni", href: "./fitur/omni-jasmine-ai.html" },
   { label: "AI Falcon + Inventory", href: "./fitur/inventory-falcon-ai.html" },
   { label: "Ana AI Analytics", href: "./fitur/ana-ai-analytics.html" },
-  { label: "AI Sora + Social Media", href: "./fitur/social-media-sora-ai.html" },
+  { label: "AI Iris + Social Media", href: "./fitur/social-media-sora-ai.html" },
 ];
 const registerHref = "https://onboard.motovax.com/onboarding.html?fresh=1";
 
@@ -91,14 +91,38 @@ async function noOverflow(page) {
 }
 
 for (const viewport of viewports) {
-  test(`index-alt product overview scanable pada ${viewport.name}`, async () => {
+  test(`beranda product overview scanable pada ${viewport.name}`, async () => {
     const context = await browser.newContext({ viewport });
     const page = await context.newPage();
     await page.route(/https:\/\/fonts\.(?:googleapis|gstatic)\.com\//, (route) => route.abort());
-    await page.goto(`${baseUrl}/index-alt.html`, { waitUntil: "load" });
+    await page.goto(`${baseUrl}/index.html`, { waitUntil: "load" });
 
     assert.equal(await page.locator("[data-typewriter]").getAttribute("data-phrases"), expectedPhrases);
+    assert.equal(
+      (await page.locator(".alt-core-lead").innerText()).replace(/\s+/g, " ").trim(),
+      "Satu platform untuk membantu bisnis mendapatkan customer, mengelola interaksi, hingga meningkatkan penjualan secara otomatis berbasis AI.",
+    );
     assert.equal(await page.locator(".alt-node[data-pillar]").count(), 6);
+
+    const headingFont = await page.locator("#core-heading").evaluate((el) => getComputedStyle(el).fontFamily);
+    assert.equal(/caveat/i.test(headingFont), false, `judul memakai font hirarki Inter, bukan Caveat: ${headingFont}`);
+    assert.match(headingFont, /inter|system-ui|sans-serif/i);
+
+    const featureHeadingFont = await page.locator("#jasmine-heading").evaluate((el) => getComputedStyle(el).fontFamily);
+    assert.equal(/caveat/i.test(featureHeadingFont), false);
+
+    const coreImage = page.locator(".alt-orbit-art img");
+    await coreImage.scrollIntoViewIfNeeded();
+    assert.match(await coreImage.getAttribute("src"), /alt-core-platform\.png/);
+    assert.equal(await coreImage.evaluate((img) => img.naturalWidth > 0), true);
+
+    const coreMore = page.locator(".alt-core-heading .alt-core-more");
+    assert.equal(await coreMore.count(), 1);
+    assert.equal(await coreMore.getAttribute("href"), "./fitur/core-platform-agentic-ai.html");
+    assert.equal(await page.locator(".alt-core-heading .btn").count(), 0, "Selengkapnya Core Platform bukan tombol");
+    const coreMoreBg = await coreMore.evaluate((el) => getComputedStyle(el).backgroundColor);
+    assert.equal(coreMoreBg === "rgba(0, 0, 0, 0)" || coreMoreBg === "transparent", true, `Selengkapnya tidak boleh berwarna tombol: ${coreMoreBg}`);
+    assert.equal(await page.locator(".alt-orbit-lines, .alt-orbit-dots, animateMotion").count(), 0, "animasi bulet diagram dihapus");
     assert.equal(await page.locator(".alt-story, .alt-howto, .channel-strip, .alt-pillar").count(), 0);
     assert.equal(await page.locator("section.alt-feature").count(), 5);
 
@@ -153,7 +177,22 @@ for (const viewport of viewports) {
       assert.equal(await modal.isHidden(), true);
     }
 
+    assert.equal(await page.locator(".alt-preview-bar").count(), 0);
+    assert.equal(await page.locator('meta[name="robots"]').count(), 0);
+    assert.match(await page.title(), /One Stock, More Sales, Faster Response/i);
+
     await page.screenshot({ path: `/tmp/motovax-index-alt-${viewport.name}.png`, fullPage: true });
     await context.close();
   });
 }
+
+test("index-alt.html mengarah ke beranda", async () => {
+  const context = await browser.newContext();
+  const page = await context.newPage();
+  const response = await page.goto(`${baseUrl}/index-alt.html`, { waitUntil: "load" });
+  const url = new URL(page.url());
+  assert.equal(url.pathname, "/");
+  assert.ok(response && [200, 301, 302, 308].includes(response.status()));
+  assert.equal(await page.locator(".alt-node[data-pillar]").count(), 6);
+  await context.close();
+});

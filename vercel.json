@@ -16,7 +16,8 @@
     { "source": "/solusi/ritel.html", "destination": "/solusi/otomotif.html", "permanent": true },
     { "source": "/solusi/teknologi-informasi.html", "destination": "/solusi/otomotif.html", "permanent": true },
     { "source": "/solusi/outsourcing.html", "destination": "/solusi/otomotif.html", "permanent": true },
-    { "source": "/solusi/property.html", "destination": "/solusi/otomotif.html", "permanent": true }
+    { "source": "/solusi/property.html", "destination": "/solusi/otomotif.html", "permanent": true },
+    { "source": "/index-alt.html", "destination": "/", "permanent": true }
   ],
   "cleanUrls": true,
   "trailingSlash": false

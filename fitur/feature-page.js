@@ -73,7 +73,7 @@
   const sharedDemo = data.demo || demoByCategory[data.category] || "dashboard";
   const sharedDemoHash = data.demoHash || demoHashes[sharedDemo] || "solusi";
   const demoParams = new URLSearchParams({ demo: sharedDemo, from: data.slug || slug });
-  const demoHref = `../index.html?${demoParams.toString()}#${sharedDemoHash}`;
+  const demoHref = `../index-legacy.html?${demoParams.toString()}#${sharedDemoHash}`;
   const isRelatedSimulation = /partial|roadmap/i.test(data.status || "");
   const demoLabel = data.demoLabel || (isRelatedSimulation ? "Lihat Simulasi Terkait" : "Coba Demo Interaktif");
   const demoCta = `<a class="btn btn-secondary feature-hero-demo" href="${escapeHtml(demoHref)}">${demoLabel} <span>-></span></a>`;
@@ -404,9 +404,9 @@
     if (id === "social-media-sora-ai") {
       return {
         family: "campaign",
-        eyebrow: "SORA AI + SOCIAL MEDIA",
+        eyebrow: "IRIS AI + SOCIAL MEDIA",
         sectionLabel: "AI KONTEN DEALER",
-        intro: "Sora mengolah visual dan materi dari stok live. Studio, scheduler, publish, dan ads menjaga kampanye tetap terjadwal dan terukur.",
+        intro: "Iris mengolah visual dan materi dari stok live. Studio, scheduler, publish, dan ads menjaga kampanye tetap terjadwal dan terukur.",
         roles: ["Marketing", "Tim Sales", "Manajemen"],
         facts: ["Visual AI", "Terjadwal", "Terukur"],
       };
@@ -656,7 +656,7 @@
       return [previewFactory("product-dashboard-overview.png?v=20260818-ana-hero-ovw-2", "Ana AI · Analytics"), previewFactory("product-dashboard-sales.png", "Sales Performance"), previewFactory("product-dashboard-locations.png", "Performa Cabang")];
     }
     if (id === "social-media-sora-ai") {
-      return [previewFactory("product-social-pilih-kendaraan-public.png?v=20260818-sora-1", "Sora AI + Social Media"), previewFactory("product-social-calendar.png", "Kalender Posting"), previewFactory("product-social-insight.png", "Campaign Insight")];
+      return [previewFactory("product-social-pilih-kendaraan-public.png?v=20260818-sora-1", "Iris AI + Social Media"), previewFactory("product-social-calendar.png", "Kalender Posting"), previewFactory("product-social-insight.png", "Campaign Insight")];
     }
 
     if (id === "whatsapp-business-api") {
