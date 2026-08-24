@@ -1205,9 +1205,9 @@ window.MOTOVAX_FEATURES = {
   "ai-500-credit": {
     slug: "ai-500-credit",
     title: "Kredit AI",
-    heroTitle: "Paket kredit AI untuk interaksi dan aksi bisnis",
+    heroTitle: "500 kredit AI per suite untuk aksi yang berhasil",
     heroDesc:
-      "Kredit AI dipakai untuk respons pelanggan dan menjalankan tool bisnis seperti cek stok, simulasi kredit, dan produksi konten lintas suite Motovax sesuai paket tenant.",
+      "Paket Omni + Jasmine, Inventory + Falcon, dan Social Media + Sora masing-masing menyertakan 500 kredit. Satu aksi AI yang berhasil memakai satu kredit; aksi gagal dan proses latar tidak mengurangi saldo.",
     status: "Live",
     module: "Cross-Suite · Kredit AI",
     flag: "whatsapp_ai",
@@ -1216,16 +1216,16 @@ window.MOTOVAX_FEATURES = {
     category: "AI & Chatbot",
     breadcrumbs: ["Produk", "Kapabilitas", "Kredit AI"],
     capabilities: [
-      { title: "Interaksi AI", desc: "Kredit terpakai untuk setiap respons AI yang membantu pelanggan." },
-      { title: "Aksi bisnis AI", desc: "Tool stok, kredit, CRM, konten, dan operasi mengonsumsi kredit sesuai aksi." },
-      { title: "Kontrol paket tenant", desc: "Penggunaan kredit dapat dipantau dan diatur sesuai alokasi tenant." },
+      { title: "Saldo kredit AI", desc: "Tim melihat total kredit paket, pemakaian aksi AI berhasil, dan sisa kredit pada periode berjalan." },
+      { title: "Kredit per suite", desc: "Omni + Jasmine, Inventory + Falcon, dan Social Media + Sora memiliki alokasi serta saldo masing-masing." },
+      { title: "Batas penggunaan", desc: "Saat kredit habis, AI paket berhenti sampai periode berikutnya sementara fitur manual tetap dapat dipakai." },
     ],
     howItWorks: [
-      { title: "Paket aktif", desc: "Tenant mendapat kuota kredit sesuai paket langganan." },
-      { title: "AI bertindak", desc: "Response dan tool bisnis memakai kredit dari alokasi." },
-      { title: "Pantau pemakaian", desc: "Tim melihat saldo dan penggunaan di konfigurasi tenant." },
+      { title: "Paket aktif", desc: "Setiap paket AI aktif mendapat alokasi 500 kredit untuk periode langganan." },
+      { title: "AI bertindak", desc: "Satu aksi AI yang berhasil tercatat sebagai satu kredit; aksi gagal dan proses latar tidak dihitung." },
+      { title: "Pantau pemakaian", desc: "Tim memantau kredit paket, jumlah terpakai, dan sisa kredit langsung dari halaman Billing." },
     ],
-    benefits: ["Biaya AI lebih terprediksi", "Satu mekanisme kredit lintas suite", "Penggunaan dapat dikontrol"],
+    benefits: ["Pemakaian AI transparan", "Saldo terpisah per suite", "Fitur manual tetap tersedia saat kredit habis"],
     related: ["omni-jasmine-ai", "inventory-falcon-ai", "social-media-sora-ai", "core-platform-agentic-ai"],
   },
 

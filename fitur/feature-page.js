@@ -585,6 +585,10 @@
       return preview("core-platform-native-ai-tools-public.png?v=20260810-workflow-3", "Agent AI · Chat, CRM & Inventory");
     }
 
+    if (id === "ai-500-credit") {
+      return preview("ai-credit-balance-public.png?v=20260824-ai-credit-1", "Billing · Saldo Kredit AI");
+    }
+
     return previewSetFor(id, preview)[0];
   }
 
@@ -932,11 +936,11 @@
     } else if (slug === "auto-routing-faneling" && index === 3) {
       preview = captured("omnichannel-faneling-bucket-public.png", "Call Center · Bucket AI / Agent / MR", "Bucket AI, Call Center, dan MR menunjukkan kepemilikan serta status penanganan yang jelas.");
     } else if (slug === "ai-500-credit" && index === 0) {
-      preview = captured("omnichannel-faneling-public.png", "AI · Interaksi Pelanggan", "Kredit terpakai untuk setiap respons AI yang membantu pelanggan dalam percakapan.");
+      preview = captured("ai-credit-balance-public.png?v=20260824-ai-credit-1", "Billing · Saldo Kredit AI", "Kredit paket, jumlah yang sudah dipakai, dan sisa kredit periode berjalan terlihat dalam satu ringkasan.");
     } else if (slug === "ai-500-credit" && index === 1) {
-      preview = captured("core-platform-native-ai-tools-public.png", "Core Platform · Native AI Tools", "Tool stok, kredit, CRM, konten, dan operasi mengonsumsi kredit sesuai aksi yang dijalankan.");
+      preview = captured("ai-credit-packages-public.png?v=20260824-ai-credit-1", "Billing · Kredit per Suite", "Omni + Jasmine, Inventory + Falcon, serta Social Media + Sora menampilkan alokasi, pemakaian, dan sisa kredit masing-masing.");
     } else if (slug === "ai-500-credit" && index === 2) {
-      preview = captured("core-platform-role-permission-public.png", "Core Platform · Role & Permission", "Penggunaan kredit dapat dipantau dan diatur sesuai paket serta kebijakan tenant.");
+      preview = captured("ai-credit-exhausted-public.png?v=20260824-ai-credit-1", "Billing · Batas Kredit AI", "Saat saldo habis, Jasmine, Falcon, dan Sora berhenti sampai periode berikutnya sementara fitur manual tetap dapat dipakai.");
     } else if (slug === "falcon-ai-search" && index === 0) {
       preview = captured("inventory-falcon-query-public.png", "Falcon AI · Query stok", "Falcon menerima permintaan stok lalu mengembalikan unit ready lengkap dengan plat, kilometer, cabang, dan harga.");
     } else if (slug === "falcon-ai-search" && index === 1) {
