@@ -860,6 +860,36 @@ for (const viewport of viewports) {
       fontWeight: "800",
       iconWidth: "21px",
     });
+    const loginShellStyle = await page.evaluate(() => {
+      const pageElement = document.querySelector(".portal-login-page");
+      const shell = document.querySelector(".portal-login-shell");
+      const panel = document.querySelector(".portal-login-panel");
+      const panelStyle = getComputedStyle(panel);
+      return {
+        pageBackground: getComputedStyle(pageElement).backgroundColor,
+        shellWidth: shell.getBoundingClientRect().width,
+        panelBorderStyle: panelStyle.borderStyle,
+        panelBorderRadius: panelStyle.borderRadius,
+        panelBoxShadow: panelStyle.boxShadow,
+        panelBackground: panelStyle.backgroundColor,
+        panelPadding: panelStyle.padding,
+      };
+    });
+    assert.equal(loginShellStyle.pageBackground, "rgb(255, 255, 255)");
+    assert.equal(loginShellStyle.panelBoxShadow, "none");
+    if (viewport.width <= 720) {
+      assert.equal(loginShellStyle.shellWidth, viewport.width - 48);
+      assert.equal(loginShellStyle.panelBorderStyle, "none");
+      assert.equal(loginShellStyle.panelBorderRadius, "0px");
+      assert.equal(loginShellStyle.panelBackground, "rgba(0, 0, 0, 0)");
+      assert.equal(loginShellStyle.panelPadding, "0px");
+    } else {
+      assert.equal(loginShellStyle.shellWidth, 720);
+      assert.equal(loginShellStyle.panelBorderStyle, "solid");
+      assert.equal(loginShellStyle.panelBorderRadius, "12px");
+      assert.equal(loginShellStyle.panelBackground, "rgb(255, 255, 255)");
+      assert.equal(loginShellStyle.panelPadding, "26px 40px 22px");
+    }
     assert.equal(await page.locator('input[name="workspace"]').count(), 0);
     await page.fill('input[name="identifier"]', "owner");
     await page.click('[data-portal-login-form] button[type="submit"]');
