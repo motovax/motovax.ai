@@ -146,3 +146,15 @@ Sebuah halaman fitur = file HTML tipis + entri di `fitur/features-data.js`:
 - **Verifikasi:** 87 test pass; Playwright render 19 halaman di desktop/tablet/
   mobile tanpa overflow; mega menu menunjuk tiap kartu ke halaman dedicated;
   seluruh file preview gambar yang direferensikan ada.
+
+### 6a. Penyesuaian screenshot per capability (2026-08-24)
+- Deep-check: banyak halaman baru memakai 1 screenshot generik untuk semua kartu
+  (fallback `matches`), karena belum ada branch per-slug.
+- `feature-page.js`: ditambahkan branch per-capability (index) untuk seluruh 19
+  halaman baru + `omni-analytic`, memetakan tiap kartu ke screenshot public yang
+  mewakili deskripsinya (cek inventori, faneling/handoff/bucket, query/foto
+  Falcon, laporan per peran, analitik operasional/finansial/sales, content
+  studio/publish/scheduler/ads, dst).
+- Cache-buster `feature-page.js` dibump ke `-dedicated-v3`.
+- Verifikasi: 19/19 halaman → semua capability distinct & file ada;
+  test 87 pass.

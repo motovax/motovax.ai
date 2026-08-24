@@ -899,6 +899,134 @@
         "Call Center · Handoff ke MR",
         "Dialog Jalur 3 Handoff Manual ke MR terbuka di workspace Call Center: saran MR, alasan, dan ringkasan sebelum lead di-routing.",
       );
+    } else if (slug === "omni-analytic" && index === 0) {
+      preview = captured(
+        "product-dashboard-channels.png",
+        "Analytics · Performa Channel",
+        "Hasil percakapan, sumber lead, dan kontribusi channel WhatsApp, Instagram, serta Facebook dapat dibandingkan dalam satu dashboard.",
+      );
+    } else if (slug === "omni-analytic" && index === 1) {
+      preview = captured(
+        "omnichannel-faneling-public.png?v=20260818-ai-first-1",
+        "Call Center · AI → Agent → MR",
+        "Jejak respons AI dan takeover agent terlihat dalam satu percakapan; waktu respons dan eskalasi ke MR tetap tercatat di konteks lead.",
+      );
+    } else if (slug === "omni-analytic" && index === 2) {
+      preview = captured(
+        "omnichannel-performance-public.png",
+        "Analytics · Journey Lead",
+        "Perjalanan customer dari percakapan, penanganan AI, Call Center, hingga handoff MR tampil dalam satu funnel hasil penanganan.",
+      );
+    } else if (slug === "custom-aksi-cepat" && index === 0) {
+      preview = captured("omnichannel-inventory-public.png", "Call Center · Cek Inventori", "Agent mencari unit ready, harga, cabang, dan foto stok live langsung dari Aksi Cepat dalam percakapan.");
+    } else if (slug === "custom-aksi-cepat" && index === 1) {
+      preview = captured("manajemen-kontak-customer-public.png", "CRM · Konteks Customer & Unit", "Hasil simulasi kredit tetap memakai konteks customer dan unit minat dari percakapan yang sama.");
+    } else if (slug === "custom-aksi-cepat" && index === 2) {
+      preview = captured("omnichannel-faneling-public.png", "Call Center · AI → Agent → MR", "Follow-up, pencatatan lead, atau handoff berlanjut tanpa memutus alur dari inbox.");
+    } else if (slug === "auto-routing-faneling" && index === 0) {
+      preview = captured("omnichannel-faneling-public.png", "Call Center · AI → Agent → MR", "Jasmine menangani respons awal dengan tool bisnis lalu menyerahkan alur ke agent.");
+    } else if (slug === "auto-routing-faneling" && index === 1) {
+      preview = captured("omnichannel-faneling-handoff-public.png", "Call Center · Takeover & Handoff", "Dialog handoff memperlihatkan saran MR, alasan, dan ringkasan saat penanganan berpindah.");
+    } else if (slug === "auto-routing-faneling" && index === 2) {
+      preview = captured("omnichannel-handoff-public.png", "Call Center · Handoff ke MR", "Agent memilih MR, alasan, dan catatan sebelum lead di-routing.");
+    } else if (slug === "auto-routing-faneling" && index === 3) {
+      preview = captured("omnichannel-faneling-bucket-public.png", "Call Center · Bucket AI / Agent / MR", "Bucket AI, Call Center, dan MR menunjukkan kepemilikan serta status penanganan yang jelas.");
+    } else if (slug === "ai-500-credit" && index === 0) {
+      preview = captured("omnichannel-faneling-public.png", "AI · Interaksi Pelanggan", "Kredit terpakai untuk setiap respons AI yang membantu pelanggan dalam percakapan.");
+    } else if (slug === "ai-500-credit" && index === 1) {
+      preview = captured("core-platform-native-ai-tools-public.png", "Core Platform · Native AI Tools", "Tool stok, kredit, CRM, konten, dan operasi mengonsumsi kredit sesuai aksi yang dijalankan.");
+    } else if (slug === "ai-500-credit" && index === 2) {
+      preview = captured("core-platform-role-permission-public.png", "Core Platform · Role & Permission", "Penggunaan kredit dapat dipantau dan diatur sesuai paket serta kebijakan tenant.");
+    } else if (slug === "falcon-ai-search" && index === 0) {
+      preview = captured("inventory-falcon-query-public.png", "Falcon AI · Query stok", "Falcon menerima permintaan stok lalu mengembalikan unit ready lengkap dengan plat, kilometer, cabang, dan harga.");
+    } else if (slug === "falcon-ai-search" && index === 1) {
+      preview = captured("inventory-falcon-photos-public.png", "Falcon AI · Foto dan unit serupa", "Falcon mengirim foto unit dan unit serupa dari stok ready tanpa membuka folder.");
+    } else if (slug === "falcon-ai-search" && index === 2) {
+      preview = captured("product-falcon-sales.png", "Call Center · AI / Agent / MR", "Saat stok yang diminta tak ada, rekomendasi alternatif sampai ke agent di workspace yang sama.");
+    } else if (slug === "inventory-laporan-peran" && index === 0) {
+      preview = captured("inventory-falcon-report-public.png", "Falcon AI · Laporan sesuai peran", "Management mendapat laporan stok per cabang dan aging unit dari percakapan yang sama, sesuai permission.");
+    } else if (slug === "inventory-laporan-peran" && index === 1) {
+      preview = captured("product-falcon-sales.png", "Call Center · AI / Agent / MR", "Sales memakai pencarian, foto, simulasi, dan pencatatan lead dari stok live.");
+    } else if (slug === "inventory-laporan-peran" && index === 2) {
+      preview = captured("core-platform-role-permission-public.png", "Core Platform · Role & Permission", "Apa yang bisa dilihat dan dilakukan mengikuti role serta permission pengguna.");
+    } else if (slug === "inventory-multi-cabang" && index === 0) {
+      preview = captured("inventory-falcon-branches-public.png", "Inventory · Unit per cabang", "Stok ready, booked, sold, dan kelengkapan foto terlihat per cabang.");
+    } else if (slug === "inventory-multi-cabang" && index === 1) {
+      preview = captured("inventory-falcon-photos-public.png", "Inventory · Foto Unit", "Foto unit ready menjadi bagian dari data kelengkapan yang dipakai tim dan AI.");
+    } else if (slug === "inventory-multi-cabang" && index === 2) {
+      preview = captured("core-platform-multi-branch-public.png", "Core Platform · Multi-cabang", "Data dan ringkasan stok dipisahkan per cabang sebagai sumber kebenaran yang dibaca Falcon.");
+    } else if (slug === "inventory-import-wa" && index === 0) {
+      preview = captured("omnichannel-faneling-public.png", "WhatsApp · Kirim data listing", "Data listing dikirim lewat percakapan WhatsApp sebelum dinilai dan diperbarui ke stok live.");
+    } else if (slug === "inventory-import-wa" && index === 1) {
+      preview = captured("inventory-falcon-import-public.png", "Inventory · Import & Validasi", "Import Excel atau Google Sheets menampilkan warning identitas dan konflik sebelum data masuk.");
+    } else if (slug === "inventory-import-wa" && index === 2) {
+      preview = captured("inventory-falcon-branches-public.png", "Inventory · Stok per cabang", "Listing yang lolos langsung memperbarui stok live yang dibaca tim dan AI.");
+    } else if (slug === "inventory-live-katalog-api" && index === 0) {
+      preview = captured("inventory-falcon-branches-public.png", "Inventory · Stok live", "Listing ready dapat disajikan aplikasi eksternal lewat endpoint katalog.");
+    } else if (slug === "inventory-live-katalog-api" && index === 1) {
+      preview = captured("core-platform-multi-branch-public.png", "Core Platform · Multi-cabang", "Data yang disajikan API sama dengan yang dipakai AI dan tim di dalam app.");
+    } else if (slug === "inventory-live-katalog-api" && index === 2) {
+      preview = captured("core-platform-whatsapp-integrations-page-public.png", "Core Platform · Integrasi Channel", "Developer API memperluas pemakaian inventory ke ekosistem dan integrasi dealer.");
+    } else if (slug === "ana-analitik-operasional" && index === 0) {
+      preview = captured("product-analitik-operasional.png", "Ana AI · Analitik Operasional", "Stok lama, rata-rata hari jual, unit terjual, dan omzet dalam satu dashboard operasional.");
+    } else if (slug === "ana-analitik-operasional" && index === 1) {
+      preview = captured("product-dashboard-sales.png", "Ana AI · Analitik Penjualan", "Unit terjual dan nilai omzet tampil per periode pada dashboard sales.");
+    } else if (slug === "ana-analitik-operasional" && index === 2) {
+      preview = captured("report-conversion-insight-public.png", "Report · Insight Konversi", "Funnel lead masuk ke booking dan hasil penanganan terlihat dalam satu tampilan.");
+    } else if (slug === "ana-analitik-financial" && index === 0) {
+      preview = captured("product-finance-trend-public.png", "Ana AI · Laporan Finansial", "Revenue, HPP, gross profit, margin, dan tren laba tersaji per periode.");
+    } else if (slug === "ana-analitik-financial" && index === 1) {
+      preview = captured("product-dashboard-sales-performance-mobix.png", "Ana AI · Sales Performance", "Margin dan profitabilitas terbaca dari metrik pendapatan, konversi, dan rata-rata deal.");
+    } else if (slug === "ana-analitik-financial" && index === 2) {
+      preview = captured("product-analitik-operasional.png", "Ana AI · Analitik Operasional", "Tren laba dan nilai stok dipantau bersama metrik operasional dealer.");
+    } else if (slug === "ana-analitik-sales" && index === 0) {
+      preview = captured("product-dashboard-sales-performance-mobix.png", "Ana AI · Sales Performance", "KPI pipeline, pendapatan, konversi, rata-rata deal, dan kecepatan closing tampil bersama.");
+    } else if (slug === "ana-analitik-sales" && index === 1) {
+      preview = captured("report-sales-trend-public.png", "Report · Sales Trend", "Tingkat konversi, rata-rata deal, kecepatan closing, dan tren forecast terlihat langsung.");
+    } else if (slug === "ana-analitik-sales" && index === 2) {
+      preview = captured("product-sales-insight-cabang-channel.png", "Ana AI · Performa Cabang & Channel", "Perbandingan hasil per cabang, sumber lead, dan channel tampil dalam satu dashboard.");
+    } else if (slug === "ana-custom-analytic" && index === 0) {
+      preview = captured("product-sales-insight-cabang-channel.png", "Ana AI · Insight Kustom", "Analitik tambahan disusun di luar dashboard standar sesuai KPI dealer.");
+    } else if (slug === "ana-custom-analytic" && index === 1) {
+      preview = captured("report-sales-trend-public.png", "Report · Sales Trend", "Metrik dapat disaring per cabang, peran, dan rentang MTD, QTD, YTD, atau harian.");
+    } else if (slug === "ana-custom-analytic" && index === 2) {
+      preview = captured("product-dashboard-overview.png", "Ana AI · Dashboard Operasional", "Custom analytic memakai sumber data operasional yang sama dan diperbarui live.");
+    } else if (slug === "iris-content-studio" && index === 0) {
+      preview = captured("product-social-studio.png", "Social Media · Content Studio", "Unit inventory dipilih sebagai sumber desain, harga, atribut, dan materi kampanye.");
+    } else if (slug === "iris-content-studio" && index === 1) {
+      preview = captured("product-social-broadcast.png", "CRM · Campaign & Materi", "Harga, spesifikasi, dan caption disusun dari data unit untuk materi kampanye.");
+    } else if (slug === "iris-content-studio" && index === 2) {
+      preview = captured("product-social-pilih-kendaraan-public.png", "Social Media · Pilih Kendaraan", "Materi selalu sinkron dengan kondisi stok tenant yang dipilih.");
+    } else if (slug === "iris-ai-edit" && index === 0) {
+      preview = captured("product-social-pilih-kendaraan-public.png", "Social Media · Aset Unit", "Resolusi dan ketajaman gambar unit ditingkatkan untuk materi iklan.");
+    } else if (slug === "iris-ai-edit" && index === 1) {
+      preview = captured("product-social-studio.png", "Social Media · Content Studio", "Background gambar disesuaikan agar tampak lebih profesional di studio konten.");
+    } else if (slug === "iris-ai-edit" && index === 2) {
+      preview = captured("product-social-calendar.png", "Social Media · Kalender Posting", "Beberapa variasi visual dari satu unit disiapkan untuk channel berbeda.");
+    } else if (slug === "iris-publish" && index === 0) {
+      preview = captured("product-social-calendar.png", "Social Media · Kalender Posting", "Feed, reel, dan story dikirim lewat Meta Business sesuai jadwal.");
+    } else if (slug === "iris-publish" && index === 1) {
+      preview = captured("product-capability-whatsapp-connected-public.png", "WhatsApp Business API", "Materi promosi dipakai untuk posting dan campaign pelanggan WhatsApp.");
+    } else if (slug === "iris-publish" && index === 2) {
+      preview = captured("product-social-studio.png", "Social Media · Content Studio", "Publish beberapa kanal dari satu proses kerja yang terpusat.");
+    } else if (slug === "iris-scheduler" && index === 0) {
+      preview = captured("product-social-calendar.png", "Social Media · Kalender Posting", "Konten terjadwal tersusun dalam kalender publikasi tim.");
+    } else if (slug === "iris-scheduler" && index === 1) {
+      preview = captured("product-social-ads-campaign.png", "Social Media · Ads Campaign", "Jadwal dan hasil dibedakan per platform serta jenis konten campaign.");
+    } else if (slug === "iris-scheduler" && index === 2) {
+      preview = captured("product-social-insight.png", "Campaign Insight", "Tim mengikuti kalender campaign dan memantau hasil dalam satu tampilan.");
+    } else if (slug === "iris-meta-ads" && index === 0) {
+      preview = captured("product-social-ads-campaign.png", "Social Media · Ads Campaign Analytics", "Campaign Meta disusun dan dipantau dari satu tempat.");
+    } else if (slug === "iris-meta-ads" && index === 1) {
+      preview = captured("product-capability-whatsapp-connected-public.png", "WhatsApp Business API", "Hasil iklan terhubung template WhatsApp untuk follow-up cepat.");
+    } else if (slug === "iris-meta-ads" && index === 2) {
+      preview = captured("product-crm-pipeline.png", "CRM · Pipeline Sales", "Lead dari iklan masuk ke CRM dan pipeline yang ada.");
+    } else if (slug === "iris-meta-ads-analytic" && index === 0) {
+      preview = captured("product-social-ads-campaign.png", "Social Media · Ads Campaign Analytics", "Klik, lead terkonfirmasi, dan konversi campaign tampil bersama.");
+    } else if (slug === "iris-meta-ads-analytic" && index === 1) {
+      preview = captured("product-social-insight.png", "Campaign Insight", "Perbandingan performa campaign antar periode dan channel terlihat jelas.");
+    } else if (slug === "iris-meta-ads-analytic" && index === 2) {
+      preview = captured("report-sales-trend-public.png", "Report · Sales Trend", "Hasil membantu tim memutuskan alokasi iklan berikutnya.");
     } else if (matches(/fanel/i)) {
       preview = captured("omnichannel-faneling-public.png", "Call Center · AI → Agent → MR", "Jejak AI dan takeover Agent tetap terlihat setelah lead masuk bucket MR.");
     } else if (matches(/handoff|takeover|eskalasi/i)) {
