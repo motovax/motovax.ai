@@ -762,6 +762,9 @@ for (const viewport of viewports) {
     let resetPayload;
     await page.route("**/api/portal/login", (route) => {
       loginPayload = route.request().postDataJSON();
+      if (loginPayload.identifier === "belum-terdaftar@dealer.test") {
+        return route.fulfill({ status: 404, contentType: "application/json", body: JSON.stringify({ error: "account_not_found", message: "Email belum terdaftar di workspace MOTOVAX." }) });
+      }
       return route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ redirectUrl: "https://dealer-test.motovax.com/magic-login?token=login-handoff" }) });
     });
     await page.route("**/api/portal/forgot-password", (route) => {
@@ -776,7 +779,7 @@ for (const viewport of viewports) {
     await page.goto(`${baseUrl}/login.html?oauth=failed&reason=account_not_found`, { waitUntil: "load" });
     await page.waitForSelector(".portal-login-auth-content:visible");
     assert.equal(await page.locator('[data-account-not-found]').isVisible(), true);
-    assert.match(await page.locator('[data-account-not-found]').textContent(), /Daftar workspace baru untuk menggunakan akun Google ini di MOTOVAX/);
+    assert.match(await page.locator('[data-account-not-found]').textContent(), /Email ini belum terdaftar di workspace MOTOVAX/);
     assert.equal(await page.locator('[data-login-default]').isHidden(), true);
     assert.equal(await page.locator('[data-login-error]').isHidden(), true);
     assert.equal(await page.locator('[data-google-login]').isHidden(), true);
@@ -793,6 +796,16 @@ for (const viewport of viewports) {
     assert.equal(await page.locator('[data-login-default]').isVisible(), true);
     assert.equal(await page.locator('[data-login-error]').isHidden(), true);
     assert.equal(await page.locator('[data-login-register-prompt]').isVisible(), true);
+
+    await page.fill('input[name="identifier"]', "belum-terdaftar@dealer.test");
+    await page.fill('#portalPassword', "rahasia123");
+    await page.click('[data-portal-login-form] button[type="submit"]');
+    await page.waitForSelector('[data-account-not-found]:visible');
+    assert.equal(await page.locator('[data-login-default]').isHidden(), true);
+    assert.equal(await page.locator('[data-login-error]').isHidden(), true);
+    assert.match(await page.locator('[data-account-not-found]').textContent(), /Email ini belum terdaftar di workspace MOTOVAX/);
+    assert.equal(await fitsViewport(page), true);
+    await page.click('[data-use-another-account]');
 
     await page.goto(`${baseUrl}/login.html?oauth=denied`, { waitUntil: "load" });
     await page.waitForSelector(".portal-login-auth-content:visible");

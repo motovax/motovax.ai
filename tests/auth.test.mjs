@@ -729,7 +729,7 @@ test("callback Google mode portal membuat sesi tenant dan langsung ke workspace"
   }
 });
 
-test("callback Google mode portal memakai sesi yang sama untuk onboarding saat tenant tidak ditemukan", async () => {
+test("callback Google mode portal menampilkan info pendaftaran saat tenant tidak ditemukan", async () => {
   googleProfileEmail = "belum-terdaftar@example.com";
   try {
     const start = await fetch(`${baseUrl}/api/auth/google/start?mode=portal`, {
@@ -745,9 +745,9 @@ test("callback Google mode portal memakai sesi yang sama untuk onboarding saat t
       },
     );
     const location = new URL(callback.headers.get("location"));
-    assert.equal(location.pathname, "/onboarding.html");
-    assert.equal(location.searchParams.get("oauth"), "success");
-    assert.equal(location.searchParams.has("reason"), false);
+    assert.equal(location.pathname, "/login.html");
+    assert.equal(location.searchParams.get("oauth"), "failed");
+    assert.equal(location.searchParams.get("reason"), "account_not_found");
 
     const sessionToken = cookieValue(callback.headers.get("set-cookie"), "motovax_session");
     assert.ok(sessionToken.length >= 48);
@@ -933,6 +933,27 @@ test("portal login memilih tenant dari password saat username dipakai di beberap
   assert.equal(response.status, 200);
   const payload = await response.json();
   assert.equal(new URL(payload.redirectUrl).origin, "https://dealer-test.motovax.com");
+});
+
+test("portal login membedakan email belum terdaftar dari password yang keliru", async () => {
+  const unknownEmail = await fetch(`${baseUrl}/api/portal/login`, {
+    method: "POST",
+    headers: { origin: "http://127.0.0.1", "content-type": "application/json" },
+    body: JSON.stringify({ identifier: "belum-terdaftar@dealer.test", password: "rahasia123" }),
+  });
+  assert.equal(unknownEmail.status, 404);
+  assert.deepEqual(await unknownEmail.json(), {
+    error: "account_not_found",
+    message: "Email belum terdaftar di workspace MOTOVAX.",
+  });
+
+  const wrongPassword = await fetch(`${baseUrl}/api/portal/login`, {
+    method: "POST",
+    headers: { origin: "http://127.0.0.1", "content-type": "application/json" },
+    body: JSON.stringify({ identifier: "owner@dealer.test", password: "password-salah" }),
+  });
+  assert.equal(wrongPassword.status, 401);
+  assert.equal((await wrongPassword.json()).error, "invalid_credentials");
 });
 
 test("portal login menolak kredensial ambigu di beberapa workspace", async () => {

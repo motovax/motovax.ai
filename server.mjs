@@ -2005,6 +2005,12 @@ export function createApp({
         });
       }
       const candidates = await store.findPortalUsers({ identifier });
+      if (candidates.length === 0 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(identifier)) {
+        return res.status(404).json({
+          error: "account_not_found",
+          message: "Email belum terdaftar di workspace MOTOVAX.",
+        });
+      }
       const matchedUsers = [];
       for (const candidate of candidates.slice(0, 21)) {
         if (await verifyTenantPassword(password, candidate.password_hash, candidate.onboarding_password_hash)) {
@@ -2662,7 +2668,7 @@ export function createApp({
         if (matchingUsers.length === 0) {
           const user = await store.upsertGoogleUser(googleProfile);
           await issueSession(req, res, user.id);
-          return res.redirect(302, oauthResultUrl(config, "success", "", "signup"));
+          return res.redirect(302, oauthResultUrl(config, "failed", "account_not_found", authMode));
         }
         if (matchingUsers.length > 1 || candidates.length > 20) {
           return res.redirect(302, oauthResultUrl(config, "failed", "ambiguous_account", authMode));

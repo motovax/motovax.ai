@@ -112,6 +112,7 @@
         if (!response.ok) {
           var error = new Error(payload.message || "Permintaan belum berhasil. Silakan coba lagi.");
           error.status = response.status;
+          error.code = payload.error || "";
           throw error;
         }
         return payload;
@@ -264,7 +265,8 @@
         window.location.assign(payload.redirectUrl);
       })
       .catch(function (error) {
-        showError(loginError, error.message || "Login belum berhasil. Silakan coba lagi.");
+        if (error.code === "account_not_found") showAccountNotFound();
+        else showError(loginError, error.message || "Login belum berhasil. Silakan coba lagi.");
         setLoading(loginForm, false);
       });
   });
