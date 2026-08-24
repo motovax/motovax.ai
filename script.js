@@ -387,6 +387,7 @@ const dealerProductNavigation = Object.freeze({
       label: "Core Platform",
       summary: "Satu fondasi aman untuk seluruh cabang, tim, dan modul.",
       paneTitle: "Core — Platform Integrasi Agentic AI",
+      page: "core-platform-agentic-ai",
       demo: { id: "whatsapp", hash: "capabilityDemo", context: "core-platform", label: "Lihat Fondasi Platform" },
       features: [
         { title: "Core Platform Agentic AI", desc: "Fondasi aman untuk cabang, tim, dan modul", icon: "suite", slug: "core-platform-agentic-ai" },
@@ -397,6 +398,7 @@ const dealerProductNavigation = Object.freeze({
       label: "CRM",
       summary: "Kelola lead, pipeline, dan follow-up dari awal sampai closing.",
       paneTitle: "CRM",
+      page: "aplikasi-crm",
       demo: { id: "crm", hash: "crmDemo", context: "crm", label: "Coba CRM" },
       features: [
         { title: "Lead / Customer List", desc: "Semua lead dan customer terpusat dengan riwayatnya", icon: "contact", slug: "manajemen-kontak" },
@@ -410,6 +412,7 @@ const dealerProductNavigation = Object.freeze({
       label: "Jasmine AI + Omnichannel",
       summary: "Semua chat pelanggan di satu inbox, dengan AI 24/7.",
       paneTitle: "Jasmine AI + Omnichannel",
+      page: "omni-jasmine-ai",
       demo: { id: "omni", hash: "omniDemo", context: "omnichannel", label: "Coba Omnichannel" },
       features: [
         { title: "WhatsApp, Instagram & Facebook", desc: "Gabung chat dari tiga channel di satu inbox", icon: "chat", slug: "omni-jasmine-ai" },
@@ -424,6 +427,7 @@ const dealerProductNavigation = Object.freeze({
       label: "Falcon AI + Inventory",
       summary: "Falcon mencarikan dan mengirim unit dari stok live.",
       paneTitle: "Falcon AI + Inventory",
+      page: "inventory-falcon-ai",
       demo: { id: "inventory", hash: "inventoryDemo", context: "inventory", label: "Coba Inventory" },
       features: [
         { title: "Falcon AI: searching, kirim foto & rekomendasi otomatis", desc: "Cari unit, kirim foto, dan rekomendasi otomatis", icon: "ai", slug: "inventory-falcon-ai" },
@@ -439,6 +443,7 @@ const dealerProductNavigation = Object.freeze({
       label: "Ana AI Analytics",
       summary: "Keputusan cepat dari data operasional, finansial, dan sales.",
       paneTitle: "Ana AI — Advanced Analytics",
+      page: "ana-ai-analytics",
       demo: { id: "dashboard", hash: "dashboardDemo", context: "analytics", label: "Lihat Analytics" },
       features: [
         { title: "Analitik operasional", desc: "KPI operasional dealer dalam satu layar", icon: "report", slug: "ana-ai-analytics" },
@@ -452,6 +457,7 @@ const dealerProductNavigation = Object.freeze({
       label: "Iris AI + Social Media",
       summary: "Ubah stok menjadi konten yang siap tayang dan diukur.",
       paneTitle: "Iris AI + Social Media",
+      page: "social-media-sora-ai",
       demo: { id: "social", hash: "socialDemo", context: "social", label: "Coba Social Studio" },
       features: [
         { title: "Content studio", desc: "Buat materi dan caption dari data inventori", icon: "shop", slug: "social-media-sora-ai" },
@@ -526,6 +532,7 @@ const dealerProductNavigation = Object.freeze({
         id: suite.id,
         label: suite.label,
         paneTitle: suite.paneTitle,
+        page: suite.page,
         demo: suite.demo,
         features: suite.features.map((feat) => ({
           title: feat.title,
@@ -593,11 +600,11 @@ const dealerProductNavigation = Object.freeze({
 
     const panes = allPanes
       .map((item) => {
-        const demoHref = item.demo
-          ? `${rootPrefix}index-legacy.html?demo=${item.demo.id}&from=${encodeURIComponent(item.demo.context || item.id)}#${item.demo.hash}`
-          : "";
+        // Tombol biru tiap produk mengarah ke halaman detail fitur yang sudah siap.
+        // Jika widget demo interaktif tersedia di halaman ini, data-open-* tetap
+        // membuka demo; jika tidak, tautan menuju halaman detail produk.
         const demoCta = item.demo
-          ? `<a href="${demoHref}" class="produk-mega-demo-button" data-open-${item.demo.id}-demo data-demo-context="${item.demo.context || item.id}" data-produk-close>
+          ? `<a href="${f(item.page)}" class="produk-mega-demo-button" data-open-${item.demo.id}-demo data-demo-context="${item.demo.context || item.id}" data-produk-close>
               ${item.demo.label}
               <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </a>`
