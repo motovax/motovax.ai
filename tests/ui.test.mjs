@@ -806,13 +806,13 @@ for (const viewport of viewports) {
     await page.goto(`${baseUrl}/login.html?oauth=failed&reason=account_not_found`, { waitUntil: "load" });
     await page.waitForSelector(".portal-login-auth-content:visible");
     assert.equal(await page.locator('[data-account-not-found]').isVisible(), true);
-    assert.match(await page.locator('[data-account-not-found]').textContent(), /Email ini belum terdaftar di workspace MOTOVAX/);
+    assert.match(await page.locator('[data-account-not-found]').textContent(), /Buat workspace baru untuk mulai menggunakan MOTOVAX/);
     assert.equal(await page.locator('[data-login-default]').isHidden(), true);
     assert.equal(await page.locator('[data-login-error]').isHidden(), true);
     assert.equal(await page.locator('[data-google-login]').isHidden(), true);
     assert.equal(await page.locator('[data-portal-login-form]').isHidden(), true);
     assert.equal(await page.getAttribute('[data-account-register]', "href"), "https://onboard.motovax.com/onboarding.html");
-    assert.match(await page.locator('[data-account-register]').textContent(), /Daftar workspace baru/);
+    assert.match(await page.locator('[data-account-register]').textContent(), /Mulai onboarding/);
     assert.equal(await page.locator('a[href="https://onboard.motovax.com/onboarding.html"]:visible').count(), 1);
     assert.equal(new URL(page.url()).searchParams.has("oauth"), false);
     assert.equal(await fitsViewport(page), true);
@@ -830,7 +830,7 @@ for (const viewport of viewports) {
     await page.waitForSelector('[data-account-not-found]:visible');
     assert.equal(await page.locator('[data-login-default]').isHidden(), true);
     assert.equal(await page.locator('[data-login-error]').isHidden(), true);
-    assert.match(await page.locator('[data-account-not-found]').textContent(), /Email ini belum terdaftar di workspace MOTOVAX/);
+    assert.match(await page.locator('[data-account-not-found]').textContent(), /Buat workspace baru untuk mulai menggunakan MOTOVAX/);
     assert.equal(await fitsViewport(page), true);
     await page.click('[data-use-another-account]');
 
