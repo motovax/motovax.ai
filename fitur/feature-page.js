@@ -918,11 +918,11 @@
         "Perjalanan customer dari percakapan, penanganan AI, Call Center, hingga handoff MR tampil dalam satu funnel hasil penanganan.",
       );
     } else if (slug === "custom-aksi-cepat" && index === 0) {
-      preview = captured("omnichannel-inventory-public.png", "Call Center · Cek Inventori", "Agent mencari unit ready, harga, cabang, dan foto stok live langsung dari Aksi Cepat dalam percakapan.");
+      preview = captured("omnichannel-quick-inventory-public.png?v=20260824-quick-actions-1", "Aksi Cepat · Cek Inventori", "Agent mencari satu unit ready lengkap dengan harga, cabang, dan foto stok langsung dari percakapan.");
     } else if (slug === "custom-aksi-cepat" && index === 1) {
-      preview = captured("manajemen-kontak-customer-public.png", "CRM · Konteks Customer & Unit", "Hasil simulasi kredit tetap memakai konteks customer dan unit minat dari percakapan yang sama.");
+      preview = captured("omnichannel-quick-credit-public.png?v=20260824-quick-actions-1", "Aksi Cepat · Simulasi Kredit", "Unit terpilih langsung menampilkan harga kredit, DP, tenor, cicilan bulanan, dan total bayar pertama.");
     } else if (slug === "custom-aksi-cepat" && index === 2) {
-      preview = captured("omnichannel-faneling-public.png", "Call Center · AI → Agent → MR", "Follow-up, pencatatan lead, atau handoff berlanjut tanpa memutus alur dari inbox.");
+      preview = captured("omnichannel-quick-handoff-public.png?v=20260824-quick-actions-1", "Aksi Lanjutan · Handoff ke MR", "Agent meneruskan lead beserta alasan, ringkasan kebutuhan, dan saran MR tanpa keluar dari inbox.");
     } else if (slug === "auto-routing-faneling" && index === 0) {
       preview = captured("omnichannel-faneling-public.png", "Call Center · AI → Agent → MR", "Jasmine menangani respons awal dengan tool bisnis lalu menyerahkan alur ke agent.");
     } else if (slug === "auto-routing-faneling" && index === 1) {
