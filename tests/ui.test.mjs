@@ -164,6 +164,8 @@ for (const viewport of viewports) {
       }));
     });
     const page = await context.newPage();
+    const devtools = await context.newCDPSession(page);
+    await devtools.send("Network.setCacheDisabled", { cacheDisabled: true });
     let logoutCount = 0;
     let meCount = 0;
     let workspaceEnterCount = 0;
@@ -196,11 +198,120 @@ for (const viewport of viewports) {
     assert.equal(workspaceEnterCount, 0);
     assert.equal(await page.inputValue('[data-auth-form="signup"] input[name="fullName"]'), "");
     assert.equal(await page.inputValue('[data-auth-form="signup"] input[name="email"]'), "");
+    assert.equal(await page.getByRole("link", { name: "Daftar dengan Google", exact: true }).count(), 1);
+    assert.equal(await page.evaluate(() => {
+      const googleButton = document.querySelector("[data-google-login]");
+      const signupForm = document.querySelector('[data-auth-form="signup"]');
+      return Boolean(googleButton.compareDocumentPosition(signupForm) & Node.DOCUMENT_POSITION_FOLLOWING);
+    }), true);
+    assert.deepEqual(await page.locator("[data-google-login]").evaluate((button) => {
+      const style = getComputedStyle(button);
+      const iconStyle = getComputedStyle(button.querySelector(".onboarding-google-icon"));
+      return {
+        minHeight: style.minHeight,
+        borderRadius: style.borderRadius,
+        fontWeight: style.fontWeight,
+        iconWidth: iconStyle.width,
+      };
+    }), {
+      minHeight: viewport.width <= 720 ? "48px" : "50px",
+      borderRadius: "10px",
+      fontWeight: "800",
+      iconWidth: "21px",
+    });
     assert.equal(await page.locator('[data-step="4"]').isHidden(), true);
     assert.equal(await page.getByText("Jadwalkan demo live", { exact: false }).count(), 0);
     assert.equal(await page.getByRole("link", { name: "Jadwalkan Demo", exact: true }).count(), 0);
     assert.equal(await page.getByRole("link", { name: "Kembali ke beranda", exact: false }).count(), 1);
     assert.equal(await page.evaluate(() => JSON.parse(localStorage.getItem("motovax_onboarding_v1")).workspace), null);
+    const onboardingShellStyle = await page.evaluate(() => {
+      const panel = document.querySelector(".onboarding-panel");
+      const activeRailStep = document.querySelector(".onboarding-rail li.is-active");
+      const secondRailStep = document.querySelector('[data-rail-step="2"]');
+      const progress = document.querySelector(".onboarding-progress");
+      const legal = document.querySelector("[data-onboarding-legal]");
+      const panelStyle = getComputedStyle(panel);
+      const activeRailStyle = getComputedStyle(activeRailStep);
+      const activeNumberStyle = getComputedStyle(activeRailStep.querySelector("i"));
+      const rail = document.querySelector(".onboarding-rail");
+      const railRect = rail.getBoundingClientRect();
+      const railItems = [...rail.querySelectorAll("li")];
+      const railCopies = railItems.map((item) => item.querySelector(":scope > div"));
+      return {
+        panelBorderStyle: panelStyle.borderStyle,
+        panelBorderRadius: panelStyle.borderRadius,
+        panelBoxShadow: panelStyle.boxShadow,
+        panelBackground: panelStyle.backgroundColor,
+        activeRailBackground: activeRailStyle.backgroundColor,
+        activeRailBoxShadow: activeRailStyle.boxShadow,
+        activeNumberBoxShadow: activeNumberStyle.boxShadow,
+        secondRailConnectorContent: getComputedStyle(secondRailStep, "::before").content,
+        railHeadCount: document.querySelectorAll(".onboarding-rail-head").length,
+        stepHeadCount: document.querySelectorAll("[data-step] > .onboarding-step-head").length,
+        activeAriaCurrent: activeRailStep.getAttribute("aria-current"),
+        progressDisplay: getComputedStyle(progress).display,
+        railInsidePanel: panel.contains(activeRailStep),
+        legalOutsidePanel: !panel.contains(legal),
+        railCopyVisible: railCopies.every((copy) => {
+          const rect = copy.getBoundingClientRect();
+          return getComputedStyle(copy).display !== "none" && rect.width > 0 && rect.height > 0;
+        }),
+        railCopyFits: railCopies.every((copy) => copy.scrollWidth <= copy.clientWidth + 1),
+        railItemsInside: railItems.every((item) => {
+          const rect = item.getBoundingClientRect();
+          return rect.left >= railRect.left - 1 && rect.right <= railRect.right + 1;
+        }),
+        railItemsDoNotOverlap: railItems.every((item, index) => {
+          if (index === railItems.length - 1) return true;
+          const current = item.getBoundingClientRect();
+          const next = railItems[index + 1].getBoundingClientRect();
+          return current.right <= next.left + 1;
+        }),
+      };
+    });
+    assert.equal(onboardingShellStyle.railInsidePanel, true);
+    assert.equal(onboardingShellStyle.legalOutsidePanel, true);
+    assert.equal(onboardingShellStyle.progressDisplay, "none");
+    assert.equal(onboardingShellStyle.railHeadCount, 0);
+    assert.equal(onboardingShellStyle.stepHeadCount, 0);
+    assert.equal(onboardingShellStyle.activeAriaCurrent, "step");
+    assert.notEqual(onboardingShellStyle.activeNumberBoxShadow, "none");
+    assert.notEqual(onboardingShellStyle.secondRailConnectorContent, "none");
+    assert.equal(onboardingShellStyle.railCopyVisible, true);
+    assert.equal(onboardingShellStyle.railCopyFits, true);
+    assert.equal(onboardingShellStyle.railItemsInside, true);
+    assert.equal(onboardingShellStyle.railItemsDoNotOverlap, true);
+    assert.equal(await fitsViewport(page), true);
+    if (viewport.width <= 720) {
+      assert.equal(onboardingShellStyle.panelBorderStyle, "none");
+      assert.equal(onboardingShellStyle.panelBorderRadius, "0px");
+      assert.equal(onboardingShellStyle.panelBoxShadow, "none");
+      assert.equal(onboardingShellStyle.panelBackground, "rgba(0, 0, 0, 0)");
+      assert.equal(onboardingShellStyle.activeRailBackground, "rgba(0, 0, 0, 0)");
+      assert.equal(onboardingShellStyle.activeRailBoxShadow, "none");
+    } else {
+      assert.notEqual(onboardingShellStyle.panelBorderStyle, "none");
+      assert.equal(onboardingShellStyle.panelBorderRadius, "12px");
+      assert.equal(onboardingShellStyle.panelBoxShadow, "none");
+    }
+    const primaryButtonStyles = await page.evaluate(() => [...document.querySelectorAll(".onboarding-panel .btn-primary:not(:disabled)")].map((button) => {
+      const style = getComputedStyle(button);
+      const arrow = button.querySelector(":scope > span:last-child, :scope > i:last-child");
+      const arrowStyle = arrow ? getComputedStyle(arrow) : null;
+      return {
+        backgroundColor: style.backgroundColor,
+        borderRadius: style.borderRadius,
+        boxShadow: style.boxShadow,
+        arrowBackgroundColor: arrowStyle?.backgroundColor || null,
+        arrowBorderWidth: arrowStyle?.borderTopWidth || null,
+      };
+    }));
+    assert.ok(primaryButtonStyles.length >= 5);
+    assert.equal(new Set(primaryButtonStyles.map((style) => style.backgroundColor)).size, 1);
+    assert.equal(new Set(primaryButtonStyles.map((style) => style.borderRadius)).size, 1);
+    assert.equal(new Set(primaryButtonStyles.map((style) => style.boxShadow)).size, 1);
+    assert.equal(primaryButtonStyles.every((style) => style.arrowBackgroundColor === null || style.arrowBackgroundColor === "rgba(0, 0, 0, 0)"), true);
+    assert.equal(primaryButtonStyles.every((style) => style.arrowBorderWidth === null || style.arrowBorderWidth === "0px"), true);
     assert.equal(await noOverflow(page), true);
     await page.screenshot({ path: `/tmp/motovax-fresh-registration-${viewport.name}.png`, fullPage: false });
     await context.close();
@@ -356,7 +467,6 @@ test("link verifikasi kedaluwarsa menampilkan pemulihan yang jelas", async () =>
   await page.route("**/api/auth/pending-signup", (route) => route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ pending: true, email: "owner@dealer.test", resendAfterSeconds: 0, expiresInSeconds: 86400 }) }));
   await page.goto(`${baseUrl}/onboarding.html?email=expired`, { waitUntil: "load" });
   await page.waitForSelector('[data-verification-panel][data-state="error"]:not([hidden])');
-  assert.equal(await page.locator('[data-auth-title]').textContent(), "Link verifikasi kedaluwarsa");
   assert.equal(await page.locator('[data-verification-title]').textContent(), "Minta link verifikasi baru");
   assert.match(await page.locator('[data-verification-status]').textContent(), /Kirim ulang email/);
   assert.equal(await noOverflow(page), true);
@@ -383,10 +493,50 @@ test("verifikasi berhasil berlanjut ke profil dealer dengan konfirmasi", async (
   await context.close();
 });
 
-test("alur final berhenti menunggu setelah 3 detik ketika server tidak merespons", async () => {
+test("loader verifikasi keamanan memakai endpoint recaptcha.net", async () => {
+  const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
+  const page = await context.newPage();
+  let recaptchaScriptUrl = "";
+  await page.route(/https:\/\/fonts\.(?:googleapis|gstatic)\.com\//, (route) => route.abort());
+  await page.route("**/api/config", (route) => route.fulfill({
+    status: 200,
+    contentType: "application/json",
+    body: JSON.stringify({ recaptcha: { enabled: true, siteKey: "test-site-key", action: "complete_onboarding" } }),
+  }));
+  await page.route("**/api/auth/me", (route) => route.fulfill({
+    status: 401,
+    contentType: "application/json",
+    body: JSON.stringify({ authenticated: false }),
+  }));
+  await page.route("https://www.recaptcha.net/recaptcha/enterprise.js?**", (route) => {
+    recaptchaScriptUrl = route.request().url();
+    return route.fulfill({
+      status: 200,
+      contentType: "application/javascript",
+      body: "window.grecaptcha = { enterprise: { ready: function (callback) { callback(); }, execute: function () { return Promise.resolve('token'); } } };",
+    });
+  });
+
+  await page.goto(`${baseUrl}/onboarding.html`, { waitUntil: "load" });
+  await page.waitForFunction(() => Boolean(window.grecaptcha?.enterprise));
+  const scriptUrl = new URL(recaptchaScriptUrl);
+  assert.equal(scriptUrl.hostname, "www.recaptcha.net");
+  assert.equal(scriptUrl.pathname, "/recaptcha/enterprise.js");
+  assert.equal(scriptUrl.searchParams.get("render"), "test-site-key");
+  await context.close();
+});
+
+test("alur final tetap berhasil ketika verifikasi keamanan membutuhkan lebih dari 3 detik", async () => {
   const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
   await context.addInitScript(() => {
-    window.grecaptcha = { enterprise: { ready(callback) { callback(); }, execute() { return Promise.resolve("recaptcha-token"); } } };
+    window.grecaptcha = {
+      enterprise: {
+        ready(callback) { callback(); },
+        execute() {
+          return new Promise((resolve) => window.setTimeout(() => resolve("recaptcha-token"), 3200));
+        },
+      },
+    };
     localStorage.setItem("motovax_onboarding_v1", JSON.stringify({
       step: 3,
       authMode: "signup",
@@ -408,45 +558,36 @@ test("alur final berhenti menunggu setelah 3 detik ketika server tidak merespons
     workspaces: [],
   }) }));
   await page.route("**/api/onboarding/profile", (route) => route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ profile: route.request().postDataJSON() }) }));
+  await page.route("**/api/onboarding/complete", (route) => route.fulfill({
+    status: 202,
+    contentType: "application/json",
+    body: JSON.stringify({
+      workspace: {
+        id: "tenant-slow-recaptcha",
+        name: "Dealer Timeout",
+        domain: "dealer-timeout.motovax.com",
+        ready: false,
+      },
+    }),
+  }));
 
   await page.goto(`${baseUrl}/onboarding.html`, { waitUntil: "load" });
   await page.waitForSelector('[data-step="3"].is-active');
   await page.evaluate(() => {
-    const originalFetch = window.fetch.bind(window);
     window.__finalTimeoutStartedAt = 0;
-    window.__finalTimeoutEndedAt = 0;
     const form = document.querySelector("[data-modules-form]");
-    const error = form?.querySelector("[data-form-error]");
     form?.addEventListener("submit", () => {
       window.__finalTimeoutStartedAt = performance.now();
     }, { capture: true, once: true });
-    if (error) {
-      const observer = new MutationObserver(() => {
-        if (!error.hidden && !window.__finalTimeoutEndedAt) {
-          window.__finalTimeoutEndedAt = performance.now();
-          observer.disconnect();
-        }
-      });
-      observer.observe(error, { attributes: true, attributeFilter: ["hidden"] });
-    }
-    window.fetch = (input, options = {}) => {
-      if (String(input).includes("/api/onboarding/complete")) {
-        return new Promise((_, reject) => {
-          options.signal?.addEventListener("abort", () => {
-            reject(new DOMException("Request dibatalkan karena timeout.", "AbortError"));
-          }, { once: true });
-        });
-      }
-      return originalFetch(input, options);
-    };
   });
   await page.click('[data-modules-form] button[type="submit"]');
-  await page.waitForSelector('[data-modules-form] [data-form-error]:not([hidden])', { timeout: 4500 });
-  const elapsed = await page.evaluate(() => window.__finalTimeoutEndedAt - window.__finalTimeoutStartedAt);
-  assert.ok(elapsed >= 2500 && elapsed < 3400, `timeout UI selesai dalam ${elapsed}ms`);
-  assert.match(await page.locator('[data-modules-form] [data-form-error]').textContent(), /batas waktu/);
+  await page.waitForSelector('[data-step="4"].is-active', { timeout: 5500 });
+  const elapsed = await page.evaluate(() => performance.now() - window.__finalTimeoutStartedAt);
+  assert.ok(elapsed >= 3000 && elapsed < 5000, `onboarding selesai dalam ${elapsed}ms`);
+  assert.equal(await page.locator('[data-modules-form] [data-form-error]').isHidden(), true);
   assert.equal(await page.locator('[data-modules-form] button[type="submit"]').isEnabled(), true);
   assert.equal(await page.getAttribute('[data-modules-form] button[type="submit"]', "aria-busy"), null);
+  assert.equal(await page.locator('[data-redirect-state]').isVisible(), true);
   assert.equal(await noOverflow(page), true);
   await context.close();
 });
@@ -496,6 +637,8 @@ for (const viewport of viewports) {
       window.grecaptcha = { enterprise: { ready(callback) { callback(); }, execute() { return Promise.resolve("recaptcha-token"); } } };
     });
     const page = await context.newPage();
+    const devtools = await context.newCDPSession(page);
+    await devtools.send("Network.setCacheDisabled", { cacheDisabled: true });
     await page.route(/https:\/\/fonts\.(?:googleapis|gstatic)\.com\//, (route) => route.abort());
     await page.route("**/api/auth/me", (route) => route.fulfill({ status: 401, contentType: "application/json", body: JSON.stringify({ authenticated: false }) }));
     await page.route("**/api/config", (route) => route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ recaptcha: { enabled: true, siteKey: "test", action: "complete_onboarding" } }) }));
@@ -565,6 +708,8 @@ for (const viewport of viewports) {
     await page.fill('[data-auth-form="signup"] input[name="passwordConfirm"]', "rahasia123");
     await page.click('[data-auth-form="signup"] button[type="submit"]');
     await page.waitForSelector('[data-step="2"].is-active');
+    assert.equal(await noOverflow(page), true);
+    await page.screenshot({ path: `/tmp/motovax-onboarding-step-2-${viewport.name}.png`, fullPage: false });
 
     await page.fill('[data-business-form] input[name="businessName"]', "Dealer Maju Jaya");
     assert.equal(await page.inputValue('[data-business-form] input[name="workspaceSlug"]'), "dealer-maju-jaya");
@@ -574,6 +719,8 @@ for (const viewport of viewports) {
     await page.waitForSelector('[data-slug-status][data-state="available"]');
     await page.click('[data-business-form] button[type="submit"]');
     await page.waitForSelector('[data-step="3"].is-active');
+    assert.equal(await noOverflow(page), true);
+    await page.screenshot({ path: `/tmp/motovax-onboarding-step-3-${viewport.name}.png`, fullPage: false });
     assert.equal(profilePayload.industry, "automotive");
     assert.equal(profilePayload.branchCount, "");
     assert.equal(profilePayload.region, "");
@@ -601,6 +748,9 @@ for (const viewport of viewports) {
       industry: document.querySelector("[data-summary-industry]")?.textContent.trim(),
       branches: document.querySelector("[data-summary-branches]")?.textContent.trim(),
       railActive: document.querySelector("[data-rail-step].is-active")?.getAttribute("data-rail-step"),
+      railAriaCurrent: document.querySelector("[data-rail-step].is-active")?.getAttribute("aria-current"),
+      railHeadCount: document.querySelectorAll(".onboarding-rail-head").length,
+      stepHeadCount: document.querySelectorAll("[data-step] > .onboarding-step-head").length,
       redirectVisible: !document.querySelector("[data-redirect-state]")?.hidden,
       redirectBusy: document.querySelector("[data-redirect-state]")?.getAttribute("aria-busy"),
       summaryHidden: document.querySelector("[data-workspace-summary]")?.hidden,
@@ -611,6 +761,9 @@ for (const viewport of viewports) {
       industry: "Dealer mobil",
       branches: "Belum ditentukan",
       railActive: "4",
+      railAriaCurrent: "step",
+      railHeadCount: 0,
+      stepHeadCount: 0,
       redirectVisible: true,
       redirectBusy: "true",
       summaryHidden: true,
@@ -632,6 +785,9 @@ for (const viewport of viewports) {
     let resetPayload;
     await page.route("**/api/portal/login", (route) => {
       loginPayload = route.request().postDataJSON();
+      if (loginPayload.identifier === "belum-terdaftar@dealer.test") {
+        return route.fulfill({ status: 404, contentType: "application/json", body: JSON.stringify({ error: "account_not_found", message: "Email belum terdaftar di workspace MOTOVAX." }) });
+      }
       return route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ redirectUrl: "https://dealer-test.motovax.com/magic-login?token=login-handoff" }) });
     });
     await page.route("**/api/portal/forgot-password", (route) => {
@@ -645,10 +801,40 @@ for (const viewport of viewports) {
     await page.route("https://dealer-test.motovax.com/**", (route) => route.fulfill({ status: 200, contentType: "text/html", body: "<title>Workspace Dealer</title>" }));
     await page.goto(`${baseUrl}/login.html?oauth=failed&reason=account_not_found`, { waitUntil: "load" });
     await page.waitForSelector(".portal-login-auth-content:visible");
-    assert.equal(await page.locator('[data-login-error]').isVisible(), true);
-    assert.match(await page.locator('[data-login-error]').textContent(), /belum terdaftar pada workspace MOTOVAX/);
+    assert.equal(await page.locator('[data-account-not-found]').isVisible(), true);
+    assert.match(await page.locator('[data-account-not-found]').textContent(), /Email ini belum terdaftar di workspace MOTOVAX/);
+    assert.equal(await page.locator('[data-login-default]').isHidden(), true);
+    assert.equal(await page.locator('[data-login-error]').isHidden(), true);
+    assert.equal(await page.locator('[data-google-login]').isHidden(), true);
+    assert.equal(await page.locator('[data-portal-login-form]').isHidden(), true);
+    assert.equal(await page.getAttribute('[data-account-register]', "href"), "https://onboard.motovax.com/onboarding.html");
+    assert.match(await page.locator('[data-account-register]').textContent(), /Daftar workspace baru/);
+    assert.equal(await page.locator('a[href="https://onboard.motovax.com/onboarding.html"]:visible').count(), 1);
     assert.equal(new URL(page.url()).searchParams.has("oauth"), false);
     assert.equal(await fitsViewport(page), true);
+    await page.screenshot({ path: `/tmp/motovax-login-account-not-found-${viewport.name}.png`, fullPage: false });
+
+    await page.click('[data-use-another-account]');
+    assert.equal(await page.locator('[data-account-not-found]').isHidden(), true);
+    assert.equal(await page.locator('[data-login-default]').isVisible(), true);
+    assert.equal(await page.locator('[data-login-error]').isHidden(), true);
+    assert.equal(await page.locator('[data-login-register-prompt]').isVisible(), true);
+
+    await page.fill('input[name="identifier"]', "belum-terdaftar@dealer.test");
+    await page.fill('#portalPassword', "rahasia123");
+    await page.click('[data-portal-login-form] button[type="submit"]');
+    await page.waitForSelector('[data-account-not-found]:visible');
+    assert.equal(await page.locator('[data-login-default]').isHidden(), true);
+    assert.equal(await page.locator('[data-login-error]').isHidden(), true);
+    assert.match(await page.locator('[data-account-not-found]').textContent(), /Email ini belum terdaftar di workspace MOTOVAX/);
+    assert.equal(await fitsViewport(page), true);
+    await page.click('[data-use-another-account]');
+
+    await page.goto(`${baseUrl}/login.html?oauth=denied`, { waitUntil: "load" });
+    await page.waitForSelector(".portal-login-auth-content:visible");
+    assert.equal(await page.locator('[data-login-error]').isVisible(), true);
+    assert.equal(await page.locator('[data-account-not-found]').isHidden(), true);
+    assert.equal(await page.locator('[data-login-register-prompt]').isVisible(), true);
 
     await page.goto(`${baseUrl}/login.html?forgot=1&workspace=dealer-test.motovax.com&email=owner%40dealer.test`, { waitUntil: "load" });
     await page.waitForSelector("[data-forgot-view]:visible");
@@ -677,6 +863,56 @@ for (const viewport of viewports) {
     assert.equal(await page.locator('[data-google-login]').isVisible(), true);
     assert.equal(await page.getAttribute('[data-google-login]', "href"), "https://onboard.motovax.com/api/auth/google/start?mode=portal");
     assert.equal(await page.getByRole("link", { name: "Login dengan Google", exact: true }).count(), 1);
+    assert.equal(await page.evaluate(() => {
+      const googleButton = document.querySelector("[data-google-login]");
+      const loginForm = document.querySelector("[data-portal-login-form]");
+      return Boolean(googleButton.compareDocumentPosition(loginForm) & Node.DOCUMENT_POSITION_FOLLOWING);
+    }), true);
+    assert.deepEqual(await page.locator("[data-google-login]").evaluate((button) => {
+      const style = getComputedStyle(button);
+      const iconStyle = getComputedStyle(button.querySelector(".onboarding-google-icon"));
+      return {
+        minHeight: style.minHeight,
+        borderRadius: style.borderRadius,
+        fontWeight: style.fontWeight,
+        iconWidth: iconStyle.width,
+      };
+    }), {
+      minHeight: viewport.width <= 720 ? "48px" : "50px",
+      borderRadius: "10px",
+      fontWeight: "800",
+      iconWidth: "21px",
+    });
+    const loginShellStyle = await page.evaluate(() => {
+      const pageElement = document.querySelector(".portal-login-page");
+      const shell = document.querySelector(".portal-login-shell");
+      const panel = document.querySelector(".portal-login-panel");
+      const panelStyle = getComputedStyle(panel);
+      return {
+        pageBackground: getComputedStyle(pageElement).backgroundColor,
+        shellWidth: shell.getBoundingClientRect().width,
+        panelBorderStyle: panelStyle.borderStyle,
+        panelBorderRadius: panelStyle.borderRadius,
+        panelBoxShadow: panelStyle.boxShadow,
+        panelBackground: panelStyle.backgroundColor,
+        panelPadding: panelStyle.padding,
+      };
+    });
+    assert.equal(loginShellStyle.pageBackground, "rgb(255, 255, 255)");
+    assert.equal(loginShellStyle.panelBoxShadow, "none");
+    if (viewport.width <= 720) {
+      assert.equal(loginShellStyle.shellWidth, viewport.width - 48);
+      assert.equal(loginShellStyle.panelBorderStyle, "none");
+      assert.equal(loginShellStyle.panelBorderRadius, "0px");
+      assert.equal(loginShellStyle.panelBackground, "rgba(0, 0, 0, 0)");
+      assert.equal(loginShellStyle.panelPadding, "0px");
+    } else {
+      assert.equal(loginShellStyle.shellWidth, 720);
+      assert.equal(loginShellStyle.panelBorderStyle, "solid");
+      assert.equal(loginShellStyle.panelBorderRadius, "12px");
+      assert.equal(loginShellStyle.panelBackground, "rgb(255, 255, 255)");
+      assert.equal(loginShellStyle.panelPadding, "26px 40px 22px");
+    }
     assert.equal(await page.locator('input[name="workspace"]').count(), 0);
     await page.fill('input[name="identifier"]', "owner");
     await page.click('[data-portal-login-form] button[type="submit"]');
