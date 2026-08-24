@@ -1038,6 +1038,15 @@ a {
   margin-top: 16px;
 }
 
+.mobile-product-suite-summary {
+  display: block;
+  margin: -4px 2px 8px;
+  color: #4a5c77;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.45;
+}
+
 .mobile-product-suite > p {
   margin: 0 2px 8px;
   color: #8791a1;

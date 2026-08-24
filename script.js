@@ -385,76 +385,88 @@ const dealerProductNavigation = Object.freeze({
     {
       id: "core-platform",
       label: "Core Platform",
+      summary: "Satu fondasi aman untuk seluruh cabang, tim, dan modul.",
       paneTitle: "Core — Platform Integrasi Agentic AI",
+      page: "core-platform-agentic-ai",
       demo: { id: "whatsapp", hash: "capabilityDemo", context: "core-platform", label: "Lihat Fondasi Platform" },
       features: [
-        { title: "Core Platform Agentic AI", desc: "Fondasi multi-tenant, akses berbasis peran, integrasi, dashboard, dan konfigurasi modul", icon: "suite", slug: "core-platform-agentic-ai" },
+        { title: "Core Platform Agentic AI", desc: "Fondasi aman untuk cabang, tim, dan modul", icon: "suite", slug: "core-platform-agentic-ai" },
       ],
     },
     {
       id: "crm",
       label: "CRM",
+      summary: "Kelola lead, pipeline, dan follow-up dari awal sampai closing.",
       paneTitle: "CRM",
+      page: "aplikasi-crm",
       demo: { id: "crm", hash: "crmDemo", context: "crm", label: "Coba CRM" },
       features: [
-        { title: "Lead / Customer List", desc: "Data lead dan customer terpusat dengan riwayat interaksi serta unit yang diminati", icon: "contact", slug: "manajemen-kontak" },
-        { title: "Pipeline & Customer Journey", desc: "Pantau perjalanan customer dan progres deal dari lead masuk hingga closing", icon: "deal", slug: "manajemen-deal" },
-        { title: "Analytics", desc: "Ukur performa sales, conversion, channel, dan hasil pipeline CRM", icon: "report", slug: "personalisasi-report-sales" },
-        { title: "Auto Follow Up", desc: "Aktifkan tindak lanjut customer terjadwal sebagai add-on CRM", icon: "workflow", slug: "automasi-workflow", badge: "Add-on" },
+        { title: "Lead / Customer List", desc: "Semua lead dan customer terpusat dengan riwayatnya", icon: "contact", slug: "manajemen-kontak" },
+        { title: "Pipeline & Customer Journey", desc: "Pantau progres deal dari lead sampai closing", icon: "deal", slug: "manajemen-deal" },
+        { title: "Analytics", desc: "Ukur konversi, performa sales, dan hasil pipeline", icon: "report", slug: "personalisasi-report-sales" },
+        { title: "Auto Follow Up", desc: "Follow-up customer terjadwal otomatis", icon: "workflow", slug: "automasi-workflow", badge: "Add-on" },
       ],
     },
     {
       id: "omni-jasmine",
       label: "Jasmine AI + Omnichannel",
+      summary: "Semua chat pelanggan di satu inbox, dengan AI 24/7.",
       paneTitle: "Jasmine AI + Omnichannel",
+      page: "omni-jasmine-ai",
       demo: { id: "omni", hash: "omniDemo", context: "omnichannel", label: "Coba Omnichannel" },
       features: [
-        { title: "WhatsApp, Instagram & Facebook", desc: "Satukan chat pelanggan dari tiga channel dalam satu inbox Call Center", icon: "chat", slug: "omni-jasmine-ai" },
-        { title: "Omni analytic", desc: "Pantau journey lead, performa channel, respons, dan hasil penanganan tim", icon: "report", slug: "omni-jasmine-ai" },
-        { title: "Custom aksi cepat", desc: "Jalankan cek inventori, simulasi kredit, dan aksi operasional dari percakapan", icon: "workflow", slug: "omni-jasmine-ai" },
-        { title: "3 funneling & 1 auto routing", desc: "Kelola alur Jasmine AI, Call Center, dan MR dengan routing otomatis", icon: "flow", slug: "omni-jasmine-ai" },
-        { title: "AI 500 credit", desc: "Gunakan 500 kredit AI untuk respons dan dukungan percakapan Jasmine", icon: "ai", slug: "omni-jasmine-ai" },
+        { title: "WhatsApp, Instagram & Facebook", desc: "Gabung chat dari tiga channel di satu inbox", icon: "chat", slug: "aplikasi-omnichannel" },
+        { title: "Omni analytic", desc: "Pantau perjalanan lead dan performa tim", icon: "report", slug: "omni-analytic" },
+        { title: "Custom aksi cepat", desc: "Cek stok dan simulasi kredit dari chat", icon: "workflow", slug: "custom-aksi-cepat" },
+        { title: "3 funneling & 1 auto routing", desc: "AI, agent, dan MR ter-route otomatis", icon: "flow", slug: "auto-routing-faneling" },
+        { title: "AI 500 credit", desc: "Kredit AI untuk respons pelanggan", icon: "ai", slug: "ai-500-credit" },
       ],
     },
     {
       id: "inventory-falcon",
       label: "Falcon AI + Inventory",
+      summary: "Falcon mencarikan dan mengirim unit dari stok live.",
       paneTitle: "Falcon AI + Inventory",
+      page: "inventory-falcon-ai",
       demo: { id: "inventory", hash: "inventoryDemo", context: "inventory", label: "Coba Inventory" },
       features: [
-        { title: "Falcon AI: searching, kirim foto & rekomendasi otomatis", desc: "Cari unit, kirim foto, dan rekomendasikan alternatif dari stok live dealer", icon: "ai", slug: "inventory-falcon-ai" },
-        { title: "Laporan dan aksi sesuai peran", desc: "Sales dan management memakai tool Falcon sesuai permission — dari cek stok sampai laporan PDF", icon: "report", slug: "inventory-falcon-ai" },
-        { title: "Item / listing multi cabang", desc: "Kelola item dan listing dari seluruh cabang sebagai sumber kebenaran Falcon", icon: "shop", slug: "inventory-falcon-ai" },
-        { title: "Import listing via WhatsApp", desc: "Tambahkan data listing melalui alur WhatsApp yang terhubung ke inventori", icon: "wa", slug: "inventory-falcon-ai" },
-        { title: "Live katalog API", desc: "Hubungkan stok aktif ke katalog dan aplikasi eksternal melalui API", icon: "live", slug: "inventory-falcon-ai" },
-        { title: "AI 500 credit", desc: "Gunakan 500 kredit AI untuk pencarian dan bantuan operasional Falcon", icon: "ai", slug: "inventory-falcon-ai" },
+        { title: "Falcon AI: searching, kirim foto & rekomendasi otomatis", desc: "Cari unit, kirim foto, dan rekomendasi otomatis", icon: "ai", slug: "falcon-ai-search" },
+        { title: "Laporan dan aksi sesuai peran", desc: "Laporan stok dan aksi sesuai permission", icon: "report", slug: "inventory-laporan-peran" },
+        { title: "Item / listing multi cabang", desc: "Stok seluruh cabang dalam satu sumber data", icon: "shop", slug: "inventory-multi-cabang" },
+        { title: "Import listing via WhatsApp", desc: "Tambah listing langsung dari WhatsApp", icon: "wa", slug: "inventory-import-wa" },
+        { title: "Live katalog API", desc: "Stok live dapat dipakai aplikasi eksternal", icon: "live", slug: "inventory-live-katalog-api" },
+        { title: "AI 500 credit", desc: "Kredit AI untuk bantuan pencarian unit", icon: "ai", slug: "ai-500-credit" },
       ],
     },
     {
       id: "ana-analytics",
       label: "Ana AI Analytics",
+      summary: "Keputusan cepat dari data operasional, finansial, dan sales.",
       paneTitle: "Ana AI — Advanced Analytics",
+      page: "ana-ai-analytics",
       demo: { id: "dashboard", hash: "dashboardDemo", context: "analytics", label: "Lihat Analytics" },
       features: [
-        { title: "Analitik operasional", desc: "Pantau aktivitas, produktivitas, dan indikator utama dealer", icon: "report", slug: "ana-ai-analytics" },
-        { title: "Analitik financial", desc: "Baca revenue, biaya, HPP, gross profit, dan tren finansial", icon: "deal", slug: "ana-ai-analytics" },
-        { title: "Analitik sales performance", desc: "Bandingkan performa sales, cabang, channel, dan hasil konversi", icon: "score", slug: "ana-ai-analytics" },
-        { title: "Additional custom analytic", desc: "Tambahkan analitik khusus sesuai KPI dan kebutuhan manajemen", icon: "workflow", slug: "ana-ai-analytics" },
+        { title: "Analitik operasional", desc: "KPI operasional dealer dalam satu layar", icon: "report", slug: "ana-analitik-operasional" },
+        { title: "Analitik financial", desc: "Revenue, HPP, dan gross profit", icon: "deal", slug: "ana-analitik-financial" },
+        { title: "Analitik sales performance", desc: "Bandingkan performa sales dan cabang", icon: "score", slug: "ana-analitik-sales" },
+        { title: "Additional custom analytic", desc: "Analytics tambahan sesuai KPI Anda", icon: "workflow", slug: "ana-custom-analytic" },
       ],
     },
     {
       id: "social-sora",
       label: "Iris AI + Social Media",
+      summary: "Ubah stok menjadi konten yang siap tayang dan diukur.",
       paneTitle: "Iris AI + Social Media",
+      page: "social-media-sora-ai",
       demo: { id: "social", hash: "socialDemo", context: "social", label: "Coba Social Studio" },
       features: [
-        { title: "Content studio", desc: "Susun materi promosi dan caption dari data produk dalam satu workspace", icon: "shop", slug: "social-media-sora-ai" },
-        { title: "Iris AI upscale & background edit", desc: "Tingkatkan kualitas visual dan edit latar gambar dengan bantuan AI", icon: "ai", slug: "social-media-sora-ai" },
-        { title: "Publish ke Facebook, Instagram & WhatsApp", desc: "Publikasikan konten ke channel sosial yang aktif dari satu alur", icon: "blast", slug: "social-media-sora-ai" },
-        { title: "Scheduler", desc: "Jadwalkan konten agar tayang sesuai kalender campaign", icon: "sla", slug: "social-media-sora-ai" },
-        { title: "Meta ads manager", desc: "Kelola campaign Meta dan lead template WhatsApp dari Social Studio", icon: "ads", slug: "social-media-sora-ai" },
-        { title: "Meta ads analytic by Iris", desc: "Pantau performa iklan dan insight campaign dengan bantuan AI", icon: "report", slug: "social-media-sora-ai" },
-        { title: "AI 500 credit", desc: "Gunakan 500 kredit AI untuk pembuatan dan pengolahan konten", icon: "ai", slug: "social-media-sora-ai" },
+        { title: "Content studio", desc: "Buat materi dan caption dari data inventori", icon: "shop", slug: "iris-content-studio" },
+        { title: "Iris AI upscale & background edit", desc: "Perbaiki kualitas dan latar gambar dengan AI", icon: "ai", slug: "iris-ai-edit" },
+        { title: "Publish ke Facebook, Instagram & WhatsApp", desc: "Terbitkan ke kanal sosial dari satu alur", icon: "blast", slug: "iris-publish" },
+        { title: "Scheduler", desc: "Jadwalkan konten sesuai kalender campaign", icon: "sla", slug: "iris-scheduler" },
+        { title: "Meta ads manager", desc: "Kelola campaign Meta dan lead template WA", icon: "ads", slug: "iris-meta-ads" },
+        { title: "Meta ads analytic by Iris", desc: "Pantau performa iklan dengan insight AI", icon: "report", slug: "iris-meta-ads-analytic" },
+        { title: "AI 500 credit", desc: "Kredit AI untuk produksi konten", icon: "ai", slug: "ai-500-credit" },
       ],
     },
   ],
@@ -520,6 +532,7 @@ const dealerProductNavigation = Object.freeze({
         id: suite.id,
         label: suite.label,
         paneTitle: suite.paneTitle,
+        page: suite.page,
         demo: suite.demo,
         features: suite.features.map((feat) => ({
           title: feat.title,
@@ -587,11 +600,11 @@ const dealerProductNavigation = Object.freeze({
 
     const panes = allPanes
       .map((item) => {
-        const demoHref = item.demo
-          ? `${rootPrefix}index-legacy.html?demo=${item.demo.id}&from=${encodeURIComponent(item.demo.context || item.id)}#${item.demo.hash}`
-          : "";
+        // Tombol biru tiap produk mengarah ke halaman detail fitur yang sudah siap.
+        // Jika widget demo interaktif tersedia di halaman ini, data-open-* tetap
+        // membuka demo; jika tidak, tautan menuju halaman detail produk.
         const demoCta = item.demo
-          ? `<a href="${demoHref}" class="produk-mega-demo-button" data-open-${item.demo.id}-demo data-demo-context="${item.demo.context || item.id}" data-produk-close>
+          ? `<a href="${f(item.page)}" class="produk-mega-demo-button" data-open-${item.demo.id}-demo data-demo-context="${item.demo.context || item.id}" data-produk-close>
               ${item.demo.label}
               <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </a>`
@@ -1042,6 +1055,7 @@ const dealerSolutionNavigation = Object.freeze({
       .map((suite) => `
             <div class="mobile-product-suite">
               <p>${suite.label}</p>
+              ${suite.summary ? `<span class="mobile-product-suite-summary">${suite.summary}</span>` : ""}
               ${suite.features
                 .map((feat) => {
                   const badge = feat.badge ? ` <span class="badge-new">${feat.badge}</span>` : "";
