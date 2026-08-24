@@ -1051,22 +1051,15 @@ const dealerSolutionNavigation = Object.freeze({
     panel.hidden = true;
     panel.setAttribute("aria-label", "Navigasi mobile");
     panel.setAttribute("data-mobile-nav-panel", "");
+    /* Di layar sempit, arahkan pengguna ke enam suite utama saja. Detail fitur
+     * tetap tersedia di halaman suite agar menu tidak berubah menjadi katalog
+     * panjang yang memaksa pengguna menggulir. */
     const productSuites = dealerProductNavigation.suites
       .map((suite) => `
-            <div class="mobile-product-suite">
-              <p>${suite.label}</p>
-              ${suite.summary ? `<span class="mobile-product-suite-summary">${suite.summary}</span>` : ""}
-              ${suite.features
-                .map((feat) => {
-                  const badge = feat.badge ? ` <span class="badge-new">${feat.badge}</span>` : "";
-                  return `
-              <a href="${root}fitur/${feat.slug}.html" data-mobile-nav-close>
-                <strong>${feat.title}${badge}</strong>
-                <small>${feat.desc}</small>
-              </a>`;
-                })
-                .join("")}
-            </div>`)
+            <a class="mobile-product-suite" href="${root}fitur/${suite.page}.html" data-mobile-nav-close>
+              <strong>${suite.label}</strong>
+              <span aria-hidden="true">→</span>
+            </a>`)
       .join("");
 
     panel.innerHTML = `
@@ -1074,12 +1067,13 @@ const dealerSolutionNavigation = Object.freeze({
         <details class="mobile-products">
           <summary>Produk <span aria-hidden="true">+</span></summary>
           <div class="mobile-products-body">
+            <div class="mobile-product-suite-grid">
+              ${productSuites}
+            </div>
             <a class="mobile-products-overview" href="${root}modul.html" data-mobile-nav-close>
-              <small>KATALOG PRODUK</small>
-              <strong>Lihat semua suite Motovax</strong>
-              <span>Enam suite yang sama dengan dropdown desktop.</span>
+              <strong>Semua produk</strong>
+              <span aria-hidden="true">→</span>
             </a>
-            ${productSuites}
           </div>
         </details>
         <a href="${home}#cara-kerja" data-mobile-nav-close>Cara Kerja <span>→</span></a>

@@ -138,8 +138,12 @@ for (const viewport of viewports) {
         await page.locator('[data-mobile-nav-panel]:not([hidden]) summary', { hasText: "Produk" }).click();
         assert.equal(page.url(), urlBeforeProduk, route);
         assert.equal(await page.locator("[data-mobile-nav-panel]:not([hidden]) .mobile-product-suite").count(), 6, route);
-        assert.equal(await page.locator('[data-mobile-nav-panel]:not([hidden]) .mobile-product-suite > p', { hasText: "Core Platform" }).isVisible(), true, route);
-        assert.equal(await page.locator('[data-mobile-nav-panel]:not([hidden]) a', { hasText: "Lead / Customer List" }).isVisible(), true, route);
+        assert.equal(await page.locator("[data-mobile-nav-panel]:not([hidden])").getByRole("link", { name: "Core Platform", exact: true }).isVisible(), true, route);
+        assert.equal(await page.locator('[data-mobile-nav-panel]:not([hidden]) a', { hasText: "Lead / Customer List" }).count(), 0, route);
+        const compactMenuFits = await page.locator("[data-mobile-nav-panel]:not([hidden])").evaluate((element) =>
+          element.scrollHeight <= element.clientHeight + 1,
+        );
+        assert.equal(compactMenuFits, true, route);
         await page.keyboard.press("Escape");
         assert.equal(await page.locator("[data-mobile-nav-panel]").isHidden(), true, route);
         assert.equal(await page.locator("body").evaluate((body) => body.classList.contains("mobile-menu-open")), false, route);
@@ -977,10 +981,18 @@ for (const viewport of viewports) {
       await panel.locator("summary", { hasText: "Produk" }).click();
       assert.equal(page.url(), urlBeforeProduk);
       assert.equal(await panel.locator(".mobile-product-suite").count(), 6);
-      assert.equal(await panel.locator(".mobile-product-suite > p", { hasText: "Jasmine AI + Omnichannel" }).isVisible(), true);
-      assert.equal(await panel.locator(".mobile-product-suite > p", { hasText: "Falcon AI + Inventory" }).isVisible(), true);
-      assert.equal(await panel.locator(".mobile-product-suite > p", { hasText: "Iris AI + Social Media" }).isVisible(), true);
-      assert.equal(await panel.locator("a", { hasText: "WhatsApp, Instagram & Facebook" }).isVisible(), true);
+      assert.equal(await panel.getByRole("link", { name: /Jasmine AI \+ Omnichannel/ }).isVisible(), true);
+      assert.equal(await panel.getByRole("link", { name: /Falcon AI \+ Inventory/ }).isVisible(), true);
+      assert.equal(await panel.getByRole("link", { name: /Iris AI \+ Social Media/ }).isVisible(), true);
+      assert.equal(await panel.getByRole("link", { name: /Semua produk/ }).isVisible(), true);
+      assert.equal(await panel.locator("a", { hasText: "WhatsApp, Instagram & Facebook" }).count(), 0);
+      const compactProductMenu = await panel.evaluate((element) => ({
+        clientHeight: element.clientHeight,
+        scrollHeight: element.scrollHeight,
+      }));
+      assert.ok(compactProductMenu.scrollHeight <= compactProductMenu.clientHeight + 1);
+      await page.screenshot({ path: `/tmp/motovax-mobile-products-compact-${viewport.name}.png`, fullPage: false });
+      await panel.locator("summary", { hasText: "Produk" }).click();
       await panel.locator("summary", { hasText: "Solusi" }).click();
       assert.equal(await panel.locator("a", { hasText: "Solusi dealer secara menyeluruh" }).isVisible(), true);
       assert.equal(await panel.locator("a", { hasText: "Tangkap & respons setiap lead" }).isVisible(), true);
