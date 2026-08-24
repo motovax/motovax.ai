@@ -233,6 +233,10 @@ for (const viewport of viewports) {
       const panelStyle = getComputedStyle(panel);
       const activeRailStyle = getComputedStyle(activeRailStep);
       const activeNumberStyle = getComputedStyle(activeRailStep.querySelector("i"));
+      const rail = document.querySelector(".onboarding-rail");
+      const railRect = rail.getBoundingClientRect();
+      const railItems = [...rail.querySelectorAll("li")];
+      const railCopies = railItems.map((item) => item.querySelector(":scope > div"));
       return {
         panelBorderStyle: panelStyle.borderStyle,
         panelBorderRadius: panelStyle.borderRadius,
@@ -248,6 +252,21 @@ for (const viewport of viewports) {
         progressDisplay: getComputedStyle(progress).display,
         railInsidePanel: panel.contains(activeRailStep),
         legalOutsidePanel: !panel.contains(legal),
+        railCopyVisible: railCopies.every((copy) => {
+          const rect = copy.getBoundingClientRect();
+          return getComputedStyle(copy).display !== "none" && rect.width > 0 && rect.height > 0;
+        }),
+        railCopyFits: railCopies.every((copy) => copy.scrollWidth <= copy.clientWidth + 1),
+        railItemsInside: railItems.every((item) => {
+          const rect = item.getBoundingClientRect();
+          return rect.left >= railRect.left - 1 && rect.right <= railRect.right + 1;
+        }),
+        railItemsDoNotOverlap: railItems.every((item, index) => {
+          if (index === railItems.length - 1) return true;
+          const current = item.getBoundingClientRect();
+          const next = railItems[index + 1].getBoundingClientRect();
+          return current.right <= next.left + 1;
+        }),
       };
     });
     assert.equal(onboardingShellStyle.railInsidePanel, true);
@@ -258,6 +277,10 @@ for (const viewport of viewports) {
     assert.equal(onboardingShellStyle.activeAriaCurrent, "step");
     assert.notEqual(onboardingShellStyle.activeNumberBoxShadow, "none");
     assert.notEqual(onboardingShellStyle.secondRailConnectorContent, "none");
+    assert.equal(onboardingShellStyle.railCopyVisible, true);
+    assert.equal(onboardingShellStyle.railCopyFits, true);
+    assert.equal(onboardingShellStyle.railItemsInside, true);
+    assert.equal(onboardingShellStyle.railItemsDoNotOverlap, true);
     assert.equal(await fitsViewport(page), true);
     if (viewport.width <= 720) {
       assert.equal(onboardingShellStyle.panelBorderStyle, "none");

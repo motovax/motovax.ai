@@ -2168,22 +2168,27 @@
   }
 
   .onboarding-aside {
-    margin-bottom: 16px;
+    margin-bottom: 20px;
   }
 
   .onboarding-rail {
+    align-items: start;
     gap: 0;
   }
 
   .onboarding-rail li {
     display: grid;
-    min-height: 32px;
-    grid-template-rows: 32px;
-    padding: 0 4px;
+    min-height: 0;
+    grid-template-rows: 32px auto;
+    align-content: start;
+    gap: 6px;
+    padding: 0 2px;
   }
 
   .onboarding-rail li > div {
-    display: none;
+    display: block;
+    width: 100%;
+    min-width: 0;
   }
 
   .onboarding-rail li i {
@@ -2193,6 +2198,25 @@
 
   .onboarding-rail li::before {
     top: 15px;
+  }
+
+  .onboarding-rail li b,
+  .onboarding-rail li small {
+    overflow: visible;
+    text-overflow: clip;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+
+  .onboarding-rail li b {
+    font-size: clamp(9px, 2.4vw, 11px);
+    line-height: 1.22;
+  }
+
+  .onboarding-rail li small {
+    margin-top: 2px;
+    font-size: clamp(8px, 1.9vw, 9px);
+    line-height: 1.25;
   }
 
   .onboarding-rail li.is-active::after {
@@ -2270,6 +2294,25 @@
   .onboarding-link-muted {
     max-width: none;
     font-size: 11px;
+  }
+
+  .onboarding-aside {
+    margin-bottom: 18px;
+  }
+
+  .onboarding-rail li {
+    grid-template-rows: 30px auto;
+    gap: 5px;
+    padding-inline: 1px;
+  }
+
+  .onboarding-rail li i {
+    width: 30px;
+    height: 30px;
+  }
+
+  .onboarding-rail li::before {
+    top: 14px;
   }
 }
 
