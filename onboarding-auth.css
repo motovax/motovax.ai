@@ -880,57 +880,6 @@
   text-align: right;
 }
 
-.onboarding-recaptcha-status {
-  display: inline-flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 7px;
-  margin: 0;
-  color: #475569;
-  font-size: 0.78rem;
-  line-height: 1.35;
-}
-
-.onboarding-recaptcha-status > span {
-  width: 8px;
-  height: 8px;
-  flex: 0 0 8px;
-  border-radius: 999px;
-  background: #94a3b8;
-  box-shadow: 0 0 0 3px rgba(148, 163, 184, 0.14);
-}
-
-.onboarding-recaptcha-status > b {
-  font-weight: 650;
-}
-
-.onboarding-recaptcha-status[data-state="ready"] {
-  color: #047857;
-}
-
-.onboarding-recaptcha-status[data-state="ready"] > span {
-  background: #10b981;
-  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.14);
-}
-
-.onboarding-recaptcha-status[data-state="verifying"] {
-  color: #0756da;
-}
-
-.onboarding-recaptcha-status[data-state="verifying"] > span {
-  background: #1670f8;
-  box-shadow: 0 0 0 3px rgba(22, 112, 248, 0.14);
-}
-
-.onboarding-recaptcha-status[data-state="error"] {
-  color: #b42318;
-}
-
-.onboarding-recaptcha-status[data-state="error"] > span {
-  background: #ef4444;
-  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.14);
-}
-
 .onboarding-module-actions {
   display: grid;
   grid-template-columns: 136px minmax(220px, 238px);
@@ -1247,11 +1196,6 @@
 
   .onboarding-complete-action .onboarding-hint {
     max-width: none;
-    text-align: center;
-  }
-
-  .onboarding-recaptcha-status {
-    justify-content: center;
     text-align: center;
   }
 

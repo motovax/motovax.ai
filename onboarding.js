@@ -330,8 +330,6 @@
   };
 
   OnboardingApp.prototype.prepareRecaptcha = function () {
-    var self = this;
-    this.setRecaptchaStatus("loading", "Memuat proteksi keamanan…");
     return api("/api/config")
       .then(function (payload) {
         var config = payload && payload.recaptcha;
@@ -339,23 +337,13 @@
           throw new Error("Proteksi keamanan belum tersedia. Hubungi tim MOTOVAX.");
         }
         return loadRecaptchaScript(config.siteKey).then(function () {
-          self.setRecaptchaStatus("ready", "reCAPTCHA siap · berjalan otomatis tanpa checkbox");
           return config;
         });
       })
       .catch(function (error) {
         var message = error.message || "Proteksi keamanan belum tersedia.";
-        self.setRecaptchaStatus("error", message);
         return { enabled: false, error: message };
       });
-  };
-
-  OnboardingApp.prototype.setRecaptchaStatus = function (state, message) {
-    var status = qs("[data-recaptcha-status]");
-    var copy = qs("[data-recaptcha-status-copy]", status);
-    if (!status || !copy) return;
-    status.dataset.state = state;
-    copy.textContent = message;
   };
 
   OnboardingApp.prototype.getRecaptchaToken = async function (timeoutMs) {
@@ -1148,16 +1136,13 @@
     setFormLoading(form, true);
     try {
       await this.saveProfile(API_REQUEST_TIMEOUT_MS);
-      this.setRecaptchaStatus("verifying", "Memverifikasi keamanan…");
       var payload;
       try {
         payload = await this.completeWithFreshRecaptcha();
       } catch (error) {
         if (error.code !== "recaptcha_invalid") throw error;
-        this.setRecaptchaStatus("verifying", "Memperbarui verifikasi keamanan…");
         payload = await this.completeWithFreshRecaptcha();
       }
-      this.setRecaptchaStatus("ready", "Verifikasi keamanan berhasil");
       this.state.workspace = payload.workspace;
       this.state.onboardingMode = "self";
       this.state.completed = true;
@@ -1169,9 +1154,6 @@
       if (this.state.workspace.ready) this.enterWorkspace();
       else this.waitForWorkspace();
     } catch (error) {
-      if (error.code === "recaptcha_invalid" || error.code === "recaptcha_low_score") {
-        this.setRecaptchaStatus("error", "Verifikasi belum berhasil · coba lagi");
-      }
       this.showError(form, friendlySubmitError(error, "Workspace belum berhasil dibuat. Pilihan Anda tetap tersimpan; silakan coba lagi."));
     } finally {
       setFormLoading(form, false);

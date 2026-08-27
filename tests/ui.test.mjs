@@ -527,8 +527,7 @@ test("loader verifikasi keamanan memakai endpoint recaptcha.net", async () => {
   assert.equal(scriptUrl.hostname, "www.recaptcha.net");
   assert.equal(scriptUrl.pathname, "/recaptcha/enterprise.js");
   assert.equal(scriptUrl.searchParams.get("render"), "test-site-key");
-  assert.equal(await page.locator("[data-recaptcha-status]").getAttribute("data-state"), "ready");
-  assert.match(await page.locator("[data-recaptcha-status-copy]").textContent(), /otomatis tanpa checkbox/i);
+  assert.equal(await page.locator("[data-recaptcha-status]").count(), 0);
   await context.close();
 });
 
@@ -604,7 +603,7 @@ test("token reCAPTCHA invalid diperbarui satu kali sebelum setup dinyatakan gaga
 
   await page.goto(`${baseUrl}/onboarding.html`, { waitUntil: "load" });
   await page.waitForSelector('[data-step="3"].is-active');
-  assert.match(await page.locator("[data-recaptcha-status-copy]").textContent(), /otomatis tanpa checkbox/i);
+  assert.equal(await page.locator("[data-recaptcha-status]").count(), 0);
   await page.click('[data-modules-form] button[type="submit"]');
   await page.waitForSelector('[data-step="4"].is-active');
   assert.deepEqual(submittedTokens, ["recaptcha-token-1", "recaptcha-token-2"]);
