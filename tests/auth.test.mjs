@@ -42,7 +42,7 @@ const config = {
   recaptchaScoreThreshold: 0.5,
   recaptchaExpectedHostname: "127.0.0.1",
   authEmailFrom: "onboarding@motovax.ai",
-  trustProxy: false,
+  trustProxy: true,
 };
 
 const store = {
@@ -121,6 +121,13 @@ const store = {
       .reduce((max, token) => Math.max(max, token.createdAt), 0);
     return Math.max(0, Math.ceil((latest + cooldownSeconds * 1000 - Date.now()) / 1000));
   },
+  async invalidateActionTokens({ userId, actionTypes }) {
+    for (const token of actionTokens.values()) {
+      if (token.userId === userId && actionTypes.includes(token.actionType) && !token.usedAt) {
+        token.usedAt = Date.now();
+      }
+    }
+  },
   async takeActionToken({ digest, actionType }) {
     const key = `${actionType}:${digest}`;
     const token = actionTokens.get(key);
@@ -132,7 +139,11 @@ const store = {
         if (user.id === userId) user.email_verified = true;
       }
       for (const pendingToken of actionTokens.values()) {
-        if (pendingToken.userId === userId && pendingToken.actionType === "pending_signup" && !pendingToken.usedAt) {
+        if (
+          pendingToken.userId === userId
+          && ["pending_signup", "pending_signup_resume"].includes(pendingToken.actionType)
+          && !pendingToken.usedAt
+        ) {
           pendingToken.usedAt = Date.now();
         }
       }
@@ -358,6 +369,12 @@ function digest(value) {
     .createHmac("sha256", config.sessionSecret)
     .update(value)
     .digest("hex");
+}
+
+function onboardingPasswordHash(password) {
+  const salt = crypto.randomBytes(16);
+  const derived = crypto.scryptSync(password, salt, 64, { N: 16384, r: 8, p: 1, maxmem: 64 * 1024 * 1024 });
+  return `scrypt$16384$8$1$${salt.toString("base64url")}$${derived.toString("base64url")}`;
 }
 
 before(async () => {
@@ -598,7 +615,8 @@ test("daftar dan login email/password memakai kredensial nyata", async () => {
       password: "rahasia789",
     }),
   });
-  assert.equal(duplicateWithoutOwnerSession.status, 409);
+  assert.equal(duplicateWithoutOwnerSession.status, 401);
+  assert.equal((await duplicateWithoutOwnerSession.json()).error, "invalid_credentials");
 
   const loginWithUpdatedPassword = await fetch(`${baseUrl}/api/auth/login`, {
     method: "POST",
@@ -606,6 +624,92 @@ test("daftar dan login email/password memakai kredensial nyata", async () => {
     body: JSON.stringify({ email: "password@example.com", password: "rahasia456" }),
   });
   assert.equal(loginWithUpdatedPassword.status, 200);
+});
+
+test("akun terverifikasi yang onboarding-nya belum selesai dapat verifikasi ulang dan lanjut ke langkah terakhir", async () => {
+  const email = "resume-onboarding@example.com";
+  const user = {
+    id: crypto.randomUUID(),
+    email,
+    avatar_url: "",
+    email_verified: true,
+    full_name: "Owner Lama",
+    password_hash: onboardingPasswordHash("rahasia123"),
+  };
+  passwordUsers.set(email, user);
+  accountState = {
+    profile: {
+      business_name: "Dealer Demo",
+      workspace_slug: "dealer-demo",
+      branch_count: "1",
+      region: "Jakarta",
+      industry: "automotive",
+      description: "",
+      modules: ["ims", "omni"],
+      goal: "conversion",
+      tenant_id: null,
+      completed_at: null,
+    },
+    workspaces: [],
+  };
+
+  const wrongPassword = await fetch(`${baseUrl}/api/auth/signup`, {
+    method: "POST",
+    headers: { "content-type": "application/json", origin: "http://127.0.0.1", "x-forwarded-for": "198.51.100.42" },
+    body: JSON.stringify({ fullName: "Owner Demo", email, password: "password999" }),
+  });
+  assert.equal(wrongPassword.status, 401);
+  assert.match((await wrongPassword.json()).message, /password pendaftaran sebelumnya/i);
+
+  const emailCount = sentEmails.length;
+  const resumed = await fetch(`${baseUrl}/api/auth/signup`, {
+    method: "POST",
+    headers: { "content-type": "application/json", origin: "http://127.0.0.1", "x-forwarded-for": "198.51.100.42" },
+    body: JSON.stringify({ fullName: "Owner Demo", email, password: "rahasia123" }),
+  });
+  assert.equal(resumed.status, 202);
+  const resumedPayload = await resumed.json();
+  assert.equal(resumedPayload.verificationRequired, true);
+  assert.equal(resumedPayload.resuming, true);
+  assert.equal(sentEmails.length, emailCount + 1);
+
+  const pendingSignup = cookieValue(resumed.headers.get("set-cookie"), "motovax_pending_signup");
+  assert.ok(pendingSignup);
+  const pending = await fetch(`${baseUrl}/api/auth/pending-signup`, {
+    headers: { cookie: `motovax_pending_signup=${encodeURIComponent(pendingSignup)}` },
+  });
+  assert.equal(pending.status, 200);
+  assert.equal((await pending.json()).resuming, true);
+
+  const verificationUrl = sentEmails.at(-1).text.match(/http:\/\/127\.0\.0\.1\/api\/auth\/verify-email\?token=[^\s]+/)[0];
+  const target = new URL(verificationUrl);
+  const verified = await fetch(`${baseUrl}${target.pathname}${target.search}`, { redirect: "manual" });
+  assert.equal(verified.status, 302);
+  assert.match(verified.headers.get("location"), /email=verified/);
+  assert.match(verified.headers.get("set-cookie"), /motovax_pending_signup=;/);
+
+  const sessionToken = cookieValue(verified.headers.get("set-cookie"), "motovax_session");
+  assert.ok(sessionToken);
+  const me = await fetch(`${baseUrl}/api/auth/me`, {
+    headers: { cookie: `motovax_session=${encodeURIComponent(sessionToken)}` },
+  });
+  assert.equal(me.status, 200);
+  const mePayload = await me.json();
+  assert.equal(mePayload.profile.workspace_slug, "dealer-demo");
+  assert.deepEqual(mePayload.workspaces, []);
+
+  accountState = {
+    profile: { ...accountState.profile, tenant_id: "tenant-finished", completed_at: new Date().toISOString() },
+    workspaces: [{ id: "tenant-finished", domain: "dealer-demo.motovax.com" }],
+  };
+  const finished = await fetch(`${baseUrl}/api/auth/signup`, {
+    method: "POST",
+    headers: { "content-type": "application/json", origin: "http://127.0.0.1", "x-forwarded-for": "198.51.100.42" },
+    body: JSON.stringify({ fullName: "Owner Demo", email, password: "rahasia123" }),
+  });
+  assert.equal(finished.status, 409);
+  assert.equal((await finished.json()).error, "account_exists");
+  accountState = { profile: null, workspaces: [] };
 });
 
 test("pendaftaran manual dapat dibatalkan untuk mengganti email", async () => {

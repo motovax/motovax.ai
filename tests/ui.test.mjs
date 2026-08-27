@@ -716,6 +716,84 @@ test("tombol cek hanya melanjutkan akun pending yang sama setelah verified", asy
   await context.close();
 });
 
+for (const viewport of [viewports[0], viewports.at(-1)]) {
+  test(`daftar ulang onboarding tersimpan kembali ke langkah terakhir pada ${viewport.name}`, async () => {
+    const context = await browser.newContext({ viewport });
+    const page = await context.newPage();
+    const devtools = await context.newCDPSession(page);
+    await devtools.send("Network.setCacheDisabled", { cacheDisabled: true });
+    const pageErrors = [];
+    page.on("pageerror", (error) => pageErrors.push(error.message));
+    let verified = false;
+    await page.route(/https:\/\/fonts\.(?:googleapis|gstatic)\.com\//, (route) => route.abort());
+    await page.route("**/api/config", (route) => route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({ recaptcha: { enabled: false } }),
+    }));
+    await page.route("**/api/auth/pending-signup", (route) => route.fulfill({
+      status: 401,
+      contentType: "application/json",
+      body: JSON.stringify({ pending: false }),
+    }));
+    await page.route("**/api/auth/signup", (route) => route.fulfill({
+      status: 202,
+      contentType: "application/json",
+      body: JSON.stringify({
+        verificationRequired: true,
+        resuming: true,
+        email: "owner@dealer.test",
+        expiresInSeconds: 86400,
+        resendAfterSeconds: 60,
+      }),
+    }));
+    await page.route("**/api/auth/me", (route) => verified
+      ? route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          authenticated: true,
+          user: { id: "owner-resume", email: "owner@dealer.test", emailVerified: true, fullName: "Owner Dealer", provider: "password" },
+          profile: {
+            business_name: "Dealer Demo",
+            workspace_slug: "dealer-demo",
+            branch_count: "1",
+            region: "Jakarta",
+            industry: "automotive",
+            description: "Dealer tersimpan",
+            modules: ["ims", "omni"],
+            goal: "response",
+            tenant_id: null,
+            completed_at: null,
+          },
+          workspaces: [],
+        }),
+      })
+      : route.fulfill({ status: 401, contentType: "application/json", body: JSON.stringify({ authenticated: false }) }));
+
+    await page.goto(`${baseUrl}/onboarding.html`, { waitUntil: "load" });
+    await page.fill('[data-auth-form="signup"] input[name="fullName"]', "Owner Dealer");
+    await page.fill('[data-auth-form="signup"] input[name="email"]', "owner@dealer.test");
+    await page.fill('[data-auth-form="signup"] input[name="password"]', "rahasia123");
+    await page.fill('[data-auth-form="signup"] input[name="passwordConfirm"]', "rahasia123");
+    await page.click('[data-auth-form="signup"] button[type="submit"]');
+    await page.waitForSelector('[data-verification-panel]:not([hidden])');
+
+    verified = true;
+    await page.click("[data-verification-check]");
+    await page.waitForSelector('[data-step="3"].is-active');
+
+    assert.equal(await page.locator('[data-step="2"]').isHidden(), true);
+    assert.equal(await page.inputValue('[data-business-form] input[name="businessName"]'), "Dealer Demo");
+    assert.equal(await page.locator('input[name="modules"][value="ims"]').isChecked(), true);
+    assert.equal(await page.locator('input[name="modules"][value="social"]').isChecked(), false);
+    assert.equal(await noOverflow(page), true);
+    assert.deepEqual(pageErrors, []);
+    await page.screenshot({ path: `/tmp/motovax-onboarding-resume-${viewport.name}.png`, fullPage: false });
+    await context.close();
+  });
+}
+
 for (const viewport of viewports) {
   test(`onboarding dealer mandiri responsif pada ${viewport.name}`, async () => {
     const context = await browser.newContext({ viewport });

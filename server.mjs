@@ -1082,6 +1082,15 @@ export async function createPostgresStore(connectionString) {
       return Number(result.rows[0]?.retry_after_seconds || 0);
     },
 
+    async invalidateActionTokens({ userId, actionTypes }) {
+      await pool.query(
+        `UPDATE onboarding_action_tokens
+         SET used_at = COALESCE(used_at, NOW())
+         WHERE user_id = $1 AND action_type = ANY($2::text[]) AND used_at IS NULL`,
+        [userId, actionTypes],
+      );
+    },
+
     async deletePendingPasswordUser(userId) {
       const result = await pool.query(
         `DELETE FROM onboarding_users u
@@ -1120,7 +1129,9 @@ export async function createPostgresStore(connectionString) {
           await client.query(
             `UPDATE onboarding_action_tokens
              SET used_at = COALESCE(used_at, NOW())
-             WHERE user_id = $1 AND action_type = 'pending_signup' AND used_at IS NULL`,
+             WHERE user_id = $1
+               AND action_type IN ('pending_signup', 'pending_signup_resume')
+               AND used_at IS NULL`,
             [userId],
           );
         }
@@ -1828,11 +1839,11 @@ export function createApp({
     });
   }
 
-  async function issuePendingSignup(res, userId) {
+  async function issuePendingSignup(res, userId, { resume = false } = {}) {
     const pendingToken = randomToken(32);
     await store.saveActionToken({
       userId,
-      actionType: "pending_signup",
+      actionType: resume ? "pending_signup_resume" : "pending_signup",
       digest: tokenDigest(pendingToken, config.sessionSecret),
       expiresAt: new Date(Date.now() + EMAIL_VERIFICATION_TTL_MS),
     });
@@ -1845,16 +1856,19 @@ export function createApp({
     });
   }
 
-  async function pendingSignupUser(req) {
+  async function pendingSignupContext(req) {
     if (!store?.findActionToken || !store?.findPasswordUserById || !config.sessionSecret) return null;
     const requestCookies = parseCookies(req.headers.cookie);
     const pendingToken = requestCookies[cookies.pendingSignup];
     if (!pendingToken) return null;
-    const userId = await store.findActionToken({
-      digest: tokenDigest(pendingToken, config.sessionSecret),
-      actionType: "pending_signup",
-    });
-    return userId ? store.findPasswordUserById(userId) : null;
+    const digest = tokenDigest(pendingToken, config.sessionSecret);
+    for (const actionType of ["pending_signup", "pending_signup_resume"]) {
+      const userId = await store.findActionToken({ digest, actionType });
+      if (!userId) continue;
+      const user = await store.findPasswordUserById(userId);
+      return user ? { user, resume: actionType === "pending_signup_resume" } : null;
+    }
+    return null;
   }
 
   async function verificationResendDelay(userId) {
@@ -2203,13 +2217,42 @@ export function createApp({
         return res.status(400).json({ error: "weak_password", message: "Password minimal 8 karakter dan harus berisi huruf serta angka." });
       }
       const signedInUser = await authenticatedUser(req);
+      const existingUser = await store.findPasswordUser?.(email);
+      let resumeState = null;
+      let resuming = false;
+      let authenticatedUserId = signedInUser?.id || "";
+      if (existingUser?.email_verified && existingUser.id !== authenticatedUserId) {
+        resumeState = await store.getAccountState(existingUser.id);
+        const onboardingFinished = Boolean(
+          resumeState?.profile?.completed_at
+          || (Array.isArray(resumeState?.workspaces) && resumeState.workspaces.length > 0),
+        );
+        if (onboardingFinished) {
+          const conflict = new Error("Akun dengan email tersebut sudah terdaftar.");
+          conflict.code = "account_exists";
+          throw conflict;
+        }
+        const passwordMatches = existingUser.password_hash
+          ? await verifyPassword(password, existingUser.password_hash)
+          : false;
+        if (!passwordMatches) {
+          return res.status(401).json({
+            error: "invalid_credentials",
+            message: "Email ini memiliki onboarding yang belum selesai. Gunakan password pendaftaran sebelumnya atau atur ulang password.",
+          });
+        }
+        // Password yang benar membuktikan kredensial lama, tetapi sesi tetap baru
+        // diterbitkan setelah pemilik email mengklik link verifikasi terbaru.
+        authenticatedUserId = existingUser.id;
+        resuming = true;
+      }
       const user = await store.createPasswordUser({
         email,
         fullName,
         passwordHash: await hashPassword(password),
-        authenticatedUserId: signedInUser?.id || "",
+        authenticatedUserId,
       });
-      if (user.email_verified) {
+      if (user.email_verified && !resuming) {
         const state = await store.getAccountState(user.id);
         return res.json({
           authenticated: true,
@@ -2225,9 +2268,10 @@ export function createApp({
         pathName: "/api/auth/verify-email",
         copy: "Verifikasi alamat email Anda untuk melanjutkan pembuatan workspace MOTOVAX.",
       });
-      await issuePendingSignup(res, user.id);
+      await issuePendingSignup(res, user.id, { resume: resuming });
       return res.status(202).json({
         verificationRequired: true,
+        resuming,
         email: user.email,
         expiresInSeconds: EMAIL_VERIFICATION_TTL_MS / 1000,
         resendAfterSeconds: EMAIL_VERIFICATION_RESEND_COOLDOWN_SECONDS,
@@ -2242,15 +2286,16 @@ export function createApp({
 
   app.get("/api/auth/pending-signup", async (req, res, next) => {
     try {
-      const user = await pendingSignupUser(req);
-      if (!user || user.email_verified) {
+      const pending = await pendingSignupContext(req);
+      if (!pending || (pending.user.email_verified && !pending.resume)) {
         clearPendingSignupCookie(res);
         return res.status(401).json({ pending: false });
       }
       return res.json({
         pending: true,
-        email: user.email,
-        resendAfterSeconds: await verificationResendDelay(user.id),
+        resuming: pending.resume,
+        email: pending.user.email,
+        resendAfterSeconds: await verificationResendDelay(pending.user.id),
         expiresInSeconds: EMAIL_VERIFICATION_TTL_MS / 1000,
       });
     } catch (error) {
@@ -2261,9 +2306,10 @@ export function createApp({
   app.post("/api/auth/resend-verification", async (req, res, next) => {
     try {
       if (!assertSameOrigin(req, res) || !checkAuthRateLimit(req, res)) return;
-      const user = await pendingSignupUser(req);
-      if (!user) return res.status(401).json({ error: "pending_signup_required", message: "Sesi pendaftaran tidak ditemukan. Silakan daftar kembali." });
-      if (user.email_verified) {
+      const pending = await pendingSignupContext(req);
+      if (!pending) return res.status(401).json({ error: "pending_signup_required", message: "Sesi pendaftaran tidak ditemukan. Silakan daftar kembali." });
+      const { user } = pending;
+      if (user.email_verified && !pending.resume) {
         clearPendingSignupCookie(res);
         return res.status(409).json({ error: "already_verified", message: "Email sudah diverifikasi. Silakan lanjutkan onboarding." });
       }
@@ -2285,6 +2331,7 @@ export function createApp({
       });
       return res.status(202).json({
         sent: true,
+        resuming: pending.resume,
         email: user.email,
         resendAfterSeconds: EMAIL_VERIFICATION_RESEND_COOLDOWN_SECONDS,
         expiresInSeconds: EMAIL_VERIFICATION_TTL_MS / 1000,
@@ -2298,8 +2345,17 @@ export function createApp({
   app.delete("/api/auth/pending-signup", async (req, res, next) => {
     try {
       if (!assertSameOrigin(req, res) || !checkAuthRateLimit(req, res)) return;
-      const user = await pendingSignupUser(req);
-      if (!user) {
+      const pending = await pendingSignupContext(req);
+      if (!pending) {
+        clearPendingSignupCookie(res);
+        return res.status(204).end();
+      }
+      const { user } = pending;
+      if (pending.resume) {
+        await store.invalidateActionTokens?.({
+          userId: user.id,
+          actionTypes: ["pending_signup_resume", "verify_email"],
+        });
         clearPendingSignupCookie(res);
         return res.status(204).end();
       }
@@ -2730,9 +2786,14 @@ export function createApp({
       if (portalSessionToken && store?.revokePortalSession && config.sessionSecret) {
         await store.revokePortalSession(tokenDigest(portalSessionToken, config.sessionSecret));
       }
-      const pendingUser = await pendingSignupUser(req);
-      if (pendingUser && !pendingUser.email_verified && store?.deletePendingPasswordUser) {
-        await store.deletePendingPasswordUser(pendingUser.id);
+      const pending = await pendingSignupContext(req);
+      if (pending?.resume) {
+        await store.invalidateActionTokens?.({
+          userId: pending.user.id,
+          actionTypes: ["pending_signup_resume", "verify_email"],
+        });
+      } else if (pending?.user && !pending.user.email_verified && store?.deletePendingPasswordUser) {
+        await store.deletePendingPasswordUser(pending.user.id);
       }
       res.clearCookie(cookies.session, {
         httpOnly: true,
