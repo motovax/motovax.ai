@@ -527,6 +527,89 @@ test("loader verifikasi keamanan memakai endpoint recaptcha.net", async () => {
   assert.equal(scriptUrl.hostname, "www.recaptcha.net");
   assert.equal(scriptUrl.pathname, "/recaptcha/enterprise.js");
   assert.equal(scriptUrl.searchParams.get("render"), "test-site-key");
+  assert.equal(await page.locator("[data-recaptcha-status]").getAttribute("data-state"), "ready");
+  assert.match(await page.locator("[data-recaptcha-status-copy]").textContent(), /otomatis tanpa checkbox/i);
+  await context.close();
+});
+
+test("token reCAPTCHA invalid diperbarui satu kali sebelum setup dinyatakan gagal", async () => {
+  const context = await browser.newContext({ viewport: { width: 1366, height: 768 } });
+  await context.addInitScript(() => {
+    let tokenSequence = 0;
+    window.grecaptcha = {
+      enterprise: {
+        ready(callback) { callback(); },
+        execute() {
+          tokenSequence += 1;
+          return Promise.resolve(`recaptcha-token-${tokenSequence}`);
+        },
+      },
+    };
+    localStorage.setItem("motovax_onboarding_v1", JSON.stringify({
+      step: 3,
+      authMode: "signup",
+      account: { fullName: "Owner Dealer", email: "owner@dealer.test", provider: "password" },
+      business: { businessName: "Dealer Firefox", workspaceSlug: "dealer-firefox", branchCount: "", region: "", industry: "automotive", description: "" },
+      modules: ["ims", "omni", "crm"],
+      goal: "conversion",
+      completed: false,
+      workspace: null,
+    }));
+  });
+  const page = await context.newPage();
+  const submittedTokens = [];
+  await page.route(/https:\/\/fonts\.(?:googleapis|gstatic)\.com\//, (route) => route.abort());
+  await page.route("**/api/config", (route) => route.fulfill({
+    status: 200,
+    contentType: "application/json",
+    body: JSON.stringify({ recaptcha: { enabled: true, siteKey: "test", action: "complete_onboarding" } }),
+  }));
+  await page.route("**/api/auth/me", (route) => route.fulfill({
+    status: 200,
+    contentType: "application/json",
+    body: JSON.stringify({
+      authenticated: true,
+      user: { id: "owner-firefox", email: "owner@dealer.test", fullName: "Owner Dealer", provider: "password" },
+      profile: { business_name: "Dealer Firefox", workspace_slug: "dealer-firefox", branch_count: "", region: "", description: "", modules: ["ims", "omni", "crm"], goal: "conversion" },
+      workspaces: [],
+    }),
+  }));
+  await page.route("**/api/onboarding/profile", (route) => route.fulfill({
+    status: 200,
+    contentType: "application/json",
+    body: JSON.stringify({ profile: route.request().postDataJSON() }),
+  }));
+  await page.route("**/api/onboarding/complete", (route) => {
+    submittedTokens.push(route.request().postDataJSON().recaptchaToken);
+    if (submittedTokens.length === 1) {
+      return route.fulfill({
+        status: 400,
+        contentType: "application/json",
+        body: JSON.stringify({ error: "recaptcha_invalid", message: "Verifikasi keamanan tidak valid." }),
+      });
+    }
+    return route.fulfill({
+      status: 202,
+      contentType: "application/json",
+      body: JSON.stringify({
+        workspace: {
+          id: "tenant-firefox",
+          name: "Dealer Firefox",
+          domain: "dealer-firefox.motovax.com",
+          ready: false,
+        },
+      }),
+    });
+  });
+
+  await page.goto(`${baseUrl}/onboarding.html`, { waitUntil: "load" });
+  await page.waitForSelector('[data-step="3"].is-active');
+  assert.match(await page.locator("[data-recaptcha-status-copy]").textContent(), /otomatis tanpa checkbox/i);
+  await page.click('[data-modules-form] button[type="submit"]');
+  await page.waitForSelector('[data-step="4"].is-active');
+  assert.deepEqual(submittedTokens, ["recaptcha-token-1", "recaptcha-token-2"]);
+  assert.equal(await page.locator('[data-modules-form] [data-form-error]').isHidden(), true);
+  assert.equal(await noOverflow(page), true);
   await context.close();
 });
 
