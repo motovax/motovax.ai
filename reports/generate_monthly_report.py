@@ -213,7 +213,7 @@ def page4(c):
         [p("Area", CELL_WHITE), p("Status", CELL_WHITE), p("Capability saat ini", CELL_WHITE), p("Dependency / support", CELL_WHITE)],
         [p("LMS / CRM", CELL_BOLD), p("LIVE", CELL_BOLD), p("Pipeline, lead journey, follow-up/campaign, analytics dan distribusi"), p("Kualitas data lead, mapping source, disiplin operasional MR")],
         [p("Jasmine AI", CELL_BOLD), p("LIVE", CELL_BOLD), p("AI sales consultant, inventory shortlist, detail unit, kredit, booking/handoff"), p("Nomor/channel aktif, policy respons, daftar PIC dan eskalasi")],
-        [p("Falcone AI", CELL_BOLD), p("LIVE", CELL_BOLD), p("Inventory ops, content, simulasi kredit, TNS/GP, dan financial analysis"), p("Full accounting berada di luar scope saat ini")],
+        [p("Falcone AI", CELL_BOLD), p("LIVE", CELL_BOLD), p("Inventory ops, content, simulasi kredit, TNS/GP, dan financial analysis"), p("Hitungan kredit: API DSF; AI hanya interface jawaban, bukan mesin kalkulasi")],
         [p("Omnichannel Call Center", CELL_BOLD), p("LIVE / ALIGN", CELL_BOLD), p("Unified inbox WhatsApp, Instagram DM, Messenger; takeover dan MR handoff"), p("Penyatuan master data Omnichannel–MR; kebutuhan report DSSM, PIC Mbak Cat")],
         [p("Analytics", CELL_BOLD), p("LIVE", CELL_BOLD), p("Lead distribution, conversion cohort, inventory dan performa cabang"), p("Konsistensi master cabang dan source mapping")],
     ]
@@ -222,7 +222,7 @@ def page4(c):
     ])
     c.setFillColor(LIGHT); c.roundRect(x0, 18*mm, (W-36*mm)/2, 39*mm, 2*mm, 0, 1)
     c.setFillColor(INK); c.setFont("Helvetica-Bold", 9); c.drawString(x0+5*mm, 48*mm, "Support yang dibutuhkan dari DSSM / Mobix")
-    draw_paragraph(c, "• Finalisasi struktur satu master data Omnichannel dan MR.<br/>• Konfirmasi field, format, dan kebutuhan report bersama Mbak Cat.<br/>• Menjaga master data cabang, inventory, dan lead source.<br/>• Memastikan akses Meta Business dan nomor WhatsApp tetap sehat.", BODY, x0+5*mm, 23*mm, (W-36*mm)/2-10*mm, 24*mm)
+    draw_paragraph(c, "• Finalisasi struktur satu master data Omnichannel dan MR.<br/>• Konfirmasi field, format, dan kebutuhan report bersama Mbak Cat.<br/>• Menjaga akses/kredensial dan availability API DSF untuk hitungan kredit.<br/>• Memastikan akses Meta Business dan nomor WhatsApp tetap sehat.", BODY, x0+5*mm, 23*mm, (W-36*mm)/2-10*mm, 24*mm)
     rx = W/2+2*mm
     c.setFillColor(colors.HexColor("#FFF7E6")); c.roundRect(rx, 18*mm, W-16*mm-rx, 39*mm, 2*mm, 0, 1)
     c.setFillColor(AMBER); c.setFont("Helvetica-Bold", 9); c.drawString(rx+5*mm, 48*mm, "Attention")
@@ -246,6 +246,7 @@ def page5(c):
     risk = [
         [p("Risk", CELL_WHITE), p("Likelihood", CELL_WHITE), p("Impact", CELL_WHITE), p("Mitigasi / keputusan management", CELL_WHITE)],
         [p("Dependency Meta/WhatsApp & session health", CELL_BOLD), p("Medium"), p("High"), p("Tetapkan PIC incident, SLA, dan jalur eskalasi channel")],
+        [p("Availability / perubahan kontrak API DSF", CELL_BOLD), p("Medium"), p("High"), p("Monitoring, fallback error, owner kredensial, dan koordinasi perubahan API")],
         [p("Kualitas master data lintas cabang", CELL_BOLD), p("Medium"), p("High"), p("Owner data per cabang + cadence audit")],
         [p("Definisi master data/report belum final", CELL_BOLD), p("High"), p("Medium"), p("Putuskan field, owner, dan acceptance bersama PIC DSSM")],
         [p("Akses dan approval akun TikTok DSSM", CELL_BOLD), p("Medium"), p("Medium"), p("Tetapkan owner akun, akses developer, dan jadwal UAT channel")],

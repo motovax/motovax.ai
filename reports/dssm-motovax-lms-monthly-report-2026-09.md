@@ -23,7 +23,7 @@ Per 3 September 2026, seluruh 12 workstream capability DSSM × Motovax LMS telah
 
 **Rekap:** total 12, completed 12, on progress 0, pending 0, progress 100%.
 
-Financial Analysis Falcone AI dinyatakan completed: simulasi kredit, kalkulasi TNS/GP, dan analisis performa keuangan tersedia. General ledger, AR/AP, rekonsiliasi bank, payroll, dan full accounting berada di luar scope saat ini.
+Financial Analysis Falcone AI dinyatakan completed: simulasi kredit, kalkulasi TNS/GP, dan analisis performa keuangan tersedia. **Hitungan kredit bergantung pada API DSF (Dipo Star Finance); AI bukan dependency kalkulasi dan hanya menjadi antarmuka untuk menyampaikan hasil.** “Mocil Plus” adalah nama paket pembiayaan pada request DSF. General ledger, AR/AP, rekonsiliasi bank, payroll, dan full accounting berada di luar scope saat ini.
 
 ## 2. Kendala dan fixing progress
 
@@ -55,11 +55,11 @@ Tidak ada kendala critical aktif. Highlight critical selama periode ini adalah o
 |---|---|---|---|
 | LMS / CRM | Live | Pipeline, lead journey, follow-up/campaign, analytics, distribusi | Kualitas data lead, mapping source, disiplin operasional MR |
 | Jasmine AI | Live | Konsultasi sales, shortlist/detail unit, simulasi kredit, booking/handoff | Channel aktif, policy respons, PIC eskalasi |
-| Falcone AI | Live | Inventory ops, content, simulasi kredit, TNS/GP, dan financial analysis | Full accounting berada di luar scope saat ini |
+| Falcone AI | Live | Inventory ops, content, simulasi kredit, TNS/GP, dan financial analysis | Hitungan kredit bergantung pada API DSF; AI hanya interface jawaban, bukan mesin kalkulasi |
 | Omnichannel Call Center | Live; data alignment on progress | Unified inbox WhatsApp, Instagram DM, Messenger; takeover dan handoff MR | Penyatuan master data Omnichannel–MR dan kebutuhan report DSSM; PIC Mbak Cat |
 | Analytics | Live | Distribusi lead, conversion cohort, inventory dan performa cabang | Konsistensi master cabang dan source mapping |
 
-Support DSSM/Mobix yang dibutuhkan: finalisasi struktur satu master data Omnichannel–MR; konfirmasi field, format, dan acceptance report bersama Mbak Cat; menjaga master data cabang/inventory/lead source; serta memastikan akses Meta dan nomor WhatsApp sehat.
+Support DSSM/Mobix yang dibutuhkan: finalisasi struktur satu master data Omnichannel–MR; konfirmasi field, format, dan acceptance report bersama Mbak Cat; menjaga akses/kredensial dan availability API DSF; serta memastikan akses Meta dan nomor WhatsApp sehat.
 
 ## 4. Future plan
 
@@ -74,6 +74,7 @@ Support DSSM/Mobix yang dibutuhkan: finalisasi struktur satu master data Omnicha
 ## 5. Risk & management attention
 
 - Dependency Meta/WhatsApp dan session health dapat memengaruhi availability. Tetapkan PIC incident, SLA, dan jalur eskalasi.
+- Availability atau perubahan kontrak API DSF dapat memengaruhi hasil simulasi kredit. Siapkan monitoring, penanganan error yang jelas, owner kredensial, dan koordinasi perubahan API.
 - Kualitas master data lintas cabang dapat memengaruhi analytics serta rekomendasi AI. Tetapkan data owner per cabang dan cadence audit.
 - Definisi satu master data dan format report belum final. Timeline bergantung pada kesepakatan field, owner, dan acceptance bersama PIC DSSM.
 - Rollout TikTok bergantung pada owner akun, akses developer/permission, dan jadwal UAT channel dari DSSM.
