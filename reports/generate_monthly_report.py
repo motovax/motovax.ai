@@ -157,39 +157,52 @@ def page2(c):
     c.setFillColor(GREEN); c.roundRect(x0, bar_y, W - 32 * mm, 7 * mm, 3.5 * mm, 0, 1)
 
     data = [
-        [p("Scope", CELL_WHITE), p("Workstream", CELL_WHITE), p("Completed", CELL_WHITE), p("On progress", CELL_WHITE), p("Progress", CELL_WHITE), p("Status utama", CELL_WHITE)],
-        [p("Leads Management System", CELL_BOLD), p("4"), p("4"), p("0"), p("100%", CELL_BOLD), p("Pipeline, capture, follow-up, analytics tersedia")],
-        [p("Jasmine AI", CELL_BOLD), p("2"), p("2"), p("0"), p("100%", CELL_BOLD), p("AI sales consultant + channel customer live")],
-        [p("Falcone AI", CELL_BOLD), p("3"), p("3"), p("0"), p("100%", CELL_BOLD), p("Inventory, financial analysis, dan content live")],
-        [p("Omnichannel Call Center", CELL_BOLD), p("3"), p("3"), p("0"), p("100%", CELL_BOLD), p("Unified inbox WA, Instagram DM, Messenger live")],
-        [p("TOTAL", CELL_BOLD), p("12", CELL_BOLD), p("12", CELL_BOLD), p("0", CELL_BOLD), p("100%", CELL_BOLD), p("Tidak ada item Not Started")],
+        [p("No.", CELL_WHITE), p("Scope", CELL_WHITE), p("Workstream capability", CELL_WHITE), p("Status", CELL_WHITE)],
+        [p("1"), p("Leads Management System", CELL_BOLD), p("Pipeline lead"), p("COMPLETED", CELL_BOLD)],
+        [p("2"), p("Leads Management System", CELL_BOLD), p("Auto capture lead"), p("COMPLETED", CELL_BOLD)],
+        [p("3"), p("Leads Management System", CELL_BOLD), p("Follow-up lead"), p("COMPLETED", CELL_BOLD)],
+        [p("4"), p("Leads Management System", CELL_BOLD), p("Analytics lead"), p("COMPLETED", CELL_BOLD)],
+        [p("5"), p("Jasmine AI", CELL_BOLD), p("AI Sales Consultant"), p("COMPLETED", CELL_BOLD)],
+        [p("6"), p("Jasmine AI", CELL_BOLD), p("Operasional channel customer: WhatsApp, Instagram, Facebook"), p("COMPLETED", CELL_BOLD)],
+        [p("7"), p("Falcone AI", CELL_BOLD), p("Inventory operations"), p("COMPLETED", CELL_BOLD)],
+        [p("8"), p("Falcone AI", CELL_BOLD), p("Financial Analysis: simulasi kredit, TNS/GP, analisis performa"), p("COMPLETED", CELL_BOLD)],
+        [p("9"), p("Falcone AI", CELL_BOLD), p("Content operations"), p("COMPLETED", CELL_BOLD)],
+        [p("10"), p("Omnichannel Call Center", CELL_BOLD), p("WhatsApp unified inbox"), p("COMPLETED", CELL_BOLD)],
+        [p("11"), p("Omnichannel Call Center", CELL_BOLD), p("Instagram DM unified inbox"), p("COMPLETED", CELL_BOLD)],
+        [p("12"), p("Omnichannel Call Center", CELL_BOLD), p("Facebook Messenger unified inbox"), p("COMPLETED", CELL_BOLD)],
     ]
-    draw_table(c, data, x0, H - 104 * mm, [48*mm, 22*mm, 27*mm, 30*mm, 25*mm, 105*mm], extra=[("BACKGROUND", (0, -1), (-1, -1), colors.HexColor("#EAF2FF"))])
-    c.setFillColor(LIGHT); c.roundRect(x0, 16 * mm, W - 32 * mm, 18 * mm, 2 * mm, 0, 1)
-    draw_paragraph(c, "<b>Executive takeaway:</b> seluruh scope capability telah operasional. Full accounting (GL, AR/AP, rekonsiliasi bank, payroll) tidak termasuk scope Financial Analysis. Fokus berjalan adalah kualitas parsing dan penyelarasan master data lintas fungsi.", BODY, x0 + 5*mm, 20*mm, W - 42*mm, 12*mm)
+    draw_table(c, data, x0, H - 101 * mm, [14*mm, 66*mm, 142*mm, 35*mm], extra=[("TEXTCOLOR", (-1, 1), (-1, -1), GREEN)])
 
 
 def page3(c):
     header(c, 3, "Issue & Fixing")
-    title(c, "Report Kendala & Fixing Progress", "Snapshot kendala terbaru yang disampaikan untuk monthly meeting DSSM.")
+    title(c, "Report Kendala & Fixing Progress", "Periode 3 Agustus–3 September 2026; task teknis terkait dikelompokkan agar tidak dihitung ganda.")
     x0 = 16 * mm
     gap, boxw = 5 * mm, (W - 32 * mm - 3 * 5 * mm) / 4
     for i, item in enumerate([
-        ("Total kendala", "2", NAVY, "item"),
-        ("Resolved", "1", GREEN, "hari ini"),
+        ("Total kendala", "10", NAVY, "cluster"),
+        ("Resolved", "9", GREEN, "90%"),
         ("On progress", "1", AMBER, "alignment"),
         ("Pending", "0", MUTED, "open"),
     ]):
         metric(c, x0 + i * (boxw + gap), H - 72 * mm, boxw, *item)
     data = [
-        [p("Issue cluster", CELL_WHITE), p("Dampak", CELL_WHITE), p("Fix / evidence changelog", CELL_WHITE), p("Status", CELL_WHITE)],
-        [p("Parsing Excel inventory", CELL_BOLD), p("Sebagian field unit salah diparsing saat import"), p("Minor bug parsing telah diperbaiki pada 3 September 2026; dilanjutkan regression check"), p("RESOLVED", CELL_BOLD)],
-        [p("Master data Omnichannel & MR", CELL_BOLD), p("Data Omnichannel dan Marketing Representative belum mengambil satu master data"), p("Struktur data dan output report masih disesuaikan dengan kebutuhan tim DSSM; PIC: Mbak Cat"), p("ON PROGRESS", CELL_BOLD)],
+        [p("Issue cluster", CELL_WHITE), p("Fixing progress / kondisi saat ini", CELL_WHITE), p("Status", CELL_WHITE)],
+        [p("Outage / deploy production", CELL_BOLD), p("Layanan dipulihkan dan deployment diverifikasi"), p("RESOLVED", CELL_BOLD)],
+        [p("Koneksi Meta Business / WhatsApp", CELL_BOLD), p("Stream recovery, reconnect guard, dan perbaikan false alert tersedia"), p("RESOLVED", CELL_BOLD)],
+        [p("Routing Jasmine AI–Agent–MR", CELL_BOLD), p("Ownership, takeover, handoff, dan pending action diperbaiki"), p("RESOLVED", CELL_BOLD)],
+        [p("Upload, antrean, dan merge foto Falcon", CELL_BOLD), p("Durable queue, validasi attachment, deduplikasi, dan monitoring tersedia"), p("RESOLVED", CELL_BOLD)],
+        [p("Parsing / import Excel dan identitas unit", CELL_BOLD), p("Warning, duplikasi, identity mismatch, dan minor parsing diperbaiki; regression check berjalan"), p("RESOLVED", CELL_BOLD)],
+        [p("Pemetaan lead, Direct Chat, cabang, funnel", CELL_BOLD), p("Mapping sumber/cabang dan drilldown report diperbaiki"), p("RESOLVED", CELL_BOLD)],
+        [p("Sinkronisasi dan alur TikTok DM", CELL_BOLD), p("Listener, request flow, identitas kontak, dan inbox dasar tersedia"), p("RESOLVED", CELL_BOLD)],
+        [p("Permission role internal dan MR", CELL_BOLD), p("Akses report/channel dan role MR diselaraskan"), p("RESOLVED", CELL_BOLD)],
+        [p("Harga, TNS/GP, MRP, stok, data unit", CELL_BOLD), p("Kalkulasi, penyimpanan, dan normalisasi data diperbaiki"), p("RESOLVED", CELL_BOLD)],
+        [p("Master data Omnichannel & MR", CELL_BOLD), p("Belum satu sumber; field dan report disesuaikan bersama PIC DSSM Mbak Cat"), p("ON PROGRESS", CELL_BOLD)],
     ]
-    draw_table(c, data, x0, H - 91 * mm, [54*mm, 52*mm, 116*mm, 35*mm], extra=[("TEXTCOLOR", (-1, 1), (-1, 1), GREEN), ("TEXTCOLOR", (-1, 2), (-1, 2), AMBER)])
+    draw_table(c, data, x0, H - 91 * mm, [77*mm, 145*mm, 35*mm], extra=[("TEXTCOLOR", (-1, 1), (-1, 9), GREEN), ("TEXTCOLOR", (-1, 10), (-1, 10), AMBER)])
     c.setFillColor(colors.HexColor("#ECFDF3")); c.roundRect(x0, 16*mm, W-32*mm, 22*mm, 2*mm, 0, 1)
     c.setFillColor(GREEN); c.setFont("Helvetica-Bold", 8); c.drawString(x0+5*mm, 30*mm, "CRITICAL HIGHLIGHT")
-    c.setFillColor(INK); c.setFont("Helvetica", 8); c.drawString(x0+5*mm, 22*mm, "Tidak ada critical issue terbuka. Perhatian utama adalah kesepakatan satu master data dan definisi report bersama PIC DSSM agar timeline tidak bergeser.")
+    c.setFillColor(INK); c.setFont("Helvetica", 8); c.drawString(x0+5*mm, 22*mm, "Critical aktif: 0. Highlight bulan ini: outage production, stream Meta, dan reliabilitas foto Falcon telah resolved; master data Omnichannel–MR perlu perhatian.")
 
 
 def page4(c):

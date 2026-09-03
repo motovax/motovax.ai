@@ -6,13 +6,22 @@ Per 3 September 2026, seluruh 12 workstream capability DSSM × Motovax LMS telah
 
 ## 1. Progress task
 
-| Scope | Total | Completed | On progress | Pending | Progress |
-|---|---:|---:|---:|---:|---:|
-| Leads Management System: pipeline, auto capture, follow-up, analytics | 4 | 4 | 0 | 0 | 100% |
-| Jasmine AI: AI Sales Consultant dan channel customer | 2 | 2 | 0 | 0 | 100% |
-| Falcone AI: inventory, financial analysis, content | 3 | 3 | 0 | 0 | 100% |
-| Omnichannel Call Center: WhatsApp, Instagram DM, Facebook Messenger | 3 | 3 | 0 | 0 | 100% |
-| **Total** | **12** | **12** | **0** | **0** | **100%** |
+| No. | Scope | Workstream capability | Status |
+|---:|---|---|---|
+| 1 | Leads Management System | Pipeline lead | Completed |
+| 2 | Leads Management System | Auto capture lead | Completed |
+| 3 | Leads Management System | Follow-up lead | Completed |
+| 4 | Leads Management System | Analytics lead | Completed |
+| 5 | Jasmine AI | AI Sales Consultant | Completed |
+| 6 | Jasmine AI | Operasional channel customer: WhatsApp, Instagram, Facebook | Completed |
+| 7 | Falcone AI | Inventory operations | Completed |
+| 8 | Falcone AI | Financial Analysis: simulasi kredit, TNS/GP, analisis performa | Completed |
+| 9 | Falcone AI | Content operations | Completed |
+| 10 | Omnichannel Call Center | WhatsApp unified inbox | Completed |
+| 11 | Omnichannel Call Center | Instagram DM unified inbox | Completed |
+| 12 | Omnichannel Call Center | Facebook Messenger unified inbox | Completed |
+
+**Rekap:** total 12, completed 12, on progress 0, pending 0, progress 100%.
 
 Financial Analysis Falcone AI dinyatakan completed: simulasi kredit, kalkulasi TNS/GP, dan analisis performa keuangan tersedia. General ledger, AR/AP, rekonsiliasi bank, payroll, dan full accounting berada di luar scope saat ini.
 
@@ -20,15 +29,25 @@ Financial Analysis Falcone AI dinyatakan completed: simulasi kredit, kalkulasi T
 
 | Status | Jumlah |
 |---|---:|
-| Total kendala | 2 |
-| Resolved | 1 |
+| Total kendala | 10 cluster |
+| Resolved | 9 |
 | On progress | 1 |
 | Pending | 0 |
 
-- **Resolved:** minor bug parsing Excel yang menyebabkan sebagian field unit salah diparsing telah diperbaiki pada 3 September 2026. Regression check tetap dilanjutkan.
-- **On progress:** data Omnichannel dan Marketing Representative belum mengambil satu master data. Struktur data dan output report masih disesuaikan dengan kebutuhan tim DSSM; PIC DSSM: **Mbak Cat**.
+| Cluster kendala | Fixing progress | Status |
+|---|---|---|
+| Outage/deploy production | Layanan dipulihkan dan deployment diverifikasi | Resolved |
+| Koneksi Meta Business/WhatsApp | Stream recovery, reconnect guard, dan perbaikan false alert tersedia | Resolved |
+| Routing Jasmine AI–Agent–MR | Ownership, takeover, handoff, dan pending action diperbaiki | Resolved |
+| Upload, antrean, dan merge foto Falcon | Durable queue, validasi attachment, deduplikasi, dan monitoring tersedia | Resolved |
+| Parsing/import Excel dan identitas unit | Warning, duplikasi, identity mismatch, dan minor parsing diperbaiki; regression check berjalan | Resolved |
+| Pemetaan lead, Direct Chat, cabang, dan funnel | Mapping sumber/cabang serta drilldown report diperbaiki | Resolved |
+| Sinkronisasi dan alur TikTok DM | Listener, request flow, identitas kontak, dan inbox dasar tersedia | Resolved |
+| Permission role internal dan MR | Akses report/channel dan role MR diselaraskan | Resolved |
+| Harga, TNS/GP, MRP, stok, dan data unit | Kalkulasi, penyimpanan, dan normalisasi data diperbaiki | Resolved |
+| Master data Omnichannel dan MR | Belum satu sumber; field dan report disesuaikan bersama PIC DSSM Mbak Cat | On progress |
 
-Tidak ada kendala critical terbuka pada snapshot ini.
+Tidak ada kendala critical aktif. Highlight critical selama periode ini adalah outage production, putusnya stream Meta, dan reliabilitas foto Falcon; ketiganya sudah resolved.
 
 ## 3. System / integration status
 
