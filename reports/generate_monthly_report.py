@@ -9,7 +9,8 @@ from reportlab.pdfgen.canvas import Canvas
 from reportlab.platypus import Paragraph, Table, TableStyle
 
 
-OUT = Path(__file__).with_name("motovax-monthly-progress-report-2026-08.pdf")
+OUT = Path(__file__).with_name("dssm-motovax-lms-monthly-report-2026-09.pdf")
+REPORT_DATE = "3 September 2026"
 PAGE = landscape(A4)
 W, H = PAGE
 BLUE = colors.HexColor("#155EEF")
@@ -48,14 +49,14 @@ def header(c, page_no, section):
     c.rect(0, H - 17 * mm, W, 17 * mm, stroke=0, fill=1)
     c.setFillColor(WHITE)
     c.setFont("Helvetica-Bold", 10)
-    c.drawString(16 * mm, H - 10.5 * mm, "MOTOVAX  |  MONTHLY PROGRESS REPORT")
+    c.drawString(16 * mm, H - 10.5 * mm, "DSSM x MOTOVAX LMS  |  MONTHLY PROGRESS REPORT")
     c.setFont("Helvetica", 7.5)
-    c.drawRightString(W - 16 * mm, H - 10.5 * mm, f"{section}   •   24 Agustus 2026")
+    c.drawRightString(W - 16 * mm, H - 10.5 * mm, f"{section}   •   {REPORT_DATE}")
     c.setStrokeColor(BORDER)
     c.line(16 * mm, 10 * mm, W - 16 * mm, 10 * mm)
     c.setFillColor(MUTED)
     c.setFont("Helvetica", 6.8)
-    c.drawString(16 * mm, 6 * mm, "Internal management material • Snapshot berbasis scope & changelog")
+    c.drawString(16 * mm, 6 * mm, "Internal management material • 12 workstream scope DSSM x Motovax LMS")
     c.drawRightString(W - 16 * mm, 6 * mm, f"{page_no} / 5")
 
 
@@ -119,7 +120,7 @@ def page1(c):
     c.circle(W - 8 * mm, H - 8 * mm, 49 * mm, stroke=0, fill=1)
     c.setFillColor(WHITE)
     c.setFont("Helvetica-Bold", 10)
-    c.drawString(18 * mm, H - 23 * mm, "MOTOVAX")
+    c.drawString(18 * mm, H - 23 * mm, "DSSM x MOTOVAX LMS")
     c.setFont("Helvetica-Bold", 30)
     c.drawString(18 * mm, H - 60 * mm, "Monthly Progress Report")
     c.setFont("Helvetica", 13)
@@ -129,16 +130,16 @@ def page1(c):
     c.drawString(18 * mm, H - 91 * mm, "Reporting date")
     c.setFillColor(WHITE)
     c.setFont("Helvetica-Bold", 15)
-    c.drawString(18 * mm, H - 102 * mm, "24 Agustus 2026")
+    c.drawString(18 * mm, H - 102 * mm, REPORT_DATE)
     c.setFillColor(colors.HexColor("#B9CCF5"))
     c.setFont("Helvetica", 8)
     c.drawString(18 * mm, 24 * mm, "Disiapkan untuk Monthly Meeting Direktur")
-    c.drawString(18 * mm, 17 * mm, "Periode kerja pada scope: 3 bulan • Snapshot changelog terakhir: 21 Agustus 2026")
+    c.drawString(18 * mm, 17 * mm, "Snapshot status: 3 September 2026 • Scope: LMS, Jasmine AI, Falcone AI, dan Omnichannel Call Center")
 
 
 def page2(c):
     header(c, 2, "Executive Summary")
-    title(c, "Progress Task", "12 workstream diturunkan dari scope attachment; status dikonfirmasi terhadap changelog dan peta produksi.")
+    title(c, "Progress Task", "12 workstream capability dalam scope meeting; bukan total seluruh backlog engineering Motovax.")
     x0, y = 16 * mm, H - 72 * mm
     gap, boxw = 4 * mm, (W - 32 * mm - 4 * 4 * mm) / 5
     for i, item in enumerate([
@@ -248,7 +249,7 @@ def page5(c):
 
 def build():
     c = Canvas(str(OUT), pagesize=PAGE, pageCompression=1)
-    c.setTitle("Motovax Monthly Progress Report — Agustus 2026")
+    c.setTitle("DSSM x Motovax LMS Monthly Progress Report — September 2026")
     c.setAuthor("Motovax")
     for fn in (page1, page2, page3, page4, page5):
         fn(c)
