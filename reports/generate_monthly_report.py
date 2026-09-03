@@ -224,9 +224,9 @@ def page5(c):
         [p("Prioritas", CELL_WHITE), p("Next task / milestone", CELL_WHITE), p("Target", CELL_WHITE), p("Outcome", CELL_WHITE)],
         [p("P0", CELL_BOLD), p("Sepakati satu master data Omnichannel dan Marketing Representative"), p("Setelah format disetujui", CELL_BOLD), p("Satu sumber data untuk operasional dan report DSSM")],
         [p("P0", CELL_BOLD), p("Finalisasi field dan format report bersama PIC DSSM (Mbak Cat)"), p("Menunggu alignment", CELL_BOLD), p("Acceptance report terdokumentasi dan dapat diuji")],
+        [p("P0", CELL_BOLD), p("Rollout integrasi TikTok untuk DSSM"), p("Setelah akses disetujui", CELL_BOLD), p("TikTok DM masuk unified inbox, routing AI/Agent/MR, dan report channel")],
         [p("P0", CELL_BOLD), p("Regression check parsing Excel inventory"), p("1 minggu", CELL_BOLD), p("Mencegah pengulangan salah parsing field unit")],
         [p("P1", CELL_BOLD), p("Operational monitoring & monthly KPI baseline"), p("2–4 minggu", CELL_BOLD), p("Availability, conversion, response dan handoff terukur")],
-        [p("P1", CELL_BOLD), p("Hardening regression untuk import inventory & reconnect"), p("Berjalan", CELL_BOLD), p("Menekan regresi pada dua area historis berisiko")],
     ]
     draw_table(c, data, x0, H - 48*mm, [28*mm, 112*mm, 32*mm, 85*mm], extra=[("TEXTCOLOR", (0, 1), (0, -1), BLUE)])
     c.setFillColor(INK); c.setFont("Helvetica-Bold", 10); c.drawString(x0, 79*mm, "Risk & Attention Matrix")
@@ -235,12 +235,12 @@ def page5(c):
         [p("Dependency Meta/WhatsApp & session health", CELL_BOLD), p("Medium"), p("High"), p("Tetapkan PIC incident, SLA, dan jalur eskalasi channel")],
         [p("Kualitas master data lintas cabang", CELL_BOLD), p("Medium"), p("High"), p("Owner data per cabang + cadence audit")],
         [p("Definisi master data/report belum final", CELL_BOLD), p("High"), p("Medium"), p("Putuskan field, owner, dan acceptance bersama PIC DSSM")],
-        [p("Regresi pada routing/import kompleks", CELL_BOLD), p("Medium"), p("Medium"), p("Pertahankan regression suite dan staged rollout")],
+        [p("Akses dan approval akun TikTok DSSM", CELL_BOLD), p("Medium"), p("Medium"), p("Tetapkan owner akun, akses developer, dan jadwal UAT channel")],
     ]
     draw_table(c, risk, x0, 74*mm, [83*mm, 29*mm, 29*mm, 116*mm], extra=[("TEXTCOLOR", (2, 1), (2, 2), RED), ("TEXTCOLOR", (2, 3), (2, 4), AMBER)])
     c.setFillColor(colors.HexColor("#EAF2FF")); c.roundRect(x0, 14*mm, W-32*mm, 15*mm, 2*mm, 0, 1)
     c.setFillColor(NAVY); c.setFont("Helvetica-Bold", 8); c.drawString(x0+5*mm, 21*mm, "DECISION REQUEST")
-    c.setFillColor(INK); c.setFont("Helvetica", 7.8); c.drawString(x0+42*mm, 21*mm, "Setujui struktur satu master data, field report, data owner, dan acceptance criteria bersama PIC DSSM (Mbak Cat).")
+    c.setFillColor(INK); c.setFont("Helvetica", 7.8); c.drawString(x0+42*mm, 21*mm, "Setujui struktur master data/report serta owner, akses akun, dan jadwal UAT TikTok DSSM bersama PIC terkait.")
 
 
 def build():

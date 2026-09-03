@@ -48,18 +48,18 @@ Support DSSM/Mobix yang dibutuhkan: finalisasi struktur satu master data Omnicha
 |---|---|---|
 | P0 | Sepakati satu master data Omnichannel dan Marketing Representative | Setelah struktur disetujui |
 | P0 | Finalisasi field, format, dan acceptance report bersama Mbak Cat | Menunggu alignment DSSM |
+| P0 | Rollout integrasi TikTok untuk DSSM: DM ke unified inbox, routing Jasmine AI/Agent/MR, dan reporting channel | Setelah akses akun dan scope disetujui |
 | P0 | Regression check parsing Excel inventory | 1 minggu |
 | P1 | Operational monitoring dan baseline KPI bulanan | 2–4 minggu |
-| P1 | Regression hardening untuk import inventory dan reconnect | Berjalan |
 
 ## 5. Risk & management attention
 
 - Dependency Meta/WhatsApp dan session health dapat memengaruhi availability. Tetapkan PIC incident, SLA, dan jalur eskalasi.
 - Kualitas master data lintas cabang dapat memengaruhi analytics serta rekomendasi AI. Tetapkan data owner per cabang dan cadence audit.
 - Definisi satu master data dan format report belum final. Timeline bergantung pada kesepakatan field, owner, dan acceptance bersama PIC DSSM.
-- Routing dan import yang kompleks memiliki risiko regresi. Pertahankan regression suite dan staged rollout.
+- Rollout TikTok bergantung pada owner akun, akses developer/permission, dan jadwal UAT channel dari DSSM.
 
-Keputusan yang diminta dari management: setujui struktur satu master data, field report, data owner, dan acceptance criteria bersama PIC DSSM (Mbak Cat).
+Keputusan yang diminta dari management: setujui struktur satu master data dan field report bersama Mbak Cat, serta tetapkan owner, akses akun, dan jadwal UAT TikTok DSSM.
 
 ## Dasar status
 
