@@ -76,14 +76,6 @@ const viewports = [
 ];
 
 const expectedPhrases = "One Stock.|More Sales.|Faster Response.|Unlimited Growth.";
-const expectedPillars = [
-  { label: "Core Platform", href: "./fitur/core-platform-agentic-ai.html" },
-  { label: "CRM", href: "./fitur/aplikasi-crm.html" },
-  { label: "AI Jasmine + Omni", href: "./fitur/omni-jasmine-ai.html" },
-  { label: "AI Falcon + Inventory", href: "./fitur/inventory-falcon-ai.html" },
-  { label: "Ana AI Analytics", href: "./fitur/ana-ai-analytics.html" },
-  { label: "AI Iris + Social Media", href: "./fitur/social-media-sora-ai.html" },
-];
 const registerHref = "https://onboard.motovax.com/onboarding.html?fresh=1";
 
 async function noOverflow(page) {
@@ -100,9 +92,11 @@ for (const viewport of viewports) {
     assert.equal(await page.locator("[data-typewriter]").getAttribute("data-phrases"), expectedPhrases);
     assert.equal(
       (await page.locator(".alt-core-lead").innerText()).replace(/\s+/g, " ").trim(),
-      "Satu platform untuk membantu bisnis mendapatkan customer, mengelola interaksi, hingga meningkatkan penjualan secara otomatis berbasis AI.",
+      "Motovax menyatukan data, workflow, dan pelaporan dalam satu platform operasional dealer.",
     );
-    assert.equal(await page.locator(".alt-node[data-pillar]").count(), 6);
+    assert.match((await page.locator("#core-heading").innerText()).replace(/\s+/g, " "), /One Data\. One Platform\. Every Lead Connected\./);
+    assert.equal(await page.locator(".platform-stage").count(), 4);
+    assert.equal(await page.locator(".one-platform-outcomes article").count(), 4);
 
     const headingFont = await page.locator("#core-heading").evaluate((el) => getComputedStyle(el).fontFamily);
     assert.equal(/caveat/i.test(headingFont), false, `judul memakai font hirarki Inter, bukan Caveat: ${headingFont}`);
@@ -111,41 +105,23 @@ for (const viewport of viewports) {
     const featureHeadingFont = await page.locator("#jasmine-heading").evaluate((el) => getComputedStyle(el).fontFamily);
     assert.equal(/caveat/i.test(featureHeadingFont), false);
 
-    const coreImage = page.locator(".alt-orbit-art img");
+    const coreImage = page.locator(".one-platform-screen picture img");
     await coreImage.scrollIntoViewIfNeeded();
-    assert.match(await coreImage.getAttribute("src"), /alt-core-platform\.png/);
+    assert.match(await coreImage.getAttribute("src"), /product-dashboard-overview\.png/);
     assert.equal(await coreImage.evaluate((img) => img.naturalWidth > 0), true);
+    assert.match(await coreImage.getAttribute("alt"), /stok unit.*performa cabang.*lead.*penjualan/i);
 
-    const coreMore = page.locator(".alt-core-heading .alt-core-more");
+    const coreMore = page.locator(".alt-core > .container > .alt-core-more");
     assert.equal(await coreMore.count(), 1);
     assert.equal(await coreMore.getAttribute("href"), "./fitur/core-platform-agentic-ai.html");
-    assert.equal(await page.locator(".alt-core-heading .btn").count(), 0, "Selengkapnya Core Platform bukan tombol");
+    assert.equal(await page.locator(".alt-core .btn").count(), 0, "Selengkapnya Core Platform bukan tombol");
     const coreMoreBg = await coreMore.evaluate((el) => getComputedStyle(el).backgroundColor);
     assert.equal(coreMoreBg === "rgba(0, 0, 0, 0)" || coreMoreBg === "transparent", true, `Selengkapnya tidak boleh berwarna tombol: ${coreMoreBg}`);
     assert.equal(await page.locator(".alt-orbit-lines, .alt-orbit-dots, animateMotion").count(), 0, "animasi bulet diagram dihapus");
     assert.equal(await page.locator(".alt-story, .alt-howto, .channel-strip, .alt-pillar").count(), 0);
     assert.equal(await page.locator("section.alt-feature").count(), 5);
 
-    const nodes = await page.locator(".alt-node[data-pillar]").evaluateAll((cards) =>
-      cards.map((card) => ({
-        pillar: card.getAttribute("data-pillar"),
-        label: (card.querySelector(".alt-pillar-label") || card.querySelector("small"))?.textContent.trim(),
-        href: card.getAttribute("href"),
-      })),
-    );
-    const byPillar = Object.fromEntries(nodes.map((item) => [item.pillar, item]));
-    assert.equal(byPillar.core.href, expectedPillars[0].href);
-    assert.match(byPillar.core.label, /CORE PLATFORM/i);
-    assert.equal(byPillar.crm.label, expectedPillars[1].label);
-    assert.equal(byPillar.crm.href, expectedPillars[1].href);
-    assert.equal(byPillar.jasmine.label, expectedPillars[2].label);
-    assert.equal(byPillar.jasmine.href, expectedPillars[2].href);
-    assert.equal(byPillar.falcon.label, expectedPillars[3].label);
-    assert.equal(byPillar.falcon.href, expectedPillars[3].href);
-    assert.equal(byPillar.ana.label, expectedPillars[4].label);
-    assert.equal(byPillar.ana.href, expectedPillars[4].href);
-    assert.equal(byPillar.sora.label, expectedPillars[5].label);
-    assert.equal(byPillar.sora.href, expectedPillars[5].href);
+    assert.match(await page.locator(".one-platform-quote").innerText(), /One Data.*One Platform/);
 
     const crmImage = page.locator(".alt-crm-visual img");
     await crmImage.scrollIntoViewIfNeeded();
@@ -193,6 +169,7 @@ test("index-alt.html mengarah ke beranda", async () => {
   const url = new URL(page.url());
   assert.equal(url.pathname, "/");
   assert.ok(response && [200, 301, 302, 308].includes(response.status()));
-  assert.equal(await page.locator(".alt-node[data-pillar]").count(), 6);
+  assert.equal(await page.locator(".platform-stage").count(), 4);
+  assert.equal(await page.locator(".one-platform-outcomes article").count(), 4);
   await context.close();
 });
