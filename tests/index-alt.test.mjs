@@ -107,9 +107,11 @@ for (const viewport of viewports) {
 
     const coreImage = page.locator(".one-platform-screen picture img");
     await coreImage.scrollIntoViewIfNeeded();
-    assert.match(await coreImage.getAttribute("src"), /product-dashboard-overview\.png/);
+    assert.match(await coreImage.getAttribute("src"), /product-crm-pipeline\.png/);
     assert.equal(await coreImage.evaluate((img) => img.naturalWidth > 0), true);
-    assert.match(await coreImage.getAttribute("alt"), /stok unit.*performa cabang.*lead.*penjualan/i);
+    assert.match(await coreImage.getAttribute("alt"), /Pipeline CRM Motovax.*data demo.*Cold.*Warm.*Prospect.*Hot/i);
+    assert.equal(await page.locator(".platform-stage .stage-icons").count(), 4);
+    assert.ok(await page.locator(".platform-stage .stage-icons li").count() >= 20);
 
     const coreMore = page.locator(".alt-core > .container > .alt-core-more");
     assert.equal(await coreMore.count(), 1);
