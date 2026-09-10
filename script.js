@@ -11593,3 +11593,262 @@ if (asciiIndonesiaMount) {
 
   window.requestAnimationFrame(() => opener.click());
 })();
+
+const heroChatScripts = {
+  lead: {
+    name: "Mobix Bintaro",
+    status: "Jasmine · Online",
+    avatar: "JX",
+    clock: "21:11",
+    steps: [
+      { kind: "date", text: "9 September 2026" },
+      { kind: "user", time: "20:54", text: "Ultimate 2019" },
+      { kind: "ai", time: "20:54", sender: "Dikirim Jasmine", text: "Ultimate 2019 ya ka. Itu tipe dari model apa—Pajero Sport, Xpander, atau yang lain?" },
+      { kind: "user", time: "21:10", text: "Expander" },
+      { kind: "ai", time: "21:10", sender: "Dikirim Jasmine", text: "Xpander ya ka. Domisilinya dimana?" },
+      { kind: "user", time: "21:10", text: "Cilegon" },
+      { kind: "ai", time: "21:11", sender: "Dikirim Jasmine", text: "Domisili Cilegon ya, Kak. Xpander Ultimate 2019 ready 2 unit di Bintaro, masing-masing Rp205 juta:\n1. Putih — 31.260 km\n2. Hitam Mika — 79.537 km" },
+      { kind: "user", time: "21:11", text: "Iya dkt Cilegon\nBudget 180an" },
+      { kind: "chip", text: "Lead tersimpan di CRM · Budget Rp180jt · Cilegon" },
+      { kind: "user", time: "21:22", text: "Expander Ultimate 2019 budget 180an bisa?" },
+      { kind: "ai", time: "21:22", sender: "Dikirim Jasmine", text: "Xpander Ultimate 2019 ready 2 unit di Bintaro, harganya Rp205 juta. Budget 180an saya catat—mau saya carikan alternatif, atau fokus unit ini?" },
+      { kind: "user", time: "21:25", text: "Yang low kilometer" },
+      { kind: "product", time: "21:25", sender: "Dikirim Jasmine", title: "Xpander Ultimate 2019", meta: "Putih · 31.260 km · Bintaro · UNIT READY", price: "Rp 205.000.000", text: "Yang low kilometer ada, Kak. Mau saya bantu cek opsi kreditnya?" },
+      { kind: "user", time: "21:27", text: "Boleh" },
+      { kind: "card", time: "21:27", sender: "Dikirim Jasmine", title: "Simulasi Kredit · Xpander Ultimate 2019", rows: [["Harga", "Rp 205.000.000"], ["Total DP", "Rp 37.850.000"], ["Angsuran", "Rp 4.810.000 × 60"]], status: "Menunggu konfirmasi customer" },
+      { kind: "chip", text: "Simulasi kredit dikirim · Assigned ke MR Bintaro", accent: true },
+    ],
+  },
+  cs: {
+    name: "Mobix Care",
+    status: "Jasmine · Online",
+    avatar: "CS",
+    clock: "14:35",
+    steps: [
+      { kind: "date", text: "6 Agustus 2026" },
+      { kind: "user", time: "14:29", text: "Halo Kak, mau tanya Stargazer Essential IVT 2026 hitam metalik." },
+      { kind: "ai", time: "14:29", sender: "Dikirim Jasmine", text: "Ada Kak, unitnya Hyundai Stargazer Essential 1.5 IVT AT 2026 hitam metalik masih ready di Bandung, harga Rp215 juta. Odo 130 km. Mau saya kirim foto unitnya?" },
+      { kind: "user", time: "14:30", text: "Ini kan plat B ya kak, biaya balik namanya brp ya krn untuk skema kredit" },
+      { kind: "card", time: "14:30", sender: "Dikirim Jasmine", title: "Simulasi Kredit · Stargazer Essential 2026", rows: [["Harga", "Rp 215.000.000"], ["Total DP", "Rp 38.717.000"], ["Angsuran", "Rp 4.647.700 × 60"]], status: "Skema kredit tersedia", tone: "ok" },
+      { kind: "chip", text: "Tiket CS · Bea balik nama + simulasi kredit" },
+      { kind: "user", time: "14:35", text: "Kalau boleh tahu pajaknya brp?" },
+      { kind: "ai", time: "14:42", sender: "Dikirim Jasmine", text: "Estimasi pajak 4–5 juta, Kak. Untuk mobil second, BBN free seluruh Indonesia. Perkiraan: pajak 4,5jt + cabut berkas 250rb + admin BPKB 500rb." },
+      { kind: "user", time: "14:47", text: "Baik kak. Paling nanti mau lihat unitnya dulu langsung di Kopo." },
+      { kind: "chip", text: "Handoff ke MR Bandung · Booking cek unit Kopo", accent: true },
+      { kind: "divider", text: "1 hari kemudian" },
+      { kind: "ai", time: "12:05", sender: "Dikirim Jasmine", text: "Halo Kak, jadwal cek unit Stargazer di Kopo masih terbuka. Mau saya hold unitnya?", outreach: true },
+      { kind: "user", time: "12:06", text: "Terima kasih, nanti kami berkabar kalau jadi ke Kopo ya" },
+      { kind: "chip", text: "Follow-up cek unit dijadwalkan · Lead tetap panas", accent: true },
+    ],
+  },
+  internal: {
+    name: "Falcon · Internal",
+    status: "Falcon · Online",
+    avatar: "FX",
+    clock: "08:58",
+    steps: [
+      { kind: "date", text: "4 September 2026" },
+      { kind: "user", time: "08:57", text: "minta laporan stok semua cabang" },
+      { kind: "ai", time: "08:58", sender: "Dikirim Falcon", text: "📦 Rekap Stok Semua Cabang\n1. Pondok Bambu — Ready 80 · Booked 11\n2. Cinere — Ready 62 · Booked 11\n3. Bintaro — Ready 129 · Booked 16\n4. Bandung — Ready 34 · Booked 3\n5. HQ3 — Ready 14 · Booked 3\nTotal: Ready 319 · Booked 44" },
+      { kind: "chip", text: "Rekap inventory live · 5 cabang" },
+      { kind: "user", time: "19:59", text: "Boleh minta foto lengkap CR-V Prestige cabang kita" },
+      { kind: "photos", time: "20:00", sender: "Dikirim Falcon", title: "Honda CR-V Prestige AT", text: "Saya sudah kirim 4 foto preview untuk unit Honda CR-V Prestige AT, Kak. Masih ada 8 foto lainnya di galeri." },
+      { kind: "chip", text: "Galeri unit dikirim ke WhatsApp MR" },
+      { kind: "divider", text: "12 menit kemudian" },
+      { kind: "chip", text: "Lead baru dari Call Center · HOT · Jasmine", accent: true },
+      { kind: "ai", time: "21:07", sender: "Dikirim Falcon", text: "Customer dari Medan, minat Toyota Rush TRD. Channel Facebook Messenger. Sudah masuk pipeline Kak.", outreach: true },
+      { kind: "user", time: "09:15", text: "ultimate 2019 hitung cicilan dengan dp 60 juta" },
+      { kind: "card", time: "09:16", sender: "Dikirim Falcon", title: "Simulasi · Xpander Ultimate 2019", rows: [["Unit", "Putih · Bintaro · READY"], ["Harga", "Rp 205.000.000"], ["DP", "Rp 60.000.000"], ["Angsuran", "Rp 3.420.000 × 60"]], status: "Simulasi Falcon tersimpan", tone: "ok" },
+    ],
+  },
+};
+
+class HeroWhatsAppDemo {
+  constructor(root) {
+    this.root = root;
+    this.thread = document.getElementById("waThread");
+    this.clock = document.getElementById("waClock");
+    this.name = document.getElementById("waName");
+    this.status = document.getElementById("waStatus");
+    this.avatar = document.getElementById("waAvatar");
+    this.mode = "lead";
+    this.timer = 0;
+    this.step = 0;
+    if (!this.thread) return;
+    this.bind();
+    this.play("lead");
+  }
+
+  bind() {
+    for (const btn of this.root.querySelectorAll("[data-mode]")) {
+      btn.addEventListener("click", () => this.play(btn.getAttribute("data-mode") || "lead"));
+    }
+  }
+
+  play(mode) {
+    if (!heroChatScripts[mode] || !this.thread) return;
+    this.mode = mode;
+    window.clearTimeout(this.timer);
+    this.step = 0;
+    this.thread.innerHTML = "";
+    const script = heroChatScripts[mode];
+    if (this.name) this.name.textContent = script.name;
+    if (this.status) this.status.textContent = script.status;
+    if (this.avatar) this.avatar.textContent = script.avatar;
+    if (this.clock) this.clock.textContent = script.clock;
+    for (const btn of this.root.querySelectorAll("[data-mode]")) {
+      const on = btn.getAttribute("data-mode") === mode;
+      btn.classList.toggle("is-active", on);
+      if (btn.getAttribute("role") === "tab") btn.setAttribute("aria-selected", on ? "true" : "false");
+    }
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      for (const item of script.steps) this.render(item);
+      this.scroll();
+      return;
+    }
+    this.next();
+  }
+
+  next() {
+    const script = heroChatScripts[this.mode];
+    if (this.step >= script.steps.length) {
+      this.timer = window.setTimeout(() => this.play(this.mode), 4200);
+      return;
+    }
+    const item = script.steps[this.step];
+    const showAi = item.kind === "ai" || item.kind === "card" || item.kind === "product" || item.kind === "photos";
+    const delay = item.kind === "user" ? 900 : item.kind === "chip" || item.kind === "divider" || item.kind === "date" ? 700 : 1600;
+    if (showAi) {
+      this.showTyping();
+      this.timer = window.setTimeout(() => {
+        this.clearTyping();
+        this.render(item);
+        this.step += 1;
+        this.scroll();
+        this.timer = window.setTimeout(() => this.next(), 700);
+      }, delay);
+      return;
+    }
+    this.timer = window.setTimeout(() => {
+      this.render(item);
+      this.step += 1;
+      this.scroll();
+      this.next();
+    }, delay);
+  }
+
+  showTyping() {
+    this.clearTyping();
+    const row = document.createElement("div");
+    row.className = "wa-row is-out";
+    row.dataset.typing = "1";
+    const typing = document.createElement("span");
+    typing.className = "wa-typing";
+    typing.setAttribute("aria-hidden", "true");
+    typing.append(document.createElement("i"), document.createElement("i"), document.createElement("i"));
+    row.appendChild(typing);
+    this.thread.appendChild(row);
+    this.scroll();
+  }
+
+  clearTyping() {
+    for (const node of this.thread.querySelectorAll("[data-typing]")) node.remove();
+  }
+
+  render(item) {
+    if (item.kind === "date" || item.kind === "divider") {
+      const el = document.createElement("div");
+      el.className = item.kind === "date" ? "wa-date" : "wa-divider";
+      el.textContent = item.text;
+      this.thread.appendChild(el);
+      return;
+    }
+    if (item.kind === "chip") {
+      const el = document.createElement("div");
+      el.className = item.accent ? "wa-chip is-accent" : "wa-chip";
+      el.textContent = item.text;
+      this.thread.appendChild(el);
+      return;
+    }
+
+    const row = document.createElement("div");
+    row.className = item.kind === "user" ? "wa-row is-in" : "wa-row is-out";
+    const bubble = document.createElement("div");
+    bubble.className = "wa-bubble";
+    if (item.sender) {
+      const sender = document.createElement("span");
+      sender.className = "wa-sender";
+      sender.textContent = item.sender;
+      bubble.appendChild(sender);
+    }
+    if (item.text) {
+      const p = document.createElement("p");
+      p.textContent = item.text;
+      bubble.appendChild(p);
+    }
+    if (item.kind === "product" || item.kind === "card") {
+      const card = document.createElement("div");
+      card.className = "wa-card";
+      const title = document.createElement("b");
+      title.textContent = item.title;
+      card.appendChild(title);
+      if (item.meta) {
+        const meta = document.createElement("small");
+        meta.textContent = item.meta;
+        card.appendChild(meta);
+      }
+      if (item.price) {
+        const price = document.createElement("p");
+        price.className = "wa-total";
+        const left = document.createElement("span");
+        const right = document.createElement("span");
+        left.textContent = "Harga";
+        right.textContent = item.price;
+        price.append(left, right);
+        card.appendChild(price);
+      }
+      for (const rowItem of item.rows || []) {
+        const line = document.createElement("p");
+        const left = document.createElement("span");
+        const right = document.createElement("span");
+        left.textContent = rowItem[0];
+        right.textContent = rowItem[1];
+        line.append(left, right);
+        card.appendChild(line);
+      }
+      if (item.status) {
+        const pill = document.createElement("span");
+        pill.className = item.tone === "ok" ? "wa-status-pill is-ok" : "wa-status-pill";
+        pill.textContent = item.status;
+        card.appendChild(pill);
+      }
+      bubble.appendChild(card);
+    }
+    if (item.kind === "photos") {
+      const shots = document.createElement("div");
+      shots.className = "wa-photos";
+      for (const color of ["#9aa7b8", "#cfd6de", "#7d8b9a", "#b9c3ce"]) {
+        const shot = document.createElement("span");
+        shot.style.setProperty("--shot", color);
+        shots.appendChild(shot);
+      }
+      bubble.appendChild(shots);
+    }
+    const meta = document.createElement("div");
+    meta.className = "wa-meta";
+    meta.textContent = item.kind === "user" ? item.time || "" : `${item.time || ""} ✓✓`;
+    bubble.appendChild(meta);
+    row.appendChild(bubble);
+    this.thread.appendChild(row);
+    if (item.time && this.clock) this.clock.textContent = item.time;
+  }
+
+  scroll() {
+    this.thread.scrollTop = this.thread.scrollHeight;
+  }
+}
+
+const waMount = document.querySelector("[data-hero-chat]");
+if (waMount) {
+  new HeroWhatsAppDemo(waMount);
+}

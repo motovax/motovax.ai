@@ -45,16 +45,22 @@ before(async () => {
   baseUrl = `http://127.0.0.1:${server.address().port}`;
 
   const chromiumRoot = path.join(homedir(), ".local/chromium-root");
-  const chromiumPath = path.join(chromiumRoot, "usr/lib/chromium/chromium");
-  const useAlpineChromium = existsSync(chromiumPath);
+  const alpineChromiumPath = path.join(chromiumRoot, "usr/lib/chromium/chromium");
+  const chromiumPath = [
+    alpineChromiumPath,
+    "/usr/lib/chromium/chromium",
+    "/usr/bin/chromium",
+    "/usr/bin/chromium-browser",
+  ].find((candidate) => existsSync(candidate));
+  const useAlpineChromium = chromiumPath === alpineChromiumPath;
   const libraryPath = [
     ...libraryDirectories(path.join(chromiumRoot, "lib")),
     ...libraryDirectories(path.join(chromiumRoot, "usr/lib")),
   ].join(":");
   browser = await chromium.launch({
     headless: true,
-    executablePath: useAlpineChromium ? chromiumPath : undefined,
-    args: useAlpineChromium ? ["--disable-gpu", "--disable-gpu-compositing"] : [],
+    executablePath: chromiumPath,
+    args: chromiumPath ? ["--disable-gpu", "--disable-gpu-compositing", "--no-sandbox"] : [],
     env: useAlpineChromium
       ? {
           ...process.env,
@@ -80,86 +86,54 @@ const viewports = [
 ];
 
 for (const viewport of viewports) {
-  test(`hero #top memakai screenshot Call Center pada ${viewport.name}`, async () => {
-    const context = await browser.newContext({ viewport });
+  test(`hero #top memakai mockup chat WhatsApp 3 AI pada ${viewport.name}`, async () => {
+    const context = await browser.newContext({
+      viewport,
+      reducedMotion: "reduce",
+    });
     const page = await context.newPage();
     await page.route(/https:\/\/fonts\.(?:googleapis|gstatic)\.com\//, (route) => route.abort());
-    await page.goto(`${baseUrl}/index.html?v=hero-cc-20260814`, { waitUntil: "load" });
+    await page.goto(`${baseUrl}/index.html?v=hero-wa-20260910`, { waitUntil: "load" });
 
-    const img = page.locator("[data-hero-shot]");
-    await img.scrollIntoViewIfNeeded();
-    await page.waitForFunction(() => {
-      const image = document.querySelector("[data-hero-shot]");
-      return Boolean(image && image.complete && image.naturalWidth > 0);
-    });
-    await img.evaluate((el) => (el instanceof HTMLImageElement ? el.decode() : Promise.resolve()));
+    const stage = page.locator("[data-hero-chat]");
+    await stage.scrollIntoViewIfNeeded();
+    await page.waitForFunction(() => document.querySelector("#waThread")?.children.length > 0);
 
     const metrics = await page.evaluate(() => {
-      const image = document.querySelector("[data-hero-shot]");
-      const shell = document.querySelector(".hero-shot-image");
-      const mockChat = document.querySelector(".conversation-card");
-      const style = image ? getComputedStyle(image) : null;
-      const imageRect = image?.getBoundingClientRect();
-      const shellRect = shell?.getBoundingClientRect();
+      const stageEl = document.querySelector("[data-hero-chat]");
+      const thread = document.querySelector("#waThread");
+      const name = document.querySelector("#waName")?.textContent || "";
+      const modes = [...document.querySelectorAll(".wa-rail [data-mode]")].map((btn) => btn.getAttribute("data-mode"));
+      const composer = document.querySelector(".wa-input");
       return {
-        hasMockChat: Boolean(mockChat),
-        naturalWidth: image?.naturalWidth || 0,
-        naturalHeight: image?.naturalHeight || 0,
-        currentSrc: image?.currentSrc || "",
-        aspectRatio: style?.aspectRatio || "",
-        objectFit: style?.objectFit || "",
-        imageWidth: imageRect?.width || 0,
-        imageHeight: imageRect?.height || 0,
-        shellWidth: shellRect?.width || 0,
-        shellHeight: shellRect?.height || 0,
-        overflow: document.documentElement.scrollWidth > document.documentElement.clientWidth,
+        hasStage: Boolean(stageEl),
+        threadCount: thread?.children.length || 0,
+        name,
+        modes,
+        composerWa: composer instanceof HTMLAnchorElement ? composer.href : "",
+        overflow: document.documentElement.scrollWidth > document.documentElement.clientWidth + 1,
       };
     });
 
-    assert.equal(metrics.hasMockChat, false, JSON.stringify(metrics));
-    assert.ok(metrics.naturalWidth >= 300, JSON.stringify(metrics));
-    assert.ok(metrics.naturalHeight >= 180, JSON.stringify(metrics));
-    assert.match(metrics.currentSrc, /omnichannel-faneling-public/);
-    assert.match(metrics.currentSrc, /hero-cc-20260814/);
-    if (viewport.width >= 1440) {
-      assert.ok(metrics.naturalWidth >= 700, JSON.stringify(metrics));
-    }
-    assert.equal(metrics.objectFit, "contain");
-    assert.ok(Math.abs(metrics.imageWidth - metrics.shellWidth) <= 0.1, JSON.stringify(metrics));
-    assert.ok(Math.abs(metrics.imageHeight - metrics.shellHeight) <= 0.1, JSON.stringify(metrics));
-    assert.ok(Math.abs(metrics.shellWidth / metrics.shellHeight - 1.6) <= 0.03, JSON.stringify(metrics));
+    assert.equal(metrics.hasStage, true, JSON.stringify(metrics));
+    assert.ok(metrics.threadCount >= 3, JSON.stringify(metrics));
+    assert.equal(metrics.name, "Mobix Bintaro", JSON.stringify(metrics));
+    assert.deepEqual(metrics.modes, ["lead", "cs", "internal"], JSON.stringify(metrics));
+    assert.match(metrics.composerWa, /wa\.me\/6281999197186/);
     assert.equal(metrics.overflow, false, JSON.stringify(metrics));
 
+    await page.locator('.wa-rail [data-mode="cs"]').click();
+    await page.waitForFunction(() => document.querySelector("#waName")?.textContent === "Mobix Care");
+    assert.match(await page.locator("#waThread").innerText(), /Stargazer|balik nama|pajak/i);
+
+    await page.locator('.wa-rail [data-mode="internal"]').click();
+    await page.waitForFunction(() => document.querySelector("#waName")?.textContent === "Falcon · Internal");
+    assert.match(await page.locator("#waThread").innerText(), /Rekap Stok|Falcon/i);
+
     await page.screenshot({
-      path: `/tmp/motovax-hero-cc-${viewport.name}.png`,
+      path: `/tmp/motovax-hero-wa-${viewport.name}.png`,
       fullPage: false,
     });
-
-    if (viewport.name === "mobile") {
-      await page.click("[data-hero-image-open]");
-      const modal = page.locator("[data-hero-image-modal]");
-      await modal.waitFor({ state: "visible" });
-      const modalState = await page.evaluate(() => {
-        const dialog = document.querySelector("[data-hero-image-modal]");
-        const modalImg = document.querySelector("[data-hero-image-modal-img]");
-        return {
-          bodyLocked: document.body.classList.contains("feature-image-open"),
-          overflow: getComputedStyle(document.body).overflow,
-          src: modalImg?.currentSrc || modalImg?.src || "",
-          alt: modalImg?.alt || "",
-        };
-      });
-      assert.equal(modalState.bodyLocked, true);
-      assert.match(modalState.src, /omnichannel-faneling-public\.png/);
-      assert.match(modalState.alt, /Call Center/i);
-
-      await page.keyboard.press("Escape");
-      await modal.waitFor({ state: "hidden" });
-      assert.equal(
-        await page.evaluate(() => document.body.classList.contains("feature-image-open")),
-        false,
-      );
-    }
 
     await context.close();
   });
