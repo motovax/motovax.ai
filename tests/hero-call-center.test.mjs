@@ -93,7 +93,7 @@ for (const viewport of viewports) {
     });
     const page = await context.newPage();
     await page.route(/https:\/\/fonts\.(?:googleapis|gstatic)\.com\//, (route) => route.abort());
-    await page.goto(`${baseUrl}/index.html?v=hero-copy-20260910b`, { waitUntil: "load" });
+    await page.goto(`${baseUrl}/index.html?v=hero-chat-gap-20260910`, { waitUntil: "load" });
 
     const stage = page.locator("[data-hero-chat]");
     await stage.scrollIntoViewIfNeeded();

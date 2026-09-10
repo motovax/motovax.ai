@@ -11707,44 +11707,53 @@ class HeroWhatsAppDemo {
       this.scroll();
       return;
     }
+    this.revealOpening(script.steps);
     this.next();
+  }
+
+  revealOpening(steps) {
+    let index = 0;
+    if (steps[0]?.kind === "date") {
+      this.render(steps[0]);
+      index = 1;
+    }
+    if (steps[index]?.kind === "user") {
+      this.render(steps[index]);
+      index += 1;
+    }
+    this.step = index;
+    this.scroll();
   }
 
   next() {
     const script = heroChatScripts[this.mode];
     if (this.step >= script.steps.length) {
-      this.timer = window.setTimeout(() => this.play(this.mode), 8000);
+      this.timer = window.setTimeout(() => this.play(this.mode), 5000);
       return;
     }
     const item = script.steps[this.step];
     const showAi = item.kind === "ai" || item.kind === "card" || item.kind === "product" || item.kind === "photos";
-    const textLen = String(item.text || item.title || "").length;
-    const readExtra = Math.min(2800, Math.round(textLen * 32));
-    const delay = showAi
-      ? 2200
-      : item.kind === "user"
-        ? 2000
-        : item.kind === "date"
-          ? 900
-          : 1800;
-    const hold = showAi ? 2400 + readExtra : item.kind === "user" ? 1200 + Math.round(readExtra * 0.35) : 1600;
+    const gap = 3000;
+    const typingMs = 700;
     if (showAi) {
-      this.showTyping();
       this.timer = window.setTimeout(() => {
-        this.clearTyping();
-        this.render(item);
-        this.step += 1;
-        this.scroll();
-        this.timer = window.setTimeout(() => this.next(), hold);
-      }, delay);
+        this.showTyping();
+        this.timer = window.setTimeout(() => {
+          this.clearTyping();
+          this.render(item);
+          this.step += 1;
+          this.scroll();
+          this.next();
+        }, typingMs);
+      }, Math.max(0, gap - typingMs));
       return;
     }
     this.timer = window.setTimeout(() => {
       this.render(item);
       this.step += 1;
       this.scroll();
-      this.timer = window.setTimeout(() => this.next(), hold);
-    }, delay);
+      this.next();
+    }, gap);
   }
 
   showTyping() {
