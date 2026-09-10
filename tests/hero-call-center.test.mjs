@@ -93,7 +93,7 @@ for (const viewport of viewports) {
     });
     const page = await context.newPage();
     await page.route(/https:\/\/fonts\.(?:googleapis|gstatic)\.com\//, (route) => route.abort());
-    await page.goto(`${baseUrl}/index.html?v=hero-copy-20260910`, { waitUntil: "load" });
+    await page.goto(`${baseUrl}/index.html?v=hero-copy-20260910b`, { waitUntil: "load" });
 
     const stage = page.locator("[data-hero-chat]");
     await stage.scrollIntoViewIfNeeded();
@@ -104,14 +104,18 @@ for (const viewport of viewports) {
       const thread = document.querySelector("#waThread");
       const name = document.querySelector("#waName")?.textContent || "";
       const copy = document.querySelector(".home-hero-copy")?.innerText || "";
+      const team = document.querySelector(".hero-ai-team")?.innerText || "";
       const modes = [...document.querySelectorAll(".wa-rail [data-mode]")].map((btn) => btn.getAttribute("data-mode"));
       const composer = document.querySelector(".wa-input");
+      const demo = document.querySelector(".home-hero-actions .btn-primary");
       return {
         hasStage: Boolean(stageEl),
         threadCount: thread?.children.length || 0,
         name,
         copy,
+        team,
         modes,
+        demoHref: demo instanceof HTMLAnchorElement ? demo.getAttribute("href") : "",
         composerWa: composer instanceof HTMLAnchorElement ? composer.href : "",
         overflow: document.documentElement.scrollWidth > document.documentElement.clientWidth + 1,
       };
@@ -120,11 +124,14 @@ for (const viewport of viewports) {
     assert.equal(metrics.hasStage, true, JSON.stringify(metrics));
     assert.ok(metrics.threadCount >= 3, JSON.stringify(metrics));
     assert.equal(metrics.name, "Mobix Bintaro", JSON.stringify(metrics));
-    assert.match(metrics.copy, /Naikkan konversi sales/i);
-    assert.match(metrics.copy, /Falcon/);
-    assert.match(metrics.copy, /Fino/);
-    assert.match(metrics.copy, /Jasmine/);
-    assert.doesNotMatch(metrics.copy, /Platform penjualan untuk dealer mobil/i);
+    assert.match(metrics.copy, /Ubah lebih banyak/i);
+    assert.match(metrics.copy, /chat jadi penjualan/i);
+    assert.match(metrics.copy, /Lead tidak tercecer/i);
+    assert.match(metrics.copy, /bisnis otomotif/i);
+    assert.match(metrics.team, /Falcon/);
+    assert.match(metrics.team, /Fino/);
+    assert.match(metrics.team, /Jasmine/);
+    assert.equal(metrics.demoHref, "./hubungi-kami.html");
     assert.deepEqual(metrics.modes, ["lead", "cs", "internal"], JSON.stringify(metrics));
     assert.match(metrics.composerWa, /wa\.me\/6281999197186/);
     assert.equal(metrics.overflow, false, JSON.stringify(metrics));
@@ -133,7 +140,7 @@ for (const viewport of viewports) {
     await page.waitForFunction(() => document.querySelector("#waName")?.textContent === "Mobix Care");
     assert.match(await page.locator("#waThread").innerText(), /Stargazer|balik nama|pajak/i);
 
-    await page.locator('.wa-rail [data-mode="internal"]').click();
+    await page.locator('.hero-ai-card[data-mode="internal"]').click();
     await page.waitForFunction(() => document.querySelector("#waName")?.textContent === "Falcon · Internal");
     assert.match(await page.locator("#waThread").innerText(), /Rekap Stok|Falcon/i);
 

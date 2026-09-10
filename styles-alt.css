@@ -88,10 +88,6 @@
   line-height: 1.02;
 }
 
-.home-alt .hero-agents {
-  margin-top: 20px;
-}
-
 .home-alt .home-hero {
   padding-block: 76px 64px;
 }
@@ -628,10 +624,6 @@
 
   .home-alt .hero-sell-headline {
     font-size: clamp(32px, 10vw, 44px);
-  }
-
-  .home-alt .hero-sell-headline span {
-    font-size: clamp(20px, 6.4vw, 28px);
   }
 
   .alt-hand {

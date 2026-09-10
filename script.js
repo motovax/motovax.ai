@@ -11666,6 +11666,7 @@ const heroChatScripts = {
 class HeroWhatsAppDemo {
   constructor(root) {
     this.root = root;
+    this.scope = root.closest(".home-hero") || root;
     this.thread = document.getElementById("waThread");
     this.clock = document.getElementById("waClock");
     this.name = document.getElementById("waName");
@@ -11680,7 +11681,7 @@ class HeroWhatsAppDemo {
   }
 
   bind() {
-    for (const btn of this.root.querySelectorAll("[data-mode]")) {
+    for (const btn of this.scope.querySelectorAll("[data-mode]")) {
       btn.addEventListener("click", () => this.play(btn.getAttribute("data-mode") || "lead"));
     }
   }
@@ -11696,7 +11697,7 @@ class HeroWhatsAppDemo {
     if (this.status) this.status.textContent = script.status;
     if (this.avatar) this.avatar.textContent = script.avatar;
     if (this.clock) this.clock.textContent = script.clock;
-    for (const btn of this.root.querySelectorAll("[data-mode]")) {
+    for (const btn of this.scope.querySelectorAll("[data-mode]")) {
       const on = btn.getAttribute("data-mode") === mode;
       btn.classList.toggle("is-active", on);
       if (btn.getAttribute("role") === "tab") btn.setAttribute("aria-selected", on ? "true" : "false");
