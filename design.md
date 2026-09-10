@@ -17,7 +17,7 @@ Pola visual utama:
 ## Struktur Yang Diimplementasikan
 
 1. Header sticky dengan logo MOTOVAX, navigasi, CTA `Login` + `Mulai Coba Sekarang` (ke `onboarding.html`).
-2. Hero dengan kicker AI Sales & CRM otomotif, headline chat jadi penjualan, CTA demo + WhatsApp, proof points, mockup chat WhatsApp, dan baris Tim AI Motovax (Falcon, Fino, Jasmine).
+2. Hero dengan kicker AI Sales & CRM (umum, tanpa otomotif), headline typewriter chat/lead/inquiry/follow-up, CTA demo + WhatsApp, proof points, mockup chat WhatsApp, dan baris Tim AI Motovax (Falcon, Fino, Jasmine).
 2b. Halaman publik `onboarding.html` — wizard self-serve 4 langkah (akun/login → profil bisnis → modul prioritas → siap coba), design system Inter/biru Motovax, state di localStorage.
 3. Ecosystem strip untuk partner dealer, leasing, insurance, ads, payment, logistic, OEM, dan dokumen.
 4. Section solusi end-to-end berisi enam kartu:

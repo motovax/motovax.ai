@@ -49,7 +49,7 @@ for (const link of document.querySelectorAll("[data-wa]")) {
     });
 })();
 
-/** Typewriter pada outcome dealer: test drive dan penjualan unit. */
+/** Typewriter pada outcome umum: chat, lead, inquiry, follow-up. */
 (function initTypewriterHeadline() {
   const typed = document.querySelector("[data-typewriter]");
   if (!(typed instanceof HTMLElement)) return;

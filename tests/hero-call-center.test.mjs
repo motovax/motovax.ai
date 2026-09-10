@@ -93,7 +93,7 @@ for (const viewport of viewports) {
     });
     const page = await context.newPage();
     await page.route(/https:\/\/fonts\.(?:googleapis|gstatic)\.com\//, (route) => route.abort());
-    await page.goto(`${baseUrl}/index.html?v=hero-chat-gap-20260910`, { waitUntil: "load" });
+    await page.goto(`${baseUrl}/index.html?v=hero-generic-20260910`, { waitUntil: "load" });
 
     const stage = page.locator("[data-hero-chat]");
     await stage.scrollIntoViewIfNeeded();
@@ -127,7 +127,12 @@ for (const viewport of viewports) {
     assert.match(metrics.copy, /Ubah lebih banyak/i);
     assert.match(metrics.copy, /chat jadi penjualan/i);
     assert.match(metrics.copy, /Lead tidak tercecer/i);
-    assert.match(metrics.copy, /bisnis otomotif/i);
+    assert.match(metrics.copy, /AI Sales & CRM/i);
+    assert.doesNotMatch(metrics.copy, /otomotif/i);
+    assert.doesNotMatch(metrics.copy, /dealer mobil/i);
+    const phrases = await page.locator("[data-typewriter]").getAttribute("data-phrases");
+    assert.match(String(phrases), /lead jadi closing/);
+    assert.doesNotMatch(String(phrases), /stock|unit|otomotif/i);
     assert.match(metrics.team, /Falcon/);
     assert.match(metrics.team, /Fino/);
     assert.match(metrics.team, /Jasmine/);
