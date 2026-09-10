@@ -93,7 +93,7 @@ for (const viewport of viewports) {
     });
     const page = await context.newPage();
     await page.route(/https:\/\/fonts\.(?:googleapis|gstatic)\.com\//, (route) => route.abort());
-    await page.goto(`${baseUrl}/index.html?v=hero-wa-20260910`, { waitUntil: "load" });
+    await page.goto(`${baseUrl}/index.html?v=hero-copy-20260910`, { waitUntil: "load" });
 
     const stage = page.locator("[data-hero-chat]");
     await stage.scrollIntoViewIfNeeded();
@@ -103,12 +103,14 @@ for (const viewport of viewports) {
       const stageEl = document.querySelector("[data-hero-chat]");
       const thread = document.querySelector("#waThread");
       const name = document.querySelector("#waName")?.textContent || "";
+      const copy = document.querySelector(".home-hero-copy")?.innerText || "";
       const modes = [...document.querySelectorAll(".wa-rail [data-mode]")].map((btn) => btn.getAttribute("data-mode"));
       const composer = document.querySelector(".wa-input");
       return {
         hasStage: Boolean(stageEl),
         threadCount: thread?.children.length || 0,
         name,
+        copy,
         modes,
         composerWa: composer instanceof HTMLAnchorElement ? composer.href : "",
         overflow: document.documentElement.scrollWidth > document.documentElement.clientWidth + 1,
@@ -118,6 +120,11 @@ for (const viewport of viewports) {
     assert.equal(metrics.hasStage, true, JSON.stringify(metrics));
     assert.ok(metrics.threadCount >= 3, JSON.stringify(metrics));
     assert.equal(metrics.name, "Mobix Bintaro", JSON.stringify(metrics));
+    assert.match(metrics.copy, /Naikkan konversi sales/i);
+    assert.match(metrics.copy, /Falcon/);
+    assert.match(metrics.copy, /Fino/);
+    assert.match(metrics.copy, /Jasmine/);
+    assert.doesNotMatch(metrics.copy, /Platform penjualan untuk dealer mobil/i);
     assert.deepEqual(metrics.modes, ["lead", "cs", "internal"], JSON.stringify(metrics));
     assert.match(metrics.composerWa, /wa\.me\/6281999197186/);
     assert.equal(metrics.overflow, false, JSON.stringify(metrics));

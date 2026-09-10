@@ -11712,12 +11712,21 @@ class HeroWhatsAppDemo {
   next() {
     const script = heroChatScripts[this.mode];
     if (this.step >= script.steps.length) {
-      this.timer = window.setTimeout(() => this.play(this.mode), 4200);
+      this.timer = window.setTimeout(() => this.play(this.mode), 8000);
       return;
     }
     const item = script.steps[this.step];
     const showAi = item.kind === "ai" || item.kind === "card" || item.kind === "product" || item.kind === "photos";
-    const delay = item.kind === "user" ? 900 : item.kind === "chip" || item.kind === "divider" || item.kind === "date" ? 700 : 1600;
+    const textLen = String(item.text || item.title || "").length;
+    const readExtra = Math.min(2800, Math.round(textLen * 32));
+    const delay = showAi
+      ? 2200
+      : item.kind === "user"
+        ? 2000
+        : item.kind === "date"
+          ? 900
+          : 1800;
+    const hold = showAi ? 2400 + readExtra : item.kind === "user" ? 1200 + Math.round(readExtra * 0.35) : 1600;
     if (showAi) {
       this.showTyping();
       this.timer = window.setTimeout(() => {
@@ -11725,7 +11734,7 @@ class HeroWhatsAppDemo {
         this.render(item);
         this.step += 1;
         this.scroll();
-        this.timer = window.setTimeout(() => this.next(), 700);
+        this.timer = window.setTimeout(() => this.next(), hold);
       }, delay);
       return;
     }
@@ -11733,7 +11742,7 @@ class HeroWhatsAppDemo {
       this.render(item);
       this.step += 1;
       this.scroll();
-      this.next();
+      this.timer = window.setTimeout(() => this.next(), hold);
     }, delay);
   }
 
