@@ -92,6 +92,50 @@
   padding-block: 76px 64px;
 }
 
+.hero-services {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 18px;
+  margin-top: 48px;
+}
+
+.hero-service-card {
+  min-width: 0;
+  padding: 26px;
+  border: 1px solid #dce7f5;
+  border-radius: 22px;
+  background: #fff;
+  box-shadow: 0 10px 28px rgba(22, 42, 83, .05);
+}
+
+.hero-service-icon {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  margin-bottom: 22px;
+  border-radius: 14px;
+  color: #1267f5;
+  background: #e8f1ff;
+}
+
+.hero-service-card:nth-child(2) .hero-service-icon { color: #0f766e; background: #e6fbf7; }
+.hero-service-card:nth-child(3) .hero-service-icon { color: #7c3aed; background: #f3e8ff; }
+.hero-service-card:nth-child(4) .hero-service-icon { color: #b45309; background: #fff3dc; }
+.hero-service-icon svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+.hero-service-card h2 { margin: 0; color: #0b1931; font-size: 21px; line-height: 1.25; letter-spacing: -.025em; }
+.hero-service-card p { margin: 14px 0 0; color: #536175; font-size: 14px; line-height: 1.7; }
+
+@media (max-width: 1100px) {
+  .hero-services { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 760px) {
+  .hero-services { grid-template-columns: 1fr; gap: 14px; margin-top: 32px; }
+  .hero-service-card { padding: 24px; }
+  .hero-service-icon { margin-bottom: 18px; }
+}
+
 .alt-hand {
   margin: 0;
   color: #0b1931;
