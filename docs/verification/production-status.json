@@ -1,0 +1,23 @@
+{
+  "deployment": {
+    "deployment_uuid": "pwvsph2cddvcjxkuogc7pchp",
+    "status": "finished",
+    "commit": "5330f91c4961fcc292a0bd0c6c60dc1861ff9a28",
+    "application_name": "motovax-onboarding"
+  },
+  "hash_checks": [
+    {
+      "file": "index.html",
+      "hash_matches": true
+    },
+    {
+      "file": "shared/design.css",
+      "hash_matches": true
+    },
+    {
+      "file": "shared/public.js",
+      "hash_matches": true
+    }
+  ],
+  "browser_verification": "timeout 250s, exit 124; incomplete"
+}

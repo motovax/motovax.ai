@@ -56,3 +56,16 @@ aplikasi onboarding. Konfigurasi organisasi bersama tidak diubah. Dockerfile dis
 
 Pemeriksaan production dilakukan setelah deployment. Detail disimpan terpisah pada
 `production-measurements.json` agar hasil lokal dan live bisa dibandingkan.
+
+## Status akhir sesi
+
+Production GitHub Pages sudah menampilkan landing baru. Hash index/CSS/JS production:
+[{"file": "index.html", "hash_matches": true}, {"file": "shared/design.css", "hash_matches": true}, {"file": "shared/public.js", "hash_matches": true}]
+
+Coolify onboarding: finished, commit 5330f91c4961fcc292a0bd0c6c60dc1861ff9a28.
+Deploy aplikasi utama yang sempat terpicu selesai pada SHA produk yang tidak berubah.
+
+Verifikasi massal production mencapai timeout 250 detik (exit 124), sehingga laporan
+195 pemeriksaan di atas adalah hasil lokal, bukan klaim seluruh pemeriksaan production.
+Screenshot production parsial tersedia di folder ini; pengukuran live lengkap belum
+selesai. Task ditutup sementara dalam status review untuk tindak lanjut verifikasi.
