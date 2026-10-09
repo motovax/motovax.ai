@@ -88,59 +88,20 @@ const expectedLogos = [
 ];
 
 for (const viewport of viewports) {
-  test(`section Our Clients tampil di ${viewport.name}`, async () => {
+  test(`studi kasus dan logo klien tampil tanpa metric rekaan pada ${viewport.name}`, async () => {
     const context = await browser.newContext({ viewport });
     const page = await context.newPage();
-    await page.route(/https:\/\/fonts\.(?:googleapis|gstatic)\.com\//, (route) => route.abort());
+    await page.route(/https:\/\/fonts\.(?:googleapis|gstatic)\.com\//, route => route.abort());
     await page.goto(`${baseUrl}/index.html`, { waitUntil: "load" });
-
-    const section = page.locator("#our-clients");
+    const section=page.locator('#studi-kasus');
     await section.scrollIntoViewIfNeeded();
-
-    const state = await page.evaluate(() => {
-      const crm = document.querySelector("#crm");
-      const clients = document.querySelector("#our-clients");
-      const cta = document.querySelector(".home-cta");
-      const logos = [...document.querySelectorAll(".clients-logos img")];
-      const more = document.querySelector(".clients-more span");
-      const heading = document.querySelector("#clients-heading");
-      const label = document.querySelector(".clients-heading .section-label");
-      return {
-        afterCrm: crm?.nextElementSibling === clients,
-        beforeCta: clients?.nextElementSibling === cta,
-        label: label?.textContent?.trim() || "",
-        heading: heading?.textContent?.trim() || "",
-        more: more?.textContent?.trim() || "",
-        logos: logos.map((img) => ({
-          src: img.currentSrc || img.getAttribute("src") || "",
-          alt: img.getAttribute("alt") || "",
-          naturalWidth: img.naturalWidth,
-          width: img.getBoundingClientRect().width,
-          height: img.getBoundingClientRect().height,
-        })),
-        overflow: document.documentElement.scrollWidth > document.documentElement.clientWidth,
-        sectionHeight: clients?.getBoundingClientRect().height || 0,
-      };
-    });
-
-    assert.equal(state.afterCrm, true, "Our Clients harus langsung di bawah seksi CRM");
-    assert.equal(state.beforeCta, true, "Our Clients harus sebelum CTA daftar");
-    assert.equal(state.label, "Our Clients");
-    assert.match(state.heading, /Dealer yang sudah memakai Motovax/);
-    assert.equal(state.more, "and many more");
-    assert.equal(state.logos.length, 3);
-    assert.equal(state.overflow, false, "tidak boleh overflow horizontal");
-    assert.ok(state.sectionHeight > 80, "section klien tidak boleh kosong");
-
-    for (const [index, expected] of expectedLogos.entries()) {
-      const logo = state.logos[index];
-      assert.match(logo.src, new RegExp(expected.file));
-      assert.match(logo.alt, new RegExp(expected.alt, "i"));
-      assert.ok(logo.naturalWidth > 0, `logo ${expected.file} belum ter-decode`);
-      assert.ok(logo.width > 40 && logo.height > 24, `logo ${expected.file} terlalu kecil`);
-    }
-
-    await page.screenshot({ path: `/tmp/motovax-clients-${viewport.name}.png`, fullPage: false });
+    const logos=section.locator('.mv-client-logos img');
+    assert.equal(await logos.count(),3);
+    for(const logo of await logos.all()){await logo.scrollIntoViewIfNeeded();await logo.evaluate(i=>i.decode());assert.ok(await logo.evaluate(i=>i.naturalWidth>0));}
+    assert.deepEqual(await logos.evaluateAll(imgs=>imgs.map(i=>i.alt)),['DSS Motor','Mobix','DSF']);
+    assert.match(await section.innerText(),/Metric keberhasilan belum dipublikasikan/);
+    assert.equal(await page.evaluate(()=>document.querySelector('#studi-kasus').nextElementSibling.classList.contains('mv-final')),true);
+    assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
     await context.close();
   });
 }

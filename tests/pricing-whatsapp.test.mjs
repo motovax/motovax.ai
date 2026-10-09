@@ -42,10 +42,10 @@ test("setiap modul harga memiliki CTA WhatsApp dengan konteks modul", () => {
   assert.equal((pricing.match(/data-wa-text=/g) || []).length, 5);
 });
 
-test("footer Hubungi Kami di harga.html memakai nomor WhatsApp sales", () => {
+test("footer Kontak di harga.html memakai nomor WhatsApp sales", () => {
   const html = read("harga.html");
-  const footer = html.slice(html.indexOf("<footer"));
-  assert.match(footer, new RegExp(`<h3>Hubungi Kami</h3>[\\s\\S]*${displayNumber.replace("+", "\\+")}`));
+  const footer = html.slice(html.indexOf('<footer class="mv-footer"'));
+  assert.match(footer, new RegExp(`<h3>Kontak</h3>[\\s\\S]*${displayNumber.replace("+", "\\+")}`));
   assert.match(footer, new RegExp(`wa\\.me/${waNumber}`));
   assert.doesNotMatch(footer, /\+62 21 1234 5678/);
 });

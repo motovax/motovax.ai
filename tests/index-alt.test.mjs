@@ -83,95 +83,37 @@ async function noOverflow(page) {
 }
 
 for (const viewport of viewports) {
-  test(`beranda product overview scanable pada ${viewport.name}`, async () => {
+  test(`tab platform dapat dioperasikan dengan keyboard pada ${viewport.name}`, async () => {
     const context = await browser.newContext({ viewport });
     const page = await context.newPage();
-    await page.route(/https:\/\/fonts\.(?:googleapis|gstatic)\.com\//, (route) => route.abort());
+    await page.route(/https:\/\/fonts\.(?:googleapis|gstatic)\.com\//, route => route.abort());
     await page.goto(`${baseUrl}/index.html`, { waitUntil: "load" });
-
-    assert.equal(await page.locator("[data-typewriter]").getAttribute("data-phrases"), expectedPhrases);
-    assert.equal(
-      (await page.locator(".alt-core-lead").innerText()).replace(/\s+/g, " ").trim(),
-      "Motovax menyatukan data, workflow, dan pelaporan dalam satu platform operasional dealer.",
-    );
-    assert.match((await page.locator("#core-heading").innerText()).replace(/\s+/g, " "), /One Data\. One Platform\. Every Lead Connected\./);
-    assert.equal(await page.locator(".platform-stage").count(), 4);
-    assert.equal(await page.locator(".one-platform-outcomes article").count(), 4);
-
-    const headingFont = await page.locator("#core-heading").evaluate((el) => getComputedStyle(el).fontFamily);
-    assert.equal(/caveat/i.test(headingFont), false, `judul memakai font hirarki Inter, bukan Caveat: ${headingFont}`);
-    assert.match(headingFont, /inter|system-ui|sans-serif/i);
-
-    const featureHeadingFont = await page.locator("#jasmine-heading").evaluate((el) => getComputedStyle(el).fontFamily);
-    assert.equal(/caveat/i.test(featureHeadingFont), false);
-
-    const coreImage = page.locator(".one-platform-screen picture img");
-    await coreImage.scrollIntoViewIfNeeded();
-    assert.match(await coreImage.getAttribute("src"), /product-crm-pipeline\.png/);
-    assert.equal(await coreImage.evaluate((img) => img.naturalWidth > 0), true);
-    assert.match(await coreImage.getAttribute("alt"), /Pipeline CRM Motovax.*data demo.*Cold.*Warm.*Prospect.*Hot/i);
-    assert.equal(await page.locator(".platform-stage .stage-icons").count(), 4);
-    assert.ok(await page.locator(".platform-stage .stage-icons li").count() >= 20);
-
-    const coreMore = page.locator(".alt-core > .container > .alt-core-more");
-    assert.equal(await coreMore.count(), 1);
-    assert.equal(await coreMore.getAttribute("href"), "./fitur/core-platform-agentic-ai.html");
-    assert.equal(await page.locator(".alt-core .btn").count(), 0, "Selengkapnya Core Platform bukan tombol");
-    const coreMoreBg = await coreMore.evaluate((el) => getComputedStyle(el).backgroundColor);
-    assert.equal(coreMoreBg === "rgba(0, 0, 0, 0)" || coreMoreBg === "transparent", true, `Selengkapnya tidak boleh berwarna tombol: ${coreMoreBg}`);
-    assert.equal(await page.locator(".alt-orbit-lines, .alt-orbit-dots, animateMotion").count(), 0, "animasi bulet diagram dihapus");
-    assert.equal(await page.locator(".alt-story, .alt-howto, .channel-strip, .alt-pillar").count(), 0);
-    assert.equal(await page.locator("section.alt-feature").count(), 5);
-
-    assert.match(await page.locator(".one-platform-quote").innerText(), /One Data.*One Platform/);
-
-    const crmImage = page.locator(".alt-crm-visual img");
-    await crmImage.scrollIntoViewIfNeeded();
-    assert.match(await crmImage.getAttribute("src"), /alt-crm-workspace\.png/);
-    assert.equal(await crmImage.evaluate((img) => img.naturalWidth > 0), true);
-
-    const featureImages = page.locator(".alt-feature img");
-    const count = await featureImages.count();
-    assert.ok(count >= 6);
-    for (let index = 0; index < count; index += 1) {
-      const image = featureImages.nth(index);
-      await image.scrollIntoViewIfNeeded();
-      const box = await image.boundingBox();
-      assert.ok(box && box.width > 80 && box.height > 80, `feature image ${index} terlalu kecil: ${JSON.stringify(box)}`);
-    }
-
-    const cta = page.locator(".home-cta a.btn");
-    assert.equal(await cta.getAttribute("href"), registerHref);
-    assert.match((await cta.textContent()).replace(/\s+/g, " "), /Daftar|Mulai Coba/i);
-
-    assert.equal(await noOverflow(page), true);
-
-    if (viewport.name === "mobile") {
-      await page.locator("[data-hero-image-open]").first().click();
-      const modal = page.locator("[data-hero-image-modal]");
-      assert.equal(await modal.isHidden(), false);
-      assert.equal(await page.locator("body").evaluate((body) => getComputedStyle(body).overflow), "hidden");
-      await page.keyboard.press("Escape");
-      assert.equal(await modal.isHidden(), true);
-    }
-
-    assert.equal(await page.locator(".alt-preview-bar").count(), 0);
-    assert.equal(await page.locator('meta[name="robots"]').count(), 0);
-    assert.match(await page.title(), /One Stock, More Sales, Faster Response/i);
-
-    await page.screenshot({ path: `/tmp/motovax-index-alt-${viewport.name}.png`, fullPage: true });
+    const tabs=page.getByRole('tab');
+    assert.equal(await tabs.count(),4);
+    await tabs.first().focus();
+    await page.keyboard.press('ArrowRight');
+    assert.equal(await tabs.nth(1).getAttribute('aria-selected'),'true');
+    assert.equal(await page.locator('[role=tabpanel]:visible').count(),1);
+    await page.keyboard.press('End');
+    assert.equal(await tabs.nth(3).getAttribute('aria-selected'),'true');
+    await page.locator('[role=tabpanel]:visible img').scrollIntoViewIfNeeded();
+    await page.locator('[role=tabpanel]:visible img').evaluate(i=>i.decode());
+    await page.locator('[data-platform-full]:visible').click();
+    assert.equal(await page.locator('dialog').evaluate(d=>d.open),true);
+    assert.equal(await page.evaluate(()=>document.body.style.overflow),'hidden');
+    await page.keyboard.press('Escape');
+    await page.waitForFunction(()=>!document.querySelector('dialog').open&&document.body.style.overflow==='');
+    assert.equal(await page.locator('[data-platform-full]:visible').evaluate(e=>e===document.activeElement),true);
+    assert.equal(await noOverflow(page),true);
     await context.close();
   });
 }
 
-test("index-alt.html mengarah ke beranda", async () => {
-  const context = await browser.newContext();
-  const page = await context.newPage();
-  const response = await page.goto(`${baseUrl}/index-alt.html`, { waitUntil: "load" });
-  const url = new URL(page.url());
-  assert.equal(url.pathname, "/");
-  assert.ok(response && [200, 301, 302, 308].includes(response.status()));
-  assert.equal(await page.locator(".platform-stage").count(), 4);
-  assert.equal(await page.locator(".one-platform-outcomes article").count(), 4);
-  await context.close();
+test("index-alt.html mengarah ke beranda omnichannel", async () => {
+ const context=await browser.newContext();const page=await context.newPage();
+ await page.goto(`${baseUrl}/index-alt.html`,{waitUntil:'load'});
+ assert.equal(new URL(page.url()).pathname,'/');
+ assert.match(await page.title(),/AI Dashboard Omnichannel/);
+ assert.equal(await page.getByRole('tab').count(),4);
+ await context.close();
 });

@@ -204,3 +204,6 @@ for (const [from, to] of Object.entries(redirects)) {
   );
   console.log("redirect", `${from}.html`, "->", `${to}.html`);
 }
+
+// Keep generated public pages on the shared design system.
+await import('./sync-public-design.mjs');
