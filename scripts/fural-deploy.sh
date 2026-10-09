@@ -13,13 +13,13 @@ for line in (Path.home()/'.env').read_text().splitlines():
         config[key.strip()]=value.strip().strip('\"\'')
 base=config['COOLIFY_BASE_URL'].rstrip('/')
 headers={'Authorization':'Bearer '+config['COOLIFY_DEPLOY_TOKEN'],'Accept':'application/json','User-Agent':'curl/8.0'}
-def request(path):
-    return json.load(urllib.request.urlopen(urllib.request.Request(base+path,headers=headers),timeout=45))
+def request(path, payload=None):
+    return json.load(urllib.request.urlopen(urllib.request.Request(base+path,headers={**headers,'Content-Type':'application/json'},data=json.dumps(payload).encode() if payload is not None else None),timeout=45))
 apps=request('/api/v1/applications')
 matches=[app for app in apps if str(app.get('git_repository','')).removesuffix('.git')=='motovax/motovax.ai' and 'https://onboard.motovax.com' in str(app.get('fqdn','')) and app.get('git_branch')=='main']
 if len(matches)!=1:
     raise SystemExit('Deploy dihentikan: target Coolify repo motovax.ai / onboard.motovax.com tidak unik.')
 app=matches[0]
-result=request('/api/v1/deploy?uuid='+app['uuid']+'&force=false')
+result=request('/api/v1/deploy', {'uuid':app['uuid'],'force':False})
 print(json.dumps({'target':app['name'],'domain':'https://onboard.motovax.com','repository':app['git_repository'],'deployment':result}))
 PY
