@@ -34,3 +34,9 @@ Pemeriksaan Chromium/CDP mencakup 65 halaman × tiga viewport, cache disabled,
 preview yang sudah di-decode, kesamaan ukuran baris reverse, tab dan modal mobile.
 Gunakan `VERIFY_URL=https://motovax.ai` untuk production, atau `VERIFY_FILES=index.html,harga.html`
 untuk pemeriksaan terarah. Hasil disimpan di `docs/verification/`.
+
+Production `motovax.ai` dipublikasikan oleh GitHub Pages dari `main`.
+Untuk image repo yang melayani `onboard.motovax.com`, gunakan
+`fural-agent repos ship RP5a52bad565635abf41dab4fa --mode script`
+atau mode auto. Script memvalidasi target Coolify berdasarkan repo/branch/domain;
+mode coolify langsung memakai default organisasi yang mengarah ke repo produk lain.
