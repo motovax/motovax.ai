@@ -16,7 +16,6 @@ COPY assets ./public/assets
 COPY fitur ./public/fitur
 COPY icons ./public/icons
 COPY solusi ./public/solusi
-COPY shared ./public/shared
 
 USER node
 EXPOSE 3000

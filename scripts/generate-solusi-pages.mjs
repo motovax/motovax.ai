@@ -116,6 +116,3 @@ for (const industry of Object.values(industries)) {
 }
 
 console.log(`done, ${Object.keys(industries).length} halaman solusi dealer mobil`);
-
-// Keep generated public pages on the shared design system.
-await import('./sync-public-design.mjs');

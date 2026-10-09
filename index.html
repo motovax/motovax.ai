@@ -1,404 +1,474 @@
 <!doctype html>
 <html lang="id">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>MOTOVAX | AI Dashboard Omnichannel Indonesia</title>
-<meta name="description" content="AI dashboard omnichannel untuk dealer mobil Indonesia. Satukan percakapan, Jasmine AI, CRM, inventory, dan handoff sales dalam satu platform.">
-<link rel="canonical" href="https://motovax.ai/">
-<meta name="theme-color" content="#0b0d12">
-<link rel="icon" href="./icons/favicon.svg">
-<link rel="stylesheet" href="./styles.css?v=omni-20261009">    <link rel="stylesheet" href="./shared/design.css?v=omni-20261009" />
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MOTOVAX | AI Sales &amp; CRM</title>
+    <meta name="description" content="Motovax menyatukan percakapan, lead omnichannel, CRM, dan AI agar tim sales merespons lebih cepat, follow-up rapi, dan closing lebih banyak." />
+    <link rel="canonical" href="https://motovax.ai/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="MOTOVAX | AI Sales &amp; CRM" />
+    <meta property="og:description" content="Satu platform untuk menghubungkan chat, lead, sales, follow-up, dan closing." />
+    <meta property="og:url" content="https://motovax.ai/" />
+    <meta property="og:image" content="./icons/icon-512.png" />
+    <meta name="theme-color" content="#1267f5" />
+    <link rel="icon" type="image/svg+xml" href="./icons/favicon.svg" />
+    <link rel="apple-touch-icon" sizes="180x180" href="./icons/apple-touch-icon.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="./styles.css?v=whatsapp-20260914" />
+    <link rel="stylesheet" href="./styles-alt.css?v=hero-services-20260914" />
   </head>
-<body class="mv-home">
-<header class="mv-header">
-<div class="mv-nav-shell">
-<a class="mv-brand" href="./index.html">MOTO<span>VAX</span>
-<i>®</i>
-</a>
-<button class="mv-menu-toggle" aria-label="Buka navigasi" aria-expanded="false" aria-controls="mv-navigation">
-<svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true">
-<path d="M4 6h16M4 12h16M4 18h16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-</svg>
-</button>
-<nav id="mv-navigation" aria-label="Navigasi utama">
-<a href="./modul.html">Produk</a>
-<a href="./index.html#tim-ai">Tim AI</a>
-<a href="./index.html#solusi">Solusi</a>
-<a href="./index.html#studi-kasus">Studi Kasus</a>
-<a href="./harga.html">Harga</a>
-<a class="mv-contact" href="./hubungi-kami.html">Hubungi Kami</a>
-<a class="btn btn-primary" href="https://onboard.motovax.com/login.html?reauth=1">Login ↗</a>
-</nav>
-</div>
-</header>
-<main id="top">
-<section class="mv-hero">
-<div class="container">
-<span class="mv-badge">
-<i>
-</i> Platform AI omnichannel buatan Indonesia</span>
-<h1>AI dashboard omnichannel untuk bisnis Indonesia yang tumbuh lewat chat<span>.</span>
-</h1>
-<p class="mv-hero-copy">Dibangun untuk dealer mobil. Satukan percakapan WhatsApp, Instagram, dan Messenger, hubungkan lead dari iklan serta website. Jasmine AI merespons 24/7, tim sales mengambil alih dengan konteks lengkap.</p>
-<div class="mv-actions">
-<a class="btn btn-primary" href="https://onboard.motovax.com/onboarding.html?fresh=1">Mulai Gratis ↗</a>
-<a class="btn btn-secondary" href="./hubungi-kami.html">Jadwalkan Demo →</a>
-</div>
-<p class="mv-micro">Satu inbox. AI dan manusia. Setiap lead terpantau.</p>
-<div class="mv-product" aria-label="Ilustrasi dashboard dengan data demo">
-<div class="mv-product-bar">
-<span>
-<i>
-</i>
-<i>
-</i>
-<i>
-</i>
-</span>
-<b>MOTOVAX / Omnichannel</b>
-<span class="mv-demo-label">DATA DEMO</span>
-</div>
-<div class="mv-product-grid">
-<aside class="mv-channels">
-<span class="mv-label">KANAL</span>
-<div class="selected">◉ WhatsApp <small>12</small>
-</div>
-<div>◎ Instagram <small>4</small>
-</div>
-<div>◉ Messenger <small>2</small>
-</div>
-<hr>
-<span class="mv-label">WORKSPACE</span>
-<p>Dealer Demo<br>
-<small>Semua cabang</small>
-</p>
-<span class="mv-online">● Jasmine aktif</span>
-</aside>
-<div class="mv-conversation">
-<div class="mv-chat-heading">
-<span class="mv-avatar">D</span>
-<div>
-<b>Pelanggan Demo</b>
-<small>WhatsApp · Lead dari iklan</small>
-</div>
-<label class="mv-lifecycle">
-<span class="sr-only">Lifecycle lead demo</span>
-<select aria-label="Lifecycle lead demo">
-<option>Lead Baru</option>
-<option selected>Hot Lead</option>
-<option>Prospect</option>
-<option>Deal</option>
-<option>Cold</option>
-</select>
-</label>
-</div>
-<div class="mv-chat-stream">
-<span class="mv-chat-date">HARI INI · ILUSTRASI PERCAKAPAN</span>
-<div class="mv-bubble customer">Halo, ada SUV untuk keluarga? Budget sekitar 250 juta.<small>09:41</small>
-</div>
-<div class="mv-bubble ai">
-<b>✦ Jasmine AI</b>Ada, Kak. Saya bantu carikan SUV sesuai budget dari stok dealer. Ada preferensi transmisi?<small>09:41 · Dijawab AI</small>
-</div>
-<div class="mv-bubble customer">Matic. Bisa test drive akhir pekan?</div>
-<div class="mv-handoff">✓ Konteks dan kebutuhan diteruskan ke Sales</div>
-<div class="mv-bubble ai">
-<b>Sales · Agent mengambil alih</b>Bisa, Kak. Saya lanjut bantu cek unit dan jadwal test drive.<small>09:42 · Ditangani tim sales</small>
-</div>
-</div>
-<div class="mv-composer">Tulis balasan untuk pelanggan… <span>↗</span>
-</div>
-</div>
-<aside class="mv-inbox">
-<span class="mv-label">INBOX</span>
-<div>Semua <b>18</b>
-</div>
-<div>✦ Ditangani AI <b>12</b>
-</div>
-<div class="selected">◉ Perlu Sales <b>4</b>
-</div>
-<div>↗ Follow-up <b>2</b>
-</div>
-<div class="mv-lead-detail">
-<span class="mv-label">KONTEKS LEAD</span>
-<p>SUV · Matic<br>Budget Rp250 juta<br>Test drive akhir pekan</p>
-<span class="mv-online">✓ Handoff lengkap</span>
-</div>
-</aside>
-</div>
-</div>
-</div>
-</section>
-<section class="mv-channel-strip">
-<div class="container">
-<p class="mv-label">TERHUBUNG DI SEPANJANG PERJALANAN PELANGGAN</p>
-<div>
-<span>WhatsApp</span>
-<span>Instagram</span>
-<span>TikTok</span>
-<span>Messenger</span>
-<span>Website Chat</span>
-<span>Meta Ads</span>
-<span>Email</span>
-<span>Telepon</span>
-</div>
-<p class="mv-micro">Inbox utama: WhatsApp, Instagram, Messenger. TikTok melalui integrasi akun; website, iklan, email, dan telepon mengikuti layanan serta konfigurasi tenant.</p>
-</div>
-</section>
-<section class="mv-section" id="produk">
-<div class="container">
-<div class="mv-section-heading">
-<span class="mv-label">DARI CHAT KE CLOSING</span>
-<h2>Ubah percakapan<br>jadi revenue<span>.</span>
-</h2>
-<p>Lebih sedikit berpindah aplikasi. Lebih banyak waktu untuk pelanggan dan penjualan.</p>
-</div>
-<div class="mv-grid three">
-<article class="mv-card">
-<span class="mv-card-icon">↗</span>
-<h3>Omnichannel team inbox</h3>
-<p>Satukan percakapan lintas kanal. Agent melanjutkan respons AI dan meneruskan lead ke sales tanpa kehilangan riwayat.</p>
-<a href="./fitur/omni-jasmine-ai.html">Pelajari lebih lanjut ↗</a>
-</article>
-<article class="mv-card">
-<span class="mv-card-icon">✦</span>
-<h3>AI Agents</h3>
-<p>Jasmine menangani pertanyaan awal. Falcon membantu cek stok dan harga, lalu tim Anda melanjutkan ke test drive dan deal.</p>
-<a href="./fitur/agentic-ai.html">Pelajari lebih lanjut ↗</a>
-</article>
-<article class="mv-card">
-<span class="mv-card-icon">⌘</span>
-<h3>Otomasi & integrasi</h3>
-<p>Hubungkan Meta, inventory, import Google Sheets, simulasi kredit, dan Developer API sesuai layanan yang diaktifkan.</p>
-<a href="./modul.html">Pelajari lebih lanjut ↗</a>
-</article>
-</div>
-</div>
-</section>
-<section class="mv-section mv-usecases" id="solusi">
-<div class="container">
-<div class="mv-section-heading">
-<span class="mv-label">DIRANCANG UNTUK DEALER MOBIL</span>
-<h2>Setiap tahap.<br>Selalu ada tindak lanjut.</h2>
-</div>
-<div class="mv-grid three">
-<article class="mv-card">
-<span class="mv-card-icon">01 / LIFECYCLE</span>
-<h3>Kelola siklus pelanggan</h3>
-<p>Dari lead baru, prospect, sampai deal. Tim sales melihat konteks dan prioritas tindak lanjut dalam CRM.</p>
-<a href="./fitur/aplikasi-crm.html">Pelajari lebih lanjut ↗</a>
-</article>
-<article class="mv-card">
-<span class="mv-card-icon">02 / AKUISISI</span>
-<h3>Lead dari iklan langsung dijawab</h3>
-<p>Arahkan Click-to-WhatsApp ke percakapan dengan Jasmine. Bantu pelanggan menemukan unit, lalu handoff ke sales.</p>
-<a href="./fitur/ctwa.html">Pelajari lebih lanjut ↗</a>
-</article>
-<article class="mv-card">
-<span class="mv-card-icon">03 / RETENSI</span>
-<h3>Tetap dekat setelah transaksi</h3>
-<p>Susun audiens dan broadcast tersegmentasi untuk promo, follow-up, serta kebutuhan after-sales. Sesuai paket dan izin kanal.</p>
-<a href="./fitur/motovax-broadcast.html">Pelajari lebih lanjut ↗</a>
-</article>
-</div>
-</div>
-</section>
-<section class="mv-section mv-light" id="tim-ai">
-<div class="container">
-<div class="mv-section-heading">
-<span class="mv-label">KENALI TIM AI ANDA</span>
-<h2>Tim kecil. Kemampuan besar.</h2>
-<p>Peran AI yang saling melengkapi untuk operasional dealer. Ketersediaan mengikuti modul dan konfigurasi tenant.</p>
-</div>
-<div class="mv-ai-grid">
-<a class="mv-ai-card" href="./fitur/omni-jasmine-ai.html">
-<div class="mv-ai-avatar">J<span>✦</span>
-</div>
-<h3>Jasmine <span>↗</span>
-</h3>
-<span class="mv-label">Customer & lead</span>
-<p>Menjawab chat dan menjaga konteks sampai handoff.</p>
-</a>
-<a class="mv-ai-card" href="./fitur/inventory-falcon-ai.html">
-<div class="mv-ai-avatar">F<span>✦</span>
-</div>
-<h3>Falcon <span>↗</span>
-</h3>
-<span class="mv-label">Stok & harga</span>
-<p>Mencari unit dan membantu tim sales dari inventory.</p>
-</a>
-<a class="mv-ai-card" href="./fitur/agentic-ai.html">
-<div class="mv-ai-avatar">Fi<span>✦</span>
-</div>
-<h3>Fino <span>↗</span>
-</h3>
-<span class="mv-label">Simulasi kredit</span>
-<p>Peran simulasi kredit melalui tool AI, sesuai data leasing.</p>
-</a>
-<a class="mv-ai-card" href="./fitur/ana-ai-analytics.html">
-<div class="mv-ai-avatar">A<span>✦</span>
-</div>
-<h3>Ana <span>↗</span>
-</h3>
-<span class="mv-label">Analytics</span>
-<p>Membantu membaca laporan dan performa dealer.</p>
-</a>
-<a class="mv-ai-card" href="./fitur/iris-content-studio.html">
-<div class="mv-ai-avatar">I<span>✦</span>
-</div>
-<h3>Iris <span>↗</span>
-</h3>
-<span class="mv-label">Social media</span>
-<p>Konten, jadwal publikasi, dan integrasi Meta.</p>
-</a>
-</div>
-</div>
-</section>
-<section class="mv-section" id="platform">
-<div class="container">
-<div class="mv-section-heading">
-<span class="mv-label">SATU WORKSPACE UNTUK DEALER ANDA</span>
-<h2>Satu data. Satu platform.</h2>
-<p>Percakapan, pelanggan, unit, dan performa bekerja dalam satu alur.</p>
-</div>
-<div class="mv-tabs" role="tablist" aria-label="Preview platform">
-<button id="tab-omni" role="tab" data-platform-tab aria-controls="panel-omni" aria-selected="true" tabindex="0">AI Jasmine + Omni</button>
-<button id="tab-crm" role="tab" data-platform-tab aria-controls="panel-crm" aria-selected="false" tabindex="-1">CRM</button>
-<button id="tab-falcon" role="tab" data-platform-tab aria-controls="panel-falcon" aria-selected="false" tabindex="-1">Falcon + Inventory</button>
-<button id="tab-ana" role="tab" data-platform-tab aria-controls="panel-ana" aria-selected="false" tabindex="-1">Ana Analytics</button>
-</div>
-<div id="panel-omni" role="tabpanel" aria-labelledby="tab-omni" >
-<div class="mv-platform-preview">
-<img src="./assets/feature-previews/omnichannel-faneling-public-1200.webp?v=omni-20261009" alt="Respons AI, takeover agent, dan handoff sales dalam satu percakapan." loading="lazy">
-</div>
-<div class="mv-preview-caption">
-<p>Respons AI, takeover agent, dan handoff sales dalam satu percakapan.</p>
-<button data-platform-full>Buka ukuran penuh ↗</button>
-</div>
-</div>
-<div id="panel-crm" role="tabpanel" aria-labelledby="tab-crm" hidden>
-<div class="mv-platform-preview">
-<img src="./assets/feature-previews/manajemen-kontak-pipeline-public-1200.webp?v=omni-20261009" alt="Kelola kontak dan pipeline lead dealer dalam satu workspace." loading="lazy">
-</div>
-<div class="mv-preview-caption">
-<p>Kelola kontak dan pipeline lead dealer dalam satu workspace.</p>
-<button data-platform-full>Buka ukuran penuh ↗</button>
-</div>
-</div>
-<div id="panel-falcon" role="tabpanel" aria-labelledby="tab-falcon" hidden>
-<div class="mv-platform-preview">
-<img src="./assets/feature-previews/inventory-falcon-query-public-1200.webp?v=omni-20261009" alt="Temukan unit yang sesuai kebutuhan pelanggan dengan Falcon." loading="lazy">
-</div>
-<div class="mv-preview-caption">
-<p>Temukan unit yang sesuai kebutuhan pelanggan dengan Falcon.</p>
-<button data-platform-full>Buka ukuran penuh ↗</button>
-</div>
-</div>
-<div id="panel-ana" role="tabpanel" aria-labelledby="tab-ana" hidden>
-<div class="mv-platform-preview">
-<img src="./assets/feature-previews/report-sales-hero-public-1200.webp?v=omni-20261009" alt="Pantau performa sales dan jadikan data dasar tindak lanjut." loading="lazy">
-</div>
-<div class="mv-preview-caption">
-<p>Pantau performa sales dan jadikan data dasar tindak lanjut.</p>
-<button data-platform-full>Buka ukuran penuh ↗</button>
-</div>
-</div>
-</div>
-</section>
-<section class="mv-section mv-light" id="studi-kasus">
-<div class="container">
-<div class="mv-case-grid">
-<div>
-<span class="mv-label">CERITA DEALER / MOBIX</span>
-<h2>Lebih dekat dengan lead.<br>Lebih rapi dalam bekerja.</h2>
-<div class="mv-case-copy">
-<div>
-<h3>Tujuan</h3>
-<p>Menghubungkan percakapan pelanggan dengan stok unit dan tindak lanjut sales dalam satu alur dealer.</p>
-</div>
-<div>
-<h3>Solusi</h3>
-<p>Omnichannel, AI, CRM, dan inventory sebagai fondasi workspace. Rincian implementasi serta hasil Mobix menunggu konfirmasi klien.</p>
-</div>
-</div>
-<p class="mv-case-note">Gambaran solusi, bukan klaim hasil klien. Metric keberhasilan belum dipublikasikan.</p>
-</div>
-<aside class="mv-case-aside">
-<img src="./assets/clients/mobix.png" alt="Mobix" loading="lazy">
-<dl>
-<dt>Industri</dt>
-<dd>Dealer mobil</dd>
-<dt>Lokasi</dt>
-<dd>Menunggu konfirmasi</dd>
-<dt>Kanal</dt>
-<dd>Menunggu konfirmasi</dd>
-</dl>
-<a href="./hubungi-kami.html">Diskusikan solusi dealer Anda →</a>
-</aside>
-</div>
-<div class="mv-client-logos">
-<img src="./assets/clients/dss-motor.png" alt="DSS Motor" loading="lazy">
-<img src="./assets/clients/mobix.png" alt="Mobix" loading="lazy">
-<img src="./assets/clients/dsf.png" alt="DSF" loading="lazy">
-</div>
-</div>
-</section>
-<section class="mv-section mv-final">
-<div class="container">
-<span class="mv-label">LANGKAH BERIKUTNYA MILIK ANDA</span>
-<h2>Gerakkan setiap lead,<br>mulai hari ini.</h2>
-<p>Berikan tim dealer Anda satu tempat untuk merespons, menindaklanjuti, dan bertumbuh.</p>
-<div class="mv-actions">
-<a class="btn btn-primary" href="https://onboard.motovax.com/onboarding.html?fresh=1">Daftar & Mulai Coba ↗</a>
-<a class="btn btn-secondary" href="https://wa.me/6281999197186">Chat WhatsApp →</a>
-</div>
-</div>
-</section>
-</main>
-<footer class="mv-footer">
-<div class="container mv-footer-grid">
-<div>
-<a class="mv-brand" href="./index.html">MOTO<span>VAX</span>
-<i>®</i>
-</a>
-<p>AI dashboard omnichannel buatan Indonesia. Dari percakapan pertama sampai pelanggan kembali ke dealer Anda.</p>
-<span class="mv-label">BUILT IN INDONESIA</span>
-</div>
-<div>
-<h3>Produk</h3>
-<a href="./fitur/omni-jasmine-ai.html">AI Omnichannel</a>
-<a href="./fitur/aplikasi-crm.html">CRM & Sales</a>
-<a href="./fitur/inventory-falcon-ai.html">Inventory & Falcon</a>
-<a href="./fitur/ana-ai-analytics.html">Ana Analytics</a>
-</div>
-<div>
-<h3>Perusahaan</h3>
-<a href="./index.html#studi-kasus">Studi kasus</a>
-<a href="./harga.html">Harga</a>
-<a href="./kebijakan-privasi.html">Kebijakan privasi</a>
-<a href="./syarat-ketentuan.html">Syarat & ketentuan</a>
-</div>
-<div>
-<h3>Kontak</h3>
-<a href="./hubungi-kami.html">Jadwalkan demo →</a>
-<a href="mailto:hello@motovax.ai">hello@motovax.ai</a>
-<a href="https://wa.me/6281999197186">+62 819-9919-7186 ↗</a>
-<a href="https://onboard.motovax.com/onboarding.html?fresh=1">Mulai gratis →</a>
-</div>
-</div>
-<div class="container mv-copyright">© 2026 MOTOVAX. Semua hak dilindungi.<span>Lebih dekat dengan setiap pelanggan.</span>
-</div>
-</footer>
-<dialog id="platform-viewer" class="mv-viewer" aria-label="Screenshot produk ukuran penuh">
-<div class="mv-viewer-toolbar">
-<b>Preview produk Motovax</b>
-<button aria-label="Tutup screenshot">×</button>
-</div>
-<div class="mv-viewer-scroll">
-<img alt="">
-</div>
-</dialog>
-    <script src="./shared/public.js?v=omni-20261009" defer>
-</script>
+  <body class="home-redesign home-alt">
+    <header class="site-header">
+      <div class="container header-inner">
+        <a class="brand" href="#top" aria-label="MOTOVAX home"><span>MOTO</span><strong>VAX</strong></a>
+        <nav class="nav" aria-label="Navigasi utama">
+          <div class="nav-item nav-item-produk is-current" data-produk-menu>
+            <button type="button" class="nav-produk-trigger" aria-expanded="false" aria-haspopup="true" aria-controls="produk-mega-menu" data-produk-trigger>Produk <svg class="nav-chevron" width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 4.5 6 8l3.5-3.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+            <div class="produk-mega" id="produk-mega-menu" role="region" aria-label="Menu produk Motovax" hidden data-produk-panel data-produk-mount></div>
+          </div>
+          <a href="#produk">Kapabilitas</a><a href="./harga.html">Harga</a><a href="./hubungi-kami.html">Hubungi Kami</a>
+        </nav>
+        <div class="header-actions">
+          <a class="btn btn-secondary header-login" href="https://onboard.motovax.com/login.html?reauth=1">Login/Daftar</a>
+        </div>
+      </div>
+    </header>
+
+    <main id="top">
+      <section class="home-hero">
+        <div class="container home-hero-grid">
+          <div class="home-hero-copy">
+            <p class="alt-hero-kicker">AI Sales &amp; CRM</p>
+            <h1 class="hero-sell-headline hero-type-headline">
+              <span class="hero-type-static">Ubah lebih banyak</span>
+              <span class="hero-type-dynamic">
+                <span class="hero-type-sizer" aria-hidden="true">chat jadi penjualan.</span>
+                <span class="hero-type-live">
+                  <span class="hero-type-text" data-typewriter data-phrases="chat jadi penjualan.|lead jadi closing.|inquiry jadi deal.|follow-up jadi order." aria-live="polite">chat jadi penjualan.</span><span class="hero-type-caret" aria-hidden="true"></span>
+                </span>
+              </span>
+            </h1>
+            <p class="hero-sell-dek">Satu platform untuk menangkap lead, menjawab lebih cepat, dan follow-up sampai closing.</p>
+            <p class="hero-sell-lead">Satukan WhatsApp, iklan, pameran, dan database pelanggan. Motovax membantu tim Anda merespons 24/7, menjaga setiap lead tetap terpantau, dan mempercepat proses menuju deal.</p>
+            <div class="home-hero-actions">
+              <a class="btn btn-primary btn-large" href="./hubungi-kami.html">Jadwalkan Demo <span>→</span></a>
+              <a class="btn btn-secondary btn-large" data-wa>WhatsApp Kami</a>
+            </div>
+            <div class="home-assurance" aria-label="Manfaat Motovax">
+              <span>✓ Lead tidak tercecer</span>
+              <span>✓ Follow-up otomatis</span>
+              <span>✓ Multi-cabang siap</span>
+            </div>
+          </div>
+          <figure class="hero-workspace hero-workspace-chat" aria-label="Mockup chat WhatsApp AI Motovax">
+            <div class="wa-stage" data-hero-chat>
+              <div class="wa-device">
+                <div class="wa-camera" aria-hidden="true"></div>
+                <div class="wa-bezel">
+                  <div class="wa-app">
+                    <div class="wa-statusbar">
+                      <span id="waClock">21:11</span>
+                      <span class="wa-signal" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" width="14" height="14"><path fill="currentColor" d="M16 6v12h2V6h-2zm-4 3v9h2V9h-2zM8 12v6h2v-6H8zM4 15v3h2v-3H4z"/></svg>
+                        <svg viewBox="0 0 24 24" width="16" height="16"><path fill="currentColor" d="M16 7H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2zm5 2v6l3 2V7l-3 2z"/></svg>
+                      </span>
+                    </div>
+                    <header class="wa-header">
+                      <span class="wa-back" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" width="18" height="18"><path fill="currentColor" d="M15.4 4.6 14 3.2 5.2 12 14 20.8l1.4-1.4L8 12z"/></svg>
+                      </span>
+                      <span class="wa-avatar" id="waAvatar">JX</span>
+                      <div class="wa-identity">
+                        <strong id="waName">Mobix Bintaro</strong>
+                        <small id="waStatus">Jasmine · Online</small>
+                      </div>
+                      <div class="wa-mode-tabs" role="tablist" aria-label="Tiga AI Motovax">
+                        <button type="button" role="tab" aria-selected="true" data-mode="lead">Lead</button>
+                        <button type="button" role="tab" aria-selected="false" data-mode="cs">CS</button>
+                        <button type="button" role="tab" aria-selected="false" data-mode="internal">Internal</button>
+                      </div>
+                      <span class="wa-header-icons" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" width="18" height="18"><path fill="currentColor" d="M6.6 10.8a15.5 15.5 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.24 11.4 11.4 0 0 0 3.6.57 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1 11.4 11.4 0 0 0 .57 3.6 1 1 0 0 1-.25 1z"/></svg>
+                      </span>
+                    </header>
+                    <div class="wa-thread" id="waThread" role="log" aria-live="polite"></div>
+                    <div class="wa-composer">
+                      <a class="wa-input" data-wa aria-label="Chat tim Motovax di WhatsApp">Coba Motovax untuk bisnis Anda...</a>
+                      <a class="wa-send" data-wa aria-label="Kirim ke WhatsApp">
+                        <svg viewBox="0 0 24 24" width="18" height="18"><path fill="currentColor" d="M3 20.5 21 12 3 3.5v6.7L15 12 3 13.8z"/></svg>
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <aside class="wa-rail" aria-label="Pilih AI Motovax">
+                <button type="button" class="is-active" data-mode="lead" title="Lead Generation">
+                  <svg viewBox="0 0 24 24" width="18" height="18"><path fill="currentColor" d="M4 4h16v12H7l-3 3z"/></svg>
+                  <span>Lead</span>
+                </button>
+                <button type="button" data-mode="cs" title="Customer Service">
+                  <svg viewBox="0 0 24 24" width="18" height="18"><path fill="currentColor" d="M12 3a7 7 0 0 0-7 7v3H3v6h6v-6H7v-3a5 5 0 0 1 10 0v3h-2v6h6v-6h-2v-3a7 7 0 0 0-7-7z"/></svg>
+                  <span>CS</span>
+                </button>
+                <button type="button" data-mode="internal" title="Internal Falcon">
+                  <svg viewBox="0 0 24 24" width="18" height="18"><path fill="currentColor" d="M12 2 3 7v2h18V7zm-7 9v9h4v-6h6v6h4v-9z"/></svg>
+                  <span>Internal</span>
+                </button>
+              </aside>
+            </div>
+          </figure>
+        </div>
+        <section class="container hero-services" aria-label="Layanan AI untuk dealer mobil">
+          <article class="hero-service-card">
+            <span class="hero-service-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 4h16l-6 7v7l-4 2v-9Z"/></svg></span>
+            <h2>Leads processing machine</h2>
+            <p>Satukan lead dari berbagai channel, kualifikasi kebutuhan mobil, dan teruskan ke tim sales yang tepat.</p>
+          </article>
+          <article class="hero-service-card">
+            <span class="hero-service-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m13 3-8 11h6l-1 7 9-12h-7Z"/></svg></span>
+            <h2>Sales closing AI</h2>
+            <p>Bantu sales cek stok unit, kirim simulasi kredit, dan jadwalkan follow-up untuk mendukung proses closing.</p>
+          </article>
+          <article class="hero-service-card">
+            <span class="hero-service-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 13v-1a8 8 0 0 1 16 0v1M4 12h4v7H4ZM16 12h4v7h-4ZM20 19c0 2-4 2-7 2"/></svg></span>
+            <h2>Customer service</h2>
+            <p>Jawab pertanyaan pelanggan lewat AI dan lanjutkan ke agen manusia dalam satu inbox omnichannel.</p>
+          </article>
+          <article class="hero-service-card">
+            <span class="hero-service-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 5h16v12h-8l-5 4v-4H4Z"/><path d="m8 11 3 3 5-6"/></svg></span>
+            <h2>After-sales support</h2>
+            <p>Tangani pertanyaan setelah pembelian dengan riwayat percakapan dan handoff ke tim dealer.</p>
+          </article>
+        </section>
+
+        <div class="container hero-ai-team">
+          <p class="hero-ai-team-label">Tim AI Motovax</p>
+          <div class="hero-ai-team-cards">
+            <button type="button" class="hero-ai-card" data-mode="internal" title="Falcon">
+              <span class="hero-ai-icon is-falcon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="22" height="22"><path fill="currentColor" d="M3.5 12.5c4.2-1.2 7.2-4.4 8.8-8.7 1.8 4.2 4.9 7.3 9.2 8.7-4.3 1.3-7.4 4.5-9.2 8.8-1.6-4.3-4.6-7.5-8.8-8.8Z"/></svg>
+              </span>
+              <span>
+                <b>Falcon</b>
+                <small>Jawab stok, harga &amp; produk</small>
+              </span>
+              <span class="hero-ai-chevron" aria-hidden="true">›</span>
+            </button>
+            <button type="button" class="hero-ai-card is-active" data-mode="lead" title="Fino">
+              <span class="hero-ai-icon is-fino" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="22" height="22"><path fill="currentColor" d="M4 18V9h3v9H4zm6.5 0V6h3v12h-3zM17 18v-7h3v7h-3z"/></svg>
+              </span>
+              <span>
+                <b>Fino</b>
+                <small>Simulasi kredit dari chat</small>
+              </span>
+              <span class="hero-ai-chevron" aria-hidden="true">›</span>
+            </button>
+            <button type="button" class="hero-ai-card" data-mode="cs" title="Jasmine">
+              <span class="hero-ai-icon is-jasmine" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="22" height="22"><path fill="currentColor" d="M5 4h14a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H9l-4 3v-3H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/></svg>
+              </span>
+              <span>
+                <b>Jasmine</b>
+                <small>Qualify, follow-up &amp; handoff</small>
+              </span>
+              <span class="hero-ai-chevron" aria-hidden="true">›</span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <section class="alt-core" id="produk" aria-labelledby="core-heading">
+        <span id="cara-kerja" hidden></span>
+        <span id="solusi" hidden></span>
+        <svg class="platform-icon-defs" aria-hidden="true">
+          <symbol id="pi-user" viewBox="0 0 24 24"><circle cx="12" cy="7" r="3"/><path d="M5 20c.6-4.2 3.1-6.4 7-6.4s6.4 2.2 7 6.4"/></symbol>
+          <symbol id="pi-chat" viewBox="0 0 24 24"><path d="M4 5.5h16v11H9l-5 3v-14Z"/><path d="M8 10h.01M12 10h.01M16 10h.01"/></symbol>
+          <symbol id="pi-box" viewBox="0 0 24 24"><path d="m4 7 8-4 8 4-8 4-8-4Z"/><path d="M4 7v10l8 4 8-4V7M12 11v10"/></symbol>
+          <symbol id="pi-building" viewBox="0 0 24 24"><path d="M4 21V8l8-5v18M12 9h8v12M8 9v2M8 14v2M16 13v2M16 18v3"/></symbol>
+          <symbol id="pi-magnet" viewBox="0 0 24 24"><path d="M6 4v8a6 6 0 0 0 12 0V4M6 8h4M14 8h4"/></symbol>
+          <symbol id="pi-spark" viewBox="0 0 24 24"><path d="m12 3 1.4 5.6L19 10l-5.6 1.4L12 17l-1.4-5.6L5 10l5.6-1.4L12 3ZM19 16l.6 2.4L22 19l-2.4.6L19 22l-.6-2.4L16 19l2.4-.6L19 16Z"/></symbol>
+          <symbol id="pi-route" viewBox="0 0 24 24"><path d="M4 7h11M12 4l3 3-3 3M20 17H9M12 14l-3 3 3 3"/></symbol>
+          <symbol id="pi-gear" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2"/></symbol>
+          <symbol id="pi-bell" viewBox="0 0 24 24"><path d="M6 17h12l-2-3V9a4 4 0 0 0-8 0v5l-2 3ZM10 20h4"/></symbol>
+          <symbol id="pi-chart" viewBox="0 0 24 24"><path d="M4 20V10M10 20V5M16 20v-7M22 20H2"/></symbol>
+          <symbol id="pi-calendar" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 10h18M8 14h.01M12 14h.01M16 14h.01"/></symbol>
+          <symbol id="pi-team" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="10" r="2"/><path d="M3 20c.5-4 2.5-6 6-6s5.5 2 6 6M15 15c3 0 5 1.7 5.5 5"/></symbol>
+          <symbol id="pi-headset" viewBox="0 0 24 24"><path d="M4 14v-2a8 8 0 0 1 16 0v2M4 14v4h4v-6H4M20 14v4h-4v-6h4M16 20h-4"/></symbol>
+          <symbol id="pi-eye" viewBox="0 0 24 24"><path d="M2 12s4-6 10-6 10 6 10 6-4 6-10 6S2 12 2 12Z"/><circle cx="12" cy="12" r="2.5"/></symbol>
+          <symbol id="pi-check" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m8 12 2.5 2.5L16 9"/></symbol>
+          <symbol id="pi-trophy" viewBox="0 0 24 24"><path d="M7 4h10v5a5 5 0 0 1-10 0V4ZM7 6H3v2a4 4 0 0 0 4 4M17 6h4v2a4 4 0 0 1-4 4M12 14v4M8 21h8"/></symbol>
+        </svg>
+        <div class="container">
+          <header class="alt-core-heading">
+            <h2 id="core-heading" class="alt-hand">One Data. One Platform. <span>Every Lead Connected.</span></h2>
+            <p class="alt-core-lead">Motovax menyatukan data, workflow, dan pelaporan dalam satu platform operasional bisnis.</p>
+          </header>
+
+          <div class="one-platform-map">
+            <div class="one-platform-stages" aria-label="Fondasi operasional Motovax">
+              <article class="platform-stage">
+                <span class="platform-number">01</span>
+                <div><h3>One Data</h3><p>Satu sumber data bisnis yang lengkap dan selalu terhubung.</p><ul class="stage-icons"><li><svg><use href="#pi-user"/></svg>Customer</li><li><svg><use href="#pi-chat"/></svg>Percakapan</li><li><svg><use href="#pi-box"/></svg>Stok</li><li><svg><use href="#pi-building"/></svg>Cabang</li><li><svg><use href="#pi-magnet"/></svg>Sumber lead</li></ul></div>
+              </article>
+              <article class="platform-stage">
+                <span class="platform-number">02</span>
+                <div><h3>Workflow Engine</h3><p>Otomasi cerdas yang mengubah konteks menjadi tindakan.</p><ul class="stage-icons"><li><svg><use href="#pi-spark"/></svg>AI actions</li><li><svg><use href="#pi-route"/></svg>Task routing</li><li><svg><use href="#pi-gear"/></svg>Automation</li><li><svg><use href="#pi-bell"/></svg>Reminder</li><li><svg><use href="#pi-calendar"/></svg>Scheduling</li><li><svg><use href="#pi-team"/></svg>Handoff</li></ul></div>
+              </article>
+              <article class="platform-stage">
+                <span class="platform-number">03</span>
+                <div><h3>One Platform</h3><p>Semua tim bekerja di sistem operasional yang sama.</p><ul class="stage-icons"><li><svg><use href="#pi-spark"/></svg>AI</li><li><svg><use href="#pi-headset"/></svg>Call Center</li><li><svg><use href="#pi-user"/></svg>MR</li><li><svg><use href="#pi-chart"/></svg>Sales</li><li><svg><use href="#pi-team"/></svg>Management</li></ul></div>
+              </article>
+              <article class="platform-stage is-impact">
+                <span class="platform-number">04</span>
+                <div><h3>Business Impact</h3><p>Dampak nyata pada performa dan pertumbuhan bisnis.</p><ul class="stage-icons"><li><svg><use href="#pi-spark"/></svg>Respons cepat</li><li><svg><use href="#pi-eye"/></svg>Visibilitas</li><li><svg><use href="#pi-check"/></svg>Follow-up</li><li><svg><use href="#pi-trophy"/></svg>Lebih banyak deal</li></ul></div>
+              </article>
+            </div>
+
+            <figure class="one-platform-screen">
+              <div class="platform-screen-bar" aria-hidden="true"><i></i><i></i><i></i><span>Motovax Operating System</span></div>
+              <picture>
+                <source type="image/webp" srcset="./assets/feature-previews/product-crm-pipeline-720.webp?v=one-platform-pipeline-20260904 720w, ./assets/feature-previews/product-crm-pipeline-1200.webp?v=one-platform-pipeline-20260904 1200w" sizes="(max-width: 760px) calc(100vw - 48px), 560px" />
+                <img src="./assets/feature-previews/product-crm-pipeline.png?v=one-platform-pipeline-20260904" width="1600" height="1000" alt="Pipeline CRM Motovax dengan data demo: tahap Cold, Warm, Prospect, Hot, serta ringkasan deal dan handover." decoding="async" />
+              </picture>
+              <figcaption><img src="./icons/logo-motovax.png" width="216" height="47" alt="Motovax" /><span>AI-Powered Operating System</span></figcaption>
+            </figure>
+
+            <div class="one-platform-outcomes" aria-label="Hasil operasional Motovax">
+              <article><span aria-hidden="true">◉</span><div><h3>Context</h3><p>Semua data terhubung dan memberi gambaran lengkap setiap lead.</p></div></article>
+              <article><span aria-hidden="true">⚙</span><div><h3>Action</h3><p>AI dan otomasi menjalankan tindakan tepat pada waktu yang tepat.</p></div></article>
+              <article><span aria-hidden="true">◎</span><div><h3>Alignment</h3><p>Call Center, MR, sales, dan manajemen bergerak dalam konteks yang sama.</p></div></article>
+              <article class="is-result"><span aria-hidden="true">↗</span><div><h3>Results</h3><p>Hasil lebih terukur, konsisten, dan berdampak pada pertumbuhan bisnis.</p></div></article>
+            </div>
+          </div>
+
+          <p class="one-platform-quote"><strong>One Data</strong> memberi semua tim konteks yang sama. <strong>One Platform</strong> mengubah konteks tersebut menjadi tindakan.</p>
+          <a class="alt-core-more" href="./fitur/core-platform-agentic-ai.html">Selengkapnya <span aria-hidden="true">→</span></a>
+        </div>
+      </section>
+
+      <section class="alt-feature" id="jasmine" aria-labelledby="jasmine-heading">
+        <div class="container alt-feature-grid">
+          <div class="alt-feature-copy">
+            <h2 id="jasmine-heading" class="alt-hand">AI Jasmine + Omni</h2>
+            <p class="alt-feature-kicker">Respons cepat, 24/7.</p>
+            <p>Satukan percakapan dari berbagai kanal. Jasmine merespons pelanggan secara otomatis, lalu agent dapat melanjutkan saat diperlukan.</p>
+            <a class="btn btn-primary alt-more" href="./fitur/omni-jasmine-ai.html">Selengkapnya <span>→</span></a>
+          </div>
+          <div class="alt-shot-stack" data-stack="jasmine">
+            <figure class="alt-shot alt-shot-back">
+              <button type="button" data-hero-image-open data-image-src="./assets/feature-previews/omnichannel-faneling-public.png?v=hero-cc-20260814" data-image-alt="Workspace Call Center Motovax: inbox multi-channel, jejak Jasmine AI, takeover Agent, dan handoff MR." data-image-title="AI Jasmine + Omni">
+                <picture>
+                  <source type="image/webp" srcset="./assets/feature-previews/omnichannel-faneling-public-720.webp?v=hero-cc-20260814 720w, ./assets/feature-previews/omnichannel-faneling-public-1200.webp?v=hero-cc-20260814 1200w" sizes="(max-width: 760px) calc(100vw - 40px), min(560px, 46vw)" />
+                  <img src="./assets/feature-previews/omnichannel-faneling-public.png?v=hero-cc-20260814" width="1440" height="900" alt="Workspace Call Center Motovax: inbox multi-channel, jejak Jasmine AI, takeover Agent, dan handoff MR." decoding="async" />
+                </picture>
+              </button>
+            </figure>
+            <figure class="alt-shot alt-shot-front">
+              <button type="button" data-hero-image-open data-image-src="./assets/feature-previews/omnichannel-multichannel-public.png?v=alt-home-20260819c" data-image-alt="Percakapan omnichannel Motovax dengan respons Jasmine, takeover Call Center, dan handoff ke MR." data-image-title="Inbox Jasmine">
+                <picture>
+                  <source type="image/webp" srcset="./assets/feature-previews/omnichannel-multichannel-public-720.webp?v=alt-home-20260819c 720w, ./assets/feature-previews/omnichannel-multichannel-public-1200.webp?v=alt-home-20260819c 1200w" sizes="(max-width: 760px) calc(100vw - 56px), min(520px, 42vw)" />
+                  <img src="./assets/feature-previews/omnichannel-multichannel-public.png?v=alt-home-20260819c" width="1440" height="900" alt="Percakapan omnichannel Motovax dengan respons Jasmine, takeover Call Center, dan handoff ke MR." decoding="async" />
+                </picture>
+              </button>
+            </figure>
+          </div>
+        </div>
+      </section>
+
+      <section class="alt-feature is-reverse" id="falcon" aria-labelledby="falcon-heading">
+        <div class="container alt-feature-grid">
+          <div class="alt-feature-copy">
+            <h2 id="falcon-heading" class="alt-hand">AI Falcon + Inventory</h2>
+            <p class="alt-feature-kicker">Satu sumber stok, siap dibagikan.</p>
+            <p>Kelola stok, status, foto, harga, dan lokasi dalam satu sumber data yang dapat langsung digunakan sales dan Falcon.</p>
+            <a class="btn btn-primary alt-more" href="./fitur/inventory-falcon-ai.html">Selengkapnya <span>→</span></a>
+          </div>
+          <figure class="alt-falcon-visual">
+            <button type="button" data-hero-image-open data-image-src="./assets/feature-previews/alt-falcon-phones.png?v=alt-home-20260819c" data-image-alt="Percakapan WhatsApp Falcon AI: catat lead baru dan kirim daftar stok ready dari inventory live." data-image-title="AI Falcon + Inventory">
+              <picture>
+                <source type="image/webp" srcset="./assets/feature-previews/alt-falcon-phones-720.webp?v=alt-home-20260819c 720w, ./assets/feature-previews/alt-falcon-phones-1200.webp?v=alt-home-20260819c 1200w" sizes="(max-width: 760px) calc(100vw - 32px), min(560px, 48vw)" />
+                <img src="./assets/feature-previews/alt-falcon-phones.png?v=alt-home-20260819c" width="742" height="805" alt="Percakapan WhatsApp Falcon AI: catat lead baru dan kirim daftar stok ready dari inventory live." decoding="async" />
+              </picture>
+            </button>
+          </figure>
+        </div>
+      </section>
+
+      <section class="alt-feature" id="ana" aria-labelledby="ana-heading">
+        <div class="container alt-feature-grid">
+          <div class="alt-feature-copy">
+            <h2 id="ana-heading" class="alt-hand">Ana AI Analytics</h2>
+            <p class="alt-feature-kicker">Ubah data jadi insight.</p>
+            <p>Pantau aktivitas lead dan performa sales untuk melihat apa yang terjadi dan menentukan langkah berikutnya.</p>
+            <a class="btn btn-primary alt-more" href="./fitur/ana-ai-analytics.html">Selengkapnya <span>→</span></a>
+          </div>
+          <div class="alt-shot-stack is-charts" data-stack="ana">
+            <figure class="alt-shot alt-shot-back">
+              <button type="button" data-hero-image-open data-image-src="./assets/feature-previews/product-finance-trend-public.png?v=alt-home-20260819c" data-image-alt="Dashboard finansial Ana: revenue, HPP, laba kotor, tren, dan perbandingan cabang." data-image-title="Ana AI Analytics">
+                <picture>
+                  <source type="image/webp" srcset="./assets/feature-previews/product-finance-trend-public-720.webp?v=alt-home-20260819c 720w, ./assets/feature-previews/product-finance-trend-public-1200.webp?v=alt-home-20260819c 1200w" sizes="(max-width: 760px) calc(100vw - 40px), min(560px, 46vw)" />
+                  <img src="./assets/feature-previews/product-finance-trend-public.png?v=alt-home-20260819c" width="1440" height="900" alt="Dashboard finansial Ana: revenue, HPP, laba kotor, tren, dan perbandingan cabang." decoding="async" />
+                </picture>
+              </button>
+            </figure>
+            <figure class="alt-shot alt-shot-front">
+              <button type="button" data-hero-image-open data-image-src="./assets/feature-previews/report-sales-trend-public.png?v=alt-home-20260819c" data-image-alt="Performa sales Ana: pipeline, konversi, tren pendapatan, dan peringatan lead yang perlu ditindaklanjuti." data-image-title="Performa sales">
+                <picture>
+                  <source type="image/webp" srcset="./assets/feature-previews/report-sales-trend-public-720.webp?v=alt-home-20260819c 720w, ./assets/feature-previews/report-sales-trend-public-1200.webp?v=alt-home-20260819c 1200w" sizes="(max-width: 760px) calc(100vw - 56px), min(520px, 42vw)" />
+                  <img src="./assets/feature-previews/report-sales-trend-public.png?v=alt-home-20260819c" width="1440" height="900" alt="Performa sales Ana: pipeline, konversi, tren pendapatan, dan peringatan lead yang perlu ditindaklanjuti." decoding="async" />
+                </picture>
+              </button>
+            </figure>
+          </div>
+        </div>
+        <div class="container">
+          <ul class="alt-pills">
+            <li>KPI utama dalam satu dashboard</li>
+            <li>Keputusan berbasis data aktual</li>
+            <li>Perbandingan lintas cabang</li>
+            <li>Visibilitas revenue dan margin</li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="alt-feature is-centered" id="sora" aria-labelledby="sora-heading">
+        <div class="container">
+          <header class="alt-feature-copy is-center">
+            <h2 id="sora-heading" class="alt-hand">AI Iris + Social Media</h2>
+            <p class="alt-feature-kicker">Social media lebih terarah.</p>
+            <p>Kelola konten dan aktivitas social media secara lebih konsisten dari satu alur kerja.</p>
+            <a class="btn btn-primary alt-more" href="./fitur/social-media-sora-ai.html">Selengkapnya <span>→</span></a>
+          </header>
+          <div class="alt-shot-stack is-social" data-stack="sora">
+            <figure class="alt-shot alt-shot-back">
+              <button type="button" data-hero-image-open data-image-src="./assets/feature-previews/product-social-pilih-kendaraan-public.png?v=alt-home-20260819c" data-image-alt="Studio Iris: pilih item ready dari inventory untuk dijadikan materi konten." data-image-title="Pilih produk">
+                <picture>
+                  <source type="image/webp" srcset="./assets/feature-previews/product-social-pilih-kendaraan-public-720.webp?v=alt-home-20260819c 720w, ./assets/feature-previews/product-social-pilih-kendaraan-public-1200.webp?v=alt-home-20260819c 1200w" sizes="(max-width: 760px) calc(100vw - 40px), min(640px, 62vw)" />
+                  <img src="./assets/feature-previews/product-social-pilih-kendaraan-public.png?v=alt-home-20260819c" width="1440" height="900" alt="Studio Iris: pilih item ready dari inventory untuk dijadikan materi konten." decoding="async" />
+                </picture>
+              </button>
+            </figure>
+            <figure class="alt-shot alt-shot-front">
+              <button type="button" data-hero-image-open data-image-src="./assets/feature-previews/product-social-studio.png?v=alt-home-20260819c" data-image-alt="Generator konten Iris: layer desain, harga, dan tools AI enhance serta background." data-image-title="Content studio Iris">
+                <picture>
+                  <source type="image/webp" srcset="./assets/feature-previews/product-social-studio-720.webp?v=alt-home-20260819c 720w, ./assets/feature-previews/product-social-studio-1200.webp?v=alt-home-20260819c 1200w" sizes="(max-width: 760px) calc(100vw - 56px), min(620px, 58vw)" />
+                  <img src="./assets/feature-previews/product-social-studio.png?v=alt-home-20260819c" width="1440" height="900" alt="Generator konten Iris: layer desain, harga, dan tools AI enhance serta background." decoding="async" />
+                </picture>
+              </button>
+            </figure>
+          </div>
+        </div>
+      </section>
+
+      <section class="alt-feature alt-crm" id="crm" aria-labelledby="crm-heading">
+        <div class="container alt-feature-grid">
+          <div class="alt-feature-copy">
+            <h2 id="crm-heading" class="alt-hand">CRM</h2>
+            <p class="alt-feature-kicker">Jangan biarkan lead terlewat.</p>
+            <p>Kelola lead, riwayat percakapan, status, dan follow-up dalam satu alur.</p>
+            <a class="btn btn-primary alt-more" href="./fitur/aplikasi-crm.html">Selengkapnya <span>→</span></a>
+          </div>
+          <figure class="alt-crm-visual">
+            <button type="button" data-hero-image-open data-image-src="./assets/feature-previews/alt-crm-workspace.png?v=alt-home-20260819c" data-image-alt="Workspace CRM Motovax: detail prospect, Sales Assistant AI, dan metrik pengunjung website di sekitar sales yang sedang follow-up." data-image-title="CRM Motovax">
+              <picture>
+                <source type="image/webp" srcset="./assets/feature-previews/alt-crm-workspace-720.webp?v=alt-home-20260819c 720w, ./assets/feature-previews/alt-crm-workspace-1200.webp?v=alt-home-20260819c 1200w" sizes="(max-width: 760px) calc(100vw - 24px), min(720px, 56vw)" />
+                <img src="./assets/feature-previews/alt-crm-workspace.png?v=alt-home-20260819c" width="1315" height="874" alt="Workspace CRM Motovax: detail prospect, Sales Assistant AI, dan metrik pengunjung website di sekitar sales yang sedang follow-up." decoding="async" />
+              </picture>
+            </button>
+            <figcaption>
+              <button type="button" data-hero-image-open data-image-src="./assets/feature-previews/alt-crm-workspace.png?v=alt-home-20260819c" data-image-alt="Workspace CRM Motovax: detail prospect, Sales Assistant AI, dan metrik pengunjung website di sekitar sales yang sedang follow-up." data-image-title="CRM Motovax">Buka ukuran penuh ↗</button>
+            </figcaption>
+          </figure>
+        </div>
+      </section>
+
+      <section class="home-section clients-section" id="our-clients" aria-labelledby="clients-heading">
+        <div class="container clients-inner">
+          <header class="clients-heading">
+            <p class="section-label">Our Clients</p>
+            <h2 id="clients-heading">Yang sudah memakai Motovax</h2>
+          </header>
+          <ul class="clients-logos">
+            <li>
+              <img src="./assets/clients/dss-motor.png?v=clients-20260815" width="130" height="129" alt="DSS Motor" decoding="async" />
+            </li>
+            <li>
+              <img src="./assets/clients/mobix.png?v=clients-20260815" width="152" height="118" alt="Mobix — Xtra aman, xtra yakin" decoding="async" />
+            </li>
+            <li>
+              <img src="./assets/clients/dsf.png?v=clients-20260815" width="218" height="124" alt="DSF" decoding="async" />
+            </li>
+            <li class="clients-more" aria-label="and many more">
+              <span>and many more</span>
+            </li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="home-cta" id="mulai">
+        <div class="container">
+          <div>
+            <span>SIAP MULAI COBA?</span>
+            <h2>Daftar sekarang dan gerakkan lead Anda.</h2>
+            <p>Buat akun Motovax, satukan kanal, stok, sales, serta follow-up — lalu coba alur kerja tim Anda hari ini.</p>
+          </div>
+          <div>
+            <a class="btn btn-light btn-large" href="https://onboard.motovax.com/onboarding.html?fresh=1">Daftar &amp; Mulai Coba <span>→</span></a>
+            <small>Gratis mulai onboarding. Sudah punya akun? <a href="https://onboard.motovax.com/login.html?reauth=1">Login</a></small>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div class="container footer-grid">
+        <div>
+          <a class="brand footer-brand" href="#top"><span>MOTO</span><strong>VAX</strong></a>
+          <p>Platform AI untuk menyatukan percakapan, lead, sales, dan operasional bisnis.</p>
+        </div>
+        <div>
+          <h3>Produk</h3>
+          <a href="./modul.html">Semua Produk</a>
+          <a href="./fitur/agentic-ai.html">Agentic AI</a>
+          <a href="./harga.html">Harga</a>
+        </div>
+        <div>
+          <h3>Perusahaan</h3>
+          <a href="./hubungi-kami.html">Hubungi Kami</a>
+          <a href="./kebijakan-privasi.html">Kebijakan Privasi</a>
+          <a href="./syarat-ketentuan.html">Syarat & Ketentuan</a>
+        </div>
+        <div>
+          <h3>Kontak</h3>
+          <p>hello@motovax.ai</p>
+          <a href="#" data-wa>WhatsApp kami →</a>
+        </div>
+      </div>
+      <div class="copyright">&copy; <span data-year></span> MOTOVAX. Hak cipta dilindungi.</div>
+    </footer>
+
+    <div class="feature-image-modal" data-hero-image-modal hidden role="dialog" aria-modal="true" aria-labelledby="heroImageModalTitle">
+      <div class="feature-image-modal-panel">
+        <header>
+          <div>
+            <span>SCREENSHOT PRODUK</span>
+            <strong id="heroImageModalTitle" data-hero-image-modal-title>Motovax Call Center</strong>
+          </div>
+          <button type="button" data-hero-image-close aria-label="Tutup screenshot">×</button>
+        </header>
+        <div class="feature-image-modal-scroll">
+          <img data-hero-image-modal-img src="" alt="">
+        </div>
+      </div>
+    </div>
+    <a class="whatsapp-float" href="https://wa.me/6281999197186?text=Halo%20MOTOVAX%2C%20saya%20ingin%20jadwalkan%20demo." data-wa target="_blank" rel="noopener noreferrer" aria-label="Chat WhatsApp Motovax (buka tab baru)">
+      <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor" aria-hidden="true" focusable="false"><path d="M20.52 3.48A11.9 11.9 0 0 0 12.05 0C5.47 0 .12 5.35.12 11.93c0 2.1.55 4.16 1.6 5.97L0 24l6.25-1.64a11.9 11.9 0 0 0 5.8 1.48h.01c6.57 0 11.92-5.35 11.93-11.93a11.85 11.85 0 0 0-3.47-8.43ZM12.06 21.83a9.9 9.9 0 0 1-5.04-1.38l-.36-.21-3.71.97.99-3.62-.24-.37a9.87 9.87 0 0 1-1.52-5.29c0-5.47 4.45-9.92 9.93-9.92a9.86 9.86 0 0 1 7.01 2.91 9.85 9.85 0 0 1 2.9 7.02c0 5.46-4.45 9.91-9.96 9.89Zm5.44-7.42c-.3-.15-1.76-.87-2.04-.97-.27-.1-.47-.15-.67.15-.2.3-.77.97-.94 1.16-.17.2-.35.22-.65.07-.3-.15-1.26-.46-2.39-1.47-.89-.79-1.49-1.77-1.66-2.07-.18-.3-.02-.46.13-.61.13-.13.3-.35.45-.52.15-.18.2-.3.3-.5.1-.2.05-.37-.03-.52-.07-.15-.67-1.61-.91-2.21-.24-.58-.48-.5-.67-.51h-.57c-.2 0-.52.07-.8.37-.27.3-1.04 1.02-1.04 2.48s1.07 2.87 1.22 3.07c.15.2 2.1 3.21 5.09 4.5.71.31 1.27.49 1.7.63.71.22 1.36.19 1.87.11.57-.09 1.76-.72 2.01-1.41.25-.7.25-1.29.17-1.42-.07-.12-.27-.2-.57-.35Z"/></svg>
+      <span>Chat WhatsApp</span>
+    </a>
+    <script src="./script.js?v=hero-generic-20260910"></script>
   </body>
 </html>

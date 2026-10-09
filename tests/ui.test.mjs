@@ -89,17 +89,68 @@ const publicNavigationPages = [
 
 for (const viewport of viewports) {
   test(`navigasi halaman publik konsisten pada ${viewport.name}`, async () => {
-    const context=await browser.newContext({viewport});const page=await context.newPage();
-    await page.route(/https:\/\/fonts\.(?:googleapis|gstatic)\.com\//,route=>route.abort());
-    for(const route of publicNavigationPages){
-      await page.goto(`${baseUrl}${route}`,{waitUntil:'load'});
-      assert.equal(await page.locator('.mv-header').count(),1,route);
-      assert.equal(await page.locator('.mv-footer').count(),1,route);
-      if(viewport.width<=900) await page.locator('.mv-menu-toggle').click();
-      assert.deepEqual((await page.locator('#mv-navigation>a').allTextContents()).map(x=>x.trim()),['Produk','Tim AI','Solusi','Studi Kasus','Harga','Hubungi Kami','Login ↗']);
-      assert.equal(await page.locator('#mv-navigation .btn-primary').getAttribute('href'),'https://onboard.motovax.com/login.html?reauth=1');
-      assert.equal(await noOverflow(page),true,route);
+    const context = await browser.newContext({ viewport });
+    const page = await context.newPage();
+    await page.route(/https:\/\/fonts\.(?:googleapis|gstatic)\.com\//, (route) => route.abort());
+
+    for (const route of publicNavigationPages) {
+      await page.goto(`${baseUrl}${route}`, { waitUntil: "load" });
+      const scheduleDemoLinks = await page.locator("a, button").evaluateAll((elements) =>
+        elements.filter((element) => /^Jadwalkan Demo(?:\s*(?:→|->))?$/i.test(element.textContent.replace(/\s+/g, " ").trim())).length,
+      );
+      assert.equal(scheduleDemoLinks, 0, route);
+      if (viewport.width > 1024) {
+        const labels = await page.locator(".site-header .nav").evaluate((nav) =>
+          [...nav.children].map((item) => {
+            const target = item.matches("a") ? item : item.querySelector(":scope > button");
+            return target?.textContent.replace(/\s+/g, " ").trim() || "";
+          }),
+        );
+        const expectedNav = route === "/index.html"
+          ? ["Produk", "Kapabilitas", "Harga", "Hubungi Kami"]
+          : ["Produk", "Cara Kerja", "Solusi", "Harga", "Hubungi Kami"];
+        assert.deepEqual(labels, expectedNav, route);
+      } else {
+        await page.click("[data-mobile-nav-trigger]");
+        const mobileState = await page.locator("[data-mobile-nav-panel]:not([hidden]) .mobile-nav-links > a, [data-mobile-nav-panel]:not([hidden]) .mobile-nav-links > details > summary").evaluateAll((links) => ({
+          labels: links.map((link) => link.textContent),
+          allVisible: links.every((link) => {
+            const rect = link.getBoundingClientRect();
+            return rect.width > 0 && rect.height > 0 && rect.top >= 0 && rect.bottom <= window.innerHeight;
+          }),
+          bodyLocked: document.body.classList.contains("mobile-menu-open"),
+        }));
+        assert.deepEqual(
+          mobileState.labels.map((label) => label.replace(/[→+]/g, "").trim()),
+          ["Produk", "Cara Kerja", "Solusi", "Harga", "Hubungi Kami"],
+          route,
+        );
+        assert.equal(mobileState.allVisible, true, route);
+        assert.equal(mobileState.bodyLocked, true, route);
+        const login = page.locator(".site-header .header-login");
+        if (await login.count()) {
+          const loginBox = await login.boundingBox();
+          const triggerBox = await page.locator("[data-mobile-nav-trigger]").boundingBox();
+          assert.ok(loginBox && triggerBox, route);
+          assert.ok(Math.abs(loginBox.y - triggerBox.y) <= 4, `header wrap on ${route}`);
+        }
+        const urlBeforeProduk = page.url();
+        await page.locator('[data-mobile-nav-panel]:not([hidden]) summary', { hasText: "Produk" }).click();
+        assert.equal(page.url(), urlBeforeProduk, route);
+        assert.equal(await page.locator("[data-mobile-nav-panel]:not([hidden]) .mobile-product-suite").count(), 6, route);
+        assert.equal(await page.locator("[data-mobile-nav-panel]:not([hidden])").getByRole("link", { name: "Core Platform", exact: true }).isVisible(), true, route);
+        assert.equal(await page.locator('[data-mobile-nav-panel]:not([hidden]) a', { hasText: "Lead / Customer List" }).count(), 0, route);
+        const compactMenuFits = await page.locator("[data-mobile-nav-panel]:not([hidden])").evaluate((element) =>
+          element.scrollHeight <= element.clientHeight + 1,
+        );
+        assert.equal(compactMenuFits, true, route);
+        await page.keyboard.press("Escape");
+        assert.equal(await page.locator("[data-mobile-nav-panel]").isHidden(), true, route);
+        assert.equal(await page.locator("body").evaluate((body) => body.classList.contains("mobile-menu-open")), false, route);
+      }
+      assert.equal(await noOverflow(page), true, route);
     }
+
     await context.close();
   });
 }
@@ -1052,38 +1103,131 @@ for (const viewport of viewports) {
   test(`landing tidak menampilkan portal akun pada ${viewport.name}`, async () => {
     const context = await browser.newContext({ viewport });
     const page = await context.newPage();
-    await page.route(/https:\/\/fonts\.(?:googleapis|gstatic)\.com\//, route => route.abort());
+    await page.route(/https:\/\/fonts\.(?:googleapis|gstatic)\.com\//, (route) => route.abort());
     await page.goto(`${baseUrl}/index.html`, { waitUntil: "load" });
-    assert.equal(await page.locator('[data-portal-account], [data-portal-workspace], [data-portal-billing]').count(),0);
-    assert.equal(await page.locator('#mv-navigation .btn-primary').getAttribute('href'),'https://onboard.motovax.com/login.html?reauth=1');
-    assert.equal(await page.locator('a[href="https://onboard.motovax.com/onboarding.html?fresh=1"]').count(),3);
-    assert.equal(await noOverflow(page),true);
+    assert.equal(await page.locator("[data-portal-account], [data-portal-workspace], [data-portal-billing]").count(), 0);
+    assert.equal(await page.getByRole("link", { name: "Login/Daftar", exact: true }).count(), 1);
+    assert.equal(await page.getAttribute('.site-header .header-login', "href"), "https://onboard.motovax.com/login.html?reauth=1");
+    assert.equal(await page.locator('a[href="https://onboard.motovax.com/onboarding.html?fresh=1"]').count(), 2);
+    assert.equal(await noOverflow(page), true);
+    await page.screenshot({ path: `/tmp/motovax-stateless-landing-${viewport.name}.png`, fullPage: false });
     await context.close();
   });
 
   test(`navigasi beranda responsif pada ${viewport.name}`, async () => {
     const context = await browser.newContext({ viewport });
     const page = await context.newPage();
-    await page.route(/https:\/\/fonts\.(?:googleapis|gstatic)\.com\//, route => route.abort());
+    await page.route(/https:\/\/fonts\.(?:googleapis|gstatic)\.com\//, (route) => route.abort());
+    await page.route("https://onboard.motovax.com/api/portal/me", (route) => route.abort());
     await page.goto(`${baseUrl}/index.html`, { waitUntil: "load" });
-    const trigger=page.locator('.mv-menu-toggle');const panel=page.locator('#mv-navigation');
-    if(viewport.width>900){assert.equal(await trigger.isHidden(),true);assert.equal(await panel.isVisible(),true);}
-    else {assert.equal(await trigger.isVisible(),true);await trigger.click();assert.equal(await trigger.getAttribute('aria-expanded'),'true');assert.equal(await panel.isVisible(),true);await page.keyboard.press('Escape');assert.equal(await panel.isHidden(),true);assert.equal(await trigger.getAttribute('aria-expanded'),'false');}
-    assert.equal(await noOverflow(page),true);
+
+    const trigger = page.locator("[data-mobile-nav-trigger]");
+    const panel = page.locator("[data-mobile-nav-panel]");
+    assert.equal(await trigger.count(), 1);
+
+    if (viewport.width > 1024) {
+      assert.equal(await trigger.isHidden(), true);
+      assert.equal(await page.locator(".nav").isVisible(), true);
+    } else {
+      assert.equal(await trigger.isVisible(), true);
+      assert.equal(await trigger.getAttribute("aria-expanded"), "false");
+      await trigger.click();
+      assert.equal(await trigger.getAttribute("aria-expanded"), "true");
+      assert.equal(await panel.isVisible(), true);
+      assert.equal(await panel.locator("summary", { hasText: "Produk" }).isVisible(), true);
+      assert.equal(await panel.locator("a", { hasText: "Cara Kerja" }).isVisible(), true);
+      assert.equal(await panel.locator("a", { hasText: "Harga" }).isVisible(), true);
+      const urlBeforeProduk = page.url();
+      await panel.locator("summary", { hasText: "Produk" }).click();
+      assert.equal(page.url(), urlBeforeProduk);
+      assert.equal(await panel.locator(".mobile-product-suite").count(), 6);
+      assert.equal(await panel.getByRole("link", { name: /Jasmine AI \+ Omnichannel/ }).isVisible(), true);
+      assert.equal(await panel.getByRole("link", { name: /Falcon AI \+ Inventory/ }).isVisible(), true);
+      assert.equal(await panel.getByRole("link", { name: /Iris AI \+ Social Media/ }).isVisible(), true);
+      assert.equal(await panel.getByRole("link", { name: /Semua produk/ }).isVisible(), true);
+      assert.equal(await panel.locator("a", { hasText: "WhatsApp, Instagram & Facebook" }).count(), 0);
+      const compactProductMenu = await panel.evaluate((element) => ({
+        clientHeight: element.clientHeight,
+        scrollHeight: element.scrollHeight,
+      }));
+      assert.ok(compactProductMenu.scrollHeight <= compactProductMenu.clientHeight + 1);
+      await page.screenshot({ path: `/tmp/motovax-mobile-products-compact-${viewport.name}.png`, fullPage: false });
+      await panel.locator("summary", { hasText: "Produk" }).click();
+      await panel.locator("summary", { hasText: "Solusi" }).click();
+      assert.equal(await panel.locator("a", { hasText: "Solusi dealer secara menyeluruh" }).isVisible(), true);
+      assert.equal(await panel.locator("a", { hasText: "Tangkap & respons setiap lead" }).isVisible(), true);
+      assert.equal(await panel.locator("a", { hasText: "Putar stok lebih cepat" }).isVisible(), true);
+      assert.equal(await panel.locator("a", { hasText: "Owner & Manajemen" }).isVisible(), true);
+      const panelBox = await panel.boundingBox();
+      assert.ok(panelBox);
+      assert.ok(Math.abs(panelBox.y + panelBox.height - viewport.height) <= 1);
+      assert.ok(panelBox.height > viewport.height / 2);
+      assert.equal(await page.locator("body").evaluate((body) => getComputedStyle(body).overflow), "hidden");
+      await page.screenshot({ path: `/tmp/motovax-mobile-navigation-open-${viewport.name}.png`, fullPage: false });
+      await panel.evaluate((element) => element.scrollTo({ top: element.scrollHeight, behavior: "instant" }));
+      const mobileCtaBox = await panel.locator(".mobile-nav-cta").boundingBox();
+      assert.ok(mobileCtaBox);
+      assert.ok(mobileCtaBox.y >= panelBox.y - 1);
+      assert.ok(mobileCtaBox.y + mobileCtaBox.height <= viewport.height + 1);
+      await page.keyboard.press("Escape");
+      assert.equal(await panel.isHidden(), true);
+      assert.equal(await trigger.getAttribute("aria-expanded"), "false");
+      await page.waitForTimeout(250);
+    }
+
+    assert.equal(await noOverflow(page), true);
+    await page.screenshot({ path: `/tmp/motovax-mobile-navigation-${viewport.name}.png`, fullPage: false });
     await context.close();
   });
 
   test(`positioning dealer mobil konsisten pada ${viewport.name}`, async () => {
     const context = await browser.newContext({ viewport });
     const page = await context.newPage();
-    await page.route(/https:\/\/fonts\.(?:googleapis|gstatic)\.com\//, route => route.abort());
+    await page.route(/https:\/\/fonts\.(?:googleapis|gstatic)\.com\//, (route) => route.abort());
+
     await page.goto(`${baseUrl}/index.html`, { waitUntil: "load" });
-    assert.match(await page.locator('.mv-hero-copy').innerText(),/dealer mobil/i);
-    assert.match(await page.locator('#solusi').innerText(),/test drive|after-sales/i);
-    await page.goto(`${baseUrl}/solusi/otomotif.html`,{waitUntil:'load'});
-    await page.waitForSelector('[data-industry-root] h1');
-    assert.match(await page.locator('main').innerText(),/dealer mobil/i);
-    assert.equal(await noOverflow(page),true);
+    assert.equal(
+      await page.locator("[data-typewriter]").getAttribute("data-phrases"),
+      "One Stock.|More Sales.|Faster Response.|Unlimited Growth.",
+    );
+    assert.equal(await noOverflow(page), true);
+
+    await page.goto(`${baseUrl}/solusi/otomotif.html`, { waitUntil: "load" });
+    await page.waitForSelector("[data-industry-root] h1");
+    const bodyText = await page.locator("body").innerText();
+    assert.match(bodyText, /dealer mobil/i);
+    assert.doesNotMatch(bodyText, /Pendidikan|Keuangan|Kesehatan|Tour & Travel|Perhotelan|Logistik|FMCG|Ritel|Outsourcing|Property/i);
+
+    if (viewport.width > 1024) {
+      await page.click("[data-solusi-trigger]");
+      assert.equal(
+        await page.locator('[data-solusi-panel]:not([hidden]) .solusi-mega-item', { hasText: "Tangkap & respons setiap lead" }).isVisible(),
+        true,
+      );
+      assert.equal(
+        await page.locator('[data-solusi-panel]:not([hidden]) .solusi-mega-item', { hasText: "Kendalikan performa semua cabang" }).isVisible(),
+        true,
+      );
+      assert.equal(await page.locator('[data-solusi-panel]:not([hidden]) .solusi-outcome-item').count(), 5);
+      assert.equal(await page.locator('[data-solusi-panel]:not([hidden]) .solusi-role-group', { hasText: "Owner & Manajemen" }).isVisible(), true);
+      assert.equal(await page.locator('[data-solusi-panel]:not([hidden]) .solusi-mega-contact').getAttribute("href"), "../hubungi-kami.html");
+      const solutionPanelBox = await page.locator('[data-solusi-panel]:not([hidden])').boundingBox();
+      assert.ok(solutionPanelBox);
+      assert.ok(solutionPanelBox.y + solutionPanelBox.height <= viewport.height + 1);
+      await page.screenshot({ path: `/tmp/motovax-solutions-menu-${viewport.name}.png`, fullPage: false });
+      await page.keyboard.press("Escape");
+      assert.equal(await page.locator("[data-solusi-panel]").isHidden(), true);
+      assert.equal(await page.locator("[data-solusi-trigger]").evaluate((element) => element === document.activeElement), true);
+    } else {
+      await page.click("[data-mobile-nav-trigger]");
+      await page.locator('[data-mobile-nav-panel]:not([hidden]) summary', { hasText: "Solusi" }).click();
+      assert.equal(await page.locator('[data-mobile-nav-panel]:not([hidden]) a', { hasText: "Tangkap & respons setiap lead" }).isVisible(), true);
+      assert.equal(await page.locator('[data-mobile-nav-panel]:not([hidden]) .mobile-solutions-grid > a').count(), 5);
+      await page.screenshot({ path: `/tmp/motovax-solutions-menu-${viewport.name}.png`, fullPage: false });
+    }
+
+    assert.equal(await noOverflow(page), true);
+    await page.screenshot({ path: `/tmp/motovax-dealer-positioning-${viewport.name}.png`, fullPage: false });
     await context.close();
   });
 }
