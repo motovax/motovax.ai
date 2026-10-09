@@ -46,5 +46,12 @@ menggunakan spesifikasi visual dan struktur pada body task.
 
 ## Production
 
+motovax.ai menggunakan GitHub Pages (`main`, root), bukan app Coolify default organisasi.
+Build Pages untuk commit `2a7742a` berhasil. Target Coolify default `mtvx-app` ternyata
+repo produk utama; deploy awal terpicu ke target default tersebut. Aplikasi yang memakai
+repo landing adalah `motovax-onboarding` (`onboard.motovax.com`); deploy lanjutan
+diarahkan dengan override `COOLIFY_APP_UUID` per invocation, tanpa mengubah konfigurasi
+organisasi bersama. Dockerfile disesuaikan agar folder `shared/` ikut tersedia.
+
 Pemeriksaan production dilakukan setelah deployment. Detail disimpan terpisah pada
 `production-measurements.json` agar hasil lokal dan live bisa dibandingkan.
