@@ -1,11 +1,52 @@
 import { chromium } from 'playwright';
 import { mkdir, writeFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
+import { existsSync, readdirSync } from 'node:fs';
+import { homedir } from 'node:os';
 import path from 'node:path';
+
+function libraryDirectories(root) {
+  if (!existsSync(root)) return [];
+  const directories = [root];
+  for (const entry of readdirSync(root, { withFileTypes: true })) {
+    if (entry.isDirectory()) directories.push(...libraryDirectories(path.join(root, entry.name)));
+  }
+  return directories;
+}
+
 const root = fileURLToPath(new URL('../', import.meta.url));
 const out = path.join(root, 'assets/presentation');
 await mkdir(out, { recursive: true });
-const browser = await chromium.launch({ headless: true, executablePath: process.env.CHROMIUM_PATH || undefined, args: ['--no-sandbox'] });
+
+const chromiumRoot = path.join(homedir(), '.local/chromium-root');
+const alpineChromiumPath = path.join(chromiumRoot, 'usr/lib/chromium/chromium');
+const chromiumPath = process.env.CHROMIUM_PATH || [
+  alpineChromiumPath,
+  '/usr/lib/chromium/chromium',
+  '/usr/bin/chromium',
+  '/usr/bin/chromium-browser',
+].find((c) => existsSync(c));
+const useAlpineChromium = existsSync(alpineChromiumPath);
+const libraryPath = [
+  ...libraryDirectories(path.join(chromiumRoot, 'lib')),
+  ...libraryDirectories(path.join(chromiumRoot, 'usr/lib')),
+].join(':');
+
+const browser = await chromium.launch({
+  headless: true,
+  executablePath: chromiumPath || undefined,
+  args: ['--no-sandbox', '--disable-gpu', '--disable-gpu-compositing'],
+  env: useAlpineChromium
+    ? {
+        ...process.env,
+        LD_LIBRARY_PATH: libraryPath,
+        FONTCONFIG_PATH: path.join(chromiumRoot, 'etc/fonts'),
+        FONTCONFIG_FILE: path.join(chromiumRoot, 'etc/fonts/fonts.conf'),
+        FONTCONFIG_SYSROOT: chromiumRoot,
+        XDG_DATA_DIRS: path.join(chromiumRoot, 'usr/share'),
+      }
+    : process.env,
+});
 try {
   const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
   const cdp = await page.context().newCDPSession(page);
