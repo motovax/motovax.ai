@@ -86,71 +86,69 @@ const viewports = [
 ];
 
 for (const viewport of viewports) {
-  test(`hero #top memakai mockup chat WhatsApp 3 AI pada ${viewport.name}`, async () => {
+  test(`hero #top menampilkan AI Omnichannel Workspace dan Bento Grid pada ${viewport.name}`, async () => {
     const context = await browser.newContext({
       viewport,
       reducedMotion: "reduce",
     });
     const page = await context.newPage();
     await page.route(/https:\/\/fonts\.(?:googleapis|gstatic)\.com\//, (route) => route.abort());
-    await page.goto(`${baseUrl}/index.html?v=hero-generic-20260910`, { waitUntil: "load" });
+    await page.goto(`${baseUrl}/index.html?v=omni-20261011`, { waitUntil: "load" });
 
-    const stage = page.locator("[data-hero-chat]");
-    await stage.scrollIntoViewIfNeeded();
-    await page.waitForFunction(() => document.querySelector("#waThread")?.children.length > 0);
+    const hero = page.locator("main#top .home-hero");
+    await hero.scrollIntoViewIfNeeded();
 
     const metrics = await page.evaluate(() => {
-      const stageEl = document.querySelector("[data-hero-chat]");
-      const thread = document.querySelector("#waThread");
-      const name = document.querySelector("#waName")?.textContent || "";
-      const copy = document.querySelector(".home-hero-copy")?.innerText || "";
-      const team = document.querySelector(".hero-ai-team")?.innerText || "";
-      const modes = [...document.querySelectorAll(".wa-rail [data-mode]")].map((btn) => btn.getAttribute("data-mode"));
-      const composer = document.querySelector(".wa-input");
-      const demo = document.querySelector(".home-hero-actions .btn-primary");
+      const heroEl = document.querySelector("main#top .home-hero");
+      const title = document.querySelector(".hero-sell-headline")?.innerText || "";
+      const kicker = document.querySelector(".alt-hero-kicker")?.innerText || "";
+      const assurance = [...document.querySelectorAll(".home-assurance span")].map((b) => b.textContent.trim());
+      const previewImg = document.querySelector(".hero-workspace-omnichannel img");
+      const ctaRegister = document.querySelector(".home-hero-actions .btn-primary");
+      const ctaDemo = document.querySelector(".home-hero-actions .btn-secondary");
+      const bentoSection = document.querySelector(".omni-bento-section");
+      const bentoCards = [...document.querySelectorAll(".omni-bento-grid article")].map((c) => c.querySelector("h3")?.innerText || "");
       return {
-        hasStage: Boolean(stageEl),
-        threadCount: thread?.children.length || 0,
-        name,
-        copy,
-        team,
-        modes,
-        demoHref: demo instanceof HTMLAnchorElement ? demo.getAttribute("href") : "",
-        composerWa: composer instanceof HTMLAnchorElement ? composer.href : "",
+        hasHero: Boolean(heroEl),
+        title,
+        kicker,
+        assurance,
+        previewSrc: previewImg?.getAttribute("src") || "",
+        previewNaturalWidth: previewImg?.naturalWidth || 0,
+        ctaRegisterHref: ctaRegister instanceof HTMLAnchorElement ? ctaRegister.getAttribute("href") : "",
+        ctaDemoHref: ctaDemo instanceof HTMLAnchorElement ? ctaDemo.getAttribute("href") : "",
+        hasBento: Boolean(bentoSection),
+        bentoCardCount: bentoCards.length,
+        bentoCards,
         overflow: document.documentElement.scrollWidth > document.documentElement.clientWidth + 1,
       };
     });
 
-    assert.equal(metrics.hasStage, true, JSON.stringify(metrics));
-    assert.ok(metrics.threadCount >= 3, JSON.stringify(metrics));
-    assert.equal(metrics.name, "Mobix Bintaro", JSON.stringify(metrics));
-    assert.match(metrics.copy, /Ubah lebih banyak/i);
-    assert.match(metrics.copy, /chat jadi penjualan/i);
-    assert.match(metrics.copy, /Lead tidak tercecer/i);
-    assert.match(metrics.copy, /AI Sales & CRM/i);
-    assert.doesNotMatch(metrics.copy, /otomotif/i);
-    assert.doesNotMatch(metrics.copy, /dealer mobil/i);
-    const phrases = await page.locator("[data-typewriter]").getAttribute("data-phrases");
-    assert.match(String(phrases), /lead jadi closing/);
-    assert.doesNotMatch(String(phrases), /stock|unit|otomotif/i);
-    assert.match(metrics.team, /Falcon/);
-    assert.match(metrics.team, /Fino/);
-    assert.match(metrics.team, /Jasmine/);
-    assert.equal(metrics.demoHref, "./hubungi-kami.html");
-    assert.deepEqual(metrics.modes, ["lead", "cs", "internal"], JSON.stringify(metrics));
-    assert.match(metrics.composerWa, /wa\.me\/6281999197186/);
-    assert.equal(metrics.overflow, false, JSON.stringify(metrics));
+    assert.equal(metrics.hasHero, true, JSON.stringify(metrics));
+    assert.match(metrics.title, /Semua Channel.*Satu Dashboard/i);
+    assert.match(metrics.kicker, /AI OMNICHANNEL/i);
+    assert.ok(metrics.assurance.some((a) => a.includes("Multi-channel")));
+    assert.ok(metrics.assurance.some((a) => a.includes("Human Takeover")));
+    assert.match(metrics.previewSrc, /omnichannel-workspace-mobix-real/);
+    assert.ok(metrics.previewNaturalWidth > 0, "preview gambar belum terdecode");
+    assert.equal(metrics.ctaRegisterHref, "https://onboard.motovax.com/onboarding.html?fresh=1");
+    assert.equal(metrics.ctaDemoHref, "./hubungi-kami.html");
+    assert.equal(metrics.hasBento, true);
+    assert.equal(metrics.bentoCardCount, 5);
+    assert.equal(metrics.overflow, false, `Overflow detected on ${viewport.name}: scrollWidth > clientWidth`);
 
-    await page.locator('.wa-rail [data-mode="cs"]').click();
-    await page.waitForFunction(() => document.querySelector("#waName")?.textContent === "Mobix Care");
-    assert.match(await page.locator("#waThread").innerText(), /Stargazer|balik nama|pajak/i);
-
-    await page.locator('.hero-ai-card[data-mode="internal"]').click();
-    await page.waitForFunction(() => document.querySelector("#waName")?.textContent === "Falcon · Internal");
-    assert.match(await page.locator("#waThread").innerText(), /Rekap Stok|Falcon/i);
+    if (viewport.name === "mobile") {
+      const openBtn = page.locator(".omni-preview-frame [data-hero-image-open]");
+      await openBtn.click();
+      const modal = page.locator("[data-hero-image-modal]");
+      assert.equal(await modal.isHidden(), false);
+      assert.equal(await page.locator("body").evaluate((b) => getComputedStyle(b).overflow), "hidden");
+      await page.keyboard.press("Escape");
+      assert.equal(await modal.isHidden(), true);
+    }
 
     await page.screenshot({
-      path: `/tmp/motovax-hero-wa-${viewport.name}.png`,
+      path: `/tmp/motovax-hero-omni-${viewport.name}.png`,
       fullPage: false,
     });
 
