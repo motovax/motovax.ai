@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f7f9fd">
+  <meta name="description" content="Prototipe interaktif Omnichannel Preview Motovax: AI Jasmine, human takeover, dan Falcon Copilot.">
+  <title>Live Interactive Demo — AI Omnichannel Motovax | mobix.motovax.com</title>
+  <link rel="stylesheet" href="./assets/demo/demo.css?v=20261011">
+  <script src="./assets/demo/demo.js?v=20261011" defer></script>
+</head>
+<body data-theme="light">
+  <!-- SVG icons: inline sprite, no dependencies or external fonts. -->
+  <svg class="svg-sprite" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <symbol id="i-sparkles" viewBox="0 0 24 24"><path d="m12 3 1.7 5.3L19 10l-5.3 1.7L12 17l-1.7-5.3L5 10l5.3-1.7L12 3ZM5 17l.7 2.3L8 20l-2.3.7L5 23l-.7-2.3L2 20l2.3-.7L5 17ZM19 14l.6 1.4L21 16l-1.4.6L19 18l-.6-1.4L17 16l1.4-.6L19 14Z"/></symbol>
+    <symbol id="i-inbox" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="M3 14h5l2 3h4l2-3h5"/></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m16 16 5 5"/></symbol>
+    <symbol id="i-send" viewBox="0 0 24 24"><path d="m22 2-7 20-4-9-9-4 20-7ZM11 13 22 2"/></symbol>
+    <symbol id="i-bot" viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="14" rx="4"/><path d="M12 3v4m-5 8h.01M17 15h.01M8 19h8"/></symbol>
+    <symbol id="i-person" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></symbol>
+    <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14m-6-6 6 6-6 6"/></symbol>
+    <symbol id="i-chevron" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></symbol>
+    <symbol id="i-close" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></symbol>
+    <symbol id="i-database" viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14c0 1.7 4 3 9 3s9-1.3 9-3V5M3 12c0 1.7 4 3 9 3s9-1.3 9-3"/></symbol>
+    <symbol id="i-car" viewBox="0 0 24 24"><path d="m5 11 2-5h10l2 5M5 17v2m14-2v2M4 11h16l1 3v4H3v-4l1-3Zm3 3h2m6 0h2"/></symbol>
+    <symbol id="i-copy" viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="13" rx="2"/><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"/></symbol>
+    <symbol id="i-shield" viewBox="0 0 24 24"><path d="m12 2 9 4v6c0 5-4 8.5-9 10-5-1.5-9-5-9-10V6l9-4Zm-4 10 3 3 5-6"/></symbol>
+    <symbol id="i-moon" viewBox="0 0 24 24"><path d="M20 15.4A9 9 0 0 1 8.6 4 9 9 0 1 0 20 15.4Z"/></symbol>
+    <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.9 4.9l1.4 1.4m11.4 11.4 1.4 1.4M2 12h2m16 0h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12 5 5L20 7"/></symbol>
+    <symbol id="i-sliders" viewBox="0 0 24 24"><path d="M4 7h16M4 17h16M9 4v6m6 4v6"/></symbol>
+    <symbol id="i-panel" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16"/></symbol>
+    <symbol id="i-wand" viewBox="0 0 24 24"><path d="m4 20 14-14 2 2L6 22l-2-2ZM14 3V1m6 11h2M6 6 4 4"/></symbol>
+  </svg>
+
+  <main class="page">
+    <header class="site-header container" aria-label="Motovax prototype header">
+      <div style="display:flex;align-items:center;gap:16px;">
+        <a class="brand" href="./index.html" aria-label="Motovax website">
+          <span class="brand-mark" aria-hidden="true"><span></span><span></span><span></span><span></span></span>
+          <span class="brand-name">motovax<span class="brand-point">.</span>ai</span>
+        </a>
+        <a class="nav-back-link" href="./index.html">← Kembali ke Beranda</a>
+      </div>
+      <div class="header-right">
+        <span class="top-status"><span class="pulse-dot"></span> Live Mobix Simulation</span>
+        <button class="icon-button theme-switch" type="button" id="theme-switch" aria-label="Ganti ke mode gelap" title="Ganti tema">
+          <svg class="icon" aria-hidden="true"><use href="#i-moon"></use></svg>
+        </button>
+        <a class="nav-cta-btn" href="https://onboard.motovax.com/onboarding.html?fresh=1">Mulai Gratis ↗</a>
+      </div>
+    </header>
+
+    <section class="hero container" aria-labelledby="hero-title">
+      <div class="eyebrow"><span class="eyebrow-shine"><svg class="icon" aria-hidden="true"><use href="#i-sparkles"></use></svg></span> MOTOVAX INTERACTIVE EXPERIENCE <span class="eyebrow-version">/ 01</span></div>
+      <h1 id="hero-title">Satu inbox. Semua channel.<br><span class="gradient-text">AI yang benar-benar bekerja.</span></h1>
+      <p>Rasakan bagaimana Jasmine AI melayani pelanggan, operator mengambil alih percakapan, dan Falcon menghubungkan chat dengan data dealer—dalam satu workspace.</p>
+      <div class="hero-proof" aria-label="Kemampuan yang didemonstrasikan">
+        <span><svg class="icon" aria-hidden="true"><use href="#i-check"></use></svg> 4 kanal komunikasi</span>
+        <span><svg class="icon" aria-hidden="true"><use href="#i-check"></use></svg> AI + human takeover</span>
+        <span><svg class="icon" aria-hidden="true"><use href="#i-check"></use></svg> Falcon MIS copilot</span>
+      </div>
+    </section>
+
+    <section class="preview-section container" aria-label="Preview interaktif dashboard Omnichannel Motovax">
+      <div class="stage-notice"><span class="notice-light"></span> <strong>Mode demo interaktif</strong> <span>Data unit, harga, stok, dan pembiayaan di bawah adalah simulasi untuk presentasi.</span></div>
+      <div class="workspace" id="omni-preview">
+        <header class="workspace-topbar">
+          <div class="workspace-brand"><span class="app-logo">M</span><span class="app-name">MOTOVAX <span class="app-subname">/ Omnichannel Inbox</span></span></div>
+          <div class="workspace-topright">
+            <button type="button" class="mobix-badge-btn" data-hero-image-open data-image-src="./assets/feature-previews/omnichannel-workspace-mobix-real.png" data-image-title="Workspace Call Center Omnichannel (Live mobix.motovax.com)" data-image-alt="Screenshot Workspace Call Center Omnichannel live dari mobix.motovax.com"><span class="pulse-dot"></span> Buka Screenshot Asli Mobix ↗</button>
+            <button class="workspace-icon-button" type="button" id="reset-demo" title="Reset seluruh percakapan" aria-label="Reset demo"><svg class="icon" aria-hidden="true"><use href="#i-sliders"></use></svg></button>
+            <div class="avatar avatar-admin" aria-label="Admin demo">AD</div>
+          </div>
+        </header>
+
+        <nav class="channel-bar" aria-label="Pilih kanal komunikasi" role="tablist">
+          <button class="channel-tab active" role="tab" aria-selected="true" aria-controls="chat-panel" data-channel="whatsapp" type="button"><span class="channel-symbol wa">W</span><span>WhatsApp</span><span class="channel-counter">08</span></button>
+          <button class="channel-tab" role="tab" aria-selected="false" aria-controls="chat-panel" data-channel="instagram" type="button"><span class="channel-symbol ig">◎</span><span>Instagram DM</span><span class="channel-counter">04</span></button>
+          <button class="channel-tab" role="tab" aria-selected="false" aria-controls="chat-panel" data-channel="messenger" type="button"><span class="channel-symbol fb">f</span><span>Messenger</span><span class="channel-counter">06</span></button>
+          <button class="channel-tab" role="tab" aria-selected="false" aria-controls="chat-panel" data-channel="webchat" type="button"><span class="channel-symbol web">&lt;/&gt;</span><span>In-App Chat</span><span class="channel-counter">03</span></button>
+        </nav>
+
+        <div class="mobile-pane-switcher" role="group" aria-label="Tampilan dashboard mobile">
+          <button class="mobile-pane-btn" type="button" data-mobile-pane="inbox">Inbox <span class="unread-bubble">3</span></button>
+          <button class="mobile-pane-btn selected" type="button" data-mobile-pane="chat">Percakapan</button>
+        </div>
+
+        <div class="workspace-body" data-mobile-view="chat">
+          <aside class="inbox-pane" aria-label="Daftar percakapan">
+            <div class="pane-heading">
+              <div><span class="kicker">TEAM INBOX</span><h2>Conversation <span class="count" id="inbox-count">08</span></h2></div>
+              <span class="mini-icon"><svg class="icon" aria-hidden="true"><use href="#i-inbox"></use></svg></span>
+            </div>
+            <label class="inbox-search"><svg class="icon" aria-hidden="true"><use href="#i-search"></use></svg><input id="search-contact" type="search" placeholder="Cari percakapan..." autocomplete="off" aria-label="Cari percakapan"></label>
+            <div class="inbox-filter"><span class="filter-pill on">Semua lead</span><span class="filter-pill">Belum dibaca</span></div>
+            <div id="contact-list" class="contact-list" role="list" aria-label="Pelanggan"></div>
+            <div class="inbox-bottom"><span class="online-avatars"><b>JA</b><b>FN</b><b>AD</b></span><span>AI &amp; operator terhubung</span></div>
+          </aside>
+
+          <section class="chat-pane" id="chat-panel" role="tabpanel" aria-label="Percakapan aktif">
+            <header class="chat-heading">
+              <div class="chat-customer">
+                <div class="avatar avatar-customer" id="customer-avatar">NP</div>
+                <div><h2 id="customer-name">Nadia Putri</h2><span class="contact-meta" id="customer-meta">WhatsApp · Prospek mobil</span></div>
+              </div>
+              <div class="chat-header-actions">
+                <span class="lead-label" id="lead-label">HOT LEAD</span>
+                <button class="falcon-shortcut" type="button" data-action="open-falcon"><svg class="icon" aria-hidden="true"><use href="#i-sparkles"></use></svg><span>Falcon Copilot</span></button>
+              </div>
+            </header>
+
+            <div class="control-strip" aria-live="polite">
+              <span id="ai-status" class="ai-status ai-on"><svg class="icon" aria-hidden="true"><use href="#i-bot"></use></svg> AI Aktif</span>
+              <span class="control-description" id="ownership-caption">Jasmine menangani pesan otomatis</span>
+              <button id="takeover-btn" class="takeover-button" type="button"><svg class="icon" aria-hidden="true"><use href="#i-person"></use></svg><span>Ambil Alih</span></button>
+            </div>
+
+            <div class="scenario-row" aria-label="Pertanyaan demo">
+              <div class="scenario-label">COBA SKENARIO</div>
+              <div class="scenario-buttons">
+                <button class="scenario-btn" type="button" data-scenario="stock"><svg class="icon" aria-hidden="true"><use href="#i-car"></use></svg> Cek Stok HR-V Ready</button>
+                <button class="scenario-btn" type="button" data-scenario="finance"><svg class="icon" aria-hidden="true"><use href="#i-sparkles"></use></svg> Simulasi DP 50 Juta</button>
+              </div>
+            </div>
+
+            <div class="messages" id="messages" role="log" aria-label="Riwayat chat" aria-live="polite" aria-relevant="additions text"></div>
+            <div class="composer-wrap">
+              <form id="chat-form" class="composer" autocomplete="off">
+                <label class="sr-only" for="chat-input">Ketik pesan sebagai operator</label>
+                <input id="chat-input" type="text" placeholder="Ambil alih untuk mengetik sebagai operator..." maxlength="500" disabled>
+                <button type="submit" id="send-button" class="send-button" aria-label="Kirim pesan" disabled><svg class="icon" aria-hidden="true"><use href="#i-send"></use></svg></button>
+              </form>
+              <div class="composer-footer"><span id="composer-hint">Aktifkan Takeover untuk mengirim pesan manual</span><span><svg class="icon" aria-hidden="true"><use href="#i-shield"></use></svg> Demo tanpa pengiriman nyata</span></div>
+            </div>
+          </section>
+
+          <aside class="context-pane" aria-label="Konteks lead dan Falcon Copilot">
+            <div class="context-section">
+              <div class="context-title-row"><span class="kicker">CUSTOMER INTELLIGENCE</span><svg class="icon" aria-hidden="true"><use href="#i-panel"></use></svg></div>
+              <h2>Lead Context</h2>
+              <div class="lead-profile"><div class="profile-avatar" id="profile-avatar">NP</div><div><strong id="profile-name">Nadia Putri</strong><span id="profile-origin">Lead dari WhatsApp</span></div><span class="verified-dot">✓</span></div>
+              <div class="context-tags"><span class="tag tag-red" id="context-stage">● HOT</span><span class="tag">Automotive</span></div>
+              <div class="context-info"><div><span>Minat unit</span><strong>Honda HR-V SE 2022</strong></div><div><span>Budget DP</span><strong>Rp50 juta</strong></div><div><span>Penanggung jawab</span><strong id="handler-name">Jasmine AI</strong></div></div>
+            </div>
+            <div class="context-section car-widget">
+              <div class="context-title-row"><span class="kicker">UNIT INTEREST</span><span class="stock-pill">● Stok Mobix</span></div>
+              <div class="car-visual" style="padding:4px;height:auto;aspect-ratio:16/9;background:#0d1629;">
+                <img src="./assets/feature-previews/inventory-falcon-photos-public.png" alt="Foto unit inventori dealer live dari Mobix" class="car-unit-thumb" />
+              </div>
+              <div class="car-model"><strong>Honda HR-V SE 2022</strong><span>Stok multi-cabang terverifikasi MIS</span></div>
+              <div class="car-bottom"><strong>Rp 280.000.000</strong><span>3 unit ready</span></div>
+              <button type="button" class="mobix-screenshot-trigger" data-hero-image-open data-image-src="./assets/feature-previews/omnichannel-workspace-mobix-real.png" data-image-title="Workspace Call Center Omnichannel (Live mobix.motovax.com)" data-image-alt="Screenshot Workspace Call Center Omnichannel live dari mobix.motovax.com">
+                <svg class="icon"><use href="#i-search"></use></svg> Buka Screenshot Asli Mobix (1440×900)
+              </button>
+            </div>
+            <div class="copilot-promo"><div class="copilot-top"><span class="copilot-icon"><svg class="icon" aria-hidden="true"><use href="#i-sparkles"></use></svg></span><span>FALCON ENGINE</span></div><h3>Tanya data dealer dengan bahasa alami.</h3><p>Cek stok, unit alternatif, aging inventory, hingga SOP langsung dari Copilot.</p><button type="button" class="copilot-open" data-action="open-falcon">Buka Falcon Copilot <svg class="icon" aria-hidden="true"><use href="#i-arrow"></use></svg></button></div>
+          </aside>
+        </div>
+
+        <div class="drawer-backdrop" id="drawer-backdrop" hidden></div>
+        <aside class="falcon-drawer" id="falcon-drawer" role="dialog" aria-modal="true" aria-label="Falcon AI Copilot" aria-hidden="true" tabindex="-1">
+          <div class="drawer-heading"><div><span class="kicker">INTELLIGENCE LAYER</span><h2><span class="falcon-mark"><svg class="icon" aria-hidden="true"><use href="#i-sparkles"></use></svg></span> Falcon Copilot</h2></div><button class="drawer-close icon-button" id="falcon-close" aria-label="Tutup Falcon Copilot" type="button"><svg class="icon" aria-hidden="true"><use href="#i-close"></use></svg></button></div>
+          <div class="falcon-tabs" role="tablist" aria-label="Tipe pengetahuan Falcon"><button type="button" class="falcon-tab active" data-falcon-tab="mis" role="tab" aria-selected="true">Tanya Falcon (MIS &amp; Stok)</button><button type="button" class="falcon-tab" data-falcon-tab="kb" role="tab" aria-selected="false">Knowledge Base</button></div>
+          <div class="drawer-content">
+            <div class="falcon-illustration"><span class="falcon-star"><svg class="icon" aria-hidden="true"><use href="#i-sparkles"></use></svg></span><div><strong>Falcon memahami data dealer</strong><span id="falcon-intro">Tanyakan ketersediaan unit, alternatif mobil, atau aging stok.</span></div></div>
+            <form id="falcon-form" class="falcon-form"><label for="falcon-query">Tanyakan sesuatu pada Falcon</label><div class="falcon-input-wrap"><input id="falcon-query" type="text" placeholder="Misal: HR-V serupa yang ready?" maxlength="180"><button type="submit" aria-label="Tanya Falcon"><svg class="icon" aria-hidden="true"><use href="#i-arrow"></use></svg></button></div></form>
+            <div class="suggestions"><span>PERTANYAAN CEPAT</span><div id="falcon-suggestions"></div></div>
+            <div class="falcon-result" id="falcon-result" aria-live="polite"></div>
+          </div>
+          <div class="falcon-footnote"><svg class="icon" aria-hidden="true"><use href="#i-database"></use></svg><span>Mode simulasi. Integrasi MIS/Knowledge Base belum terhubung pada prototipe.</span></div>
+        </aside>
+      </div>
+      <div class="preview-caption"><span><svg class="icon" aria-hidden="true"><use href="#i-wand"></use></svg> Pilih kanal, jalankan skenario, ambil alih chat, lalu coba Falcon.</span><span>Built for automotive dealerships <span class="caption-sep">/</span> Vanilla JS + CSS</span></div>
+    </section>
+    <footer class="footer container"><p>Motovax Omnichannel Interactive Preview <span>·</span> Prototype only — bukan sistem produksi</p><a href="https://motovax.ai/" target="_blank" rel="noopener noreferrer">motovax.ai <svg class="icon" aria-hidden="true"><use href="#i-arrow"></use></svg></a></footer>
+  </main>
+  <div class="toast" id="toast" role="status" aria-live="polite" aria-atomic="true"></div>
+
+  <!-- Modal Screenshot Asli Mobix (Ukuran Penuh) -->
+  <div class="feature-image-modal" data-hero-image-modal hidden role="dialog" aria-modal="true" aria-labelledby="heroImageModalTitle">
+    <div class="feature-image-modal-panel">
+      <header>
+        <div>
+          <span>SCREENSHOT PRODUKSI MOBIX.MOTOVAX.COM</span>
+          <strong id="heroImageModalTitle" data-hero-image-modal-title>Workspace Call Center Omnichannel (Live Mobix)</strong>
+        </div>
+        <button type="button" data-hero-image-close aria-label="Tutup screenshot">×</button>
+      </header>
+      <div class="feature-image-modal-scroll">
+        <img data-hero-image-modal-img src="" alt="Screenshot live Mobix">
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>
