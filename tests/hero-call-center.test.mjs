@@ -93,7 +93,7 @@ for (const viewport of viewports) {
     });
     const page = await context.newPage();
     await page.route(/https:\/\/fonts\.(?:googleapis|gstatic)\.com\//, (route) => route.abort());
-    await page.goto(`${baseUrl}/index.html?v=omni-20261011`, { waitUntil: "load" });
+    await page.goto(`${baseUrl}/index-callcenter.html?v=omni-20261011`, { waitUntil: "load" });
 
     const hero = page.locator("main#top .home-hero");
     await hero.scrollIntoViewIfNeeded();

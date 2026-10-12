@@ -76,7 +76,7 @@ const viewports = [
 ];
 
 const publicNavigationPages = [
-  "/index.html",
+  "/index-callcenter.html",
   "/modul.html",
   "/fitur/index.html",
   "/fitur/aplikasi-omnichannel.html",
@@ -106,7 +106,7 @@ for (const viewport of viewports) {
             return target?.textContent.replace(/\s+/g, " ").trim() || "";
           }),
         );
-        const expectedNav = route === "/index.html"
+        const expectedNav = route === "/index-callcenter.html"
           ? ["Produk", "Kapabilitas", "Harga", "Hubungi Kami"]
           : ["Produk", "Cara Kerja", "Solusi", "Harga", "Hubungi Kami"];
         assert.deepEqual(labels, expectedNav, route);
@@ -1104,7 +1104,7 @@ for (const viewport of viewports) {
     const context = await browser.newContext({ viewport });
     const page = await context.newPage();
     await page.route(/https:\/\/fonts\.(?:googleapis|gstatic)\.com\//, (route) => route.abort());
-    await page.goto(`${baseUrl}/index.html`, { waitUntil: "load" });
+    await page.goto(`${baseUrl}/index-callcenter.html`, { waitUntil: "load" });
     assert.equal(await page.locator("[data-portal-account], [data-portal-workspace], [data-portal-billing]").count(), 0);
     assert.equal(await page.getByRole("link", { name: "Login/Daftar", exact: true }).count(), 1);
     assert.equal(await page.getAttribute('.site-header .header-login', "href"), "https://onboard.motovax.com/login.html?reauth=1");
@@ -1119,7 +1119,7 @@ for (const viewport of viewports) {
     const page = await context.newPage();
     await page.route(/https:\/\/fonts\.(?:googleapis|gstatic)\.com\//, (route) => route.abort());
     await page.route("https://onboard.motovax.com/api/portal/me", (route) => route.abort());
-    await page.goto(`${baseUrl}/index.html`, { waitUntil: "load" });
+    await page.goto(`${baseUrl}/index-callcenter.html`, { waitUntil: "load" });
 
     const trigger = page.locator("[data-mobile-nav-trigger]");
     const panel = page.locator("[data-mobile-nav-panel]");
@@ -1185,7 +1185,7 @@ for (const viewport of viewports) {
     const page = await context.newPage();
     await page.route(/https:\/\/fonts\.(?:googleapis|gstatic)\.com\//, (route) => route.abort());
 
-    await page.goto(`${baseUrl}/index.html`, { waitUntil: "load" });
+    await page.goto(`${baseUrl}/index-callcenter.html`, { waitUntil: "load" });
     assert.equal(
       await page.locator("[data-typewriter]").getAttribute("data-phrases"),
       "One Stock.|More Sales.|Faster Response.|Unlimited Growth.",
@@ -1302,7 +1302,7 @@ test("session portal legacy di landing langsung handoff ke workspace", async () 
   });
   await page.route("https://dealer-test.motovax.com/**", (route) => route.fulfill({ status: 200, contentType: "text/html", body: "<title>Workspace Dealer</title>" }));
 
-  await page.goto(`${baseUrl}/index.html#portal_session=${token}&portal_action=enter_workspace`, { waitUntil: "domcontentloaded" });
+  await page.goto(`${baseUrl}/index-callcenter.html#portal_session=${token}&portal_action=enter_workspace`, { waitUntil: "domcontentloaded" });
   await page.waitForURL("https://dealer-test.motovax.com/**");
   assert.equal(enterRequestCount, 1);
   assert.equal(new URL(page.url()).searchParams.get("token"), "legacy-handoff");

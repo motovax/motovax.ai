@@ -92,7 +92,7 @@ for (const viewport of viewports) {
     const context = await browser.newContext({ viewport });
     const page = await context.newPage();
     await page.route(/https:\/\/fonts\.(?:googleapis|gstatic)\.com\//, (route) => route.abort());
-    await page.goto(`${baseUrl}/index.html`, { waitUntil: "load" });
+    await page.goto(`${baseUrl}/index-callcenter.html`, { waitUntil: "load" });
 
     const section = page.locator("#our-clients");
     await section.scrollIntoViewIfNeeded();
