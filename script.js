@@ -1,4 +1,4 @@
-const whatsappNumber = "6281999197186";
+const whatsappNumber = "6281703302438";
 const defaultWhatsappText = "Halo MOTOVAX, saya ingin jadwalkan demo.";
 
 function buildWhatsAppUrl(text = defaultWhatsappText) {
@@ -375,7 +375,7 @@ if (contactForm instanceof HTMLFormElement) {
       .filter(Boolean)
       .join("\n");
 
-    window.open(`https://wa.me/6281999197186?text=${encodeURIComponent(message)}`, "_blank", "noopener,noreferrer");
+    window.open(`https://wa.me/6281703302438?text=${encodeURIComponent(message)}`, "_blank", "noopener,noreferrer");
   });
 }
 

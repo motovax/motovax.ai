@@ -322,7 +322,7 @@
     </div>`;
 
   const whatsappUrl =
-    "https://wa.me/6281999197186?text=Halo%20MOTOVAX%2C%20saya%20ingin%20jadwalkan%20demo.";
+    "https://wa.me/6281703302438?text=Halo%20MOTOVAX%2C%20saya%20ingin%20jadwalkan%20demo.";
   for (const link of root.querySelectorAll("[data-wa]")) {
     if (link instanceof HTMLAnchorElement) {
       link.href = whatsappUrl;

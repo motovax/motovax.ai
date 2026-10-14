@@ -5,8 +5,8 @@ import { fileURLToPath } from "node:url";
 import path from "node:path";
 
 const root = path.dirname(fileURLToPath(new URL("../package.json", import.meta.url)));
-const waNumber = "6281999197186";
-const displayNumber = "+62 819-9919-7186";
+const waNumber = "6281703302438";
+const displayNumber = "+62 817 0330 2438";
 
 function read(rel) {
   return readFileSync(path.join(root, rel), "utf8");
