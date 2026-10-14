@@ -55,3 +55,20 @@ test("halaman Hubungi Kami menampilkan nomor WhatsApp sales", () => {
   assert.match(html, new RegExp(displayNumber.replace("+", "\\+")));
   assert.match(html, new RegExp(`wa\\.me/${waNumber}`));
 });
+
+test("footer Kontak di index.html menampilkan nomor WhatsApp sales", () => {
+  const html = read("index.html");
+  const footer = html.slice(html.indexOf("<footer"));
+  assert.match(footer, new RegExp(`Kontak[\\s\\S]*${displayNumber.replace("+", "\\+")}`));
+  assert.match(footer, new RegExp(`wa\\.me/${waNumber}`));
+  assert.doesNotMatch(footer, /WhatsApp kami →/);
+});
+
+test("footer Kontak di index-callcenter.html menampilkan nomor WhatsApp sales", () => {
+  const html = read("index-callcenter.html");
+  const footer = html.slice(html.indexOf("<footer"));
+  assert.match(footer, new RegExp(`Kontak[\\s\\S]*${displayNumber.replace("+", "\\+")}`));
+  assert.match(footer, new RegExp(`wa\\.me/${waNumber}`));
+  assert.doesNotMatch(footer, /WhatsApp kami →/);
+});
+
