@@ -232,3 +232,74 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* Legal documents remain readable and keyboard accessible at every viewport. */
+.legal-skip {
+  position: fixed;
+  top: 12px;
+  left: 12px;
+  z-index: 1000;
+  padding: 12px 18px;
+  border-radius: 8px;
+  color: #fff;
+  background: #1258ca;
+  transform: translateY(-180%);
+}
+
+.legal-skip:focus {
+  transform: translateY(0);
+}
+
+.legal-page a:focus-visible,
+.legal-page button:focus-visible {
+  outline: 3px solid #1267f5;
+  outline-offset: 4px;
+}
+
+.legal-document {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  scroll-margin-top: 110px;
+}
+
+.legal-nav {
+  gap: 2px;
+}
+
+.legal-nav a {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 5px 0;
+}
+
+@media (min-width: 901px) {
+  .legal-intro {
+    max-height: calc(100dvh - 130px);
+    overflow-y: auto;
+    padding: 0 8px 8px 0;
+  }
+}
+
+@media print {
+  .legal-header, .legal-nav, .legal-footer, .legal-skip {
+    display: none;
+  }
+  .legal-shell {
+    display: block;
+  }
+  .legal-intro {
+    position: static;
+    max-height: none;
+    overflow: visible;
+  }
+  .legal-document {
+    margin-top: 24px;
+    padding: 0;
+    border: 0;
+    box-shadow: none;
+  }
+  .legal-section {
+    break-inside: avoid;
+  }
+}
